@@ -14,7 +14,7 @@
 /*
   Default solver configuration: In any environment, clp is the default if you
   do nothing.
-  
+
   The necessary definitions will be handled by the configure script (based on
   the value specified for --with-osicbc-default-solver) in any environment
   where configure is available. The results can be found in inc/config_osi.h,
@@ -87,7 +87,7 @@ OsiCbcSolverInterface::setStrParam(OsiStrParam key, const std::string & value)
 //-----------------------------------------------------------------------------
 
 bool
-OsiCbcSolverInterface::getIntParam(OsiIntParam key, int& value) const 
+OsiCbcSolverInterface::getIntParam(OsiIntParam key, int& value) const
 {
   return modelPtr_->solver()->getIntParam(key,value);
 }
@@ -235,7 +235,7 @@ const CoinPackedMatrix * OsiCbcSolverInterface::getMatrixByCol() const
 
 //------------------------------------------------------------------
 std::vector<double*> OsiCbcSolverInterface::getDualRays(int maxNumRays,
-							bool fullRay) const
+              bool fullRay) const
 {
   return modelPtr_->solver()->getDualRays(maxNumRays,fullRay);
 }
@@ -269,12 +269,12 @@ OsiCbcSolverInterface::setInteger(const int* indices, int len)
   modelPtr_->solver()->setInteger(indices,len);
 }
 //-----------------------------------------------------------------------------
-void OsiCbcSolverInterface::setColSolution(const double * cs) 
+void OsiCbcSolverInterface::setColSolution(const double * cs)
 {
   modelPtr_->solver()->setColSolution(cs);
 }
 //-----------------------------------------------------------------------------
-void OsiCbcSolverInterface::setRowPrice(const double * rs) 
+void OsiCbcSolverInterface::setRowPrice(const double * rs)
 {
   modelPtr_->solver()->setRowPrice(rs);
 }
@@ -282,71 +282,71 @@ void OsiCbcSolverInterface::setRowPrice(const double * rs)
 //#############################################################################
 // Problem modifying methods (matrix)
 //#############################################################################
-void 
+void
 OsiCbcSolverInterface::addCol(const CoinPackedVectorBase& vec,
-			      const double collb, const double colub,   
-			      const double obj)
+            const double collb, const double colub,
+            const double obj)
 {
   modelPtr_->solver()->addCol(vec,collb,colub,obj);
 }
 /* Add a column (primal variable) to the problem. */
-void 
+void
 OsiCbcSolverInterface::addCol(int numberElements, const int * rows, const double * elements,
-			   const double collb, const double colub,   
-			   const double obj) 
+         const double collb, const double colub,
+         const double obj)
 {
   modelPtr_->solver()->addCol(numberElements, rows, elements,
                               collb,colub,obj);
 }
 //-----------------------------------------------------------------------------
-void 
+void
 OsiCbcSolverInterface::addCols(const int numcols,
-			       const CoinPackedVectorBase * const * cols,
-			       const double* collb, const double* colub,   
-			       const double* obj)
+             const CoinPackedVectorBase * const * cols,
+             const double* collb, const double* colub,
+             const double* obj)
 {
   modelPtr_->solver()->addCols(numcols,cols,collb,colub,obj);
 }
 //-----------------------------------------------------------------------------
-void 
+void
 OsiCbcSolverInterface::deleteCols(const int num, const int * columnIndices)
 {
   modelPtr_->solver()->deleteCols(num,columnIndices);
 }
 //-----------------------------------------------------------------------------
-void 
+void
 OsiCbcSolverInterface::addRow(const CoinPackedVectorBase& vec,
-			      const double rowlb, const double rowub)
+            const double rowlb, const double rowub)
 {
   modelPtr_->solver()->addRow(vec,rowlb,rowub);
 }
 //-----------------------------------------------------------------------------
-void 
+void
 OsiCbcSolverInterface::addRow(const CoinPackedVectorBase& vec,
-			      const char rowsen, const double rowrhs,   
-			      const double rowrng)
+            const char rowsen, const double rowrhs,
+            const double rowrng)
 {
   modelPtr_->solver()->addRow(vec,rowsen,rowrhs,rowrng);
 }
 //-----------------------------------------------------------------------------
-void 
+void
 OsiCbcSolverInterface::addRows(const int numrows,
-			       const CoinPackedVectorBase * const * rows,
-			       const double* rowlb, const double* rowub)
+             const CoinPackedVectorBase * const * rows,
+             const double* rowlb, const double* rowub)
 {
   modelPtr_->solver()->addRows(numrows,rows,rowlb,rowub);
 }
 //-----------------------------------------------------------------------------
-void 
+void
 OsiCbcSolverInterface::addRows(const int numrows,
-			       const CoinPackedVectorBase * const * rows,
-			       const char* rowsen, const double* rowrhs,   
-			       const double* rowrng)
+             const CoinPackedVectorBase * const * rows,
+             const char* rowsen, const double* rowrhs,
+             const double* rowrng)
 {
   modelPtr_->solver()->addRows(numrows,rows,rowsen,rowrhs,rowrng);
 }
 //-----------------------------------------------------------------------------
-void 
+void
 OsiCbcSolverInterface::deleteRows(const int num, const int * rowIndices)
 {
   modelPtr_->solver()->deleteRows(num,rowIndices);
@@ -358,9 +358,9 @@ OsiCbcSolverInterface::deleteRows(const int num, const int * rowIndices)
 
 void
 OsiCbcSolverInterface::loadProblem(const CoinPackedMatrix& matrix,
-				   const double* collb, const double* colub,   
-				   const double* obj,
-				   const double* rowlb, const double* rowub)
+           const double* collb, const double* colub,
+           const double* obj,
+           const double* rowlb, const double* rowub)
 {
   modelPtr_->solver()->loadProblem(matrix,collb,colub,obj,rowlb,rowub);
 }
@@ -369,9 +369,9 @@ OsiCbcSolverInterface::loadProblem(const CoinPackedMatrix& matrix,
 
 void
 OsiCbcSolverInterface::assignProblem(CoinPackedMatrix*& matrix,
-				     double*& collb, double*& colub,
-				     double*& obj,
-				     double*& rowlb, double*& rowub)
+             double*& collb, double*& colub,
+             double*& obj,
+             double*& rowlb, double*& rowub)
 {
   modelPtr_->solver()->assignProblem(matrix,collb,colub,obj,rowlb,rowub);
 }
@@ -380,10 +380,10 @@ OsiCbcSolverInterface::assignProblem(CoinPackedMatrix*& matrix,
 
 void
 OsiCbcSolverInterface::loadProblem(const CoinPackedMatrix& matrix,
-				   const double* collb, const double* colub,
-				   const double* obj,
-				   const char* rowsen, const double* rowrhs,   
-				   const double* rowrng)
+           const double* collb, const double* colub,
+           const double* obj,
+           const char* rowsen, const double* rowrhs,
+           const double* rowrng)
 {
   modelPtr_->solver()->loadProblem(matrix,collb,colub,obj,rowsen,rowrhs,rowrng);
 }
@@ -392,10 +392,10 @@ OsiCbcSolverInterface::loadProblem(const CoinPackedMatrix& matrix,
 
 void
 OsiCbcSolverInterface::assignProblem(CoinPackedMatrix*& matrix,
-				     double*& collb, double*& colub,
-				     double*& obj,
-				     char*& rowsen, double*& rowrhs,
-				     double*& rowrng)
+             double*& collb, double*& colub,
+             double*& obj,
+             char*& rowsen, double*& rowrhs,
+             double*& rowrng)
 {
   modelPtr_->solver()->assignProblem(matrix,collb,colub,obj,rowsen,rowrhs,rowrng);
 }
@@ -404,11 +404,11 @@ OsiCbcSolverInterface::assignProblem(CoinPackedMatrix*& matrix,
 
 void
 OsiCbcSolverInterface::loadProblem(const int numcols, const int numrows,
-				   const CoinBigIndex * start, const int* index,
-				   const double* value,
-				   const double* collb, const double* colub,
-				   const double* obj,
-				   const double* rowlb, const double* rowub)
+           const CoinBigIndex * start, const int* index,
+           const double* value,
+           const double* collb, const double* colub,
+           const double* obj,
+           const double* rowlb, const double* rowub)
 {
   modelPtr_->solver()->loadProblem(numcols,numrows,start,index,value,
                                    collb,colub,obj,rowlb,rowub);
@@ -417,12 +417,12 @@ OsiCbcSolverInterface::loadProblem(const int numcols, const int numrows,
 
 void
 OsiCbcSolverInterface::loadProblem(const int numcols, const int numrows,
-				   const CoinBigIndex * start, const int* index,
-				   const double* value,
-				   const double* collb, const double* colub,
-				   const double* obj,
-				   const char* rowsen, const double* rowrhs,   
-				   const double* rowrng)
+           const CoinBigIndex * start, const int* index,
+           const double* value,
+           const double* collb, const double* colub,
+           const double* obj,
+           const char* rowsen, const double* rowrhs,
+           const double* rowrng)
 {
   modelPtr_->solver()->loadProblem(numcols,numrows,start,index,value,
                                    collb,colub,obj,rowsen,rowrhs,rowrng);
@@ -433,26 +433,26 @@ OsiCbcSolverInterface::loadProblem(const int numcols, const int numrows,
 //-----------------------------------------------------------------------------
 
 void OsiCbcSolverInterface::writeMps(const char * filename,
-				     const char * extension,
-				     double objSense) const
+             const char * extension,
+             double objSense) const
 {
   modelPtr_->solver()->writeMps(filename,extension,objSense);
 }
 
-int 
-OsiCbcSolverInterface::writeMpsNative(const char *filename, 
-		  const char ** rowNames, const char ** columnNames,
-		  int formatType,int numberAcross,double objSense) const 
+int
+OsiCbcSolverInterface::writeMpsNative(const char *filename,
+      const char ** rowNames, const char ** columnNames,
+      int formatType,int numberAcross,double objSense) const
 {
   return modelPtr_->solver()->writeMpsNative(filename, rowNames, columnNames,
-			       formatType, numberAcross,objSense);
+             formatType, numberAcross,objSense);
 }
 
 //#############################################################################
 // Constructors, destructors clone and assignment
 //#############################################################################
 //-------------------------------------------------------------------
-// Default Constructor 
+// Default Constructor
 //-------------------------------------------------------------------
 OsiCbcSolverInterface::OsiCbcSolverInterface (OsiSolverInterface * solver,
                                               CbcStrategy * strategy)
@@ -487,7 +487,7 @@ OsiSolverInterface * OsiCbcSolverInterface::clone(bool CopyData) const
 
 
 //-------------------------------------------------------------------
-// Copy constructor 
+// Copy constructor
 //-------------------------------------------------------------------
 OsiCbcSolverInterface::OsiCbcSolverInterface (
                   const OsiCbcSolverInterface & rhs)
@@ -497,10 +497,10 @@ OsiSolverInterface(rhs)
   assert (rhs.modelPtr_);
   modelPtr_ = new CbcModel(*rhs.modelPtr_);
 }
-    
+
 
 //-------------------------------------------------------------------
-// Destructor 
+// Destructor
 //-------------------------------------------------------------------
 OsiCbcSolverInterface::~OsiCbcSolverInterface ()
 {
@@ -508,12 +508,12 @@ OsiCbcSolverInterface::~OsiCbcSolverInterface ()
 }
 
 //-------------------------------------------------------------------
-// Assignment operator 
+// Assignment operator
 //-------------------------------------------------------------------
 OsiCbcSolverInterface &
 OsiCbcSolverInterface::operator=(const OsiCbcSolverInterface& rhs)
 {
-  if (this != &rhs) {    
+  if (this != &rhs) {
     OsiSolverInterface::operator=(rhs);
     delete modelPtr_;
     modelPtr_=new CbcModel(*rhs.modelPtr_);
@@ -532,7 +532,7 @@ void OsiCbcSolverInterface::applyRowCut( const OsiRowCut & rowCut )
 /* Apply a collection of row cuts which are all effective.
    applyCuts seems to do one at a time which seems inefficient.
 */
-void 
+void
 OsiCbcSolverInterface::applyRowCuts(int numberCuts, const OsiRowCut * cuts)
 {
   modelPtr_->solver()->applyRowCuts(numberCuts,cuts);
@@ -540,7 +540,7 @@ OsiCbcSolverInterface::applyRowCuts(int numberCuts, const OsiRowCut * cuts)
 /* Apply a collection of row cuts which are all effective.
    applyCuts seems to do one at a time which seems inefficient.
 */
-void 
+void
 OsiCbcSolverInterface::applyRowCuts(int numberCuts, const OsiRowCut ** cuts)
 {
   modelPtr_->solver()->applyRowCuts(numberCuts, cuts);
@@ -570,48 +570,48 @@ void OsiCbcSolverInterface::applyColCut( const OsiColCut & cc )
 }
 /* Read an mps file from the given filename (defaults to Osi reader) - returns
    number of errors (see OsiMpsReader class) */
-int 
+int
 OsiCbcSolverInterface::readMps(const char *filename,
-			       const char *extension ) 
+             const char *extension )
 {
   return modelPtr_->solver()->readMps(filename,extension);
 }
 // Get pointer to array[getNumCols()] of primal solution vector
-const double * 
-OsiCbcSolverInterface::getColSolution() const 
-{ 
+const double *
+OsiCbcSolverInterface::getColSolution() const
+{
   return modelPtr_->solver()->getColSolution();
 }
-  
+
 // Get pointer to array[getNumRows()] of dual prices
-const double * 
+const double *
 OsiCbcSolverInterface::getRowPrice() const
-{ 
+{
   return modelPtr_->solver()->getRowPrice();
 }
-  
+
 // Get a pointer to array[getNumCols()] of reduced costs
-const double * 
-OsiCbcSolverInterface::getReducedCost() const 
-{ 
+const double *
+OsiCbcSolverInterface::getReducedCost() const
+{
   return modelPtr_->solver()->getReducedCost();
 }
 
 /* Get pointer to array[getNumRows()] of row activity levels (constraint
    matrix times the solution vector */
-const double * 
-OsiCbcSolverInterface::getRowActivity() const 
-{ 
+const double *
+OsiCbcSolverInterface::getRowActivity() const
+{
   return modelPtr_->solver()->getRowActivity();
 }
-double 
-OsiCbcSolverInterface::getObjValue() const 
+double
+OsiCbcSolverInterface::getObjValue() const
 {
   return modelPtr_->solver()->getObjValue();
 }
 
 /* Set an objective function coefficient */
-void 
+void
 OsiCbcSolverInterface::setObjCoeff( int elementIndex, double elementValue )
 {
   modelPtr_->solver()->setObjCoeff(elementIndex,elementValue);
@@ -619,89 +619,89 @@ OsiCbcSolverInterface::setObjCoeff( int elementIndex, double elementValue )
 
 /* Set a single column lower bound<br>
    Use -DBL_MAX for -infinity. */
-void 
+void
 OsiCbcSolverInterface::setColLower( int elementIndex, double elementValue )
 {
   modelPtr_->solver()->setColLower(elementIndex,elementValue);
 }
-      
+
 /* Set a single column upper bound<br>
    Use DBL_MAX for infinity. */
-void 
+void
 OsiCbcSolverInterface::setColUpper( int elementIndex, double elementValue )
 {
   modelPtr_->solver()->setColUpper(elementIndex,elementValue);
 }
 
 /* Set a single column lower and upper bound */
-void 
+void
 OsiCbcSolverInterface::setColBounds( int elementIndex,
-				     double lower, double upper )
+             double lower, double upper )
 {
   modelPtr_->solver()->setColBounds(elementIndex,lower,upper);
 }
 void OsiCbcSolverInterface::setColSetBounds(const int* indexFirst,
-					    const int* indexLast,
-					    const double* boundList)
+              const int* indexLast,
+              const double* boundList)
 {
   modelPtr_->solver()->setColSetBounds(indexFirst,indexLast,boundList);
 }
 //------------------------------------------------------------------
 /* Set a single row lower bound<br>
    Use -DBL_MAX for -infinity. */
-void 
+void
 OsiCbcSolverInterface::setRowLower( int elementIndex, double elementValue ) {
   modelPtr_->solver()->setRowLower(elementIndex,elementValue);
 }
-      
+
 /* Set a single row upper bound<br>
    Use DBL_MAX for infinity. */
-void 
+void
 OsiCbcSolverInterface::setRowUpper( int elementIndex, double elementValue ) {
   modelPtr_->solver()->setRowUpper(elementIndex,elementValue);
 }
-    
+
 /* Set a single row lower and upper bound */
-void 
+void
 OsiCbcSolverInterface::setRowBounds( int elementIndex,
-	      double lower, double upper ) {
+        double lower, double upper ) {
   modelPtr_->solver()->setRowBounds(elementIndex,lower,upper);
 }
 //-----------------------------------------------------------------------------
 void
 OsiCbcSolverInterface::setRowType(int i, char sense, double rightHandSide,
-				  double range)
+          double range)
 {
   modelPtr_->solver()->setRowType(i,sense,rightHandSide,range);
 }
 //-----------------------------------------------------------------------------
 void OsiCbcSolverInterface::setRowSetBounds(const int* indexFirst,
-					    const int* indexLast,
-					    const double* boundList)
+              const int* indexLast,
+              const double* boundList)
 {
   modelPtr_->solver()->setRowSetBounds(indexFirst,indexLast,boundList);
 }
 //-----------------------------------------------------------------------------
 void
 OsiCbcSolverInterface::setRowSetTypes(const int* indexFirst,
-				      const int* indexLast,
-				      const char* senseList,
-				      const double* rhsList,
-				      const double* rangeList)
+              const int* indexLast,
+              const char* senseList,
+              const double* rhsList,
+              const double* rangeList)
 {
   modelPtr_->solver()->setRowSetTypes(indexFirst,indexLast,senseList,rhsList,rangeList);
 }
 // Set a hint parameter
-bool 
+bool
 OsiCbcSolverInterface::setHintParam(OsiHintParam key, bool yesNo,
                                     OsiHintStrength strength,
-                                    void * otherInformation) 
+                                    void * otherInformation)
 {
   return modelPtr_->solver()->setHintParam(key,yesNo, strength, otherInformation);
 }
 
 // Get a hint parameter
-bool 
+bool
 OsiCbcSolverInterface::getHintParam(OsiHintParam key, bool & yesNo,
                                     OsiHintStrength & strength,
                                     void *& otherInformation) const
@@ -710,7 +710,7 @@ OsiCbcSolverInterface::getHintParam(OsiHintParam key, bool & yesNo,
 }
 
 // Get a hint parameter
-bool 
+bool
 OsiCbcSolverInterface::getHintParam(OsiHintParam key, bool & yesNo,
                                     OsiHintStrength & strength) const
 {
@@ -718,68 +718,68 @@ OsiCbcSolverInterface::getHintParam(OsiHintParam key, bool & yesNo,
 }
 
 
-int 
+int
 OsiCbcSolverInterface::getNumCols() const
 {
   return modelPtr_->solver()->getNumCols();
 }
-int 
+int
 OsiCbcSolverInterface::getNumRows() const
 {
   return modelPtr_->solver()->getNumRows();
 }
-int 
+int
 OsiCbcSolverInterface::getNumElements() const
 {
   return modelPtr_->solver()->getNumElements();
 }
-const double * 
+const double *
 OsiCbcSolverInterface::getColLower() const
 {
   return modelPtr_->solver()->getColLower();
 }
-const double * 
+const double *
 OsiCbcSolverInterface::getColUpper() const
 {
   return modelPtr_->solver()->getColUpper();
 }
-const double * 
+const double *
 OsiCbcSolverInterface::getRowLower() const
 {
   return modelPtr_->solver()->getRowLower();
 }
-const double * 
+const double *
 OsiCbcSolverInterface::getRowUpper() const
 {
   return modelPtr_->solver()->getRowUpper();
 }
-const double * 
-OsiCbcSolverInterface::getObjCoefficients() const 
+const double *
+OsiCbcSolverInterface::getObjCoefficients() const
 {
   return modelPtr_->solver()->getObjCoefficients();
 }
-double 
-OsiCbcSolverInterface::getObjSense() const 
+double
+OsiCbcSolverInterface::getObjSense() const
 {
   return modelPtr_->solver()->getObjSense();
 }
-double 
+double
 OsiCbcSolverInterface::getInfinity() const
 {
   return modelPtr_->solver()->getInfinity();
 }
-int 
-OsiCbcSolverInterface::getIterationCount() const 
+int
+OsiCbcSolverInterface::getIterationCount() const
 {
   return modelPtr_->solver()->getIterationCount();
 }
-void 
+void
 OsiCbcSolverInterface::setObjSense(double s )
 {
   modelPtr_->setObjSense(s);
 }
 // Invoke solver's built-in enumeration algorithm
-void 
+void
 OsiCbcSolverInterface::branchAndBound()
 {
   *messageHandler() << "Warning: Use of OsiCbc is deprecated." << CoinMessageEol;
@@ -827,7 +827,7 @@ const OsiSolverInterface::OsiNameVec &OsiCbcSolverInterface::getColNames ()
 }
 
 void OsiCbcSolverInterface::setRowNames (OsiNameVec &srcNames,
-					 int srcStart, int len, int tgtStart)
+           int srcStart, int len, int tgtStart)
 {
   modelPtr_->solver()->setRowNames(srcNames,srcStart,len,tgtStart) ;
 }
@@ -838,7 +838,7 @@ void OsiCbcSolverInterface::deleteRowNames (int tgtStart, int len)
 }
 
 void OsiCbcSolverInterface::setColNames (OsiNameVec &srcNames,
-					 int srcStart, int len, int tgtStart)
+           int srcStart, int len, int tgtStart)
 {
   modelPtr_->solver()->setColNames(srcNames,srcStart,len,tgtStart) ;
 }
@@ -865,7 +865,7 @@ void OsiCbcSolverInterface::setObjName (std::string name)
 */
 void OsiCbcSolverInterface::setRowName (int ndx, std::string name)
 
-{ 
+{
   modelPtr_->solver()->setRowName(ndx,name) ;
 }
 
@@ -874,11 +874,11 @@ void OsiCbcSolverInterface::setRowName (int ndx, std::string name)
 */
 void OsiCbcSolverInterface::setColName (int ndx, std::string name)
 
-{ 
+{
   modelPtr_->solver()->setColName(ndx,name) ;
 }
 // Pass in Message handler (not deleted at end)
-void 
+void
 OsiCbcSolverInterface::passInMessageHandler(CoinMessageHandler * handler)
 {
   OsiSolverInterface::passInMessageHandler(handler);
@@ -886,7 +886,7 @@ OsiCbcSolverInterface::passInMessageHandler(CoinMessageHandler * handler)
     modelPtr_->passInMessageHandler(handler);
 }
 // So unit test can find out if NDEBUG set
-bool OsiCbcHasNDEBUG() 
+bool OsiCbcHasNDEBUG()
 {
 #ifdef NDEBUG
   return true;

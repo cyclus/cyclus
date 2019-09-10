@@ -98,7 +98,7 @@ class Arc {
   inline double excl_val() const { return excl_val_; }
   inline double pref() const { return pref_; }
   inline void pref(double pref) { pref_ = pref; }
-  
+
  private:
   boost::weak_ptr<ExchangeNode> unode_;
   boost::weak_ptr<ExchangeNode> vnode_;
@@ -159,7 +159,7 @@ class ExchangeNodeGroup {
     }
     return false;
   }
-  
+
   /// @brief adds a single node to the set of exclusive node groupings, in
   /// general this function is used for demand exclusivity
   void AddExclNode(ExchangeNode::Ptr n);
@@ -227,7 +227,7 @@ class ExchangeGraph {
 
   /// clears all matches
   inline void ClearMatches() { matches_.clear(); }
-  
+
   inline const std::vector<RequestGroup::Ptr>& request_groups() const {
     return request_groups_;
   }
@@ -260,7 +260,7 @@ class ExchangeGraph {
 
   inline const std::map<int, Arc>& arc_by_id() const { return arc_by_id_; }
   inline std::map<int, Arc>& arc_by_id() { return arc_by_id_; }
-  
+
  private:
   std::vector<RequestGroup::Ptr> request_groups_;
   std::vector<ExchangeNodeGroup::Ptr> supply_groups_;

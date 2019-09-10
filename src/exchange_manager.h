@@ -39,7 +39,7 @@ class ExchangeManager {
     exchng.AddAllBids();
     exchng.AdjustAll();
     CLOG(LEV_DEBUG1) << "done with info gathering";
-    
+
     if (debug_)
       RecordDebugInfo(exchng.ex_ctx());
 

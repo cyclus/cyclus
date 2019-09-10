@@ -18,7 +18,7 @@ void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
 /// double Capacity(const Arc& a, double u_curr_qty, double v_curr_qty) {
 ///     return 0;
 /// }
-      
+
 /// @brief A comparison function for sorting a container of Arcs by the
 /// requester's (unode's) preference, in decensing order (i.e., most preferred
 /// Arc first). In the case of a tie, a lexicalgraphic ordering of node ids is
@@ -73,7 +73,7 @@ class GreedySolver: public ExchangeSolver {
   explicit GreedySolver(GreedyPreconditioner* c);
   GreedySolver(bool exclusive_orders, GreedyPreconditioner* c);
   /// @}
-  
+
   virtual ~GreedySolver();
 
   /// Uses the provided (or a default) GreedyPreconditioner to condition the
@@ -145,7 +145,7 @@ class GreedySolver: public ExchangeSolver {
   void GreedilySatisfySet(RequestGroup::Ptr prs);
   void UpdateCapacity(ExchangeNode::Ptr n, const Arc& a, double qty);
   void UpdateObj(double qty, double pref);
-  
+
   GreedyPreconditioner* conditioner_;
   std::map<ExchangeNode::Ptr, double> n_qty_;
   std::map<ExchangeNodeGroup*, std::vector<double> > grp_caps_;

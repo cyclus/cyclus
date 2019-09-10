@@ -22,7 +22,7 @@ GreedySolver::GreedySolver(bool exclusive_orders, GreedyPreconditioner* c)
 
 GreedySolver::GreedySolver(bool exclusive_orders)
     : ExchangeSolver(exclusive_orders) {
-  conditioner_ = new cyclus::GreedyPreconditioner();  
+  conditioner_ = new cyclus::GreedyPreconditioner();
 }
 
 GreedySolver::GreedySolver(GreedyPreconditioner* c)
@@ -30,7 +30,7 @@ GreedySolver::GreedySolver(GreedyPreconditioner* c)
       ExchangeSolver(true) {}
 
 GreedySolver::GreedySolver() : ExchangeSolver(true) {
-  conditioner_ = new cyclus::GreedyPreconditioner();  
+  conditioner_ = new cyclus::GreedyPreconditioner();
 }
 
 GreedySolver::~GreedySolver() {
@@ -63,9 +63,9 @@ double GreedySolver::SolveGraph() {
   obj_ = 0;
   unmatched_ = 0;
   n_qty_.clear();
-  
+
   Init();
- 
+
   std::for_each(graph_->request_groups().begin(),
                 graph_->request_groups().end(),
                 std::bind1st(

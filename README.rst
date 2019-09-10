@@ -9,8 +9,8 @@ information on the entire "ecosystem" please refer to the `Cyclus website
 
 ================    =================    ===================    ===================
 Cyclus Projects Status
------------------------------------------------------------------------------------ 
-**Branch**              **Cyclus**         **Cycamore**           **Cymetric** 
+-----------------------------------------------------------------------------------
+**Branch**              **Cyclus**         **Cycamore**           **Cymetric**
 ================    =================    ===================    ===================
 master              |cyclus_master|       |cycamore_master|      |cymetric_master|
 develop             |cyclus_develop|      |cycamore_develop|     |cymetric_develop|
@@ -39,7 +39,7 @@ development of the Cyclus Core.  If you are interested Cyclus as a user or in
 developing Cyclus archetypes, you may want to consult `Getting Started with Cyclus <http://fuelcycle.org/user/install.html>`_.
 
 This README provides basic information about:
- - the dependencies required by Cyclus 
+ - the dependencies required by Cyclus
  - installation of Cyclus from the command line
  - how to run Cyclus and the Cyclus unit tests
 
@@ -48,7 +48,7 @@ required to interface with the input file, write the output file, and manage
 material flow during the simulation via the Dynamic Resource Exchange.  It
 does not contain any fuel cycle facility models. A set of nuclear facilities can be
 obtained by installing Cycamore, the Cyclus Additional Module.  Cycamore is
-supported by the Cyclus Developer Team.  
+supported by the Cyclus Developer Team.
 
 Third party modules can also be installed (or developed) with additional
 facilities.  Please visit the Cyclus website for a `list of contributed modules <http://fuelcycle.org/user/index.html#archetypes>`_.
@@ -59,9 +59,9 @@ facilities.  Please visit the Cyclus website for a `list of contributed modules 
   `INSTALLATION Guide <INSTALL.rst>`_,
 
 - **To see user and developer documentation for this code, please visit
-  the** `Users Guide <http://fuelcycle.org/user/index.html>`_, 
+  the** `Users Guide <http://fuelcycle.org/user/index.html>`_,
 
-- **If you would like to contribute to Cyclus, please check our** 
+- **If you would like to contribute to Cyclus, please check our**
   `Contribution Guidelines <CONTRIBUTING.rst>`_.
 
 
@@ -94,23 +94,39 @@ For detailed instructions on installing dependencies, see `Installing Dependenci
 *************************
 Quick Cyclus Installation
 *************************
+The quickest way to install Cyclus and its dependencies relies on using the `conda-forge` channel and the `conda` package manager within the Anaconda python environment.  The following instructions guide you through that approach.
+To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18.04 LTS):
 
-Assuming you have the dependencies installed correctly, installing Cyclus based 
-on the source code from github is fairly straightforward:
+- Download the latest Anaconda installer for Linux at
+  ``https://www.anaconda.com/distribution/#download-section``
 
-- Clone the Cyclus repository: ``git clone https://github.com/cyclus/cyclus.git``,
+- Move the ``.sh`` to your Home directory
 
-- to install Cyclus locally (in ``~/.local/``) just run: ``python install.py``
-  from the ``cyclus`` folder,
+- In Terminal, execute the following commands:
 
-- finally, add the following Cyclus installation path (``~/.local/bin``) to
-  the **front** on your ``$PATH``.
-- additionally if you are using MacOSX, also add
-  ``~/.local/lib/pythonX.Y/site-packages`` to your ``$PYTHONPATH``
+- ``bash Anaconda3-2019.03-Linux-x86_64.sh``
+
+- ``echo 'export PATH="~/anaconda/bin:$PATH"' >> ~/.bashrc``
+
+- ``source .bashrc``
+
+- ``conda config --add channels conda-forge``
+
+- ``conda install -y openssh gxx_linux-64 gcc_linux-64 cmake make docker-pycreds git xo
+  python-json-logger python=3.6 glibmm glib=2.56 libxml2 libxmlpp libblas libcblas
+  liblapack pkg-config coincbc=2.9 boost-cpp hdf5 sqlite pcre gettext bzip2 xz
+  setuptools nose pytables pandas jinja2 cython==0.26 websockets pprintpp``
+
+- Use ``sudo apt install`` to install and configure git
+
+- Clone the Cyclus repository by running ``git clone https://github.com/cyclus/cyclus.git``
+
+- Navigate to the folder containing Cyclus
+
+- Run the command ``python install.py``
 
 For more detailed installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_.
-
 
 *************
 Running Tests
@@ -179,4 +195,3 @@ You may also want to read our `Contribution Guidelines <CONTRIBUTING.rst>`_.
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
 .. _`INSTALL`: INSTALL.rst
 .. _`CONTRIBUTING`: CONTRIBUTING.rst
-
