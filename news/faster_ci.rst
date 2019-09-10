@@ -6,7 +6,7 @@
 **Deprecated:** None
 
 **Removed:** None
--  git and open-ssh form CI (added to the dockerfile)
+-  git and open-ssh from CI (added to the dockerfile)
 **Fixed:** None
 
 **Security:** None
