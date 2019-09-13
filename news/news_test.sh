@@ -2,6 +2,7 @@
 folder=$1
 #setup temp remote 
 git_remote_name=ci_news_`git log --pretty=format:'%h' -n 1`
+echo $git_remote_name
 git remote add ${git_remote_name} https://github.com/cyclus/cyclus/
 git fetch ${git_remote_name}
 # diff against temp remote
