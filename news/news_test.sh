@@ -1,9 +1,9 @@
 #!/bin/sh
 folder=$1
 #setup temp remote 
-git_remote_name=ci_news_ #`git log --pretty=format:'%h' -n 1`
+git_remote_name=ci_news_`git log --pretty=format:'%h' -n 1`
 echo $git_remote_name
-git remote add ${git_remote_name} http://github.com/cyclus/cyclus.git
+git remote add ${git_remote_name} https://github.com/cyclus/cyclus.git
 git fetch ${git_remote_name}
 # diff against temp remote
 added_news_file=$((`git diff ${git_remote_name}/master --name-only $folder |wc -l`))
