@@ -1,15 +1,25 @@
 #!/bin/sh
+# folder to look for addition
 folder=$1
-#setup temp remote 
+
+# default main repo setup
+master_repo="https://github.com/cyclus/cyclus.git"
+default_branch="master"
+
+
+# setup temp remote 
 git_remote_name=ci_news_`git log --pretty=format:'%h' -n 1`
-echo $git_remote_name
-git remote add ${git_remote_name} https://github.com/cyclus/cyclus.git
+git remote add ${git_remote_name} ${master_repo}
 git fetch ${git_remote_name}
+
 # diff against temp remote
-added_news_file=$((`git diff ${git_remote_name}/master --name-only $folder |wc -l`))
-#cleaning temp remote
+added_news_file=$((`git diff ${git_remote_name}/${default_branch} --name-only $folder |wc -l`))
+
+# cleaning temp remote
 git remote remove ${git_remote_name}
 
+
+# analysing the diff and returning accordingly
 if [ $added_news_file -eq 0 ]; then
     exit 1
 fi
