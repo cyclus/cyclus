@@ -20,7 +20,7 @@ class MatQuery {
   /// Returns the mass in kg of nuclide nuc in the material.
   double mass(Nuc nuc);
 
-  /// Returns the mass in kg of nuclide nuc in the material.  
+  /// Returns the mass in kg of nuclide nuc in the material.
   double mass(std::string nuc);
 
   /// Returns the number of moles of nuclide nuc in the material.
@@ -44,7 +44,7 @@ class MatQuery {
 
   /// returns the atom/mole fraction of nuclide nuc in the material.
   double atom_frac(std::string nuc);
-  
+
   /// Returns the combined atom/mole fraction of the set of nuclides
   /// nuc in the material.
   double atom_frac(std::set<Nuc> nucs);

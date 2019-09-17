@@ -94,7 +94,7 @@ namespace pretty_print
     struct delimiters
     {
         typedef delimiters_values<TChar> type;
-        static const type values; 
+        static const type values;
     };
 
 
