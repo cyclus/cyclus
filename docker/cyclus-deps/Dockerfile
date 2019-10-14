@@ -73,7 +73,7 @@ RUN conda update -y --all && \
 ENV CC /opt/conda/bin/x86_64-conda_cos6-linux-gnu-gcc
 ENV CXX /opt/conda/bin/x86_64-conda_cos6-linux-gnu-g++
 ENV CPP /opt/conda/bin/x86_64-conda_cos6-linux-gnu-cpp
-ENV PYTHONPATH /home/conda/.local/lib/python3.7/site-packages/
+ENV PYTHONPATH "/home/conda/.local/lib/python3.7/site-packages/:/root/.local/lib/python3.7/site-packages/"
 # required for the nosetest
 ENV PYTHONWARNINGS ignore
 RUN mkdir -p /root/.local/lib/python3.7/site-packages/
