@@ -2,7 +2,7 @@
 ##################################### begin cyclus app #######################################
 ##############################################################################################
 
-INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(BEFORE ${CYCLUS_CORE_INCLUDE_DIRS})
 
 # Build the cyclus executable from the CYCLUS_SOURCE source files
 SET(CYCLUS_SOURCE ${CYCLUS_SOURCE}

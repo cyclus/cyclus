@@ -157,7 +157,7 @@ endif(Cython_FOUND)
 ######### build libcyclus #######################################
 #################################################################
 
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
+INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 set(CYCLUS_COIN_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/prog_solver.cc"

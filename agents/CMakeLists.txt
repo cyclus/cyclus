@@ -1,4 +1,4 @@
-INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(BEFORE ${CYCLUS_CORE_INCLUDE_DIRS})
 
 use_cyclus("agents" "null_inst")
 use_cyclus("agents" "null_region")
