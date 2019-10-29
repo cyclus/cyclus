@@ -3,11 +3,9 @@ jobs:
     # News update check
     news_update:
         docker:
-            - image: cyclus/cyclus-deps_py37
+            - image: cyclus/cyclus-deps
         working_directory: ~/cyclus
         steps:
-            # Ensure your image has git (required by git to clone via SSH) so that CircleCI can clone your repo
-            - run: apt-get -qq update; apt-get -y install git openssh-client
             - checkout
             - run: git fetch --all
             - run:
@@ -23,9 +21,6 @@ jobs:
             - checkout
             - run:
                 name: Build Cyclus
-                command: mkdir -p /root/.local/lib/python3.7/site-packages
-            - run:
-                name: Build Docker Image
                 command: |
                     python install.py -j 2 --build-type=Release --core-version 999999.999999 \
                     -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
