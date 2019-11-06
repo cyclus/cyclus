@@ -6,8 +6,6 @@ jobs:
             - image: cyclus/cyclus-deps
         working_directory: ~/cyclus
         steps:
-            # Ensure your image has git (required by git to clone via SSH) so that CircleCI can clone your repo
-            - run: apt-get -qq update; apt-get -y install git openssh-client
             - checkout
             - run: git fetch --all
             - run:

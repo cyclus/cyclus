@@ -28,7 +28,7 @@ SET(GTest
     "${CMAKE_CURRENT_SOURCE_DIR}/GoogleTest/gtest/gtest-all.cc"
     )
 
-INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
+INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 ADD_LIBRARY(gtest ${GTest})
 
@@ -59,7 +59,7 @@ INSTALL(FILES GoogleTest/gtest/gtest.h
 ################################### begin cyclus testing ######################
 ###############################################################################
 
-INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(BEFORE ${CYCLUS_CORE_INCLUDE_DIRS})
 
 set(CYCLUS_TEST_COIN_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/solver_factory_tests.cc"

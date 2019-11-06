@@ -3,6 +3,7 @@ import re
 import os
 import sys
 from distutils.core import setup
+import setuptools
 from pprint import pprint
 
 PROJECT = 'cyclus'
