@@ -1,4 +1,5 @@
-# Demonstrate Dakota script interface to Python script to interface to Cyclus
+# Demonstrate Cyclus-Dakota Coupling
+# One-at-a-time sensitivity analysis of power capacity for a reactor facility. 
 
 environment, 
 	tabular_data 
