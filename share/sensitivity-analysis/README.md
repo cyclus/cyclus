@@ -1,6 +1,6 @@
 # Cyclus-Dakota Sensitivity Analysis 
 
-This folder contains a test example of Cyclus sensitivity analysis studies conducted with a Dakota wrapper. Cyclus interfaces with Dakota using a Python interface.
+This folder contains a test example of Cyclus sensitivity analysis studies conducted using Dakota. Cyclus interfaces with Dakota through a Python interface.
 
 To run the test case, run the following from this directory:
 ```
