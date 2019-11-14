@@ -7,7 +7,7 @@ environment,
 
 method,						
 	multidim_parameter_study
-    partitions = 1 
+    partitions = 2 
 
 variables,					
 	continuous_design = 1			
