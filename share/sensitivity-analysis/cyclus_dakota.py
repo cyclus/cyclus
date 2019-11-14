@@ -13,7 +13,7 @@ params, results = di.read_parameters_file()
 # Convert and send to Cyclus
 # -------------------------------
 
-# Edit Dymond6 input file
+# Edit Cyclus input file
 cyclus_template = 'test.xml.in'
 scenario_name = 'PW' + str(round(params['x1']))
 variable_dict = {'handle': scenario_name, 'power_cap': params['x1']}
