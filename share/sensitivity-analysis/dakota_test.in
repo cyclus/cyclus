@@ -10,6 +10,7 @@ method,
 	multidim_parameter_study
     partitions = 2 
 
+# use the reactor power as a parameter space, between 1500 and 1600 MWe
 variables,					
 	continuous_design = 1			
     lower_bounds      1500     
