@@ -10,7 +10,7 @@ import subprocess
 params, results = di.read_parameters_file()
 
 # -------------------------------
-# Convert and send to Dymond
+# Convert and send to Cyclus
 # -------------------------------
 
 # Edit Dymond6 input file
