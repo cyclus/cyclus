@@ -13,7 +13,7 @@ variables,
 	continuous_design = 1			
     lower_bounds      1500     
     upper_bounds      1600     
-    descriptors       'x1'     
+    descriptors       'power'     
 
 interface,							
 	fork							

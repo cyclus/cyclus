@@ -15,8 +15,8 @@ params, results = di.read_parameters_file()
 
 # Edit Cyclus input file
 cyclus_template = 'test.xml.in'
-scenario_name = 'PW' + str(round(params['x1']))
-variable_dict = {'handle': scenario_name, 'power_cap': params['x1']}
+scenario_name = 'PW' + str(round(params['power']))
+variable_dict = {'handle': scenario_name, 'power_cap': params['power']}
 output_xml = 'test.xml'
 inp.render_input(cyclus_template, variable_dict, output_xml)
 
