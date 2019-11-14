@@ -1,8 +1,11 @@
 import sys
 import os
 import input as inp
+import output as oup
 import dakota.interfacing as di
 import subprocess
+import cymetric as cym
+from cymetric import fco_metrics
 # ----------------------------
 # Parse Dakota parameters file
 # ----------------------------
@@ -27,9 +30,12 @@ os.system('cyclus -i ' + output_xml + ' -o ' + output_sqlite)
 # ----------------------------
 # Return the results to Dakota
 # ----------------------------
+# return total electricity generated to Dakota 
+cursor = oup.cursor(output_sqlite)
+power = cursor.execute('SELECT time, sum(value) FROM timeseriespower').fetchall()
 
 for i, r in enumerate(results.responses()):
     if r.asv.function:
-        r.function = 1
+        r.function = power[0][1]
 
 results.write()
