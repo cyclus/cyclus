@@ -5,6 +5,7 @@ environment,
 	tabular_data 
 		tabular_data_file = 'dakota_test.dat'
 
+# partition parameter space into 2, causing 3 simulations
 method,						
 	multidim_parameter_study
     partitions = 2 
