@@ -1,0 +1,134 @@
+<simulation>
+
+  <archetypes>
+    <spec>
+      <lib>agents</lib>
+      <name>NullRegion</name>
+    </spec>
+    <spec>
+      <lib>agents</lib>
+      <name>NullInst</name>
+    </spec>
+    <spec>
+      <lib>cycamore</lib>
+      <name>Source</name>
+    </spec>
+    <spec>
+      <lib>cycamore</lib>
+      <name>Reactor</name>
+    </spec>
+    <spec>
+      <lib>cycamore</lib>
+      <name>Sink</name>
+    </spec>
+  </archetypes>
+
+
+  <control>
+    <duration>10</duration>
+    <startmonth>1</startmonth>
+    <startyear>2000</startyear>
+    <simhandle>{{handle}}</simhandle>
+  </control>
+
+
+  <facility>
+    <config>
+      <Source>
+        <outcommod>fuel</outcommod>
+        <outrecipe>fresh_uox</outrecipe>
+        <throughput>100</throughput>
+      </Source>
+    </config>
+    <name>source</name>
+  </facility>
+
+  <facility>
+    <config>
+      <Sink>
+        <in_commods>
+          <val>spent_uox</val>
+        </in_commods>
+        <max_inv_size>1000</max_inv_size>
+      </Sink>
+    </config>
+    <name>sink</name>
+  </facility>
+
+  <facility>
+    <config>
+      <Reactor>
+        <assem_size>1</assem_size>
+        <cycle_time>1</cycle_time>
+        <fuel_incommods>
+          <val>fuel</val>
+        </fuel_incommods>
+        <fuel_inrecipes>
+          <val>fresh_uox</val>
+        </fuel_inrecipes>
+        <fuel_outcommods>
+          <val>spent_uox</val>
+        </fuel_outcommods>
+        <fuel_outrecipes>
+          <val>spent_uox</val>
+        </fuel_outrecipes>
+        <n_assem_batch>1</n_assem_batch>
+        <n_assem_core>1</n_assem_core>
+        <power_cap>{{power_cap}}</power_cap>
+        <refuel_time>0</refuel_time>
+      </Reactor>
+    </config>
+    <name>reactor</name>
+  </facility>
+
+  <recipe>
+    <basis>mass</basis>
+    <name>fresh_uox</name>
+    <nuclide>
+      <comp>0.711</comp>
+      <id>U235</id>
+    </nuclide>
+    <nuclide>
+      <comp>99.289</comp>
+      <id>U238</id>
+    </nuclide>
+  </recipe>
+
+  <recipe>
+    <basis>mass</basis>
+    <name>spent_uox</name>
+    <nuclide>
+      <comp>50</comp>
+      <id>Kr85</id>
+    </nuclide>
+    <nuclide>
+      <comp>50</comp>
+      <id>Cs137</id>
+    </nuclide>
+  </recipe>
+
+  <region>
+    <name>region</name>
+    <config><NullRegion/></config>
+    <institution>
+      <name>nullinst</name>
+      <initialfacilitylist>
+        <entry>
+          <number>1</number>
+          <prototype>sink</prototype>
+        </entry>
+        <entry>
+          <number>1</number>
+          <prototype>reactor</prototype>
+        </entry>
+        <entry>
+          <number>1</number>
+          <prototype>source</prototype>
+        </entry>
+      </initialfacilitylist>
+      <config><NullInst/></config>
+    </institution>
+  </region>
+
+
+</simulation>

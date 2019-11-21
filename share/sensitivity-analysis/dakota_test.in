@@ -1,0 +1,27 @@
+# Demonstrate Cyclus-Dakota Coupling
+# One-at-a-time sensitivity analysis of power capacity for a reactor facility. 
+
+environment, 
+	tabular_data 
+		tabular_data_file = 'dakota_test.dat'
+
+# partition parameter space into 2, causing 3 simulations
+method,						
+	multidim_parameter_study
+    partitions = 2 
+
+# use the reactor power as a parameter space, between 1500 and 1600 MWe
+variables,					
+	continuous_design = 1			
+    lower_bounds      1500     
+    upper_bounds      1600     
+    descriptors       'power'     
+
+interface,							
+	fork							
+	  analysis_drivers = 'python cyclus_dakota.py'
+
+responses,				
+	num_objective_functions = 1	
+	no_gradients
+	no_hessians
