@@ -9,7 +9,7 @@
 //   longitude);'
 //   - call the record method: 'coordinates.RecordPosititon(this);'
 
-cyclus::toolkit::Position coordinates;
+cyclus::toolkit::Position coordinates(0,0);
 
 #pragma cyclus var { \
 "default": 0.0, \
@@ -19,7 +19,7 @@ cyclus::toolkit::Position coordinates;
 }
 double latitude;
 // required for compilation but not added by the cycpp preprocessor...
-std::vector<int> cycpp_shape_latitude;
+std::vector<int> cycpp_shape_latitude = 0;
 
 #pragma cyclus var { \
 "default": 0.0, \
@@ -29,4 +29,4 @@ std::vector<int> cycpp_shape_latitude;
 }
 double longitude;
 // required for compilation but not added by the cycpp preprocessor...
-std::vector<int> cycpp_shape_longitude;
+std::vector<int> cycpp_shape_longitude = 0;
