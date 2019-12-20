@@ -337,7 +337,6 @@ IF(NOT CYCLUS_DOC_ONLY)
 
         # make sure we know about having python
         add_definitions(-DCYCLUS_WITH_PYTHON)
-        set(LIBS ${LIBS} ${PYTHON_LIBRARIES})
         INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/cyclus")
     else(Cython_FOUND)
         # If we don't have Python bindings, we may try to find tcmalloc.

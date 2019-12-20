@@ -31,6 +31,10 @@ else:
     try:
         import concurrent_futures
     except ImportError:
-        concurrent_futures = None
+        try:
+            from concurrent import futures as concurrent_futures
+        except ImportError:
+            concurrent_futures = None
+         
 
 
