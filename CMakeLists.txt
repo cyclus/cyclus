@@ -338,7 +338,6 @@ IF(NOT CYCLUS_DOC_ONLY)
         # make sure we know about having python
         add_definitions(-DCYCLUS_WITH_PYTHON)
         IF (NOT APPLE)
-            MESSAGE("ININININHBJGVHGCVGFCGFCGFCGFCGFCGFCGFCGFC:")
             set(LIBS ${LIBS} ${PYTHON_LIBRARIES})
         ENDIF (!APPLE)
         INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/cyclus")
