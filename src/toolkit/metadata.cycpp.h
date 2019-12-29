@@ -1,12 +1,15 @@
 
-// This includes the required header to add geographic coordinates to a
+// This includes the required header to metadata to a
 // archetypes.
 // One only need to:
 // - '#include "toolkit/metadata.cycpp"' in the core of the archetype class (as
 // private)
 // - and in the EnterNotify() method:
 //   - set the metadata 
-//      'coordinates = cyclus::toolkit::Position(latitude,longitude);'
+//      'metadata.SetWorkLabel(work_label);
+//      'metadata.LoadData(metadata_);
+//      'metadata.LoadData(usage_metadata_);
+
 
 #pragma cyclus var { \
     "default": {}, \

@@ -152,10 +152,10 @@ void Metadata::LoadData(std::map<std::string, std::string> data) {
 }
 
 void Metadata::LoadData(
-    std::map<std::string, std::map<std::string, double>> datas) {
-  for (auto keyword_datas : datas) {
-    std::string keyword = keyword_datas.first;
-    for (auto usage : keyword_datas.second) {
+    std::map<std::string, std::map<std::string, double>> data) {
+  for (auto keyword_data : data) {
+    std::string keyword = keyword_data.first;
+    for (auto usage : keyword_data.second) {
       metadata[keyword][usage.first] = usage.second;
       if (std::find(usages.begin(), usages.end(), usage.first) ==
           usages.end()) {
