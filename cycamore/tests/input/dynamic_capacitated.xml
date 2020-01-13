@@ -1,0 +1,81 @@
+<!-- Dynamic Capacitated -->
+
+<simulation>
+  <control>
+    <duration>4</duration>
+    <startmonth>1</startmonth>
+    <startyear>2000</startyear>
+  <solver><config><coin-or><timeout>100</timeout><verbose>1</verbose></coin-or></config></solver></control>
+
+  <archetypes>
+    <spec><lib>cycamore</lib><name>Sink</name></spec>
+    <spec><lib>cycamore</lib><name>Source</name></spec>
+    <spec><lib>agents</lib><name>NullRegion</name></spec>
+    <spec><lib>cycamore</lib><name>DeployInst</name></spec>
+  </archetypes>
+
+  <facility>
+    <name>Source</name>
+    <config>
+      <Source>
+        <outcommod>commodity</outcommod>
+        <outrecipe>commod_recipe</outrecipe>
+        <throughput>1.0</throughput>
+      </Source>
+    </config>
+  </facility>
+
+  <facility>
+    <name>Sink</name>
+    <lifetime>2</lifetime>
+    <config>
+      <Sink>
+        <in_commods>
+          <val>commodity</val>
+        </in_commods>
+        <capacity>1.0</capacity>
+      </Sink>
+    </config>
+  </facility>
+
+  <region>
+    <name>SingleRegion</name>
+    <config>
+      <NullRegion/>
+    </config>
+    <institution>
+      <name>SingleInstitution</name>
+      <config>
+        <DeployInst>
+          <prototypes>
+            <val>Source</val>
+            <val>Sink</val>
+            <val>Sink</val>
+          </prototypes>
+
+          <build_times>
+            <val>1</val>
+            <val>1</val>
+            <val>2</val>
+          </build_times>
+
+          <n_build>
+            <val>3</val>
+            <val>2</val>
+            <val>2</val>
+          </n_build>
+        </DeployInst>
+      </config>
+    </institution>
+  </region>
+
+  <recipe>
+    <name>commod_recipe</name>
+    <basis>mass</basis>
+    <nuclide>
+      <id>010010000</id>
+      <comp>1</comp>
+    </nuclide>
+  </recipe>
+
+</simulation>
