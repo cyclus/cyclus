@@ -1,4 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node2" href="$classcyclus_1_1BidPortfolio.html" title="A BidPortfolio is a collection of bids as responses to requests for resources and associated constrai..." alt="" coords="237,5,403,32"/>
-<area shape="rect" id="node3" href="$classcyclus_1_1RequestPortfolio.html" title="A RequestPortfolio is a group of (possibly constrainted) requests for resources. " alt="" coords="221,56,419,83"/>
+<area shape="rect" id="node2" href="$classcyclus_1_1BidPortfolio.html" title="A BidPortfolio is a collection of bids as responses to requests for resources and associated constrai..." alt="" coords="235,5,402,32"/>
+<area shape="rect" id="node3" href="$classcyclus_1_1RequestPortfolio.html" title="A RequestPortfolio is a group of (possibly constrainted) requests for resources. " alt="" coords="220,56,417,83"/>
 </map>

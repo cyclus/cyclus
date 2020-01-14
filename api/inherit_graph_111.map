@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structpyne_1_1level__data.html" title="a struct matching the &#39;/decay/level_list&#39; table in nuc_data.h5. " alt="" coords="5,5,123,32"/>
+<area shape="rect" id="node1" href="$structpretty__print_1_1custom__delims__base.html" title="pretty_print::custom\l_delims_base" alt="" coords="5,5,144,47"/>
+<area shape="rect" id="node2" href="$structpretty__print_1_1custom__delims__wrapper.html" title="pretty_print::custom\l_delims_wrapper\&lt; T, Delims \&gt;" alt="" coords="192,5,393,47"/>
 </map>

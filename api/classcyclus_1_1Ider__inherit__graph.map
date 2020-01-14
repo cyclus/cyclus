@@ -1,8 +1,8 @@
 <map id="cyclus::Ider" name="cyclus::Ider">
-<area shape="rect" id="node2" href="$classcyclus_1_1Agent.html" title="The abstract base class used by all types of agents that live and interact in a simulation. " alt="" coords="77,80,179,107"/>
-<area shape="rect" id="node7" href="$classcyclus_1_1TimeListener.html" title="The TimeListener class is an inheritable class for any Agent that requires knowlege of ticks and tock..." alt="" coords="203,80,345,107"/>
-<area shape="rect" id="node3" href="$classcyclus_1_1Facility.html" title="The Facility class is the abstract class/interface used by all facility agents. " alt="" coords="5,155,115,181"/>
-<area shape="rect" id="node4" href="$classcyclus_1_1Institution.html" title="The Institution class is the abstract class/interface used by all institution agents. " alt="" coords="140,155,265,181"/>
-<area shape="rect" id="node5" href="$classcyclus_1_1Region.html" title="The Region class is the abstract class/interface used by all region agents. " alt="" coords="289,155,399,181"/>
-<area shape="rect" id="node6" href="$classcyclus_1_1Dummy.html" title="cyclus::Dummy" alt="" coords="287,229,401,256"/>
+<area shape="rect" id="node2" href="$classcyclus_1_1Agent.html" title="The abstract base class used by all types of agents that live and interact in a simulation. " alt="" coords="77,80,180,107"/>
+<area shape="rect" id="node7" href="$classcyclus_1_1TimeListener.html" title="The TimeListener class is an inheritable class for any Agent that requires knowlege of ticks and tock..." alt="" coords="204,80,347,107"/>
+<area shape="rect" id="node3" href="$classcyclus_1_1Facility.html" title="The Facility class is the abstract class/interface used by all facility agents. " alt="" coords="5,155,116,181"/>
+<area shape="rect" id="node4" href="$classcyclus_1_1Institution.html" title="The Institution class is the abstract class/interface used by all institution agents. " alt="" coords="141,155,266,181"/>
+<area shape="rect" id="node5" href="$classcyclus_1_1Region.html" title="The Region class is the abstract class/interface used by all region agents. " alt="" coords="290,155,399,181"/>
+<area shape="rect" id="node6" href="$classcyclus_1_1Dummy.html" title="cyclus::Dummy" alt="" coords="287,229,402,256"/>
 </map>

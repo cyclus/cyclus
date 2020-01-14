@@ -1,10 +1,12 @@
 var searchData=
 [
+  ['py_5fssize_5ft_5fclean',['PY_SSIZE_T_CLEAN',['../eventhooks_8cc.html#ac9efdaac9411d0868b715edccca3269d',1,'PY_SSIZE_T_CLEAN():&#160;eventhooks.cc'],['../pyinfile_8cc.html#ac9efdaac9411d0868b715edccca3269d',1,'PY_SSIZE_T_CLEAN():&#160;pyinfile.cc'],['../pymodule_8cc.html#ac9efdaac9411d0868b715edccca3269d',1,'PY_SSIZE_T_CLEAN():&#160;pymodule.cc']]],
   ['pyne_5f3qgdwzmlzbhdhi424jl52sqhn4',['PYNE_3QGDWZMLZBHDHI424JL52SQHN4',['../pyne_8h.html#a1b893f499020c1669bf1e801c5331d36',1,'pyne.h']]],
   ['pyne_5f46z7lqyfi5hznasipcwhvx3x5e',['PYNE_46Z7LQYFI5HZNASIPCWHVX3X5E',['../pyne_8h.html#ae5fcb554abf396a442d0dce5e2ae91cb',1,'pyne.h']]],
   ['pyne_5f4hfu6pueqjb3zj4uiflvu4spcm',['PYNE_4HFU6PUEQJB3ZJ4UIFLVU4SPCM',['../pyne_8cc.html#ac44da87371056a41a6cd6b2c21660221',1,'pyne.cc']]],
   ['pyne_5f7doeb2pksbeffia3q2nari3kfy',['PYNE_7DOEB2PKSBEFFIA3Q2NARI3KFY',['../pyne_8h.html#a5fccef9d5b4fb108fc8129bf43567419',1,'pyne.h']]],
   ['pyne_5fb3annckdq5hejli33rpzpdnx6a',['PYNE_B3ANNCKDQ5HEJLI33RPZPDNX6A',['../pyne_8h.html#a79ac30fb8c12248bd7c0a08ad4402822',1,'pyne.h']]],
+  ['pyne_5fcram_5fsolve_5fcpp',['PYNE_CRAM_SOLVE_CPP',['../cram_8hpp.html#a6b1cc67abaefea20bf74f193e99a3962',1,'cram.hpp']]],
   ['pyne_5fd35wixv5dzaa5llowby2bl2dpa',['PYNE_D35WIXV5DZAA5LLOWBY2BL2DPA',['../pyne_8h.html#acab662eb1c1df33331a17af4d127e3cc',1,'pyne.h']]],
   ['pyne_5fis_5famalgamated',['PYNE_IS_AMALGAMATED',['../pyne_8h.html#a00fe2ef6f890d7d96ffffb98f1d98ed0',1,'pyne.h']]],
   ['pyne_5fkmmhynanyff5bfmeyip7tunlha',['PYNE_KMMHYNANYFF5BFMEYIP7TUNLHA',['../pyne_8h.html#a9aa542b41d964a0bdab043a73a7db235',1,'pyne.h']]],

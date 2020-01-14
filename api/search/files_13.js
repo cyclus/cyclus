@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['version_2ecc',['version.cc',['../version_8cc.html',1,'']]],
-  ['version_2eh',['version.h',['../version_8h.html',1,'']]]
+  ['windows_5fhelper_5ffunctions_2eh',['windows_helper_functions.h',['../windows__helper__functions_8h.html',1,'']]]
 ];

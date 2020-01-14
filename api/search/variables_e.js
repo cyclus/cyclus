@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['n',['N',['../classpyne_1_1enrichment_1_1Cascade.html#a9061e7809e7de48072097cf680bb1a67',1,'pyne::enrichment::Cascade']]],
+  ['n',['n',['../structpyne__cram__transmute__info__tag.html#ac288cdd5bdcf7a42524f107f314817bb',1,'pyne_cram_transmute_info_tag::n()'],['../classpyne_1_1enrichment_1_1Cascade.html#a9061e7809e7de48072097cf680bb1a67',1,'pyne::enrichment::Cascade::N()']]],
   ['n_5fa',['N_A',['../namespacepyne.html#a44461c2367af5fc9b6bb0988aac2429b',1,'pyne']]],
   ['name_5fid',['name_id',['../namespacepyne_1_1rxname.html#a615522d66adc558775f60c559b3127fe',1,'pyne::rxname']]],
   ['name_5fzz',['name_zz',['../namespacepyne_1_1nucname.html#a89a08a6d3420ed8ca468589435780083',1,'pyne::nucname']]],
@@ -9,12 +9,15 @@ var searchData=
   ['ndsfpy_5fdata',['ndsfpy_data',['../namespacepyne.html#a0526a4bf1637612d760c106836475c6d',1,'pyne']]],
   ['ni_5fshell_5fbe',['ni_shell_be',['../structpyne_1_1atomic.html#a67f3f6467f6aa5b4cdd0edcd6d2a620f',1,'pyne::atomic']]],
   ['ni_5fshell_5fbe_5ferr',['ni_shell_be_err',['../structpyne_1_1atomic.html#aaf211665d5f535c602a07c396d63b56d',1,'pyne::atomic']]],
+  ['nnz',['nnz',['../structpyne__cram__transmute__info__tag.html#a6eb48aee2e991162735b683fa518b8c4',1,'pyne_cram_transmute_info_tag']]],
   ['node_5fto_5fbid',['node_to_bid',['../structcyclus_1_1ExchangeTranslationContext.html#a990c2854cee2d5fd8f46a27d1e1e75e8',1,'cyclus::ExchangeTranslationContext']]],
   ['node_5fto_5frequest',['node_to_request',['../structcyclus_1_1ExchangeTranslationContext.html#af5e864b4a916440bb0769005faae2ea2',1,'cyclus::ExchangeTranslationContext']]],
   ['not_5fvl',['NOT_VL',['../namespacehdf5__back__gen.html#af284a65963c4d3db119e2772b130b4f9',1,'hdf5_back_gen']]],
   ['nuc',['nuc',['../structsimple__xs.html#a3b9ab3ba1c7c702c2c967d4039cd9b03',1,'simple_xs::nuc()'],['../structpyne_1_1atomic__mass__data.html#ae0315c2d1f8504ad3ef3a47ca5d77e9e',1,'pyne::atomic_mass_data::nuc()'],['../structpyne_1_1q__val__data.html#a39dbf1ad0347f0f68f09c94a9ff9157f',1,'pyne::q_val_data::nuc()'],['../structpyne_1_1dose.html#aecdcc915d5508f34715be42e13498d54',1,'pyne::dose::nuc()'],['../structpyne_1_1scattering__lengths.html#a0a7eab28f0d7ff075524950827cfb4d1',1,'pyne::scattering_lengths::nuc()']]],
   ['nuc_5fdata_5fpath',['NUC_DATA_PATH',['../namespacepyne.html#ac4b3b3dcf295d033b906bf921d820ae2',1,'pyne']]],
   ['nuc_5fid',['nuc_id',['../structpyne_1_1level__data.html#aefac68a7a5aaedafd0b01f459e75adc8',1,'pyne::level_data']]],
+  ['nucids',['nucids',['../structpyne__cram__transmute__info__tag.html#a100a4bd9e087c3d68596e38ee01ca810',1,'pyne_cram_transmute_info_tag']]],
+  ['nucs',['nucs',['../structpyne__cram__transmute__info__tag.html#a488f43cedb86c85781e662461a99fa6f',1,'pyne_cram_transmute_info_tag']]],
   ['null',['null',['../classJson_1_1Value.html#a57d8e12306732c80d1719206fcc59b22',1,'Json::Value']]],
   ['number',['number',['../structcyclus_1_1toolkit_1_1BuildOrder.html#ab8329fa51738af6081fbb9ce07131949',1,'cyclus::toolkit::BuildOrder']]]
 ];

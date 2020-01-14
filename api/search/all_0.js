@@ -1,7 +1,8 @@
 var searchData=
 [
   ['_5f',['_',['../namespacepyne_1_1rxname.html#ac59f8c4154e812420e0dfef0388a592b',1,'pyne::rxname']]],
-  ['_5f_5finit_5f_5f',['__init__',['../classhdf5__back__gen_1_1Node.html#ad9d1466ac2c230c5f387e80607b14c53',1,'hdf5_back_gen.Node.__init__()'],['../classhdf5__back__gen_1_1Visitor.html#a15531d35a85e9bd2b4e45c998a1dd9c9',1,'hdf5_back_gen.Visitor.__init__()'],['../classhdf5__back__gen_1_1PrettyFormatter.html#afcc26dcd02c594f1e57f7c52bf8847a8',1,'hdf5_back_gen.PrettyFormatter.__init__()'],['../classhdf5__back__gen_1_1CppGen.html#a2725d6ad6568d60ce0720999f4462ced',1,'hdf5_back_gen.CppGen.__init__()']]],
+  ['_5f_5finit_5f_5f',['__init__',['../classhdf5__back__gen_1_1Node.html#ad9d1466ac2c230c5f387e80607b14c53',1,'hdf5_back_gen.Node.__init__()'],['../classhdf5__back__gen_1_1Visitor.html#a15531d35a85e9bd2b4e45c998a1dd9c9',1,'hdf5_back_gen.Visitor.__init__()'],['../classhdf5__back__gen_1_1PrettyFormatter.html#afcc26dcd02c594f1e57f7c52bf8847a8',1,'hdf5_back_gen.PrettyFormatter.__init__()'],['../classhdf5__back__gen_1_1CppGen.html#a5c355f94be8e9b5b66c0536d5d5d1ae4',1,'hdf5_back_gen.CppGen.__init__()']]],
+  ['_5f_5fpyx_5fextern_5fc',['__PYX_EXTERN_C',['../eventhooks_8cc_8h.html#a1f8c53f8bf2de248911af7d6094febf1',1,'__PYX_EXTERN_C():&#160;eventhooks.cc.h'],['../eventhooks_8h.html#a1f8c53f8bf2de248911af7d6094febf1',1,'__PYX_EXTERN_C():&#160;eventhooks.h'],['../pyinfile_8cc_8h.html#a1f8c53f8bf2de248911af7d6094febf1',1,'__PYX_EXTERN_C():&#160;pyinfile.cc.h'],['../pyinfile_8h.html#a1f8c53f8bf2de248911af7d6094febf1',1,'__PYX_EXTERN_C():&#160;pyinfile.h'],['../pymodule_8cc_8h.html#a1f8c53f8bf2de248911af7d6094febf1',1,'__PYX_EXTERN_C():&#160;pymodule.cc.h'],['../pymodule_8h.html#a1f8c53f8bf2de248911af7d6094febf1',1,'__PYX_EXTERN_C():&#160;pymodule.h']]],
   ['_5f_5fstr_5f_5f',['__str__',['../classhdf5__back__gen_1_1Node.html#a3b7e9bf922b027b777147e0701696c94',1,'hdf5_back_gen::Node']]],
   ['_5fdeltau_5fi_5foverg',['_deltaU_i_OverG',['../namespacepyne_1_1enrichment.html#ab8f3f7b06c2d2d0ec291aaa9c0aef0f6',1,'pyne::enrichment']]],
   ['_5ffill_5fdefault_5furanium_5fcascade',['_fill_default_uranium_cascade',['../namespacepyne_1_1enrichment.html#af7c9529aaf7c9ec69c68ef0ec4d917fa',1,'pyne::enrichment']]],
@@ -30,8 +31,6 @@ var searchData=
   ['_5fload_5fwimsdfpy',['_load_wimsdfpy',['../namespacepyne.html#a32682c82d07a8370677923550dbc9904',1,'pyne']]],
   ['_5fnames',['_names',['../namespacepyne_1_1rxname.html#a880e1a059fe54b6fd425cc3319978555',1,'pyne::rxname']]],
   ['_5fnorm_5fcomp_5fsecant',['_norm_comp_secant',['../namespacepyne_1_1enrichment.html#a27435bc36fca59ca85dcf17b1db17fe4',1,'pyne::enrichment']]],
-  ['_5fpyne_5fdecay_2ecc',['_pyne_decay.cc',['../__pyne__decay_8cc.html',1,'']]],
-  ['_5fpyne_5fdecay_2eh',['_pyne_decay.h',['../__pyne__decay_8h.html',1,'']]],
   ['_5frecompute_5fnm',['_recompute_nm',['../namespacepyne_1_1enrichment.html#a19f834163164c5b5f4725fae89ac2e22',1,'pyne::enrichment']]],
   ['_5frecompute_5fprod_5ftail_5fmats',['_recompute_prod_tail_mats',['../namespacepyne_1_1enrichment.html#ade92dd071c84c71de42599bda809af26',1,'pyne::enrichment']]],
   ['_5freset_5fxjs',['_reset_xjs',['../classpyne_1_1enrichment_1_1Cascade.html#a83d3c438c3f9bc23069470cda6543c58',1,'pyne::enrichment::Cascade']]],

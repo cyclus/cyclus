@@ -1,4 +1,4 @@
 <map id="cyclus::ExchangeSolver" name="cyclus::ExchangeSolver">
 <area shape="rect" id="node2" href="$classcyclus_1_1GreedySolver.html" title="The GreedySolver provides the implementation for a &quot;greedy&quot; solution to a resource exchange graph..." alt="" coords="5,80,152,107"/>
-<area shape="rect" id="node3" href="$classcyclus_1_1ProgSolver.html" title="The ProgSolver provides the implementation for a mathematical programming solution to a resource exch..." alt="" coords="177,80,308,107"/>
+<area shape="rect" id="node3" href="$classcyclus_1_1ProgSolver.html" title="The ProgSolver provides the implementation for a mathematical programming solution to a resource exch..." alt="" coords="177,80,309,107"/>
 </map>

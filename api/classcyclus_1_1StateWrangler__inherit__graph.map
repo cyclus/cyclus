@@ -1,8 +1,8 @@
 <map id="cyclus::StateWrangler" name="cyclus::StateWrangler">
-<area shape="rect" id="node2" href="$classcyclus_1_1Agent.html" title="The abstract base class used by all types of agents that live and interact in a simulation. " alt="" coords="151,88,253,115"/>
-<area shape="rect" id="node7" href="$classcyclus_1_1toolkit_1_1CommodityRecipeContext.html" title="a CommodityRecipeContext contains relationships between commodities, recipes and resources ..." alt="" coords="279,81,457,122"/>
-<area shape="rect" id="node3" href="$classcyclus_1_1Facility.html" title="The Facility class is the abstract class/interface used by all facility agents. " alt="" coords="5,171,115,197"/>
-<area shape="rect" id="node4" href="$classcyclus_1_1Institution.html" title="The Institution class is the abstract class/interface used by all institution agents. " alt="" coords="140,171,265,197"/>
-<area shape="rect" id="node5" href="$classcyclus_1_1Region.html" title="The Region class is the abstract class/interface used by all region agents. " alt="" coords="289,171,399,197"/>
-<area shape="rect" id="node6" href="$classcyclus_1_1Dummy.html" title="cyclus::Dummy" alt="" coords="287,245,401,272"/>
+<area shape="rect" id="node2" href="$classcyclus_1_1Agent.html" title="The abstract base class used by all types of agents that live and interact in a simulation. " alt="" coords="152,87,255,114"/>
+<area shape="rect" id="node7" href="$classcyclus_1_1toolkit_1_1CommodityRecipeContext.html" title="a CommodityRecipeContext contains relationships between commodities, recipes and resources ..." alt="" coords="279,80,458,121"/>
+<area shape="rect" id="node3" href="$classcyclus_1_1Facility.html" title="The Facility class is the abstract class/interface used by all facility agents. " alt="" coords="5,169,116,196"/>
+<area shape="rect" id="node4" href="$classcyclus_1_1Institution.html" title="The Institution class is the abstract class/interface used by all institution agents. " alt="" coords="141,169,266,196"/>
+<area shape="rect" id="node5" href="$classcyclus_1_1Region.html" title="The Region class is the abstract class/interface used by all region agents. " alt="" coords="290,169,399,196"/>
+<area shape="rect" id="node6" href="$classcyclus_1_1Dummy.html" title="cyclus::Dummy" alt="" coords="287,244,402,271"/>
 </map>

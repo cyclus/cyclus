@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['vals',['Vals',['../classcyclus_1_1Datum.html#addd24dbe5887f277c1fe38a60ce30680',1,'cyclus::Datum']]],
-  ['value_5ftype',['value_type',['../structpretty__print_1_1array__wrapper__n.html#a6ad06ae74e53a3466794e81100fad14e',1,'pretty_print::array_wrapper_n']]],
-  ['vector',['Vector',['../namespacecyclus.html#aeba450c321b18d8a09224e72d0655098',1,'cyclus']]]
+  ['uint',['UInt',['../classJson_1_1Value.html#a0933d59b45793ae4aade1757c322a98d',1,'Json::Value::UInt()'],['../namespaceJson.html#a800fb90eb6ee8d5d62b600c06f87f7d4',1,'Json::UInt()']]],
+  ['uint64',['UInt64',['../classJson_1_1Value.html#a8b62564be8c087c6d18de180ff4e13e3',1,'Json::Value::UInt64()'],['../namespaceJson.html#a01f20bce8f8229f38ff890168c0e6452',1,'Json::UInt64()']]],
+  ['uinttostringbuffer',['UIntToStringBuffer',['../namespaceJson.html#a602bcf69c2042fb61c3b243cb16f04ca',1,'Json']]]
 ];

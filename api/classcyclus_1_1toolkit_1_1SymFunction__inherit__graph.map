@@ -1,5 +1,5 @@
 <map id="cyclus::toolkit::SymFunction" name="cyclus::toolkit::SymFunction">
-<area shape="rect" id="node2" href="$classcyclus_1_1toolkit_1_1ExponentialFunction.html" title="Exponential functions f(x) = constant_ * exp ( exponent_ * x ) + intercept_. " alt="" coords="252,5,431,46"/>
-<area shape="rect" id="node3" href="$classcyclus_1_1toolkit_1_1LinearFunction.html" title="Linear functions f(x) = slope_ * x + intercept_. " alt="" coords="243,71,439,97"/>
-<area shape="rect" id="node4" href="$classcyclus_1_1toolkit_1_1PiecewiseFunction.html" title="Piecewise function f(x) for all x in [lhs,rhs] 0 otherwise. " alt="" coords="256,122,427,163"/>
+<area shape="rect" id="node2" href="$classcyclus_1_1toolkit_1_1ExponentialFunction.html" title="Exponential functions f(x) = constant_ * exp ( exponent_ * x ) + intercept_. " alt="" coords="250,5,429,47"/>
+<area shape="rect" id="node3" href="$classcyclus_1_1toolkit_1_1LinearFunction.html" title="Linear functions f(x) = slope_ * x + intercept_. " alt="" coords="241,71,437,98"/>
+<area shape="rect" id="node4" href="$classcyclus_1_1toolkit_1_1PiecewiseFunction.html" title="Piecewise function f(x) for all x in [lhs,rhs] 0 otherwise. " alt="" coords="254,123,425,164"/>
 </map>

@@ -1,3 +1,6 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$structpyne_1_1atomic__mass__data.html" title="a struct matching the atomic_mass table in nuc_data.h5. " alt="" coords="5,5,173,32"/>
+<area shape="rect" id="node1" href="$classJson_1_1Writer.html" title="Abstract class for writers. " alt="" coords="5,56,99,83"/>
+<area shape="rect" id="node2" href="$classJson_1_1CustomWriter.html" title="Writes a Value in JSON format with custom formatting. " alt="" coords="147,5,285,32"/>
+<area shape="rect" id="node3" href="$classJson_1_1FastWriter.html" title="Outputs a Value in JSON format without formatting (not human friendly). " alt="" coords="157,56,275,83"/>
+<area shape="rect" id="node4" href="$classJson_1_1StyledWriter.html" title="Writes a Value in JSON format in a human friendly way. " alt="" coords="151,107,281,133"/>
 </map>

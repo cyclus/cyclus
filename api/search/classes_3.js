@@ -27,7 +27,6 @@ var searchData=
   ['derived',['Derived',['../structpretty__print_1_1has__begin__end_1_1Derived.html',1,'pretty_print::has_begin_end']]],
   ['digest',['Digest',['../classcyclus_1_1Digest.html',1,'cyclus']]],
   ['dose',['dose',['../structpyne_1_1dose.html',1,'pyne']]],
-  ['dummy',['Dummy',['../classcyclus_1_1Dummy.html',1,'cyclus']]],
-  ['dummy',['Dummy',['../structpretty__print_1_1has__begin__end_1_1Dummy.html',1,'pretty_print::has_begin_end']]],
+  ['dummy',['Dummy',['../structpretty__print_1_1has__begin__end_1_1Dummy.html',1,'pretty_print::has_begin_end&lt; T &gt;::Dummy'],['../classcyclus_1_1Dummy.html',1,'cyclus::Dummy']]],
   ['dynamicmodule',['DynamicModule',['../classcyclus_1_1DynamicModule.html',1,'cyclus']]]
 ];

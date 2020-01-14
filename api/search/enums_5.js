@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['timeseriestype',['TimeSeriesType',['../namespacecyclus_1_1toolkit.html#a672ce1982cd41a0fb8c9d313ad4f2464',1,'cyclus::toolkit']]]
+  ['stringformat',['StringFormat',['../classcyclus_1_1toolkit_1_1Position.html#a822cafa5b88ae27c32f963c5ba676f24',1,'cyclus::toolkit::Position']]]
 ];

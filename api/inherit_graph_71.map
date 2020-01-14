@@ -1,3 +1,8 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classcyclus_1_1toolkit_1_1BasicFunctionFactory.html" title="A concrete factory that can provide access to basic symbolic functions. " alt="" coords="5,5,200,46"/>
+<area shape="rect" id="node1" href="$classcyclus_1_1toolkit_1_1AgentManaged.html" title="This is a mixin class that provides an interface to access the underlying agent that manages it..." alt="" coords="5,129,204,156"/>
+<area shape="rect" id="node2" href="$classcyclus_1_1toolkit_1_1Builder.html" title="A mixin to provide information about commodity producers that can be built. " alt="" coords="277,5,427,32"/>
+<area shape="rect" id="node3" href="$classcyclus_1_1toolkit_1_1BuildingManager.html" title="The BuildingManager class is a managing entity that makes decisions about which objects to build give..." alt="" coords="273,57,431,98"/>
+<area shape="rect" id="node4" href="$classcyclus_1_1toolkit_1_1CommodityProducer.html" title="A mixin to provide information about produced commodities. " alt="" coords="263,122,441,163"/>
+<area shape="rect" id="node5" href="$classcyclus_1_1toolkit_1_1CommodityProducerManager.html" title="A mixin to provide information about commodity producers. " alt="" coords="263,187,441,229"/>
+<area shape="rect" id="node6" href="$classcyclus_1_1toolkit_1_1SupplyDemandManager.html" title="This is a manager class that manages a set of commodities. " alt="" coords="252,253,452,294"/>
 </map>

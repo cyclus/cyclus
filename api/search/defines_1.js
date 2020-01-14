@@ -7,6 +7,8 @@ var searchData=
   ['cpptl_5fjson_5freader_5fh_5fincluded',['CPPTL_JSON_READER_H_INCLUDED',['../pyne_8h.html#a474bdd38a6f0d733485d831d9d99faa2',1,'pyne.h']]],
   ['cyclus_5fbindval',['CYCLUS_BINDVAL',['../sqlite__back_8cc.html#ab496d4094b708d7397d158c4e94757f4',1,'sqlite_back.cc']]],
   ['cyclus_5fcomma',['CYCLUS_COMMA',['../sqlite__back_8cc.html#a4078367354377e70156286afceec0924',1,'CYCLUS_COMMA():&#160;sqlite_back.cc'],['../sqlite__back_8cc.html#a4078367354377e70156286afceec0924',1,'CYCLUS_COMMA():&#160;sqlite_back.cc']]],
+  ['cyclus_5fdecimal_5fsecond_5fmultiplier',['CYCLUS_DECIMAL_SECOND_MULTIPLIER',['../position_8h.html#aaa4c2e695f3d86dd79ffebb290ce8ed6',1,'position.h']]],
+  ['cyclus_5fhas_5fcoin',['CYCLUS_HAS_COIN',['../platform_8h.html#a7741b6398568fa82adbc8debfeb4cd01',1,'platform.h']]],
   ['cyclus_5floadval',['CYCLUS_LOADVAL',['../sqlite__back_8cc.html#ad0a93d3c19871fcc768020cb661d225d',1,'sqlite_back.cc']]],
   ['cyclus_5fsha1_5fnint',['CYCLUS_SHA1_NINT',['../query__backend_8h.html#a64fd685934aa4bf8c677f2b9213189c9',1,'query_backend.h']]],
   ['cyclus_5fsha1_5fsize',['CYCLUS_SHA1_SIZE',['../query__backend_8h.html#a333df72706f0b78e671c617f0f724d29',1,'query_backend.h']]],

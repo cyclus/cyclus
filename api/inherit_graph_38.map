@@ -1,5 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classcyclus_1_1ExchangeSolver.html" title="a very simple interface for solving translated resource exchanges " alt="" coords="5,31,168,57"/>
-<area shape="rect" id="node2" href="$classcyclus_1_1GreedySolver.html" title="The GreedySolver provides the implementation for a &quot;greedy&quot; solution to a resource exchange graph..." alt="" coords="216,5,363,32"/>
-<area shape="rect" id="node3" href="$classcyclus_1_1ProgSolver.html" title="The ProgSolver provides the implementation for a mathematical programming solution to a resource exch..." alt="" coords="223,56,355,83"/>
+<area shape="rect" id="node1" href="$classcyclus_1_1ExchangeNodeGroup.html" title="A ExchangeNodeGroup is a collection of ExchangeNodes, and is the ExchangeGraph representation of a Bi..." alt="" coords="5,5,197,32"/>
+<area shape="rect" id="node2" href="$classcyclus_1_1RequestGroup.html" title="A RequestGroup is a specific ExchangeNodeGroup with a notion of an total requested quantity..." alt="" coords="245,5,397,32"/>
 </map>

@@ -1,3 +1,6 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classcyclus_1_1TradeExecutor.html" title="The TradeExecutor is an object whose task is to execute a collection of Trades. " alt="" coords="6,5,191,32"/>
+<area shape="rect" id="node1" href="$classcyclus_1_1toolkit_1_1SymFunction.html" title="Abstract base class for symbolic functions. " alt="" coords="5,71,193,98"/>
+<area shape="rect" id="node2" href="$classcyclus_1_1toolkit_1_1ExponentialFunction.html" title="Exponential functions f(x) = constant_ * exp ( exponent_ * x ) + intercept_. " alt="" coords="250,5,429,47"/>
+<area shape="rect" id="node3" href="$classcyclus_1_1toolkit_1_1LinearFunction.html" title="Linear functions f(x) = slope_ * x + intercept_. " alt="" coords="241,71,437,98"/>
+<area shape="rect" id="node4" href="$classcyclus_1_1toolkit_1_1PiecewiseFunction.html" title="Piecewise function f(x) for all x in [lhs,rhs] 0 otherwise. " alt="" coords="254,123,425,164"/>
 </map>

@@ -1,4 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classcyclus_1_1ExchangeNodeGroup.html" title="A ExchangeNodeGroup is a collection of ExchangeNodes, and is the ExchangeGraph representation of a Bi..." alt="" coords="5,5,197,32"/>
-<area shape="rect" id="node2" href="$classcyclus_1_1RequestGroup.html" title="A RequestGroup is a specific ExchangeNodeGroup with a notion of an total requested quantity..." alt="" coords="245,5,397,32"/>
+<area shape="rect" id="node1" href="$structcyclus_1_1ExchangeNode.html" title="ExchangeNodes are used in ExchangeGraphs to house information about a given translated Bid or Request..." alt="" coords="5,5,163,32"/>
 </map>

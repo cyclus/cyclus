@@ -2,10 +2,12 @@ var searchData=
 [
   ['label',['label',['../namespacepyne_1_1rxname.html#ade7f3ea5b064a6681304d744e980af61',1,'pyne::rxname::label(int x)'],['../namespacepyne_1_1rxname.html#a8987dc37a3449cf20f4a82c06c3dacf0',1,'pyne::rxname::label(unsigned int x)'],['../namespacepyne_1_1rxname.html#afc967448852b315acdd9c5b1e1f1a3cc',1,'pyne::rxname::label(char *x)'],['../namespacepyne_1_1rxname.html#a9183e4eb4d2f8386238df017a6763910',1,'pyne::rxname::label(std::string x)'],['../namespacepyne_1_1rxname.html#a1d990996b1b80abcdf8ba7cb03bf9c0b',1,'pyne::rxname::label(int from_nuc, int to_nuc, std::string z=&quot;n&quot;)'],['../namespacepyne_1_1rxname.html#a2e4d7d20d4278d6b6b5b57592fab287b',1,'pyne::rxname::label(int from_nuc, std::string to_nuc, std::string z=&quot;n&quot;)'],['../namespacepyne_1_1rxname.html#aff83b91df8abe88197680a467b843969',1,'pyne::rxname::label(std::string from_nuc, int to_nuc, std::string z=&quot;n&quot;)'],['../namespacepyne_1_1rxname.html#aa316be9d06a9987cb9816cc26926a237',1,'pyne::rxname::label(std::string from_nuc, std::string to_nuc, std::string z=&quot;n&quot;)']]],
   ['last_5fchar',['last_char',['../namespacepyne.html#a97495e780a8fd91e4604e5a7b2f84f3e',1,'pyne']]],
+  ['latitude',['latitude',['../classcyclus_1_1toolkit_1_1Position.html#acab8fb348c3bd09df521f03c40a5f32a',1,'cyclus::toolkit::Position::latitude() const'],['../classcyclus_1_1toolkit_1_1Position.html#ab845e4740619fe307dc892a6a93fea8c',1,'cyclus::toolkit::Position::latitude(double lat)']]],
   ['lib',['lib',['../classcyclus_1_1AgentSpec.html#af8373ca7a1fecad0339b6c7b1cef50b1',1,'cyclus::AgentSpec']]],
   ['libpath',['LibPath',['../classcyclus_1_1AgentSpec.html#ad9190828de518d791ece046db182c812',1,'cyclus::AgentSpec']]],
-  ['lifetime',['lifetime',['../classcyclus_1_1Agent.html#a318e8ce59d1fcfe5baa856cbab2d59d9',1,'cyclus::Agent::lifetime(int n_timesteps)'],['../classcyclus_1_1Agent.html#a6adf10322a19050b3b2425fa5fde6369',1,'cyclus::Agent::lifetime() const '],['../classcyclus_1_1MockAgent.html#a1d1aaa4e11a75133a3fc30417b148c4c',1,'cyclus::MockAgent::lifetime()']]],
-  ['limit',['Limit',['../classcyclus_1_1toolkit_1_1MatlSellPolicy.html#af3c5c3b6d29f115d233724480237e847',1,'cyclus::toolkit::MatlSellPolicy']]],
+  ['lifetime',['lifetime',['../classcyclus_1_1Agent.html#a318e8ce59d1fcfe5baa856cbab2d59d9',1,'cyclus::Agent::lifetime(int n_timesteps)'],['../classcyclus_1_1Agent.html#a851b0e9e13ad21215a52068e01669306',1,'cyclus::Agent::lifetime() const'],['../classcyclus_1_1MockAgent.html#a1d1aaa4e11a75133a3fc30417b148c4c',1,'cyclus::MockAgent::lifetime()']]],
+  ['lifetime_5fforce',['lifetime_force',['../classcyclus_1_1Agent.html#af61e63450a912574a33e608b0e47e879',1,'cyclus::Agent']]],
+  ['limit',['Limit',['../classcyclus_1_1toolkit_1_1MatlSellPolicy.html#ae869d3b02529001209968e9a9c87bdd1',1,'cyclus::toolkit::MatlSellPolicy']]],
   ['linearfunction',['LinearFunction',['../classcyclus_1_1toolkit_1_1LinearFunction.html#add7f0990df075a7df6415d9ac0fdc1b4',1,'cyclus::toolkit::LinearFunction']]],
   ['list_5fbody',['list_body',['../namespacehdf5__back__gen.html#a2fdcea6b0c4cb3a48960756e4ccfb026',1,'hdf5_back_gen']]],
   ['list_5fdependencies',['list_dependencies',['../namespacehdf5__back__gen.html#a307b698eb3136e5dd10a798493337d5f',1,'hdf5_back_gen']]],
@@ -21,6 +23,8 @@ var searchData=
   ['loadsim',['LoadSim',['../classcyclus_1_1XMLFileLoader.html#af4e2617485aacb01066bf2d02ae28b4b',1,'cyclus::XMLFileLoader']]],
   ['loadsolver',['LoadSolver',['../classcyclus_1_1XMLFileLoader.html#a3f27d900b21bcd9bedd93384c3530f46',1,'cyclus::XMLFileLoader']]],
   ['loadspecs',['LoadSpecs',['../classcyclus_1_1XMLFileLoader.html#a451584ea9912b2c27780168f67c3f69c',1,'cyclus::XMLFileLoader']]],
-  ['loadstringstreamfromfile',['LoadStringstreamFromFile',['../namespacecyclus.html#afc68680021a35d0888c4fbd5cae9bb65',1,'cyclus']]],
-  ['logger',['Logger',['../classcyclus_1_1Logger.html#a39d2d20cf265d09792797d2d279c8867',1,'cyclus::Logger']]]
+  ['loadstringfromfile',['LoadStringFromFile',['../namespacecyclus.html#a6d3a7cf1d0b0bff78ae9af34f2bb0798',1,'cyclus']]],
+  ['loadstringstreamfromfile',['LoadStringstreamFromFile',['../namespacecyclus.html#a4325c9ec92ee67895bd23bb5339586ea',1,'cyclus']]],
+  ['logger',['Logger',['../classcyclus_1_1Logger.html#a39d2d20cf265d09792797d2d279c8867',1,'cyclus::Logger']]],
+  ['longitude',['longitude',['../classcyclus_1_1toolkit_1_1Position.html#a16a9d13d38abbd3a22060cb82968eaca',1,'cyclus::toolkit::Position::longitude() const'],['../classcyclus_1_1toolkit_1_1Position.html#a5f6c1e7cb33adc0e83cc2f81f5fc87d0',1,'cyclus::toolkit::Position::longitude(double lon)']]]
 ];

@@ -3,7 +3,7 @@ var searchData=
   ['schema_5f',['schema_',['../classcyclus_1_1RelaxNGValidator.html#aa758c33694d388c557f0855094a9f05f',1,'cyclus::RelaxNGValidator']]],
   ['schema_5fpath_5f',['schema_path_',['../classcyclus_1_1XMLFileLoader.html#aa97366141471d496a4a255c766eed2f8',1,'cyclus::XMLFileLoader']]],
   ['sec_5fper_5fday',['sec_per_day',['../namespacepyne.html#a3a54f183e7323b4d62c12f309c3af081',1,'pyne']]],
-  ['shape',['shape',['../classh5wrap_1_1HomogenousTypeTable.html#ab0e03ddbee134e775ea6fa389897fc8b',1,'h5wrap::HomogenousTypeTable']]],
+  ['shape',['shape',['../classh5wrap_1_1HomogenousTypeTable.html#ab0e03ddbee134e775ea6fa389897fc8b',1,'h5wrap::HomogenousTypeTable::shape()'],['../structcyclus_1_1ColumnInfo.html#a9c47c00cee8d58b86f5e5bd1ad6f1402',1,'cyclus::ColumnInfo::shape()']]],
   ['sigma_5f2n',['sigma_2n',['../structsimple__xs.html#a48428459c08bd8e7ca73ede3d5d1b12d',1,'simple_xs']]],
   ['sigma_5f3n',['sigma_3n',['../structsimple__xs.html#a2d20b02fe8098c55466d12de065bfdee',1,'simple_xs']]],
   ['sigma_5f4n',['sigma_4n',['../structsimple__xs.html#a1c2a32a82a8f3e381d67b778c89c499e',1,'simple_xs']]],

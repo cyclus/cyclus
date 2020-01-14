@@ -1,5 +1,5 @@
 <map id="cyclus::Trader" name="cyclus::Trader">
-<area shape="rect" id="node2" href="$classcyclus_1_1Facility.html" title="The Facility class is the abstract class/interface used by all facility agents. " alt="" coords="5,88,115,115"/>
-<area shape="rect" id="node3" href="$classcyclus_1_1toolkit_1_1MatlBuyPolicy.html" title="MatlBuyPolicy performs semi&#45;automatic inventory management of a material buffer by making requests an..." alt="" coords="139,81,297,122"/>
-<area shape="rect" id="node4" href="$classcyclus_1_1toolkit_1_1MatlSellPolicy.html" title="MatlSellPolicy performs semi&#45;automatic inventory management of a material buffer by making offers and..." alt="" coords="322,81,480,122"/>
+<area shape="rect" id="node2" href="$classcyclus_1_1Facility.html" title="The Facility class is the abstract class/interface used by all facility agents. " alt="" coords="5,87,116,114"/>
+<area shape="rect" id="node3" href="$classcyclus_1_1toolkit_1_1MatlBuyPolicy.html" title="MatlBuyPolicy performs semi&#45;automatic inventory management of a material buffer by making requests an..." alt="" coords="140,80,299,121"/>
+<area shape="rect" id="node4" href="$classcyclus_1_1toolkit_1_1MatlSellPolicy.html" title="MatlSellPolicy performs semi&#45;automatic inventory management of a material buffer by making offers and..." alt="" coords="323,80,481,121"/>
 </map>
