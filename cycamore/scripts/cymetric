@@ -1,5 +1,0 @@
-#!/usr/bin/env python
-"""Cymetric entry point."""
-from cymetric.main import main
-main()
-
