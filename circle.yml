@@ -5,6 +5,9 @@ jobs:
     build:
         docker:
             - image: cyclus/cyclus-deps
+              auth:
+                username: $DOCKERHUB_USER
+                password: $DOCKERHUB_PASS
         working_directory: ~/cyclus
         steps:
             # Ensure your image has git (required by git to clone via SSH) so that CircleCI can clone your repo
@@ -29,6 +32,9 @@ jobs:
     unit_test:
         docker:
             - image: cyclus/cyclus-deps
+              auth:
+                username: $DOCKERHUB_USER
+                password: $DOCKERHUB_PASS
         working_directory: /root
         steps:
             - run:
@@ -44,6 +50,9 @@ jobs:
     nosetest:
         docker:
             - image: cyclus/cyclus-deps
+              auth:
+                username: $DOCKERHUB_USER
+                password: $DOCKERHUB_PASS
         working_directory: /root
         steps:
             - run:
@@ -61,6 +70,9 @@ jobs:
     deploy_latest: # Cyclus/dev -> Cyclus:latest
         docker:
             - image: circleci/ruby:2.4-node
+              auth:
+                username: $DOCKERHUB_USER
+                password: $DOCKERHUB_PASS
         working_directory: ~/cyclus
         steps:
             # Ensure your image has git (required by git to clone via SSH) so that CircleCI can clone your repo
@@ -83,6 +95,9 @@ jobs:
     deploy_stable:
         docker: # Cyclus/master -> Cyclus:stable
             - image: circleci/ruby:2.4-node
+              auth:
+                username: $DOCKERHUB_USER
+                password: $DOCKERHUB_PASS
         working_directory: ~/cyclus
         steps:
             - checkout
@@ -105,6 +120,9 @@ jobs:
     deb_generation:
         docker:
             - image: circleci/ruby:2.4-node
+              auth:
+                username: $DOCKERHUB_USER
+                password: $DOCKERHUB_PASS
         working_directory: ~/cyclus
         steps:
             - checkout
@@ -119,6 +137,9 @@ jobs:
     cycamore_master: ## Cycamore/master against Cyclus/dev
         docker:
             - image: cyclus/cyclus-deps
+              auth:
+                username: $DOCKERHUB_USER
+                password: $DOCKERHUB_PASS
         working_directory: /root
         steps:
             # Ensure your image has git (required by git to clone via SSH) so that CircleCI can clone your repo
@@ -153,6 +174,9 @@ jobs:
     cymetric_master: ## Cymetric/master against Cyclus/dev + Cycamore/dev
         docker:
             - image: cyclus/cyclus-deps
+              auth:
+                username: $DOCKERHUB_USER
+                password: $DOCKERHUB_PASS
         working_directory: /root
         steps:
             # Ensure your image has git (required by git to clone via SSH) so that CircleCI can clone your repo
@@ -210,19 +234,24 @@ workflows:
         jobs:
 
             # On a PR // All Branch
-            - build
+            - build:
+                context: Dockerhub
             - unit_test:
+                context: Dockerhub
                 requires:
                     - build
             - nosetest:
+                context: Dockerhub
                 requires:
                     - build
 
             - cycamore_master:
+                context: Dockerhub
                 requires:
                     - unit_test
                     - nosetest
             - cymetric_master:
+                context: Dockerhub
                 requires:
                     - unit_test
                     - nosetest
@@ -230,6 +259,7 @@ workflows:
 
             # Merge on Master
             - deploy_latest:
+                context: Dockerhub
                 filters:
                     branches:
                         only: master
@@ -245,6 +275,7 @@ workflows:
 
             # The following should now be done on version tag.
             - deploy_stable:
+                context: Dockerhub
                 filters:
                     branches:
                         ignore: /.*/
@@ -254,6 +285,7 @@ workflows:
                     - unit_test
                     - nosetest
             - deb_generation:
+                context: Dockerhub
                 filters:
                     branches:
                         ignore: /.*/
