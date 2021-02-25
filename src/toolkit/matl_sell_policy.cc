@@ -123,12 +123,15 @@ double MatlSellPolicy::Limit() const {
 std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
     CommodMap<Material>::type& commod_requests) {
   std::set<BidPortfolio<Material>::Ptr> ports;
-  if (buf_->empty() || buf_->quantity() < eps())
-    return ports;
+  
 
-  BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
+  
 
   double limit = Limit();
+  if (buf_->empty() || buf_->quantity() < eps()|| limit <eps())
+    return ports;
+  
+  BidPortfolio<Material>::Ptr port(new BidPortfolio<Material>());
   CapacityConstraint<Material> cc(limit);
   port->AddConstraint(cc);
   ports.insert(port);
