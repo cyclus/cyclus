@@ -183,6 +183,9 @@ to contribute into Cyclus, please follow this procedure:
 
 #. Wait for reviews/merge (the proposer of a pull request cannot be the Merger).
 
+*** We recommend testing your changes before making a pull request. All pull
+requests are now subject to continuous integration via CircleCI. ***
+
 You may also want to read our `Contribution Guidelines <CONTRIBUTING.rst>`_.
 
 .. _`Cyclus Homepage`: http://fuelcycle.org/
