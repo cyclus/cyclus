@@ -1,7 +1,6 @@
 #ifndef CYCLUS_SRC_HDF5_BACK_H_
 #define CYCLUS_SRC_HDF5_BACK_H_
 
-#include <list>
 #include <map>
 #include <set>
 #include <string>

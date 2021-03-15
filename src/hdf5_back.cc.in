@@ -337,6 +337,7 @@ void Hdf5Back::CreateTable(Datum* d) {
   using std::vector;
   using std::list;
   using std::pair;
+  using std::list;
   using std::map;
   Datum::Vals vals = d->vals();
   hsize_t nvals = vals.size();
