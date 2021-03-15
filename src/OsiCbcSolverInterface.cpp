@@ -7,6 +7,8 @@
 #include "OsiCbcSolverInterface_2_8.cpp"
 #elif CBC_VERSION_MAJOR == 2 && CBC_VERSION_MINOR == 9
 #include "OsiCbcSolverInterface_2_9.cpp"
+#elif CBC_VERSION_MAJOR == 2 && CBC_VERSION_MINOR == 10
+#include "OsiCbcSolverInterface_2_10.hpp"
 #else
 #error "Cyclus cannot yet handle your version of CoinCBC. Please open an issue with your CoinCBC version."
 #endif
