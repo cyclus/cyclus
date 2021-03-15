@@ -187,6 +187,20 @@ From now on, to switch between different versions, use:
 
    sudo update-alternatives --config python
 
+Even if you only have a single python installation, you may have to use update-alternatives to point python at the correct version to avoid build errors.
+
+Check your current python version with the following command:
+
+ .. code-block:: bash
+
+   python --version
+
+Then make Ubuntu aware of your current python version. Run the following command, using the python version you just checked. The following command uses version python3.8 as an example and will fail if you do not replace 3.8 with your own version number.
+
+ .. code-block:: bash
+
+   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 2
+
 
 Cython Note
 ^^^^^^^^^^^
