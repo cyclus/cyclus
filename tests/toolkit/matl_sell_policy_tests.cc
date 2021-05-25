@@ -100,9 +100,13 @@ TEST_F(MatlSellPolicyTests, Bids) {
   ASSERT_EQ(obs.size(), 1);
   ASSERT_EQ((*obs.begin())->bids().size(), 2);
   ASSERT_FLOAT_EQ((*(*obs.begin())->bids().begin())->offer()->quantity(),
-                  mat->quantity() / 2);
+                  qty / 2);
   ASSERT_EQ((*(*obs.begin())->bids().begin())->offer()->comp(), comp1);
   
+  // quantize bigger than the quantity in storage
+  p.Init(NULL, &buff, "", qty, true, qty * 2).Set(commod);
+  obs = p.GetMatlBids(reqs);
+  ASSERT_EQ(obs.size(), 0);
   delete req;
 }
 
