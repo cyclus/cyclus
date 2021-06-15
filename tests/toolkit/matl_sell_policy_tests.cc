@@ -95,7 +95,7 @@ TEST_F(MatlSellPolicyTests, Bids) {
   ASSERT_EQ((*(*obs.begin())->bids().begin())->offer()->comp(), comp);
 
   // excl and ignore_comp
-    // Qty = 3, Throughput = 3, Quanta = 1.5 -> only 2 transactions of 1 quanta
+    // Qty = 3, Throughput = 3, Quanta = 1.5 -> 2 transactions of 1 quanta
   p.Init(NULL, &buff, "", qty, true, qty / 2).Set(commod);
   obs = p.GetMatlBids(reqs);
   ASSERT_EQ(obs.size(), 1);
