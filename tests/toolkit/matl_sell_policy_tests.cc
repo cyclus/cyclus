@@ -95,14 +95,31 @@ TEST_F(MatlSellPolicyTests, Bids) {
   ASSERT_EQ((*(*obs.begin())->bids().begin())->offer()->comp(), comp);
 
   // excl and ignore_comp
+    // Qty = 3, Throughput = 3, Quanta = 1.5 -> 2 transactions of 1 quanta
   p.Init(NULL, &buff, "", qty, true, qty / 2).Set(commod);
   obs = p.GetMatlBids(reqs);
   ASSERT_EQ(obs.size(), 1);
   ASSERT_EQ((*obs.begin())->bids().size(), 2);
   ASSERT_FLOAT_EQ((*(*obs.begin())->bids().begin())->offer()->quantity(),
-                  mat->quantity() / 2);
+                  qty / 2);
+  ASSERT_EQ((*(*obs.begin())->bids().begin())->offer()->comp(), comp1);
+
+  // If available quantity is bigger than the quanta only an integer number of quanta is offered
+  // Qty = 3, Throughput = 3, Quanta = 2 -> only 1 transactions of 1 quanta
+  p.Init(NULL, &buff, "", qty, true, 2).Set(commod);
+  obs = p.GetMatlBids(reqs);
+  ASSERT_EQ(obs.size(), 1);
+  ASSERT_EQ((*obs.begin())->bids().size(), 1);
+  ASSERT_FLOAT_EQ((*(*obs.begin())->bids().begin())->offer()->quantity(),
+                  2);
   ASSERT_EQ((*(*obs.begin())->bids().begin())->offer()->comp(), comp1);
   
+
+  // quantize bigger than the quantity in storage
+   // Qty = 3, Throughput = 3, Quanta = 6 -> No transaction
+  p.Init(NULL, &buff, "", qty, true, qty * 2).Set(commod);
+  obs = p.GetMatlBids(reqs);
+  ASSERT_EQ(obs.size(), 0);
   delete req;
 }
 
