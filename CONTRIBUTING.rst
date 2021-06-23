@@ -36,6 +36,9 @@ Issuing a Pull Request
   <https://help.github.com/articles/using-pull-requests/>`_ before you make a
   pull request to the master branch.
 
+* Please create an appropriately-named copy of `news/TEMPLATE.rst`, and describe
+  your changes briefly.
+
 Reviewing a Pull Request
 ========================
 
