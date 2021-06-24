@@ -96,7 +96,7 @@
 
 #if (__GNUC__ >= 4)
   #include <cmath>
-  #define isnan(x) std::isnan(x)
+  using std::isnan;
 #else
   #include <math.h>
   #define isnan(x) __isnand((double)x)
