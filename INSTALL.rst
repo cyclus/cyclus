@@ -12,7 +12,10 @@ provided with the source.
 Dependencies
 ************
 
-A full list of the Cyclus package dependencies is shown below:
+A full list of the Cyclus package dependencies is shown below; note however
+that many of these versions are not available anymore from common sources
+(anaconda, Linux distributions, etc.), and Cyclus doesn't always work with any
+newer version.
 
 ====================   ==================
 Package                Minimum Version
@@ -34,8 +37,16 @@ Installation
 
 Before going further with the installation procedure be sure you have installed
 all the required dependencies listed above. We have provided detailed
-instructions for `installing dependencies <DEPENDENCIES.rst>`_ for the major supported
-systems.
+instructions for `installing dependencies
+<https://github.com/cyclus/cyclus/blob/master/DEPENDENCIES.rst>`_ for the major
+supported systems.
+
+**NOTE**: Cyclus needs dependencies that go beyond the list above, and doesn't
+always work with newer versions. It is recommended that you use the `binary
+installation from Anaconda <install_binary>`, the `Virtualbox image
+<virtualbox>`, or the `Docker image <https://hub.docker.com/r/cyclus/cyclus>`,
+which contains the correct dependencies required to build Cyclus from source as
+described below.
 
 
 Default Installation
@@ -176,6 +187,11 @@ The main variables used are:
 
 All variables can be set using ``-DMY_VARIABLE=MY_VARIABLES_VALUE``.
 
+**NOTE:** It is difficult to install the correct dependencies unless you work
+in the `Virtualbox image <virtualbox>`, or the `Docker image
+<https://hub.docker.com/r/cyclus/cyclus>`. If building doesn't work on your machine,
+try out these alternative methods.
+
 .. website_custom_end
 
 Note on Building Cyclus with Conda
@@ -183,6 +199,10 @@ Note on Building Cyclus with Conda
 
 If your python libraries are installed using Conda, install cyclus
 dependencies through conda-forge.
+
+**NOTE:** This does not currently work, as the ``cyclus-build-deps`` package is
+not up-to-date with the current Cyclus version. This will change in the future,
+however.
 
 .. code-block:: bash
 
