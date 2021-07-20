@@ -34,4 +34,4 @@ jobs:
                             --core-version 999999.999999 \
                             -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
                             -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
-          $GITHUB_WORKSPACE/.local/bin/cyclus_unit_tests
+          /github/home/.local/bin/cyclus_unit_tests
