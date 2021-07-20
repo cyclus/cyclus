@@ -28,6 +28,7 @@ jobs:
         shell: bash -l {0}
         run: |
           cd $GITHUB_WORKSPACE
+          mkdir /github/home/.local/lib/python3.7/site-packages/
           python install.py -j 2\
                             --build-type=Release \
                             --core-version 999999.999999 \
