@@ -15,7 +15,6 @@ jobs:
 
   BuildTest:
     runs-on: ubuntu-latest
-    fail-fast: false
 
 
     container:
