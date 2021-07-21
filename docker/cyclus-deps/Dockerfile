@@ -45,15 +45,15 @@ RUN conda update -y --all && \
                git \
                xo \
                python-json-logger \
-               glib=2.56 \
+               glib=2.68.3 \
                libxml2 \
                libxmlpp \
-               libblas \
-               libcblas \
+               libblas=3.8.0 \
+               libcblas=3.8.0 \
                liblapack \
                pkg-config \
-               coincbc=2.9 \
-               boost-cpp \
+               coincbc=2.9.9 \
+               boost-cpp=1.70.0 \
                hdf5 \
                sqlite \
                pcre \
@@ -65,7 +65,7 @@ RUN conda update -y --all && \
                pytables \
                pandas \
                jinja2 \
-               "cython<=0.28.5" \
+               "cython<=0.29.23" \
                websockets \
                pprintpp \
                && \

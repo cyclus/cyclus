@@ -18,7 +18,7 @@ jobs:
 
 
     container:
-      image: cyclus/cyclus-deps
+      image: cyclus/cyclus-deps_test
 
     steps:
       - name: Checkout repository
