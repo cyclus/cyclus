@@ -47,6 +47,7 @@ RUN conda update -y --all && \
                 ca-certificates=2021.5.25=h06a4308_1 \
                 certifi=2021.5.30=py36h06a4308_0 \
                 cmake=3.19.6=h973ab73_0 \
+                make \
                 coincbc=2.9.9=blas_openblash0f40ac4_1002 \
                 cython=0.29.23=py36h2531618_0 \
                 expat=2.4.1=h2531618_2 \
@@ -116,10 +117,10 @@ RUN conda update -y --all && \
 ENV CC /opt/conda/bin/x86_64-conda_cos6-linux-gnu-gcc
 ENV CXX /opt/conda/bin/x86_64-conda_cos6-linux-gnu-g++
 ENV CPP /opt/conda/bin/x86_64-conda_cos6-linux-gnu-cpp
-ENV PYTHONPATH "/home/conda/.local/lib/python3.7/site-packages/:/root/.local/lib/python3.7/site-packages/"
+ENV PYTHONPATH "/home/conda/.local/lib/python3.6/site-packages/:/root/.local/lib/python3.6/site-packages/"
 # required for the nosetest
 ENV PYTHONWARNINGS ignore
-RUN mkdir -p /root/.local/lib/python3.7/site-packages/
+RUN mkdir -p /root/.local/lib/python3.6/site-packages/
 #
 # pip packages to overide conda
 #
