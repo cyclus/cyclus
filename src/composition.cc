@@ -28,10 +28,10 @@ Composition::Ptr Composition::CreateFromAtom(CompMap v) {
 
 Composition::Ptr Composition::CreateFromMass(CompMap v) {
   if (!compmath::ValidNucs(v))
-    throw ValueError("invalid nuclide in CompMap");
+    std::cout << "invalid nuclide in CompMap" << std::endl;
 
   if (!compmath::AllPositive(v))
-    throw ValueError("negative quantity in CompMap");
+     std::cout << "negative quantity in CompMap" << std::endl;
 
   Composition::Ptr c(new Composition());
   c->mass_ = v;
