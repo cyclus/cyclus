@@ -20,9 +20,11 @@ double MatQuery::moles(Nuc nuc) {
     std::cout << __FILE__ << " " << __LINE__ << std::endl;
     double loc_mass = mass(nuc);
     std::cout << __FILE__ << " " << __LINE__ << std::endl;
-    double atm = pyne::atomic_mass(nuc) * units::g;
+    double atm = pyne::atomic_mass(nuc);
     std::cout << __FILE__ << " " << __LINE__ << std::endl;
-    double rtn = loc_mass / atm;
+    double atm_u = atm * units::g;
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
+    double rtn = loc_mass / atm_u;
     std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
     return rtn;
