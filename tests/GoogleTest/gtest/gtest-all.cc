@@ -9420,7 +9420,7 @@ void RE::Init(const char* regex) {
 
 #endif  // GTEST_USES_POSIX_RE
 
-const char kUnknownFile[] = "unknown file";
+const char kUnknownFile[] = "NOT KNOW file";
 
 // Formats a source file path and a line number as they would appear
 // in an error message from the compiler used to compile this code.

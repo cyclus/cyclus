@@ -1,0 +1,37 @@
+name: Standard Build and Test
+
+on:
+  # allows us to run workflows manually
+  workflow_dispatch:
+  pull_request:
+  push:
+
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+jobs:
+
+  BuildTest:
+    runs-on: ubuntu-latest
+
+
+    container:
+      image: cyclus/cyclus-deps
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Building PyNE
+        shell: bash -l {0}
+        run: |
+          cd $GITHUB_WORKSPACE
+          mkdir -p /github/home/.local/lib/python3.7/site-packages/
+          python install.py -j 2\
+                            --build-type=Release \
+                            --core-version 999999.999999 \
+                            -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
+                            -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
+          /github/home/.local/bin/cyclus_unit_tests
