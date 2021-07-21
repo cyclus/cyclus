@@ -10439,34 +10439,53 @@ void pyne::_load_atomic_mass_map() {
 
 double pyne::atomic_mass(int nuc) {
   // Find the nuclide's mass in AMU
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
+
   std::map<int, double>::iterator nuc_iter, nuc_end;
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   nuc_iter = atomic_mass_map.find(nuc);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   nuc_end = atomic_mass_map.end();
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   // First check if we already have the nuc mass in the map
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   if (nuc_iter != nuc_end) {
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
     return (*nuc_iter).second;
   }
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   // Next, fill up the map with values from the
   // nuc_data.h5, if the map is empty.
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   if (atomic_mass_map.empty()) {
     // Don't fail if we can't load the library
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
     _load_atomic_mass_map();
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
     return atomic_mass(nuc);
   }
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   double aw;
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   int nucid = nucname::id(nuc);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   // If in an excited state, return the ground
   // state mass...not strictly true, but good guess.
   if (0 < nucid%10000) {
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
     aw = atomic_mass((nucid/10000)*10000);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
     if (atomic_mass_map.count(nuc) != 1) {
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
       atomic_mass_map.insert(std::pair<int, double>(nuc, aw));
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
     }
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
     return aw;
   };
 
