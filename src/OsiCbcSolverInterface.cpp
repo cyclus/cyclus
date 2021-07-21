@@ -1,5 +1,4 @@
 #include "CbcConfig.h"
-#include "OsiCbcSolverInterface.hpp"
 
 // CBC_VERSION_MAJOR defined for Cbc > 2.5
 #ifndef CBC_VERSION_MAJOR
