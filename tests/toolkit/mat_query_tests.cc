@@ -14,23 +14,23 @@ namespace toolkit {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(MatQueryTests, MassAndMoles) {
-  std::cout << __LINE__ << std::endl;
+  std::cout << __FILE__ << " " << __LINE__ << std::endl;
   CompMap v;
-  std::cout << __LINE__ << std::endl;
+  std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   Env::SetNucDataPath();
-  std::cout << __LINE__ << std::endl;
+  std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   v[922350000] = 1.5;
   v[10070000] = 2.5;
-  std::cout << __LINE__ << std::endl;
+  std::cout << __FILE__ << " " << __LINE__ << std::endl;
   Composition::Ptr c = Composition::CreateFromMass(v);
-  std::cout << __LINE__ << std::endl;
+  std::cout << __FILE__ << " " << __LINE__ << std::endl;
   Material::Ptr m = Material::CreateUntracked(4.0, c);
-  std::cout << __LINE__ << std::endl;
+  std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   MatQuery mq(m);
-  std::cout << __LINE__ << std::endl;
+  std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   // EXPECT_DOUBLE_EQ(mq.mass(922350000), 1.5);
   // EXPECT_DOUBLE_EQ(mq.mass(10070000), 2.5);
@@ -38,22 +38,22 @@ TEST(MatQueryTests, MassAndMoles) {
   // EXPECT_DOUBLE_EQ(mq.moles(10070000), 2500 / pyne::atomic_mass(10070000));
   // EXPECT_DOUBLE_EQ(mq.mass_frac(922350000), 1.5 / 4.0);
   // EXPECT_DOUBLE_EQ(mq.mass_frac(10070000), 2.5 / 4.0);
-  std::cout << __LINE__ << std::endl;
+  std::cout << __FILE__ << " " << __LINE__ << std::endl;
   double nmoles = mq.moles(922350000) + mq.moles(10070000);
-   std::cout << __LINE__ << std::endl;
+   std::cout << __FILE__ << " " << __LINE__ << std::endl;
  // EXPECT_DOUBLE_EQ(mq.atom_frac(922350000), 1500 / pyne::atomic_mass(922350000) / nmoles);
   // EXPECT_DOUBLE_EQ(mq.atom_frac(10070000), 2500 / pyne::atomic_mass(10070000) / nmoles);
 
-   std::cout << __LINE__ << std::endl;
+   std::cout << __FILE__ << " " << __LINE__ << std::endl;
  std::set<cyclus::Nuc> nucs ;
-   std::cout << __LINE__ << std::endl;
+   std::cout << __FILE__ << " " << __LINE__ << std::endl;
  nucs.insert(922350000);
-   std::cout << __LINE__ << std::endl;
+   std::cout << __FILE__ << " " << __LINE__ << std::endl;
  double out_frac=mq.mass_frac(nucs);
-   std::cout << __LINE__ << std::endl;
+   std::cout << __FILE__ << " " << __LINE__ << std::endl;
  // EXPECT_DOUBLE_EQ(mq.mass_frac(nucs), 1.5/(1.5+2.5));  
   nucs.insert(10070000);
-  std::cout << __LINE__ << std::endl;
+  std::cout << __FILE__ << " " << __LINE__ << std::endl;
   // EXPECT_DOUBLE_EQ(mq.mass_frac(nucs), 1.0);  
 }
 

@@ -17,7 +17,15 @@ double MatQuery::mass(Nuc nuc) {
 }
 
 double MatQuery::moles(Nuc nuc) {
-  return mass(nuc) / (pyne::atomic_mass(nuc) * units::g);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
+    double mass = mass(nuc);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
+    double atm = pyne::atomic_mass(nuc) * units::g
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
+    double rtn = mass / atm;
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
+
+    return rtn;
 }
 
 double MatQuery::mass_frac(Nuc nuc) {
