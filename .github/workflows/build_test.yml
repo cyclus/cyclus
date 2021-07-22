@@ -34,6 +34,7 @@ jobs:
           EXPORT CPP=/opt/conda/bin/x86_64-conda_cos6-linux-gnu-cpp
           EXPORT PYTHONPATH="/home/conda/.local/lib/python3.6/site-packages/:/root/.local/lib/python3.6/site-packages/"
           mkdir -p /github/home/.local/lib/python3.6/site-packages/
+          ls /github/home/.local/share/cyclus/cyclus_nuc_data.h5
           python install.py -j 2\
                             --build-type=Release \
                             --core-version 999999.999999 \
