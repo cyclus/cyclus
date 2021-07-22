@@ -10403,6 +10403,7 @@ void pyne::_load_atomic_mass_map() {
     std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   bool ish5 = H5Fis_hdf5(pyne::NUC_DATA_PATH.c_str());
+  std::cout << "pyne::NUC_DATA_PATH.c_str() " << pyne::NUC_DATA_PATH.c_str() <<std::endl;
     std::cout << __FILE__ << " " << __LINE__ << std::endl;
   if (!ish5)
     throw h5wrap::FileNotHDF5(pyne::NUC_DATA_PATH);
