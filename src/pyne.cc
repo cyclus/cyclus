@@ -10436,8 +10436,7 @@ void pyne::_load_atomic_mass_map() {
     std::cout << __FILE__ << " " << __LINE__ << std::endl;
   atomic_mass_data * atomic_mass_array = new atomic_mass_data[atomic_mass_length];
     std::cout << __FILE__ << " " << __LINE__ << std::endl;
-  H5Dread(atomic_mass_set, desc, H5S_ALL, H5S_ALL, H5P_DEFAULT,     std::cout << __FILE__ << " " << __LINE__ << std::endl;
-atomic_mass_array);
+  H5Dread(atomic_mass_set, desc, H5S_ALL, H5S_ALL, H5P_DEFAULT,     std::cout << atomic_mass_array);
     std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   // close the nuc_data library, before doing anything stupid
