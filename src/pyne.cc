@@ -10391,49 +10391,74 @@ std::map<int, double> pyne::atomic_mass_map = std::map<int, double>();
 
 void pyne::_load_atomic_mass_map() {
   // Loads the important parts of atomic_wight table into atomic_mass_map
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   //Check to see if the file is in HDF5 format.
   if (!pyne::file_exists(pyne::NUC_DATA_PATH)) {
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
     pyne::_load_atomic_mass_map_memory();
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
     return;
   }
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   bool ish5 = H5Fis_hdf5(pyne::NUC_DATA_PATH.c_str());
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   if (!ish5)
     throw h5wrap::FileNotHDF5(pyne::NUC_DATA_PATH);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   // Get the HDF5 compound type (table) description
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   hid_t desc = H5Tcreate(H5T_COMPOUND, sizeof(atomic_mass_data));
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   H5Tinsert(desc, "nuc",   HOFFSET(atomic_mass_data, nuc),   H5T_NATIVE_INT);
   H5Tinsert(desc, "mass",  HOFFSET(atomic_mass_data, mass),  H5T_NATIVE_DOUBLE);
   H5Tinsert(desc, "error", HOFFSET(atomic_mass_data, error), H5T_NATIVE_DOUBLE);
   H5Tinsert(desc, "abund", HOFFSET(atomic_mass_data, abund), H5T_NATIVE_DOUBLE);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   // Open the HDF5 file
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   hid_t nuc_data_h5 = H5Fopen(pyne::NUC_DATA_PATH.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   // Open the data set
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   hid_t atomic_mass_set = H5Dopen2(nuc_data_h5, "/atomic_mass", H5P_DEFAULT);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   hid_t atomic_mass_space = H5Dget_space(atomic_mass_set);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   int atomic_mass_length = H5Sget_simple_extent_npoints(atomic_mass_space);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   // Read in the data
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   atomic_mass_data * atomic_mass_array = new atomic_mass_data[atomic_mass_length];
-  H5Dread(atomic_mass_set, desc, H5S_ALL, H5S_ALL, H5P_DEFAULT, atomic_mass_array);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
+  H5Dread(atomic_mass_set, desc, H5S_ALL, H5S_ALL, H5P_DEFAULT,     std::cout << __FILE__ << " " << __LINE__ << std::endl;
+atomic_mass_array);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   // close the nuc_data library, before doing anything stupid
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   H5Dclose(atomic_mass_set);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   H5Fclose(nuc_data_h5);
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   // Ok now that we have the array of structs, put it in the map
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
   for(int n = 0; n < atomic_mass_length; n++) {
     atomic_mass_map.insert(std::pair<int, double>(atomic_mass_array[n].nuc, \
                                                   atomic_mass_array[n].mass));
     natural_abund_map.insert(std::pair<int, double>(atomic_mass_array[n].nuc, \
                                                     atomic_mass_array[n].abund));
   }
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 
   delete[] atomic_mass_array;
+    std::cout << __FILE__ << " " << __LINE__ << std::endl;
 }
 
 
