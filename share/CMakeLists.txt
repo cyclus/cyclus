@@ -1,9 +1,9 @@
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5")
     message("-- Found '${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5'")
 else()
-    message("-- Downloading http://regtests.fuelcycle.org/cyclus_nuc_data.h5 to "
+    message("-- Downloading https://raw.githubusercontent.com/cyclus/data/main/cyclus_nuc_data.h5 to "
         "'${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5'...")
-    file(DOWNLOAD "http://regtests.fuelcycle.org/cyclus_nuc_data.h5"
+    file(DOWNLOAD "https://raw.githubusercontent.com/cyclus/data/main/cyclus_nuc_data.h5"
         "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5" SHOW_PROGRESS)
     message("-- ...download complete!")
 endif()
