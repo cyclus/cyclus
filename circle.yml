@@ -15,7 +15,7 @@ jobs:
     # Build Cyclus
     build:
         docker:
-            - image: cyclus/cyclus-deps
+            - image: cyclus/cyclus-deps_test
         working_directory: ~/cyclus
         steps:
             - checkout
@@ -37,7 +37,7 @@ jobs:
     # Test Jobs
     unit_test:
         docker:
-            - image: cyclus/cyclus-deps
+            - image: cyclus/cyclus-deps_test
         working_directory: /root
         steps:
             - run:
@@ -52,7 +52,7 @@ jobs:
 
     nosetest:
         docker:
-            - image: cyclus/cyclus-deps
+            - image: cyclus/cyclus-deps_test
         working_directory: /root
         steps:
             - run:
