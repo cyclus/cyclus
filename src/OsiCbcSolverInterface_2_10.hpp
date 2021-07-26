@@ -3,8 +3,8 @@
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
-#ifndef OsiCbcSolverInterface_2_9_H
-#define OsiCbcSolverInterface_2_9_H
+#ifndef OsiCbcSolverInterface_2_10_H
+#define OsiCbcSolverInterface_2_10_H
 
 #include <string>
 #include <cfloat>
