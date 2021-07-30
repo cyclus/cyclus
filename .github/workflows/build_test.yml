@@ -27,10 +27,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
          
-      - name: Building DAGMC
+      - name: Building Cyclus
         run: |
           cd $GITHUB_WORKSPACE
-          python install.py -j 2 
+          python install.py -j 2 \
                             --build-type=Release --core-version 999999.999999 \
                             -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
                             -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
