@@ -29,6 +29,7 @@ jobs:
          
       - name: Building Cyclus
         run: |
+          mkdir /github/home/.local/lib/python3.7/site-packages/
           cd $GITHUB_WORKSPACE
           python install.py -j 2 \
                             --build-type=Release --core-version 999999.999999 \
