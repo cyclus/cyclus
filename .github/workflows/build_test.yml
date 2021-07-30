@@ -34,7 +34,7 @@ jobs:
           echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${HOME}/.local/lib" >> $GITHUB_ENV
       - name: Building Cyclus
         run: |
-          mkdir -p ${HOME}/lib/python3.7/site-packages/
+          mkdir -p ${HOME}/.local/lib/python3.7/site-packages/
           cd ${GITHUB_WORKSPACE}
           python install.py -j 2 \
                             --build-type=Release --core-version 999999.999999 \
