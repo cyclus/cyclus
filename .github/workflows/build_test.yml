@@ -26,7 +26,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-         
+
+      - name: setup
+        run: |
+          echo "PATH=$PATH:$GITHUB_WORKSPACE/../.local/bin" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/../.local/lib" >> $GITHUB_ENV
       - name: Building Cyclus
         run: |
           mkdir -p /github/home/.local/lib/python3.7/site-packages/
