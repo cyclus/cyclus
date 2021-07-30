@@ -31,7 +31,6 @@ jobs:
         run: |
           mkdir -p /github/home/.local/lib/python3.7/site-packages/
           cd ${GITHUB_WORKSPACE}
-          pwd
           python install.py -j 2 \
                             --build-type=Release --core-version 999999.999999 \
                             -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
@@ -39,8 +38,8 @@ jobs:
 
       - name: Unit Test
         run: |
-          ${GITHUB_WORKSPACE}/../cyclus_unit_tests; exit $?
+          /github/home/.local/bin/cyclus_unit_tests; exit $?
       
       - name: Nosetest
         run: |
-          nosetests -w ${GITHUB_WORKSPACE}/../cyclus/tests; exit $?
+          nosetests -w ${GITHUB_WORKSPACE}/tests; exit $?
