@@ -5,20 +5,16 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - develop
+      - master
     paths-ignore:
       - '.github/workflows/docker_publish.yml'
-      - '.github/workflows/housekeeping.yml'
-      - 'CI/**'
-      - 'news/**' 
+
   push:
     branches:
-      - develop
+      - master
     paths-ignore:
       - '.github/workflows/docker_publish.yml'
-      - '.github/workflows/housekeeping.yml'
-      - 'CI/**'
-      - 'news/**'
+
 
 jobs:
   BuildTest:
