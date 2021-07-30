@@ -43,7 +43,7 @@ jobs:
 
       - name: Unit Test
         run: |
-          ${HOME}/bin/cyclus_unit_tests; exit $?
+          cyclus_unit_tests; exit $?
       
       - name: Nosetest
         run: |
