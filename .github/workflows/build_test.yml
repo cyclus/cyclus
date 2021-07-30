@@ -29,11 +29,12 @@ jobs:
 
       - name: setup
         run: |
-          echo "PATH=$PATH:$GITHUB_WORKSPACE/../.local/bin" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/../.local/lib" >> $GITHUB_ENV
+          echo "HOME=/github/home/" >> $GITHUB_ENV
+          echo "PATH=$PATH:${HOME}/.local/bin" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${HOME}/.local/lib" >> $GITHUB_ENV
       - name: Building Cyclus
         run: |
-          mkdir -p /github/home/.local/lib/python3.7/site-packages/
+          mkdir -p ${HOME}/lib/python3.7/site-packages/
           cd ${GITHUB_WORKSPACE}
           python install.py -j 2 \
                             --build-type=Release --core-version 999999.999999 \
@@ -42,7 +43,7 @@ jobs:
 
       - name: Unit Test
         run: |
-          /github/home/.local/bin/cyclus_unit_tests; exit $?
+          ${HOME}/bin/cyclus_unit_tests; exit $?
       
       - name: Nosetest
         run: |
