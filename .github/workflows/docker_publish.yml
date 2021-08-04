@@ -52,18 +52,13 @@ jobs:
       image: ghcr.io/${{ github.repository_owner }}/cyclus:ci_testing
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
       - name: Unit Test
         run: |
           cyclus_unit_tests; exit $?
       
       - name: Nosetest
         run: |
-          echo ${GITHUB_WORKSPACE}
-          ls /__w/cyclus/cyclus/src/../share/dbtypes.json
-          nosetests -w ${GITHUB_WORKSPACE}/tests; exit $?
+          nosetests -w /cyclus/tests; exit $?
 
   pushing_latest_stable_img:
     if: ${{ github.repository_owner == 'svalinn' }}
