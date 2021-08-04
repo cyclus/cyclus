@@ -63,7 +63,7 @@ jobs:
         run: |
           nosetests -w ${GITHUB_WORKSPACE}/tests; exit $?
 
-  pushing_latest/stable_img:
+  pushing_latest_stable_img:
     if: ${{ github.repository_owner == 'svalinn' }}
     needs: [test_img]
     runs-on: ubuntu-latest
