@@ -12,7 +12,6 @@ on:
 jobs:
   build-deps-img:
     runs-on: ubuntu-latest
-
     name: Cyclus deps
 
     steps:
@@ -29,7 +28,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Build and Export Dockerfile_0_base
+      - name: Build and Export Cyclus-deps
         uses: docker/build-push-action@v2
         with:
           file: docker/cyclus-deps/Dockerfile
