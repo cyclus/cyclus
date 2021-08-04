@@ -62,6 +62,7 @@ jobs:
       - name: Nosetest
         run: |
           ls /__w/cyclus/cyclus/src/../share/dbtypes.json
+          echo ${GITHUB_WORKSPACE}
           nosetests -w ${GITHUB_WORKSPACE}/tests; exit $?
 
   pushing_latest_stable_img:
