@@ -2,7 +2,39 @@
 cyclus Change Log
 =================
 
-.. current developments
+Since last release
+====================
+
+**Added:**
+
+* adding compatibility with cbc 2.10 (#1557)
+* In `src/pyne.h`, replace a macro `isnan()` with `using std::isnan`, 
+  as the former has led to undesired macro expansion in Boost header files. (#1560)
+* updated cyclus_nuc_data.h5 URL after Dory retirement (#1567)
+* now default quantize are zero which corresponds to no quantize policy. (#1552)
+* Added several lines to DEPENDENCIES.rst to explain that even when using a 
+  machine with a single python3 install (such as a fresh Ubuntu 20.04), install 
+  will fail unless update-alternatives has been used to point python at the 
+  correct python3 version (#1558)
+
+
+**Changed:**
+
+* Moved to unified CHANGELOG Entry and check them with GithubAction (#1571)
+
+
+**Removed:**
+
+* A duplicate `using std::list` in `src/hdf5_back.cc.in`, which triggers compiler 
+  errors with some GCC versions. (#1560)
+
+**Fixed:**
+
+* Issue #1312. (#1560)
+* fix sell_policy that was offering bids when capacity was inbetween 0 and the
+  quantize, bids that one was not able to fullfill and caused cyclus to crash. (#1552)
+
+
 
 v1.5.5
 ====================

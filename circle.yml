@@ -1,17 +1,5 @@
 version: 2
 jobs:
-    # News update check
-    news_update:
-        docker:
-            - image: cyclus/cyclus-deps
-        working_directory: ~/cyclus
-        steps:
-            - checkout
-            - run: git fetch --all
-            - run:
-                name: Checking News Update
-                command: news/news_test.sh news
-                
     # Build Cyclus
     build:
         docker:
@@ -217,13 +205,6 @@ workflows:
     version: 2 #Needed ?? (already on the top of the file)
     build_and_test:
         jobs:
-            # On a PR // All Branch
-            - news_update:
-                filters:
-                    branches:
-                        ignore: master
-                    tags:
-                        ignore: /.*/
             - build
             - unit_test:
                 requires:
