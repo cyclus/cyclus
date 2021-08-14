@@ -48,6 +48,8 @@ INPUT = os.path.join(os.path.dirname(__file__), "input")
 
 
 def test_bear_deploy():
+
+    print( "IN BEAR")
     sim_input = os.path.join(INPUT, 'bears.json')
     sim_output = os.path.join(INPUT, 'bears.h5')
 
@@ -69,3 +71,5 @@ def test_bear_deploy():
         os.remove(sim_input)
     if os.path.exists(sim_output):
         os.remove(sim_output)
+
+    print( "OUT BEAR")
