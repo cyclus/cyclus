@@ -44,15 +44,20 @@ inputfile = {
  },
 }
 
+INPUT = os.path.join(os.path.dirname(__file__), "input")
+
 
 def test_bear_deploy():
-    if os.path.exists('bears.h5'):
-        os.remove('bears.h5')
-    with open('bears.json', 'w') as f:
+    sim_input = os.path.join(INPUT, 'bears.json')
+    sim_output = os.path.join(INPUT, 'bears.h5')
+
+    if os.path.exists(sim_output):
+        os.remove(sim_output)
+    with open(sim_input, 'w') as f:
         json.dump(inputfile, f)
     env = dict(os.environ)
     env['PYTHONPATH'] = "."
-    s = subprocess.check_output(['cyclus', '-o', 'bears.h5', 'bears.json'],
+    s = subprocess.check_output(['cyclus', '-o', sim_output, sim_input],
                                 universal_newlines=True, env=env)
     # test that the institution deploys a BearStore
     assert_in("New fac: BearStore", s)
@@ -60,7 +65,7 @@ def test_bear_deploy():
     agents = re.compile('Agent \d+ 8\.0')
     all_agents = set(agents.findall(s))
     assert_greater_equal(len(all_agents), 9)
-    if os.path.exists('bears.json'):
-        os.remove('bears.json')
-    if os.path.exists('bears.h5'):
-        os.remove('bears.h5')
+    if os.path.exists(sim_input):
+        os.remove(sim_input)
+    if os.path.exists(sim_output):
+        os.remove(sim_output)
