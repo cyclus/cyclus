@@ -16,6 +16,7 @@ Since last release
   machine with a single python3 install (such as a fresh Ubuntu 20.04), install 
   will fail unless update-alternatives has been used to point python at the 
   correct python3 version (#1558)
+* build and test are now fown on githubAction in place or CircleCI (#1569)
 
 
 **Changed:**

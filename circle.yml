@@ -1,59 +1,5 @@
 version: 2
 jobs:
-    # Build Cyclus
-    build:
-        docker:
-            - image: cyclus/cyclus-deps
-        working_directory: ~/cyclus
-        steps:
-            - checkout
-            - run:
-                name: Build Cyclus
-                command: |
-                    python install.py -j 2 --build-type=Release --core-version 999999.999999 \
-                    -DBLAS_LIBRARIES="/opt/conda/lib/libblas.so" \
-                    -DLAPACK_LIBRARIES="/opt/conda/lib/liblapack.so"
-            - run:
-                name: save SHA to a file
-                command: echo $CIRCLE_SHA1 > .circle-sha
-            - save_cache:
-                key: v1-repo-{{ checksum ".circle-sha" }}
-                paths:
-                  - /root
-
-
-    # Test Jobs
-    unit_test:
-        docker:
-            - image: cyclus/cyclus-deps
-        working_directory: /root
-        steps:
-            - run:
-                name: save SHA to a file
-                command: echo $CIRCLE_SHA1 > .circle-sha
-            - restore_cache:
-                keys:
-                  - v1-repo-{{ checksum ".circle-sha" }}
-            - run:
-                name: Unit Test
-                command: /root/.local/bin/cyclus_unit_tests; exit $?
-
-    nosetest:
-        docker:
-            - image: cyclus/cyclus-deps
-        working_directory: /root
-        steps:
-            - run:
-                name: save SHA to a file
-                command: echo $CIRCLE_SHA1 > .circle-sha
-            - restore_cache:
-                keys:
-                  - v1-repo-{{ checksum ".circle-sha" }}
-            - run:
-                name: Nosetest
-                command: nosetests -w ~/cyclus/tests; exit $?
-
-
     # Update docker container
     deploy_latest: # Cyclus/dev -> Cyclus:latest
         docker:
@@ -205,32 +151,12 @@ workflows:
     version: 2 #Needed ?? (already on the top of the file)
     build_and_test:
         jobs:
-            - build
-            - unit_test:
-                requires:
-                    - build
-            - nosetest:
-                requires:
-                    - build
-
-            - cycamore_master:
-                requires:
-                    - unit_test
-                    - nosetest
-            - cymetric_master:
-                requires:
-                    - unit_test
-                    - nosetest
-
 
             # Merge on Master
             - deploy_latest:
                 filters:
                     branches:
                         only: master
-                requires:
-                    - unit_test
-                    - nosetest
             - cyXX_trig:
                 filters:
                     branches:
@@ -245,15 +171,9 @@ workflows:
                         ignore: /.*/
                     tags:
                         only: /.*/
-                requires:
-                    - unit_test
-                    - nosetest
             - deb_generation:
                 filters:
                     branches:
                         ignore: /.*/
                     tags:
                         only: /.*/
-                requires:
-                    - unit_test
-                    - nosetest
