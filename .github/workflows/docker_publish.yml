@@ -44,6 +44,7 @@ jobs:
             UBUNTU_VERSION=${{ matrix.ubuntu_versions }}
           tags: ghcr.io/${{ github.repository_owner }}/cyclus:ci_testing
       
+
   test_img:
     needs: [build-img]
     runs-on: ubuntu-latest 
@@ -58,7 +59,8 @@ jobs:
       
       - name: Nosetest
         run: |
-          nosetests -w /cyclus/tests; exit $?
+          nosetests --nocapture  -w /cyclus/tests; exit $?
+
 
   pushing_latest_stable_img:
     if: ${{ github.repository_owner == 'cyclus' }}
