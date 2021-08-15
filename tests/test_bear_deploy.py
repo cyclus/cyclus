@@ -66,8 +66,11 @@ def test_bear_deploy():
     print( "BEAR 3")
 
     cmd = ["cyclus", "-o", sim_output, "--input-file", sim_input]
+    s = [1]
     yield check_cmd, cmd, '.', s
     rtn = s[0]
+    print(rtn)
+    print(s)
 
     # s = subprocess.check_output(['cyclus', '-o', sim_output, sim_input],
     #                             universal_newlines=True, env=env)
