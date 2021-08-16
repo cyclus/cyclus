@@ -59,6 +59,7 @@ jobs:
       
       - name: Nosetest
         run: |
+          export PYTHONPATH="${PYTHONPATH}:/cyclus/tests"
           nosetests --nocapture  -w /cyclus/tests; exit $?
 
 
