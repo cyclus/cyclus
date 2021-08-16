@@ -62,8 +62,8 @@ def test_bear_deploy():
     env = dict(os.environ)
     env['PYTHONPATH'] = "."
 
+    cmd = ["cyclus", "-o", sim_output, "--input-file", sim_input]
     s = subprocess.call(cmd, shell=True, env=env)
-    yield check_cmd, cmd, '.', s
 
     # test that the institution deploys a BearStore
     assert_in("New fac: BearStore", s)
