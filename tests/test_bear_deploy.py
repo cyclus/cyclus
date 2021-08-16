@@ -51,46 +51,29 @@ INPUT = os.path.join(os.path.dirname(__file__), "input")
 
 def test_bear_deploy():
 
-    print( "IN BEAR")
     sim_input = os.path.join(INPUT, 'bears.json')
     sim_output = os.path.join(INPUT, 'bears.h5')
-    print( "BEAR 1")
 
     if os.path.exists(sim_output):
         os.remove(sim_output)
     with open(sim_input, 'w') as f:
         json.dump(inputfile, f)
-    print( "BEAR 2")
+
     env = dict(os.environ)
     env['PYTHONPATH'] = "."
-    print( "BEAR 3")
 
-    cmd = ["cyclus", "-o", sim_output, "--input-file", sim_input]
-    s = [1]
+    s = subprocess.call(cmd, shell=True, env=env)
     yield check_cmd, cmd, '.', s
-    rtn = s[0]
-    print(rtn)
-    print(s)
 
-    # s = subprocess.check_output(['cyclus', '-o', sim_output, sim_input],
-    #                             universal_newlines=True, env=env)
-    print( "BEAR 4")
     # test that the institution deploys a BearStore
-    print( "BEAR 5")
     assert_in("New fac: BearStore", s)
-    print( "BEAR 1")
     # test that the first agents exist with right minimum production.
-    print( "BEAR 1")
     agents = re.compile('Agent \d+ 8\.0')
-    print( "BEAR 1")
     all_agents = set(agents.findall(s))
-    print( "BEAR 1")
     assert_greater_equal(len(all_agents), 9)
-    print( "BEAR 1")
+
     if os.path.exists(sim_input):
         os.remove(sim_input)
     if os.path.exists(sim_output):
         os.remove(sim_output)
-    print( "BEAR 1")
 
-    print( "OUT BEAR")
