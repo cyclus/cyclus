@@ -65,7 +65,8 @@ def test_bear_deploy():
 
     cmd = ["cyclus", "-o", sim_output, "--input-file", sim_input]
     yield check_cmd, cmd, CWD, holdsrtn
-
+    print(holdsrtn[0])
+    print(holdsrtn)
     s = holdsrtn[0] 
 
     # test that the institution deploys a BearStore
