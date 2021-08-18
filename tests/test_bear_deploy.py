@@ -46,8 +46,8 @@ inputfile = {
  },
 }
 
-INPUT = os.path.join(os.path.dirname(__file__), "input")
-
+CWD = os.path.dirname(__file__)
+INPUT = os.path.join(CWD, "input")
 
 def test_bear_deploy():
 
@@ -61,9 +61,12 @@ def test_bear_deploy():
 
     env = dict(os.environ)
     env['PYTHONPATH'] = "."
+    holdsrtn = [1]  # needed because nose does not send() to test generator
 
     cmd = ["cyclus", "-o", sim_output, "--input-file", sim_input]
-    s = subprocess.call(cmd, shell=True, env=env)
+    yield check_cmd, cmd, CWD, holdsrtn
+
+    s = holdsrtn[0] 
 
     # test that the institution deploys a BearStore
     assert_in("New fac: BearStore", s)
