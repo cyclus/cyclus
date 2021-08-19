@@ -70,6 +70,7 @@ jobs:
       
       - name: Nosetest
         run: |
+          export PYTHONPATH="$PYTHONPATH:${GITHUB_WORKSPACE}/tests"
           nosetests --nocapture  -w ${GITHUB_WORKSPACE}/tests; exit $?
 
   pushing_test_stable_img:
