@@ -61,13 +61,10 @@ def test_bear_deploy():
 
     env = dict(os.environ)
     env['PYTHONPATH'] = "."
-    holdsrtn = [1]  # needed because nose does not send() to test generator
 
     cmd = ["cyclus", "-o", sim_output, "--input-file", sim_input]
-    yield check_cmd, cmd, ".", holdsrtn
-    print(holdsrtn[0])
-    print(holdsrtn)
-    s = holdsrtn[0] 
+    s = subprocess.check_output(cmd, cwd=".", universal_newlines=True, env=env)
+
 
     # test that the institution deploys a BearStore
     assert_in("New fac: BearStore", s)
