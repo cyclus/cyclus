@@ -64,7 +64,7 @@ def test_bear_deploy():
     holdsrtn = [1]  # needed because nose does not send() to test generator
 
     cmd = ["cyclus", "-o", sim_output, "--input-file", sim_input]
-    yield check_cmd, cmd, CWD, holdsrtn
+    yield check_cmd, cmd, ".", holdsrtn
     print(holdsrtn[0])
     print(holdsrtn)
     s = holdsrtn[0] 
