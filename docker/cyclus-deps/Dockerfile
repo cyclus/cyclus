@@ -47,6 +47,7 @@ RUN conda update -y --all && \
                 ca-certificates=2021.5.25=h06a4308_1 \
                 certifi=2021.5.30=py36h06a4308_0 \
                 cmake=3.19.6=h973ab73_0 \
+                make \
                 coincbc=2.9.9=blas_openblash0f40ac4_1002 \
                 cython=0.29.23=py36h2531618_0 \
                 expat=2.4.1=h2531618_2 \
