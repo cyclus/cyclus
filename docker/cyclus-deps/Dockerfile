@@ -50,7 +50,7 @@ RUN conda update -y --all && \
                 make \
                 nose \
                 coincbc=2.9.9=blas_openblash0f40ac4_1002 \
-                cython<0.29 \
+                cython=0.28.5 \
                 expat=2.4.1=h2531618_2 \
                 gcc_impl_linux-64=9.3.0=h6df7d76_17 \
                 gcc_linux-64=9.3.0=h1ee779e_30 \
