@@ -110,8 +110,8 @@ RUN conda update -y --all && \
                 wheel=0.36.2=pyhd3eb1b0_0 \
                 xz=5.2.5=h7b6447c_0 \
                 zlib=1.2.11=h7b6447c_3 \
-                zstd=1.4.9=ha95c52a_0
-               && \
+                zstd=1.4.9=ha95c52a_0 \
+    && \
     conda clean -y --all
 ENV CC /opt/conda/bin/x86_64-conda_cos6-linux-gnu-gcc
 ENV CXX /opt/conda/bin/x86_64-conda_cos6-linux-gnu-g++
