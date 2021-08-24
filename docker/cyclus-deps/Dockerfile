@@ -65,7 +65,7 @@ RUN conda update -y --all && \
                pytables \
                pandas \
                jinja2 \
-               "cython<=0.28.5" \
+               cython=0.28.5 \
                websockets \
                pprintpp \
                && \
