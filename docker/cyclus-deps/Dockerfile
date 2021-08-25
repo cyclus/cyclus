@@ -60,7 +60,7 @@ RUN conda update -y --all && \
                 glibmm=2.58.1=h778ead0_1 \
                 gxx_impl_linux-64=9.3.0=hbdd7822_17 \
                 gxx_linux-64=9.3.0=h7e70986_30 \
-                hdf5 \
+                hdf5=1.10.6=hb1b8bf9_0 \
                 icu=67.1=he1b5a44_0 \
                 jinja2=3.0.0=pyhd3eb1b0_0 \
                 kernel-headers_linux-64=3.10.0=h57e8cba_10 \
