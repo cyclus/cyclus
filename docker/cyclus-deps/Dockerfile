@@ -60,7 +60,7 @@ RUN conda update -y --all && \
                 glibmm=2.58.1=h778ead0_1 \
                 gxx_impl_linux-64=9.3.0=hbdd7822_17 \
                 gxx_linux-64=9.3.0=h7e70986_30 \
-                hdf5=1.10.6=hb1b8bf9_0 \
+                hdf5 \
                 icu=67.1=he1b5a44_0 \
                 jinja2=3.0.0=pyhd3eb1b0_0 \
                 kernel-headers_linux-64=3.10.0=h57e8cba_10 \
@@ -91,6 +91,7 @@ RUN conda update -y --all && \
                 markupsafe=2.0.1=py36h27cfd23_0 \
                 ncurses=6.2=he6710b0_1 \
                 numpy=1.19.5=py36h2aa4a07_1 \
+                tables \
                 openblas=0.3.3=h9ac9557_1001 \
                 openssl=1.1.1k=h27cfd23_0 \
                 pandas=1.1.5=py36ha9443f7_0 \
