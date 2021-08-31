@@ -46,6 +46,7 @@ RUN conda update -y --all && \
                 xo \
                 python-json-logger \
                 glib \
+                glibmm \
                 libxml2 \
                 libxmlpp \
                 libblas \
