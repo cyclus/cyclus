@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
 #taken from http://geant4.cern.ch/support/source/geant4/CMakeLists.txt
 IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(STATUS "Cyclus requires an out-of-source build.")
@@ -9,10 +9,6 @@ IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(STATUS "and run CMake from there")
     message(FATAL_ERROR "in-source build detected")
 ENDIF()
-
-# Set some policies
-cmake_policy(SET CMP0040 OLD)
-cmake_policy(SET CMP0042 OLD)
 
 # This project name is cyclus.
 PROJECT(CYCLUS)
