@@ -104,8 +104,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     endif()
 
     # Tell CMake where the modules are
-    LIST(APPEND CMAKE_MODULE_PATH
-        "${CMAKE_DIR}/share/cmake-2.8/Modules" "${PROJECT_SOURCE_DIR}/cmake")
+    LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
+        "${CMAKE_DIR}/usr/share/cmake-3.22/Modules" "${PROJECT_SOURCE_DIR}/cmake")
 
     # Include macros
     INCLUDE(CopyWhenDiffMacro)
@@ -158,21 +158,22 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("-- Dependency Binary Hints (DEPS_BIN_HINTS): ${DEPS_BIN_HINTS}")
     MESSAGE("-- Dependency Library Hints (DEPS_LIB_HINTS): ${DEPS_LIB_HINTS}")
     MESSAGE("-- Dependency Include Hints (DEPS_INCLUDE_HINTS): ${DEPS_INCLUDE_HINTS}")
+    MESSAGE("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+
+    # Search pkg-config utility first
+    find_package(PkgConfig REQUIRED)
+
 
     # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
     # libxml2 is required for relaxng schema validation
-    FIND_PACKAGE(LibXml2 ${DEPS_HINTS})
-    IF(NOT LIBXML2_LIBRARIES)
-        FIND_LIBRARY(LibXml2 REQUIRED ${DEPS_HINTS})
-    ENDIF()
+
+    FIND_PACKAGE(LibXml2 REQUIRED)
     ADD_DEFINITIONS(${LIBXML2_DEFINITIONS})
     SET(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
+    message("-- LibXML2 Include Dir: ${LIBXML2_INCLUDE_DIR}")
 
-    # Find LibXML++ and dependencies
-    FIND_PACKAGE(LibXML++)
-    IF(NOT LibXML++_LIBRARIES)
-        FIND_LIBRARY(LibXML++ REQUIRED ${DEPS_HINTS})
-    ENDIF()
+    # Then use pkg-config for locate specific package
+    pkg_check_modules(LIBXMLXX REQUIRED IMPORTED_TARGET libxml++-2.6)
     SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
     message("-- LibXML++ Include Dir: ${LibXML++_INCLUDE_DIR}")
 
@@ -184,7 +185,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("-- Found BLAS Libraries: ${BLAS_LIBRARIES}")
 
     # Find Sqlite3
-    FIND_PACKAGE(Sqlite3 REQUIRED)
+    pkg_check_modules(SQLITE3 REQUIRED IMPORTED_TARGET sqlite3)
     SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
     # Find HDF5
@@ -225,7 +226,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("--    Boost Serialization location: ${Boost_SERIALIZATION_LIBRARY}")
 
     # find coin and link to it
-    FIND_PACKAGE(COIN)
+    pkg_check_modules(COIN REQUIRED IMPORTED_TARGET cbc)
     MESSAGE("-- COIN Version: ${COIN_VERSION}")
     set(LIBS ${LIBS} ${COIN_LIBRARIES})
     if(NOT COIN_FOUND)
@@ -296,8 +297,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Cython & Python Bindings
     #
     # Use new Python library finder
-    find_package(PythonInterp)
-    find_package(PythonLibs)
+    find_package (Python3 COMPONENTS Interpreter Development NumPy)
+
     execute_process(COMMAND "${PYTHON_EXECUTABLE}" -c
                             "import site; print(site.getsitepackages(['${CMAKE_INSTALL_PREFIX}'])[0])"
                     OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
@@ -317,7 +318,6 @@ IF(NOT CYCLUS_DOC_ONLY)
         endif()
         include(UseCython)
 
-        find_package(Numpy REQUIRED)
         find_package(Jinja2 REQUIRED)
         find_package(Pandas REQUIRED)
 
