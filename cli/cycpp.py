@@ -48,7 +48,8 @@ import os
 import re
 import sys
 import uuid
-from collections import Sequence, Mapping, MutableMapping, OrderedDict
+from collections.abc import Sequence, Mapping, MutableMapping
+from collections import OrderedDict
 from contextlib import contextmanager
 from itertools import takewhile
 from subprocess import Popen, PIPE
