@@ -1,4 +1,4 @@
-FROM cyclus/cyclus-deps
+FROM cyclus-local
 
 COPY . /cyclus
 WORKDIR /cyclus
