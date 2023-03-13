@@ -62,6 +62,7 @@ RUN conda update -y --all && \
                websockets \
                pprintpp \
                && \
+    mamba install -y --force-reinstall libsqlite && \
     conda clean -y --all
 ENV CC /opt/conda/bin/x86_64-conda_cos6-linux-gnu-gcc
 ENV CXX /opt/conda/bin/x86_64-conda_cos6-linux-gnu-g++
