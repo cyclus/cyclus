@@ -104,8 +104,10 @@ IF(NOT CYCLUS_DOC_ONLY)
     endif()
 
     # Tell CMake where the modules are
+    MESSAGE("-- CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
     LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-        "${CMAKE_DIR}/usr/share/cmake-3.22/Modules" "${PROJECT_SOURCE_DIR}/cmake")
+ #       "/opt/conda/share/cmake-3.25/Modules" 
+        "${PROJECT_SOURCE_DIR}/cmake")
 
     # Include macros
     INCLUDE(CopyWhenDiffMacro)
@@ -173,7 +175,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     message("-- LibXML2 Include Dir: ${LIBXML2_INCLUDE_DIR}")
 
     # Then use pkg-config for locate specific package
-    pkg_check_modules(LIBXMLXX REQUIRED IMPORTED_TARGET libxml++-2.6)
+    pkg_check_modules(LIBXMLXX REQUIRED IMPORTED_TARGET libxml++-4.0)
     SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
     message("-- LibXML++ Include Dir: ${LibXML++_INCLUDE_DIR}")
 
@@ -185,7 +187,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("-- Found BLAS Libraries: ${BLAS_LIBRARIES}")
 
     # Find Sqlite3
-    pkg_check_modules(SQLITE3 REQUIRED IMPORTED_TARGET sqlite3)
+    FIND_PACKAGE(SQLite3 REQUIRED)
     SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
 
     # Find HDF5
