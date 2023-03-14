@@ -127,32 +127,29 @@ MACRO(USE_CYCLUS lib_root src_root)
     SET(CCOUT "${BUILD_DIR}/${src_root}.cc")
     SET(CCFLAG "-o=${CCOUT}")
 
-    # not sure if needed..
+    # do all processing for CC file - always needed
     IF(NOT EXISTS ${CCOUT})
-        MESSAGE(STATUS "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}")
-        EXECUTE_PROCESS(COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG}
-                        ${ORIG} ${INCL_ARGS} RESULT_VARIABLE res_var)
-        IF(NOT "${res_var}" STREQUAL "0")
-            message(FATAL_ERROR "cycpp failed on '${CCIN}' with exit code '${res_var}'")
-        ENDIF()
+        PREPROCESS_CYCLUS_FILE_(${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS})
     ENDIF(NOT EXISTS ${CCOUT})
     SET(
         "${lib_root}_CC"
         "${${lib_root}_CC}" "${CCOUT}"
         CACHE INTERNAL "Agent impl" FORCE
         )
+
+    # check for existing of header file
     IF(EXISTS "${HIN}")
-        # not sure if we still need this...
+        # Do all processing for header file
         IF(NOT EXISTS ${HOUT})
-            MESSAGE(STATUS "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}")
-            EXECUTE_PROCESS(COMMAND ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}
-                            RESULT_VARIABLE res_var)
-
-            IF(NOT "${res_var}" STREQUAL "0")
-                message(FATAL_ERROR "archetype preprocessing failed for ${HIN}, res_var = '${res_var}'")
-            ENDIF()
-
+            PREPROCESS_CYCLUS_FILE_( ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS})
         ENDIF(NOT EXISTS ${HOUT})
+        SET(
+            "${lib_root}_H"
+            "${${lib_root}_H}" "${HOUT}"
+            CACHE INTERNAL "Agent header" FORCE
+            )
+
+        # make custom Makefile target for CC and H file together for joint dependency
         ADD_CUSTOM_COMMAND(
             OUTPUT ${CCOUT}
             OUTPUT ${HOUT}
@@ -165,12 +162,9 @@ MACRO(USE_CYCLUS lib_root src_root)
             COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}"
             COMMENT "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}"
             )
-        SET(
-            "${lib_root}_H"
-            "${${lib_root}_H}" "${HOUT}"
-            CACHE INTERNAL "Agent header" FORCE
-            )
+        SET(DEP_LIST ${DEP_LIST} ${CCOUT} ${HOUT})
     ELSE(EXISTS "${HIN}")
+        # Make custom Makefile target for CC file alone if ho header
         ADD_CUSTOM_COMMAND(
             OUTPUT ${CCOUT}
             COMMAND ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}
@@ -179,6 +173,7 @@ MACRO(USE_CYCLUS lib_root src_root)
             DEPENDS ${CYCLUS_CUSTOM_HEADERS}
             COMMENT "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}"
             )
+        SET(DEP_LIST ${CCOUT})
     ENDIF(EXISTS "${HIN}")
 
     # add tests
@@ -187,11 +182,20 @@ MACRO(USE_CYCLUS lib_root src_root)
     SET(HTIN "${CMAKE_CURRENT_SOURCE_DIR}/${src_root}_tests.h")
     SET(HTOUT "${BUILD_DIR}/${src_root}_tests.h")
     SET(CMD "cp")
+
     IF(EXISTS "${CCTIN}")
+        MESSAGE(STATUS "Copying ${CCTIN} to ${CCTOUT}.")
+        EXECUTE_PROCESS(COMMAND ${CMD} ${CCTIN} ${CCTOUT})    
+        SET("${lib_root}_TEST_CC" "${${lib_root}_TEST_CC}" "${CCTOUT}"
+            CACHE INTERNAL "Agent test source" FORCE)
+
         IF(EXISTS "${HTIN}")
             # install test headers
             MESSAGE(STATUS "Copying ${HTIN} to ${HTOUT}.")
             EXECUTE_PROCESS(COMMAND ${CMD} ${HTIN} ${HTOUT})
+            SET("${lib_root}_TEST_H" "${${lib_root}_TEST_H}" "${HTOUT}"
+                CACHE INTERNAL "Agent test headers" FORCE)
+            # Create custom Makefile target for CC and H file together for joint dependency
             ADD_CUSTOM_COMMAND(
                 OUTPUT ${HTOUT}
                 OUTPUT ${CCTOUT}
@@ -205,25 +209,32 @@ MACRO(USE_CYCLUS lib_root src_root)
                 COMMENT "Copying ${HTIN} to ${HTOUT}."
                 COMMENT "Copying ${CCTIN} to ${CCTOUT}."
                 )
-            SET("${lib_root}_TEST_H" "${${lib_root}_TEST_H}" "${HTOUT}"
-                CACHE INTERNAL "Agent test headers" FORCE)
+            SET(DEP_LIST ${DEP_LIST} ${HTOUT} ${CCTOUT})
+        ELSE(EXISTS "${HTIN}")
+            # create custom Makefile target for CC only
+            ADD_CUSTOM_COMMAND(
+                OUTPUT ${CCTOUT}
+                COMMAND ${CMD} ${CCTIN} ${CCTOUT}
+                DEPENDS ${CCTIN}
+                DEPENDS ${CCIN}
+                DEPENDS ${CYCLUS_CUSTOM_HEADERS}
+                COMMENT "Copying ${CCTIN} to ${CCTOUT}."
+                )
+            SET(DEP_LIST ${DEP_LIST} ${CCTOUT})
         ENDIF(EXISTS "${HTIN}")
-
-        # install test impl
-        MESSAGE(STATUS "Copying ${CCTIN} to ${CCTOUT}.")
-        EXECUTE_PROCESS(COMMAND ${CMD} ${CCTIN} ${CCTOUT})
-        ADD_CUSTOM_COMMAND(
-            OUTPUT ${CCTOUT}
-            COMMAND ${CMD} ${CCTIN} ${CCTOUT}
-            DEPENDS ${CCTIN}
-            DEPENDS ${CCIN}
-            DEPENDS ${CYCLUS_CUSTOM_HEADERS}
-            COMMENT "Copying ${CCTIN} to ${CCTOUT}."
-            )
-        SET("${lib_root}_TEST_CC" "${${lib_root}_TEST_CC}" "${CCTOUT}"
-            CACHE INTERNAL "Agent test source" FORCE)
     ENDIF(EXISTS "${CCTIN}")
+    ADD_CUSTOM_TARGET(${lib_root}-target ${DEP_LIST})
     MESSAGE(STATUS "Finished construction of build files for agent: ${src_root}")
+ENDMACRO()
+
+MACRO(PREPROCESS_CYCLUS_FILE_ cycpp filein preproc flags orig incl_args)
+    MESSAGE(STATUS "Executing ${cycpp} ${filein} ${preproc} ${flags} ${orig} ${incl_args}")
+    EXECUTE_PROCESS(COMMAND ${cycpp} ${filein} ${PREPROCESSOR} ${flags}
+                    ${orig} ${incl_args} RESULT_VARIABLE res_var)
+    IF(NOT "${res_var}" STREQUAL "0")
+        message(FATAL_ERROR "${cycpp} failed on '${filein}' with exit code '${res_var}'")
+ENDIF()
+
 ENDMACRO()
 
 MACRO(INSTALL_CYCLUS_STANDALONE lib_root src_root lib_dir)
