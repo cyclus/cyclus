@@ -15,11 +15,11 @@ PROJECT(CYCLUS)
 
 # check for and enable c++11 support (required for cyclus)
 INCLUDE(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
 IF(COMPILER_SUPPORTS_CXX11)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 ELSE()
-    MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+    MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++14 support. Please use a different C++ compiler.")
 ENDIF()
 
 # enable assembly
@@ -176,9 +176,10 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     # Then use pkg-config for locate specific package
     pkg_check_modules(LIBXMLXX REQUIRED IMPORTED_TARGET libxml++-4.0)
-    SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
-    message("-- LibXML++ Include Dir: ${LibXML++_INCLUDE_DIR}")
-
+    SET(LIBS ${LIBS} ${LIBXMLXX_LIBRARIES})
+    message("-- LibXML++ Include Dir: ${LIBXMLXX_INCLUDE_DIRS}")
+    message("-- LibXML++ Librarires: ${LIBXMLXX_LIBRARIES}")
+    
     # find lapack and link to it
     FIND_PACKAGE(LAPACK REQUIRED)
     set(LIBS ${LIBS} ${LAPACK_LIBRARIES})
@@ -360,9 +361,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     # ${Glibmm_INCLUDE_DIRS} breaks Ubuntu 12.04
     set(inc_dirs
         "${LIBXML2_INCLUDE_DIR}"
-        "${LibXML++_INCLUDE_DIR}"
+        "${LIBXMLXX_INCLUDE_DIRS}"
         "${Glibmm_INCLUDE_DIRS}"
-        "${LibXML++Config_INCLUDE_DIR}"
+        "${LIBXMLXXConfig_INCLUDE_DIR}"
         "${SQLITE3_INCLUDE_DIR}"
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
@@ -486,7 +487,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libboost-program-options-dev (>= 1.54.0)")
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libboost-serialization-dev (>= 1.54.0)")
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libhdf5-dev (>= 1.8.11)")
-    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libxml++2.6-dev (>= 2.36.0)")
+    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libxml++4.0-dev (>= 4.0.0)")
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, coinor-libcbc-dev (>= 2.8.7)")
     MESSAGE("CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS}")
 
