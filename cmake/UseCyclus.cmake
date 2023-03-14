@@ -223,7 +223,7 @@ MACRO(USE_CYCLUS lib_root src_root)
             SET(DEP_LIST ${DEP_LIST} ${CCTOUT})
         ENDIF(EXISTS "${HTIN}")
     ENDIF(EXISTS "${CCTIN}")
-    ADD_CUSTOM_TARGET(${lib_root}-target ${DEP_LIST})
+
     MESSAGE(STATUS "Finished construction of build files for agent: ${src_root}")
 ENDMACRO()
 
@@ -233,7 +233,7 @@ MACRO(PREPROCESS_CYCLUS_FILE_ cycpp filein preproc flags orig incl_args)
                     ${orig} ${incl_args} RESULT_VARIABLE res_var)
     IF(NOT "${res_var}" STREQUAL "0")
         message(FATAL_ERROR "${cycpp} failed on '${filein}' with exit code '${res_var}'")
-ENDIF()
+    ENDIF()
 
 ENDMACRO()
 
@@ -277,11 +277,14 @@ MACRO(INSTALL_CYCLUS_MODULE lib_root lib_dir)
 ENDMACRO()
 
 MACRO(INSTALL_AGENT_LIB_ lib_name lib_src lib_h inst_dir)
+
+    ADD_CUSTOM_TARGET(${lib_name}-sources DEPENDS ${lib_src} ${lib_h})
+
     # add lib
     ADD_LIBRARY(${lib_name} ${lib_src})
     TARGET_LINK_LIBRARIES(${lib_name} dl ${LIBS})
     SET(CYCLUS_LIBRARIES ${CYCLUS_LIBRARIES} ${lib_root})
-    ADD_DEPENDENCIES(${lib_name} ${lib_src} ${lib_h})
+    ADD_DEPENDENCIES(${lib_name} ${lib_name}-sources)
 
     set(dest_ "lib/cyclus")
     string(COMPARE EQUAL "${inst_dir}" "" is_empty)
