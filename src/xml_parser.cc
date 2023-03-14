@@ -58,8 +58,8 @@ xmlpp::Document* XMLParser::Document() {
   // but which is unvalidatable. The web is truly cobbled together
   // by a race of evil gnomes.
   xmlpp::Element* root = doc->get_root_node();
-  xmlpp::NodeSet have_base = root->find("//*[@xml:base]");
-  xmlpp::NodeSet::iterator it = have_base.begin();
+  xmlpp::Node::NodeSet have_base = root->find("//*[@xml:base]");
+  xmlpp::Node::NodeSet::iterator it = have_base.begin();
   for (; it != have_base.end(); ++it) {
     reinterpret_cast<xmlpp::Element*>(*it)->remove_attribute("base", "xml");
   }
