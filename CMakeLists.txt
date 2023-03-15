@@ -189,7 +189,8 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     # Find Sqlite3
     FIND_PACKAGE(SQLite3 REQUIRED)
-    SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
+    SET(LIBS ${LIBS} ${SQLite3_LIBRARIES})
+    MESSAGE("-- Found SQLite3 Libraries: ${SQLite3_LIBRARIES}")
 
     # Find HDF5
     FIND_PACKAGE(HDF5 REQUIRED COMPONENTS HL)
@@ -364,7 +365,7 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${LIBXMLXX_INCLUDE_DIRS}"
         "${Glibmm_INCLUDE_DIRS}"
         "${LIBXMLXXConfig_INCLUDE_DIR}"
-        "${SQLITE3_INCLUDE_DIR}"
+        "${SQLite3_INCLUDE_DIR}"
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
         "${COIN_INCLUDE_DIRS}")
