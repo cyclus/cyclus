@@ -42,8 +42,11 @@ INSTALL(
 ##############################################################################################
 ################################## begin cyclus unit tests ###################################
 ##############################################################################################
-TARGET_SOURCES(cyclus_unit_tests
-    PRIVATE cyclus_unit_test_driver.cc
+
+ADD_EXECUTABLE(
+    cyclus_unit_tests
+    ${CYCLUS_CORE_TEST_SOURCE}
+    cyclus_unit_test_driver.cc
     )
     
 TARGET_LINK_LIBRARIES(
@@ -54,7 +57,9 @@ TARGET_LINK_LIBRARIES(
     agents
     ${CYCLUS_TEST_LIBRARIES}
     )
-
+    MESSAGE(STATUS "(cli) CYCLUS_TEST_LIBRARIES: ${CYCLUS_TEST_LIBRARIES}")
+    MESSAGE(STATUS "(cli) CYCLUS_AGENT_TEST_LIBRARIES: ${CYCLUS_AGENT_TEST_LIBRARIES}")
+    
 INSTALL(
     TARGETS cyclus_unit_tests
     RUNTIME DESTINATION bin

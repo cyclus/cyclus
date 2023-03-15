@@ -110,10 +110,6 @@ INSTALL(FILES ${test_agents}
 
 # read tests after building the driver, and add them to ctest
 set(tgt "cyclus_unit_tests")
-ADD_EXECUTABLE(
-    ${tgt}
-    ${CYCLUS_CORE_TEST_SOURCE}
-    )
 
 add_custom_command(TARGET ${tgt}
     POST_BUILD
