@@ -111,13 +111,13 @@ INSTALL(FILES ${test_agents}
 # read tests after building the driver, and add them to ctest
 set(tgt "cyclus_unit_tests")
 
-add_custom_command(TARGET ${tgt}
-    POST_BUILD
+add_custom_target(
+    ${tgt}-post-build
+    DEPENDS ${tgt}
     COMMAND python "${CMAKE_CURRENT_SOURCE_DIR}/generate_gtest_macros.py"
     "--executable=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${tgt}"
     "--output=${CYCLUS_BINARY_DIR}/CTestTestfile.cmake"
     COMMENT "adding tests from ${tgt}"
-    DEPENDS
     VERBATIM
     )
 
