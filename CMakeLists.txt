@@ -230,7 +230,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("--    Boost Serialization location: ${Boost_SERIALIZATION_LIBRARY}")
 
     # find coin and link to it
-    pkg_check_modules(COIN REQUIRED IMPORTED_TARGET cbc)
+    FIND_PACKAGE(COIN)
     MESSAGE("-- COIN Version: ${COIN_VERSION}")
     set(LIBS ${LIBS} ${COIN_LIBRARIES})
     if(NOT COIN_FOUND)
@@ -402,7 +402,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     if(Cython_FOUND)
         ADD_SUBDIRECTORY("${CYCLUS_PYSOURCE_DIR}")
     endif(Cython_FOUND)
-
+    
     ##############################################################################################
     ####################################### end includes #########################################
     ##############################################################################################
