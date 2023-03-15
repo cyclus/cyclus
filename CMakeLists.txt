@@ -376,7 +376,7 @@ IF(NOT CYCLUS_DOC_ONLY)
 
 
     if(Cython_FOUND)
-        INCLUDE_DIRECTORIES(AFTER "${PYTHON_INCLUDE_DIRS}")
+        INCLUDE_DIRECTORIES(AFTER "${PYTHON_INCLUDE_DIRS}" "${_Python3_NumPy_INCLUDE_DIR}")
     endif(Cython_FOUND)
     # set core version, one way or the other
     IF(NOT "${CORE_VERSION}" STREQUAL "")
