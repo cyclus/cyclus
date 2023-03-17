@@ -3,7 +3,6 @@ import re
 import json
 import subprocess
 
-from nose.tools import assert_in, assert_true, assert_greater_equal
 
 inputfile = {
  'simulation': {
@@ -55,11 +54,11 @@ def test_bear_deploy():
     s = subprocess.check_output(['cyclus', '-o', 'bears.h5', 'bears.json'],
                                 universal_newlines=True, env=env)
     # test that the institution deploys a BearStore
-    assert_in("New fac: BearStore", s)
+    assert ("New fac: BearStore" in  s)
     # test that the first agents exist with right minimum production.
     agents = re.compile('Agent \d+ 8\.0')
     all_agents = set(agents.findall(s))
-    assert_greater_equal(len(all_agents), 9)
+    assert (len(all_agents) >=  9)
     if os.path.exists('bears.json'):
         os.remove('bears.json')
     if os.path.exists('bears.h5'):

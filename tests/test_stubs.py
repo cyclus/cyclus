@@ -6,7 +6,6 @@ import tempfile
 import io
 from contextlib import contextmanager
 
-from nose.plugins.skip import SkipTest
 
 @contextmanager
 def tmpdir():

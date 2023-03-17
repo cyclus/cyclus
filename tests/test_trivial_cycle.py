@@ -1,7 +1,5 @@
 #! /usr/bin/env python
 
-from nose.tools import assert_equal, assert_almost_equal, assert_true
-from nose.plugins.skip import SkipTest
 from numpy.testing import assert_array_equal
 import os
 import sqlite3

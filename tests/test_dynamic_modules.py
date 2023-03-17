@@ -1,6 +1,5 @@
 from __future__ import print_function, unicode_literals
 
-from nose.tools import assert_equal, assert_true
 
 from cyclus import lib
 
@@ -33,4 +32,4 @@ def test_dm_exists():
     print(spec)
     dm = lib.DynamicModule()
     obs = dm.exists(spec)
-    assert_true(obs)
+    assert(obs)

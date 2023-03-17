@@ -11,9 +11,6 @@ import tempfile
 from contextlib import contextmanager
 from functools import wraps
 
-from nose.tools import assert_true, assert_equal
-from nose.plugins.attrib import attr
-from nose.plugins.skip import SkipTest
 
 from cyclus import lib as libcyclus
 
@@ -55,7 +52,7 @@ def check_cmd(args, cwd, holdsrtn):
         print("STDOUT + STDERR:\n\n" + f.read().decode())
     f.close()
     holdsrtn[0] = rtn
-    assert_equal(rtn, 0)
+    assert rtn ==  0
 
 
 def cyclus_has_coin():

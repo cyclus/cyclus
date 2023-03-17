@@ -1,7 +1,6 @@
 """Tests Python main CLI for Cyclus."""
 from __future__ import print_function, unicode_literals
 
-from nose.tools import assert_equal, assert_true
 
 from cyclus.main import main
 

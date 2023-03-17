@@ -6,8 +6,6 @@ import tempfile
 from collections import OrderedDict
 from subprocess import Popen, PIPE, STDOUT
 
-import nose
-from nose.tools import assert_equal, assert_true, assert_false, assert_raises
 
 cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'cli'))
@@ -28,7 +26,7 @@ from cycpp import CloneFilter, InitFromCopyFilter, \
 
 import cycpp
 
-assert_equal.__self__.maxDiff = None
+# assert_equal.__self__.maxDiff = None  !! this may not be necessary for pytest???
 
 class MockMachine(object):
     def __init__(self):
@@ -373,7 +371,7 @@ def test_clonefilter():
     impl = f.impl()
     exp_impl = "  MyFactory* m = new MyFactory(context());\n" + \
                "  m->InitFrom(this);\n  return m;\n"
-    assert_equal(exp_impl, impl)
+    assert exp_impl ==  impl
 
 def test_ifcfilter():
     """Test InitFromCopyFilter"""
@@ -415,26 +413,26 @@ def test_ifdbfilter():
 def test_aliasing_schemafilter():
     impl = setup_alias(SchemaFilter)
 
-    assert_true('foo_alias' in impl)
-    assert_false('bar_var' in impl)
-    assert_true('foo_map_alias' in impl)
-    assert_false('bar_map_var' in impl)
+    assert('foo_alias' in impl)
+    assert not('bar_var' in impl)
+    assert('foo_map_alias' in impl)
+    assert not('bar_map_var' in impl)
 
 def test_aliasing_snapshotfilter():
     impl = setup_alias(SnapshotFilter)
 
-    assert_false('foo_alias' in impl)
-    assert_true('bar_var' in impl)
-    assert_false('foo_map_alias' in impl)
-    assert_true('bar_map_var' in impl)
+    assert not('foo_alias' in impl)
+    assert('bar_var' in impl)
+    assert not('foo_map_alias' in impl)
+    assert('bar_map_var' in impl)
 
 def test_aliasing_infiletodbfilter():
     impl = setup_alias(InfileToDbFilter)
 
-    assert_true('foo_alias' in impl)
-    assert_true('bar_var' in impl)
-    assert_true('foo_map_alias' in impl)
-    assert_true('bar_map_var' in impl)
+    assert('foo_alias' in impl)
+    assert('bar_var' in impl)
+    assert('foo_map_alias' in impl)
+    assert('bar_map_var' in impl)
 
 def setup_alias(filt):
     m = MockAliasCodeGenMachine()
@@ -1050,7 +1048,7 @@ def test_internal_schema():
         msg = 'case {0} failed\n    ---- got ----\n    {1}\n    ---- want ----\n    {2}'.format(i + 1, impl.replace('\n', '\n    '), want.replace('\n', '\n    '))
         if want != impl:
             pprint.pprint(impl)
-            assert_true(False, msg)
+            assert(False, msg)
 
 def test_internal_infiletodb():
     # the expected output (i.e. 'want':...) is set as 'throw' if the
@@ -1132,7 +1130,7 @@ def test_internal_infiletodb():
             except:
                 haderr = True
             msg = 'case {0} failed: expected raised exception, got none.'
-            assert_true(haderr, msg)
+            assert(haderr, msg)
             continue
         else:
             impl = f.impl()
@@ -1140,7 +1138,7 @@ def test_internal_infiletodb():
         msg = 'case {0} failed\n    ---- got ----\n    {1}\n    ---- want ----\n    {2}'.format(i + 1, impl.replace('\n', '\n    '), want.replace('\n', '\n    '))
         if want != impl:
             pprint.pprint(impl)
-            assert_true(False, msg)
+            assert(False, msg)
 
 def test_nuclide_uitype():
     m = MockCodeGenMachine()
@@ -1188,7 +1186,7 @@ def test_integration():
     else: 
         cmd = 'cycpp.py {} -o {} --cpp-path `which g++`'.format(inf, outf.name)
     p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-    assert_equal('', p.stdout.read().decode())
+    assert '' ==  p.stdout.read().decode()
 
 if __name__ == "__main__":
     nose.runmodule()

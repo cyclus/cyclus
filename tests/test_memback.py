@@ -1,10 +1,6 @@
 """Tests Python memory backend."""
 from __future__ import print_function, unicode_literals
 
-import nose
-from nose.tools import assert_equal, assert_true, assert_is_instance, \
-    assert_in, assert_false, assert_not_in, assert_is, assert_is_not
-
 from cyclus import memback
 from cyclus import lib
 from cyclus import typesystem as ts

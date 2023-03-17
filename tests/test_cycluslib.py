@@ -3,8 +3,6 @@ import os
 import subprocess
 from functools import wraps
 
-import nose
-from nose.tools import assert_equal, assert_less
 
 from cyclus import lib
 
@@ -16,7 +14,7 @@ setup = libcyclus_setup
 @dbtest
 def test_name(db, fname, backend):
     obs = db.name
-    assert_equal(fname, obs)
+    assert fname ==  obs
 
 
 @dbtest
@@ -25,23 +23,23 @@ def test_simid(db, fname, backend):
     simid = df['SimId']
     exp = simid[0]
     for obs in simid:
-        assert_equal(exp, obs)
+        assert exp ==  obs
 
 @dbtest
 def test_conds_ae(db, fname, backend):
     obs = db.query("AgentEntry", [('Kind', '==', 'Region')])
-    assert_equal(1, len(obs))
-    assert_equal('Region', obs['Kind'][0])
-    assert_equal(':agents:NullRegion', obs['Spec'][0])
+    assert 1 ==  len(obs)
+    assert 'Region' ==  obs['Kind'][0]
+    assert ':agents:NullRegion' ==  obs['Spec'][0]
 
 
 @dbtest
 def test_conds_comp(db, fname, backend):
     conds = [('NucId', '==', 922350000), ('MassFrac', '<=', 0.0072)]
     df = db.query("Compositions", conds)
-    assert_less(0, len(df))
+    assert (0 <  len(df))
     for row in df['MassFrac']:
-        assert_less(row, 0.00720000001)
+        assert (row <  0.00720000001)
 
 
 @dbtest
@@ -51,23 +49,23 @@ def test_dbopen(db, fname, backend):
 @dbtest
 def test_schema(db, fname, backend):
     schema = db.schema("AgentEntry")
-    assert_equal(8, len(schema))
+    assert 8 ==  len(schema)
     cols = ["SimId", "AgentId", "Kind", "Spec", "Prototype", "ParentId", "Lifetime", "EnterTime"]
     dbs = [7, 1, 5, 5, 5, 1, 1, 1]
     for i, ci in enumerate(schema):
-        assert_equal("AgentEntry", ci.table)
-        assert_equal(cols[i], ci.col)
-        assert_equal(dbs[i], ci.dbtype)
-        assert_equal(i, ci.index)
-        assert_equal(1, len(ci.shape))
-        assert_equal(-1, ci.shape)
+        assert "AgentEntry" ==  ci.table
+        assert cols[i] ==  ci.col
+        assert dbs[i] ==  ci.dbtype
+        assert i ==  ci.index
+        assert 1 ==  len(ci.shape)
+        assert -1 ==  ci.shape
 
 
 def test_position():
     p1 = lib.Position(42.65, 28.6)
     p2 = lib.Position(42.65, 28.6)
     d = p1.distance(p2)
-    assert_equal(0.0, d)
+    assert 0.0 ==  d
 
 
 if __name__ == "__main__":

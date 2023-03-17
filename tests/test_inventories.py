@@ -1,6 +1,5 @@
 #! /usr/bin/env python
 
-from nose.tools import assert_false, assert_true, assert_equal
 from numpy.testing import assert_array_equal
 import os
 import tables
@@ -30,7 +29,7 @@ def test_inventories_false():
             return  # don't execute further commands
 
         # Ensure tables do not exist
-        assert_false, tables_exist(outfile, path)
+        assert not tables_exist(outfile, path)
         if tables_exist(outfile, path):
             print('Inventory table exists despite false entry in control section of input file.')
             outfile.close()
@@ -55,7 +54,7 @@ def test_inventories():
             return  # don't execute further commands
 
         # Check if inventory tables exist
-        assert_true, tables_exist(outfile, path)
+        assert tables_exist(outfile, path)
         if not tables_exist(outfile, path):
             print('Inventory table does not exist despite true entry in control section of input file.')
             outfile.close()

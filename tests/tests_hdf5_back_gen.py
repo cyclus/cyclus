@@ -2,8 +2,6 @@ import os
 import sys
 import pprint
 
-import nose
-from nose.tools import assert_equal, assert_true, assert_false, assert_raises
 
 cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'src'))
@@ -21,19 +19,19 @@ def test_node_pretty():
     exp = "Node()"
     n = Node()
     obs = PRETTY.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
     
 def test_var_pretty():
     exp = "Var(\n name='x'\n)"
     n = Var(name="x")
     obs = PRETTY.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
     
 def test_decl_pretty():
     exp = "Decl(\n type='x',\n name='y'\n)"
     n = Decl(type="x", name="y")
     obs = PRETTY.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
 
 #cppgen tests
 
@@ -41,43 +39,43 @@ def test_cppgen_var():
     exp = "x"
     n = Var(name="x")
     obs = CPPGEN.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
     
 def test_cppgen_type():
     exp = "std::string"
     n = Type(cpp="std::string")
     obs = CPPGEN.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
     
 def test_cppgen_decl():
     exp = "std::string s"
     n = Decl(type=Type(cpp="std::string"), name=Var(name="s"))
     obs = CPPGEN.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
     
 def test_cppgen_assign():
     exp = "x=y"
     n = Assign(target=Var(name="x"), value=Var(name="y"))
     obs = CPPGEN.visit(n)
-    assert_equal(exp, obs)  
+    assert exp ==  obs  
     
 def test_cppgen_binop():
     exp = "x+y"
     n = BinOp(x=Var(name="x"), op="+", y=Var(name="y"))
     obs = CPPGEN.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
     
 def test_cppgen_leftunaryop():
     exp = "++x"
     n = LeftUnaryOp(op="++", name=Var(name="x"))
     obs = CPPGEN.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
     
 def test_cppgen_rightunaryop():
     exp = "x++"
     n = RightUnaryOp(name=Var(name="x"), op="++")
     obs = CPPGEN.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
 
 def test_cppgen_if():
     exp = """
@@ -93,7 +91,7 @@ if(x==y){
            elifs=[(BinOp(x=Var(name="x"), op=">", y=Var(name="y")), [ExprStmt(child=Assign(target=Var(name="x"), value=Raw(code="2")))])],\
            el=ExprStmt(child=Assign(target=Var(name="x"), value=Raw(code="3"))))
     obs = CPPGEN.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
     
 def test_cppgen_for():
     exp = """
@@ -110,7 +108,7 @@ for(int i=0;i<5;i++){
                   ExprStmt(child=Assign(target=RightUnaryOp(name=Var(name="c"), op="[i]"),
                          value=BinOp(x=Var(name="a"), op="+", y=Var(name="b"))))])
     obs = CPPGEN.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
 
 def test_cppgen_funccall():
     exp = """
@@ -119,7 +117,7 @@ mult_two<std::string,STRING>(a, b)""".strip()
                  args=[Var(name="a"), Var(name="b")],\
                  targs=[Type(cpp="std::string"), Var(name="STRING")])
     obs = CPPGEN.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
     
 def test_cppgen_case():
     exp = """case 3: {
@@ -130,7 +128,7 @@ def test_cppgen_case():
              body=[ExprStmt(child=RightUnaryOp(name=Var(name="b"), op="++")),
                    Raw(code="break;")])
     obs = CPPGEN.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
                    
 def test_cppgen_block():
     exp = """int x=5;
@@ -150,7 +148,7 @@ int z=x+y;\n"""
                                                                   op="+", 
                                                                   y=Var(name="y"))))])])
     obs = CPPGEN.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
     
 def test_cppgen_funcdef():
     exp = """template<>
@@ -176,7 +174,7 @@ void hello(int a, std::string b) {
                                                             y=Var(name="y"))))], 
                 tspecial=True)
     obs = CPPGEN.visit(n)
-    assert_equal(exp, obs)
+    assert exp ==  obs
     
 #test various node structures
     
@@ -196,9 +194,9 @@ def test_get_item_size():
                               db="VECTOR_DOUBLE", 
                               canon=("VECTOR","DOUBLE")), 
                          [0,1])
-    assert_equal(exp1, obs1)
-    assert_equal(exp2, obs2)
-    assert_equal(exp3, obs3)
+    assert exp1 ==  obs1
+    assert exp2 ==  obs2
+    assert exp3 ==  obs3
     
     
     

@@ -3,8 +3,6 @@
 import os
 import sqlite3
 
-from nose.tools import assert_false, assert_true, assert_equal
-from nose.plugins.skip import SkipTest
 
 
 import numpy as np

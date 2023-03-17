@@ -2,9 +2,6 @@ import os
 import sys
 import subprocess
 
-import nose
-from nose.tools import assert_equal, assert_true, assert_false, assert_raises
-from nose.plugins.skip import SkipTest
 
 cycdir = os.path.dirname(os.path.dirname(__file__))
 reldir = os.path.join(cycdir, 'release')
@@ -31,7 +28,7 @@ def test_abi_stability():
     args = '--update -t HEAD --no-save --check'.split()
     with tools.indir(reldir):
         obs = smbchk.main(args=args)
-    assert_true(obs)
+    assert(obs)
 
 
 if __name__ == "__main__":

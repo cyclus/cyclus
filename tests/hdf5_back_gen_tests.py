@@ -4,8 +4,6 @@ import json
 import subprocess
 from random import randint
 import uuid
-import nose
-from nose.plugins.skip import SkipTest
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 

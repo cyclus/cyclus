@@ -4,11 +4,6 @@ import platform
 import sys
 from argparse import Namespace
 
-import nose
-from nose.plugins.deprecated import DeprecatedTest
-from nose.tools import assert_equal, assert_true, assert_false, assert_raises, \
-    assert_in
-
 from tools import skip_then_continue
 
 cycdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,7 +22,7 @@ def test_load():
         return
     ns = Namespace(filename=os.path.join(reldir, 'symbols.json'))
     db = smbchk.load(ns)
-    assert_true(isinstance(db, list))
+    assert(isinstance(db, list))
 
 def test_nm():
     raise DeprecatedTest("symbol test has been deprecated")
@@ -39,7 +34,7 @@ def test_nm():
         return
     ns = Namespace(prefix=blddir)
     syms = smbchk.nm(ns)
-    assert_in("cyclus::Agent::Agent(cyclus::Context*)", syms)
+    assert ("cyclus::Agent::Agent(cyclus::Context*)" in  syms)
 
 def test_diff():
     raise DeprecatedTest("symbol test has been deprecated")
@@ -51,7 +46,7 @@ def test_diff():
                        "cyclus::Agent::~Agent()"],
            'version': 'Y', 'date': 'y.y.y'},]
     obs = smbchk.diff(db, 0, 1)
-    assert_true(len(obs) > 0)
+    assert(len(obs) > 0)
 
 def test_check():
     raise DeprecatedTest("symbol test has been deprecated")
@@ -64,13 +59,13 @@ def test_check():
                        "cyclus::Agent::~Agent()"],
            'version': 'Y', 'date': 'y.y.y'},]
     obs = smbchk.check(db)
-    assert_true(obs)
+    assert(obs)
 
     # removes from API
     db.append({'symbols': ["cyclus::Agent::~Agent()"],
                'version': 'Z', 'date': 'z.z.z'})
     obs = smbchk.check(db)
-    assert_false(obs)
+    assert not(obs)
 
 if __name__ == "__main__":
     nose.runmodule()

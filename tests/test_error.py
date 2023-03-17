@@ -1,7 +1,6 @@
 """Tests Python wrapping for cyclus errors."""
 from __future__ import print_function, unicode_literals
 
-from nose.tools import assert_equal, assert_true
 
 from cyclus import lib
 

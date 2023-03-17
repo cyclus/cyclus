@@ -1,7 +1,6 @@
 """Tests Python wrapping on Env object."""
 from __future__ import print_function, unicode_literals
 
-from nose.tools import assert_equal, assert_true
 
 from cyclus import lib
 
@@ -32,4 +31,4 @@ def test_nuc_data():
 
 
 def test_allow_milps():
-    assert_true(isinstance(ENV.allow_milps, bool))
+    assert(isinstance(ENV.allow_milps, bool))

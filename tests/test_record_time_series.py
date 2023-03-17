@@ -2,7 +2,6 @@ import json
 import subprocess
 import os
 
-from nose.tools import assert_in
 
 inputfile = {'simulation': {'archetypes': {'spec': [
                                         {'lib': 'dummy_power_recorder', 'name': 'DummyPowerRecorder'},
@@ -29,7 +28,7 @@ def test_record_time_series():
     env = dict(os.environ)
     env['PYTHONPATH'] = "."
     s = subprocess.check_output(['cyclus', '-o', 'dummy.h5', 'dummy.json'], universal_newlines=True, env=env)
-    assert_in("The power is 10", s)
+    assert ("The power is 10" in  s)
     if os.path.exists('dummy.json'):
         os.remove('dummy.json')
     if os.path.exists('dummy.h5'):
