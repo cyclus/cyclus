@@ -22,7 +22,8 @@ from cpython.pycapsule cimport PyCapsule_GetPointer
 from binascii import hexlify
 import uuid
 import os
-from collections import Mapping, Sequence, Iterable, defaultdict
+from collections import defaultdict
+from collections.abc import Mapping, Sequence, Iterable
 from importlib import import_module
 
 cimport numpy as np
