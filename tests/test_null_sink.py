@@ -38,7 +38,7 @@ def check_null_sink(fname, given_spec):
     legal_paths = ["/AgentEntry", "/Info"]
     illegal_paths = ["/Transactions"]  # this must contain tables to test
     # Check if these tables exist
-    yield assert_true, tables_exist(outfile, legal_paths)
+    assert  tables_exist(outfile, legal_paths)
     if not tables_exist(outfile, legal_paths):
         outfile.close()
         clean_outs()
@@ -66,10 +66,10 @@ def check_null_sink(fname, given_spec):
 
     sink_id = find_ids(given_spec, spec, agent_ids)
     # Test if one SimpleSink is deployed
-    yield assert_equal, len(sink_id), 1
+    assert len(sink_id) == 1
 
     # No resource exchange is expected
-    yield assert_false, tables_exist(outfile, illegal_paths)
+    assert not tables_exist(outfile, illegal_paths)
 
     clean_outs()
 

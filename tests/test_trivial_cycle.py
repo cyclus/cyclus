@@ -5,6 +5,8 @@ import os
 import sqlite3
 import tables
 import numpy as np
+import pytest
+
 from tools import check_cmd, cyclus_has_coin
 from helper import tables_exist, find_ids, exit_times, create_sim_input, \
     h5out, sqliteout, clean_outs, to_ary, which_outfile
@@ -48,7 +50,7 @@ def test_source_to_sink():
         paths = ["/AgentEntry", "/Resources", "/Transactions",
                 "/Info"]
         # Check if these tables exist
-        yield assert_true, tables_exist(outfile, paths)
+        assert  tables_exist(outfile, paths)
         if not tables_exist(outfile, paths):
             outfile.close()
             clean_outs()
@@ -79,7 +81,7 @@ def test_source_to_sink():
 
         facility_id = find_ids(":agents:KFacility", spec, agent_ids)
         # Test for only one KFacility
-        yield assert_equal, len(facility_id), 1
+        assert len(facility_id) == 1
 
         sender_ids = to_ary(transactions, "SenderId")
         receiver_ids = to_ary(transactions, "ReceiverId")
@@ -87,12 +89,12 @@ def test_source_to_sink():
         expected_sender_array.fill(facility_id[0])
         expected_receiver_array = np.empty(receiver_ids.size)
         expected_receiver_array.fill(facility_id[0])
-        yield assert_array_equal, sender_ids, expected_sender_array
-        yield assert_array_equal, receiver_ids, expected_receiver_array
+        assert_array_equal, sender_ids, expected_sender_array
+        assert_array_equal, receiver_ids, expected_receiver_array
 
         # Transaction ids must be equal range from 1 to the number of rows
         expected_trans_ids = np.arange(0, sender_ids.size, 1)
-        yield assert_array_equal, \
+        assert_array_equal, \
             to_ary(transactions, "TransactionId"), \
                    expected_trans_ids
 
@@ -104,7 +106,7 @@ def test_source_to_sink():
         i = 0
         initial_capacity = quantities[0]
         for q in quantities:
-            yield assert_almost_equal, q, initial_capacity * k_factor ** i
+            assert pytest.approx(q, abs=1e-7) == initial_capacity * k_factor ** i
             i += 1
 
         clean_outs()

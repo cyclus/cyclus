@@ -7,6 +7,8 @@ import os
 import sqlite3
 import tables
 import numpy as np
+import pytest
+
 from tools import check_cmd, cyclus_has_coin
 from helper import tables_exist, find_ids, exit_times, create_sim_input, \
     h5out, sqliteout, clean_outs, sha1array, to_ary, which_outfile
@@ -121,7 +123,7 @@ def test_minimal_cycle():
             paths = ["/AgentEntry", "/Resources", "/Transactions",
                      "/Info"]
             # Check if these tables exist
-            yield assert_true, tables_exist(outfile, paths)
+            assert  tables_exist(outfile, paths)
             if not tables_exist(outfile, paths):
                 outfile.close()
                 clean_outs()
@@ -156,18 +158,18 @@ def test_minimal_cycle():
 
             facility_id = find_ids(":agents:KFacility", spec, agent_ids)
             # Test for two KFacility
-            yield assert_equal, len(facility_id), 2
+            assert len(facility_id) == 2
 
             # Test for one Facility A and Facility B
             facility_a = find_ids("FacilityA", agent_protos, agent_ids)
             facility_b = find_ids("FacilityB", agent_protos, agent_ids)
-            yield assert_equal, len(facility_a), 1
-            yield assert_equal, len(facility_b), 1
+            assert len(facility_a) == 1
+            assert len(facility_b) == 1
 
             # Test if both facilities are KFracilities
             # Assume FacilityA is deployed first according to the schema
-            yield assert_equal, facility_a[0], facility_id[0]
-            yield assert_equal, facility_b[0], facility_id[1]
+            assert facility_a[0] == facility_id[0]
+            assert facility_b[0] == facility_id[1]
 
             # Test if the transactions are strictly between Facility A and
             # Facility B. There are no Facility A to Facility A or vice versa.
@@ -183,23 +185,23 @@ def test_minimal_cycle():
                 pattern_a = pattern_two
                 pattern_b = pattern_one
 
-            yield assert_array_equal, \
+            assert_array_equal, \
                 np.where(sender_ids == facility_a[0])[0], \
                 pattern_a, "Fac A Pattern A"
-            yield assert_array_equal, \
+            assert_array_equal, \
                 np.where(receiver_ids == facility_a[0])[0], \
                 pattern_b, "Fac A Pattern B"  # reverse pattern when acted as a receiver
 
-            yield assert_array_equal, \
+            assert_array_equal, \
                 np.where(sender_ids == facility_b[0])[0], \
                 pattern_b, "Fac B Pattern A"
-            yield assert_array_equal, \
+            assert_array_equal, \
                 np.where(receiver_ids == facility_b[0])[0], \
                 pattern_a, "Fac B Pattern B"  # reverse pattern when acted as a receiver
 
             # Transaction ids must be equal range from 1 to the number of rows
             expected_trans_ids = np.arange(sender_ids.size)
-            yield assert_array_equal, \
+            assert_array_equal, \
                 to_ary(transactions, "TransactionId"), \
                 expected_trans_ids
 
@@ -210,7 +212,7 @@ def test_minimal_cycle():
             # there must be (2 * duration) number of transactions.
             exp = 2 * duration
             obs = sender_ids.size
-            yield assert_equal, exp, obs, "number of transactions, {} != {}".format(exp, obs)
+            assert exp == obs, f"number of transactions, {exp} != {obs}"
 
             # Track transacted resources
             quantities = to_ary(resources, "Quantity")
@@ -220,13 +222,13 @@ def test_minimal_cycle():
             init_capacity_b = quantities[1]
             j = 0
             for p in pattern_a:
-                yield assert_almost_equal, quantities[p], \
+                assert pytest.approx(quantities[p], abs=1e-7) == \
                     init_capacity_a * k_factor_a ** j
                 j += 1
 
             j = 0
             for p in pattern_b:
-                yield assert_almost_equal, quantities[p], \
+                assert pytest.approx(quantities[p], abs=1e-7) == \
                     init_capacity_b * k_factor_b ** j
                 j += 1
 

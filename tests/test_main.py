@@ -34,6 +34,6 @@ def test_main():
         except Exception:
             res = False
             raise
-        yield assert_true, res
+        assert  res
 
 

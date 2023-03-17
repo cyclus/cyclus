@@ -35,7 +35,7 @@ def check_source_to_sink(fname, source_spec, sink_spec):
         # Tables of interest
         paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
         # Check if these tables exist
-        yield assert_true, tables_exist(outfile, paths)
+        assert  tables_exist(outfile, paths)
         if not tables_exist(outfile, paths):
             clean_outs()
             return  # don't execute further commands
@@ -69,8 +69,8 @@ def check_source_to_sink(fname, source_spec, sink_spec):
         sink_id = find_ids(sink_spec, spec, agent_ids)
 
         # Test for only one source and one sink are deployed in the simulation
-        yield assert_equal, len(source_id), 1
-        yield assert_equal, len(sink_id), 1
+        assert len(source_id) == 1
+        assert len(sink_id) == 1
 
         # Check if transactions are only between source and sink
         sender_ids = to_ary(transactions, "SenderId")
@@ -79,12 +79,12 @@ def check_source_to_sink(fname, source_spec, sink_spec):
         expected_sender_array.fill(source_id[0])
         expected_receiver_array = np.empty(receiver_ids.size)
         expected_receiver_array.fill(sink_id[0])
-        yield assert_array_equal, sender_ids, expected_sender_array
-        yield assert_array_equal, receiver_ids, expected_receiver_array
+        assert_array_equal, sender_ids, expected_sender_array
+        assert_array_equal, receiver_ids, expected_receiver_array
 
         # Transaction ids must be equal range from 1 to the number of rows
         expected_trans_ids = np.arange(0, sender_ids.size, 1)
-        yield assert_array_equal, \
+        assert_array_equal, \
             to_ary(transactions, "TransactionId"),\
             expected_trans_ids
 
@@ -95,7 +95,7 @@ def check_source_to_sink(fname, source_spec, sink_spec):
         # Expect that every transaction quantity is the same amount
         expected_quantities.fill(quantities[0])
 
-        yield assert_array_equal, quantities, expected_quantities
+        assert_array_equal, quantities, expected_quantities
 
         clean_outs()
 

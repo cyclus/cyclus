@@ -268,7 +268,7 @@ def generate_and_test():
             rec.flush()
         obs = back.query("test0")
         print("observed: \n", obs)
-        yield assert_frame_equal, exp, obs
+        assert_frame_equal, exp, obs
         rec.close()
         os.remove(PATH)
 
