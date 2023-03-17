@@ -91,6 +91,7 @@ TEST(InfileConverters, JsonPyRoundTrip) {
   string j2 = cyclus::toolkit::PyToJson(p2);
   cyclus::PyStop();
 
+  EXPECT_STREQ(inp.c_str(), j1.c_str());
   EXPECT_STREQ(j1.c_str(), j2.c_str());
   EXPECT_STREQ(p1.c_str(), p2.c_str());
 }
