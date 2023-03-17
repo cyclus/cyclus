@@ -5,17 +5,17 @@ import sys
 import tempfile
 import io
 from contextlib import contextmanager
+import pytest
 
 
 @contextmanager
 def tmpdir():
     d = tempfile.mkdtemp()
-    yield d
     shutil.rmtree(d)
 
 @contextmanager
 def tmplog(fname):
-    yield io.open(fname, mode='w')
+    io.open(fname, mode='w')
     os.remove(fname)
 
 def test_stubs():
@@ -54,7 +54,7 @@ def test_stubs():
                                       cwd=src, stdout=f, stderr=f)
         except subprocess.CalledProcessError as e:
             print(msg)
-            raise SkipTest(msg)  # skip if we can't install for some reason.
+            pytest.skip(msg)  # skip if we can't install for some reason.
 
         # run unit tests for stub
         cmd = tst_cmd.format(pth)

@@ -1,6 +1,7 @@
 import os
 import sys
 import subprocess
+import pytest
 
 
 cycdir = os.path.dirname(os.path.dirname(__file__))
@@ -16,14 +17,14 @@ except ImportError:
 
 
 def test_abi_stability():
-    raise SkipTest('manually remove this skip to test ABI stability')
+    pytest.skip('manually remove this skip to test ABI stability')
     if smbchk is None:
-        raise SkipTest('Could not import smbchk!')
+        pytest.skip('Could not import smbchk!')
     if os.name != 'posix':
-        raise SkipTest('can only check for ABI stability on posix systems.')
+        pytest.skip('can only check for ABI stability on posix systems.')
     libcyc = os.path.join(cycdir, 'build', 'lib', 'libcyclus.so')
     if not os.path.exists(libcyc):
-        raise SkipTest('libcyclus could not be found, '
+        pytest.skip('libcyclus could not be found, '
                        'cannot check for ABI stability')
     args = '--update -t HEAD --no-save --check'.split()
     with tools.indir(reldir):
@@ -31,5 +32,3 @@ def test_abi_stability():
     assert(obs)
 
 
-if __name__ == "__main__":
-    nose.runmodule()

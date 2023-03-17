@@ -2,6 +2,7 @@
 
 import os
 import sqlite3
+import pytest
 
 
 
@@ -23,14 +24,14 @@ def check_null_sink(fname, given_spec):
     """
     clean_outs()
     if not cyclus_has_coin():
-        raise SkipTest("Cyclus does not have COIN")
+        pytest.skip("Cyclus does not have COIN")
 
     # Cyclus simulation input for null sink testing
     sim_input = os.path.join(INPUT, fname)
     holdsrtn = [1]  # needed because nose does not send() to test generator
     outfile = which_outfile()
     cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
-    yield check_cmd, cmd, '.', holdsrtn
+    check_cmd(cmd, '.', holdsrtn)
     rtn = holdsrtn[0]
     if rtn != 0:
         return  # don't execute further commands
@@ -70,7 +71,7 @@ def check_null_sink(fname, given_spec):
 
     # No resource exchange is expected
     assert not tables_exist(outfile, illegal_paths)
-
+    assert 1 == 2 # FIX ME
     clean_outs()
 
 
@@ -79,5 +80,5 @@ def test_null_sink():
              ("null_sink.py", ":cyclus.pyagents:Sink")]
     for case in cases:
         for x in check_null_sink(*case):
-            yield x
+            pass
 

@@ -364,8 +364,3 @@ def test_query():
 
     # test convert to JSON
     obs.to_json()
-
-
-
-if __name__ == "__main__":
-    nose.runmodule()

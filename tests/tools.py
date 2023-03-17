@@ -10,6 +10,7 @@ import subprocess
 import tempfile
 from contextlib import contextmanager
 from functools import wraps
+import pytest
 
 
 from cyclus import lib as libcyclus
@@ -17,8 +18,8 @@ from cyclus import lib as libcyclus
 if sys.version_info[0] >= 3:
     basestring = str
 
-unit = attr('unit')
-integration = attr('integration')
+#unit = attr('unit')
+#integration = attr('integration')
 
 INPUT = os.path.join(os.path.dirname(__file__), "input")
 
@@ -118,7 +119,7 @@ def skip_then_continue(msg=""):
     and we may continue on our merry way. A message may be optionally passed
     to this function.
     """
-    raise SkipTest(msg)
+    pytest.skip(msg)
 
 @contextmanager
 def indir(d):
@@ -174,7 +175,7 @@ def dbtest(f):
                 os.remove(fname)
             shutil.copy(oname, fname)
             db = backend(fname)
-            yield f, db, fname, backend
+            f(db, fname, backend)
     return wrapper
 
 

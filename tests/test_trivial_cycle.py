@@ -26,7 +26,7 @@ def test_source_to_sink():
     This equation is used to test each transaction amount.
     """
     if not cyclus_has_coin():
-        raise SkipTest("Cyclus does not have COIN")
+        pytest.skip("Cyclus does not have COIN")
 
     # A reference simulation input for the trivial cycle simulation.
     ref_input = os.path.join(INPUT, "trivial_cycle.xml")
@@ -41,7 +41,7 @@ def test_source_to_sink():
         holdsrtn = [1]  # needed because nose does not send() to test generator
         outfile = which_outfile()
         cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
-        yield check_cmd, cmd, '.', holdsrtn
+        check_cmd(cmd, '.', holdsrtn)
         rtn = holdsrtn[0]
         if rtn != 0:
             return  # don't execute further commands

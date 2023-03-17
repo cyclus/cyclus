@@ -1192,5 +1192,3 @@ def test_integration():
     p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
     assert '' ==  p.stdout.read().decode()
 
-if __name__ == "__main__":
-    nose.runmodule()

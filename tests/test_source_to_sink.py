@@ -6,6 +6,8 @@ import os
 import sqlite3
 import tables
 import numpy as np
+import pytest
+
 from tools import check_cmd, cyclus_has_coin
 from helper import tables_exist, find_ids, exit_times, \
     h5out, sqliteout, clean_outs, to_ary, which_outfile
@@ -18,7 +20,7 @@ def check_source_to_sink(fname, source_spec, sink_spec):
     """
     clean_outs()
     if not cyclus_has_coin():
-        raise SkipTest("Cyclus does not have COIN")
+        pytest.skip("Cyclus does not have COIN")
 
     # Cyclus simulation input for Source and Sink
     sim_inputs = [os.path.join(INPUT, fname)]
@@ -27,7 +29,7 @@ def check_source_to_sink(fname, source_spec, sink_spec):
         holdsrtn = [1]  # needed because nose does not send() to test generator
         outfile = which_outfile()
         cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
-        yield check_cmd, cmd, '.', holdsrtn
+        check_cmd(cmd, '.', holdsrtn)
         rtn = holdsrtn[0]
         if rtn != 0:
             return  # don't execute further commands
@@ -106,4 +108,4 @@ def test_source_to_sink():
              ]
     for case in cases:
         for x in check_source_to_sink(*case):
-            yield x
+            pass

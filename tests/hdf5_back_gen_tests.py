@@ -6,6 +6,7 @@ from random import randint
 import uuid
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
+import pytest
 
 from cyclus.lib import Hdf5Back, Recorder
 import cyclus.typesystem as ts
@@ -245,7 +246,7 @@ def generate_and_test():
     """Generate and run tests for supported Hdf5 datatypes."""
     if sys.version_info[0] == 2:
         msg = 'Hdf5 backend gen tests do not support Python 2.x'
-        raise SkipTest(msg)
+        pytest.skip(msg)
     if os.path.isfile(PATH):
         os.remove(PATH)
     for i in CANON_TYPES:
@@ -272,6 +273,4 @@ def generate_and_test():
         rec.close()
         os.remove(PATH)
 
-if __name__ == "__main__":
-    nose.runmodule()
     

@@ -30,7 +30,7 @@ def test_predator_only():
     outfile = which_outfile()
 
     cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
-    yield check_cmd, cmd, '.', holdsrtn
+    check_cmd(cmd, '.', holdsrtn)
     rtn = holdsrtn[0]
 
     print("Confirming valid Cyclus execution.")
@@ -58,7 +58,7 @@ def test_prey_only():
     outfile = which_outfile()
 
     cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
-    yield check_cmd, cmd, '.', holdsrtn
+    check_cmd(cmd, '.', holdsrtn)
     rtn = holdsrtn[0]
 
     print("Confirming valid Cyclus execution.")
@@ -95,7 +95,7 @@ def test_lotka_volterra():
     outfile = which_outfile()
 
     cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
-    yield check_cmd, cmd, '.', holdsrtn
+    check_cmd(cmd, '.', holdsrtn)
     rtn = holdsrtn[0]
 
     print("Confirming valid Cyclus execution.")
@@ -112,5 +112,3 @@ def test_lotka_volterra():
 
     clean_outs()
 
-if __name__ == "__main__":
-    nose.runmodule()

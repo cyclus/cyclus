@@ -99,7 +99,7 @@ def test_minimal_cycle():
     This equation is used to test each transaction amount.
     """
     if not cyclus_has_coin():
-        raise SkipTest("Cyclus does not have COIN")
+        pytest.skip("Cyclus does not have COIN")
 
     # A reference simulation input for minimal cycle with different commodities
     ref_input = os.path.join(INPUT, "minimal_cycle.xml")
@@ -114,7 +114,7 @@ def test_minimal_cycle():
             holdsrtn = [1]  # needed b/c nose does not send() to test generator
             outfile = which_outfile()
             cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
-            yield check_cmd, cmd, '.', holdsrtn
+            check_cmd(cmd, '.', holdsrtn)
             rtn = holdsrtn[0]
             if rtn != 0:
                 return  # don't execute further commands
@@ -235,5 +235,3 @@ def test_minimal_cycle():
             clean_outs()
             os.remove(sim_input)
 
-if __name__ == "__main__":
-    nose.runmodule()

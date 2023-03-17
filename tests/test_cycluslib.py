@@ -3,13 +3,12 @@ import os
 import subprocess
 from functools import wraps
 
-
 from cyclus import lib
 
 from tools import libcyclus_setup, dbtest
 
 
-setup = libcyclus_setup
+#setup = libcyclus_setup
 
 @dbtest
 def test_name(db, fname, backend):
@@ -68,6 +67,4 @@ def test_position():
     assert 0.0 ==  d
 
 
-if __name__ == "__main__":
-    nose.runmodule()
 

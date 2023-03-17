@@ -23,7 +23,7 @@ def test_inventories_false():
         holdsrtn = [1]  # needed because nose does not send() to test generator
         outfile = sqliteout
         cmd = ["cyclus", "-o", outfile, "--input-file", sim]
-        yield check_cmd, cmd, '.', holdsrtn
+        check_cmd(cmd, '.', holdsrtn)
         rtn = holdsrtn[0]
         if rtn != 0:
             return  # don't execute further commands
@@ -48,7 +48,7 @@ def test_inventories():
         holdsrtn = [1]  # needed because nose does not send() to test generator
         outfile = sqliteout
         cmd = ["cyclus", "-o", outfile, "--input-file", sim]
-        yield check_cmd, cmd, '.', holdsrtn
+        check_cmd(cmd, '.', holdsrtn)
         rtn = holdsrtn[0]
         if rtn != 0:
             return  # don't execute further commands

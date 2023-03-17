@@ -20,7 +20,7 @@ def test_include_recipe():
     holdsrtn = [1]  # needed because nose does not send() to test generator
     outfile = which_outfile()
     cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
-    yield check_cmd, cmd, CWD, holdsrtn
+    check_cmd(cmd, CWD, holdsrtn)
     rtn = holdsrtn[0]
     if rtn != 0:
         return  # don't execute further commands

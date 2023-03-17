@@ -67,5 +67,3 @@ def test_check():
     obs = smbchk.check(db)
     assert not(obs)
 
-if __name__ == "__main__":
-    nose.runmodule()
