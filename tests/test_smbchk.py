@@ -2,6 +2,7 @@ from __future__ import print_function, unicode_literals
 import os
 import platform
 import sys
+import pytest
 from argparse import Namespace
 
 from tools import skip_then_continue
@@ -16,8 +17,8 @@ try:
 except ImportError:
     smbchk = False
 
+@pytest.mark.deprecated("symbol test has been deprecated")
 def test_load():
-    raise DeprecatedTest("symbol test has been deprecated")
     if not smbchk:
         return
     ns = Namespace(filename=os.path.join(reldir, 'symbols.json'))
