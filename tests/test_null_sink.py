@@ -71,7 +71,6 @@ def check_null_sink(fname, given_spec):
 
     # No resource exchange is expected
     assert not tables_exist(outfile, illegal_paths)
-    assert 1 == 2 # FIX ME
     clean_outs()
 
 
@@ -79,6 +78,5 @@ def test_null_sink():
     cases = [("null_sink.xml", ":agents:Sink"),
              ("null_sink.py", ":cyclus.pyagents:Sink")]
     for case in cases:
-        for x in check_null_sink(*case):
-            pass
+        check_null_sink(*case)
 
