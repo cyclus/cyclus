@@ -107,5 +107,4 @@ def test_source_to_sink():
              ("source_to_sink.py", ":cyclus.pyagents:Source", ":cyclus.pyagents:Sink"),
              ]
     for case in cases:
-        for x in check_source_to_sink(*case):
-            pass
+        check_source_to_sink(*case)
