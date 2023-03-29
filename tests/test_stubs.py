@@ -11,11 +11,12 @@ import pytest
 @contextmanager
 def tmpdir():
     d = tempfile.mkdtemp()
+    yield d
     shutil.rmtree(d)
 
 @contextmanager
 def tmplog(fname):
-    io.open(fname, mode='w')
+    yield io.open(fname, mode='w')
     os.remove(fname)
 
 def test_stubs():
