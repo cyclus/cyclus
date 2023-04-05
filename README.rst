@@ -79,7 +79,7 @@ Package                Minimum Version
 ``boost``                1.46.1
 ``libxml2``              2
 ``libxml++``             2.36
-``python``               2.7 or 3.3+
+``python``               2.7 or 3.10
 ``sqlite3``              3.7.10
 ``HDF5``                 1.8.4
 ``Coin-Cbc``             2.5
@@ -108,10 +108,10 @@ To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18
 
 - ``conda config --add channels conda-forge``
 
-- ``conda install -y openssh gxx_linux-64 gcc_linux-64 cmake make docker-pycreds git xo
-  python-json-logger python=3.6 glibmm glib=2.56 libxml2 libxmlpp libblas libcblas
-  liblapack pkg-config coincbc=2.9 boost-cpp hdf5 sqlite pcre gettext bzip2 xz
-  setuptools nose pytables pandas jinja2 cython==0.26 websockets pprintpp``
+- ``conda install -y openssh gxx_linux-64=12.2 gcc_linux-64=12.2 cmake make 
+  docker-pycreds git xo python-json-logger python=3.10 glibmm glib libxml2 libxmlpp
+  libblas libcblas liblapack pkg-config coincbc boost-cpp hdf5 sqlite pcre gettext 
+  bzip2 xz setuptools nose pytables pandas jinja2 cython websockets pprintpp``
 
 - Use ``sudo apt install`` to install and configure git
 
