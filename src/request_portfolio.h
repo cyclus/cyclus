@@ -50,7 +50,7 @@ template <class T> struct QtyCoeffConverter : public Converter<T> {
 
 /// @class RequestPortfolio
 ///
-/// @brief A RequestPortfolio is a group of (possibly constrainted) requests for
+/// @brief A RequestPortfolio is a group of (possibly constrained) requests for
 /// resources
 ///
 /// The portfolio contains a grouping of resource requests that may be mutually
@@ -69,7 +69,7 @@ template <class T> struct QtyCoeffConverter : public Converter<T> {
 /// RequestPortfolio<SomeResource>());
 /// // add some requests
 /// rp->AddRequest(/* args */);
-/// // declare some of them as multicommodity requsts (i.e., any one will
+/// // declare some of them as multi-commodity requests (i.e., any one will
 /// // satisfy this demand).
 /// rp->AddMutualReqs(/* args */);
 ///
@@ -229,7 +229,7 @@ class RequestPortfolio
   /// constraints_ is a set because constraints are assumed to be unique
   std::set<CapacityConstraint<T>> constraints_;
 
-  /// the total quantity of resources assocaited with the portfolio
+  /// the total quantity of resources associated with the portfolio
   double qty_;
   Trader* requester_;
 };
