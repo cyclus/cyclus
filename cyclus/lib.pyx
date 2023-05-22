@@ -1810,6 +1810,7 @@ cpdef dict normalize_request_portfolio(object inp):
     if 'commodities' in inp:
         commods = inp['commodities']
         constrs = inp.get('constraints', [])
+        prefs = inp.get('preference', [])
     else:
         commods = inp
         constrs = []
@@ -1825,7 +1826,9 @@ cpdef dict normalize_request_portfolio(object inp):
         if isinstance(val, ts.Resource):
             req = default_req.copy()
             req['target'] = val
+            req['preference'] = prefs
             commods[key] = [req]
+
         elif isinstance(val, Mapping):
             req = default_req.copy()
             req.update(val)
@@ -1846,7 +1849,9 @@ cpdef dict normalize_request_portfolio(object inp):
         else:
             raise TypeError('Did not recognize type of commodity while '
                             'converting to portfolio: ' + repr(inp))
-    cdef dict rtn = {'commodities': commods, 'constraints': constrs}
+
+    cdef dict rtn = {'commodities': commods, 'constraints': constrs,
+                     'preference': prefs}
     return rtn
 
 

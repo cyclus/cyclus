@@ -2280,7 +2280,11 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
             if req['cost'] is not None:
                 raise ValueError('setting cost functions from Python is not yet '
                                  'supported.')
-            port.get().AddRequest(targ_ptr, requester, commod, req['preference'],
+            if pyport['preference'] is not None:
+                port.get().AddRequest(targ_ptr, requester, commod, pyport['preference'],
+                                  req['exclusive'])
+            else:
+                port.get().AddRequest(targ_ptr, requester, commod, req['preference'],
                                   req['exclusive'])
     # add constraints
     for constr in pyport['constraints']:
