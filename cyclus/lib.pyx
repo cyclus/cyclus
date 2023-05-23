@@ -1804,54 +1804,71 @@ cpdef dict normalize_request_portfolio(object inp):
     """Normalizes a request portfolio into a standard Python form, ready to be traded.
     Note that this does not include the requester object.
     """
+    print("normalizing input")
     # get initial values
     if not isinstance(inp, Mapping):
         inp = dict(inp)
     if 'commodities' in inp:
-        commods = inp['commodities']
+        commods = []
+        prefs = []
+        for commodity in inp['commodities']:
+            for name, reqs in commodity.items():
+                if name == 'preference':
+                    continue
+                commods.append({name:reqs})
         constrs = inp.get('constraints', [])
-        prefs = inp.get('preference', [])
     else:
-        commods = inp
+        commods = []
+        for name, reqs in inp:
+            if name == 'preference':
+                continue
+            commods.append({name:reqs})
         constrs = []
     # canonize constraints
     if not isinstance(constrs, Iterable):
         constrs = [constrs]
     # canonize commods
-    if not isinstance(commods, Mapping):
-        commods = dict(commods)
+    if not isinstance(commods, Iterable):
+        commods = list(commods)
     cdef dict default_req = {'target': None, 'preference': 1.0,
                              'exclusive': False, 'cost': None}
-    for key, val in commods.items():
-        if isinstance(val, ts.Resource):
-            req = default_req.copy()
-            req['target'] = val
-            req['preference'] = prefs
-            commods[key] = [req]
 
-        elif isinstance(val, Mapping):
-            req = default_req.copy()
-            req.update(val)
-            commods[key] = [req]
-        elif isinstance(val, Sequence):
-            newval = []
-            for x in val:
+    print(default_req)
+    print(commods)
+    for index, commodity in enumerate(commods):
+        print(index, commodity)
+        for key, val in commodity.items():
+            print("looping", key, val)
+            if isinstance(val, ts.Resource):
                 req = default_req.copy()
-                if isinstance(x, ts.Resource):
-                    req['target'] = x
-                elif isinstance(x, Mapping):
-                    req.update(x)
-                else:
-                    raise TypeError('Did not recognize type of request while '
-                                    'converting to portfolio: ' + repr(inp))
-                newval.append(req)
-            commods[key] = newval
-        else:
-            raise TypeError('Did not recognize type of commodity while '
-                            'converting to portfolio: ' + repr(inp))
+                req['target'] = val
+                req['preference'] = inp['commodities'][index]['preference']
+                commods[index][key] = [req]
+                print(commods)
 
-    cdef dict rtn = {'commodities': commods, 'constraints': constrs,
-                     'preference': prefs}
+            elif isinstance(val, Mapping):
+                req = default_req.copy()
+                req.update(val)
+                commods[key] = [req]
+            elif isinstance(val, Sequence):
+                newval = []
+                for x in val:
+                    req = default_req.copy()
+                    if isinstance(x, ts.Resource):
+                        req['target'] = x
+                    elif isinstance(x, Mapping):
+                        req.update(x)
+                    else:
+                        raise TypeError('Did not recognize type of request while '
+                                        'converting to portfolio: ' + repr(inp))
+                    newval.append(req)
+                commods[key] = newval
+            else:
+                raise TypeError('Did not recognize type of commodity while '
+                                'converting to portfolio: ' + repr(inp))
+
+    cdef dict rtn = {'commodities': commods, 'constraints': constrs}
+    print("returned dict:", rtn)
     return rtn
 
 
