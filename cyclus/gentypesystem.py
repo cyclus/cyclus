@@ -2271,21 +2271,25 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
     cdef _{{rclsname}} targ
     cdef shared_ptr[{{cyr}}] targ_ptr
     # add requests
-    for name, reqs in pyport['commodities'].items():
-        commod = str_py_to_cpp(name)
-        for req in reqs:
-            targ = <_{{rclsname}}> req['target']
-            targ_ptr = reinterpret_pointer_cast[{{ts.cython_type(r)}},
-                                                cpp_cyclus.Resource](targ.ptx)
-            if req['cost'] is not None:
-                raise ValueError('setting cost functions from Python is not yet '
-                                 'supported.')
-            if pyport['preference'] is not None:
-                port.get().AddRequest(targ_ptr, requester, commod, pyport['preference'],
-                                  req['exclusive'])
-            else:
+    print("adding requests")
+    for commodity in pyport['commodities']:
+        for name, reqs in commodity.items():
+            commod = str_py_to_cpp(name)
+            print(commod, reqs)
+            for req in reqs:
+                targ = <_{{rclsname}}> req['target']
+                targ_ptr = reinterpret_pointer_cast[{{ts.cython_type(r)}},
+                                                    cpp_cyclus.Resource](targ.ptx)
+                if req['cost'] is not None:
+                    raise ValueError('setting cost functions from Python is not yet '
+                                    'supported.')
+                #if pyport['preference'] is not None:
+                #    port.get().AddRequest(targ_ptr, requester, commod, pyport['preference'],
+                #                    req['exclusive'])
+                #else:
                 port.get().AddRequest(targ_ptr, requester, commod, req['preference'],
-                                  req['exclusive'])
+                                req['exclusive'])
+                print("added request for", req)
     # add constraints
     for constr in pyport['constraints']:
         port.get().AddConstraint(
