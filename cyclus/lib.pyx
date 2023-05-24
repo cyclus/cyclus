@@ -1804,7 +1804,6 @@ cpdef dict normalize_request_portfolio(object inp):
     """Normalizes a request portfolio into a standard Python form, ready to be traded.
     Note that this does not include the requester object.
     """
-    print("normalizing input")
     # get initial values
     if not isinstance(inp, Mapping):
         inp = dict(inp)
@@ -1833,18 +1832,13 @@ cpdef dict normalize_request_portfolio(object inp):
     cdef dict default_req = {'target': None, 'preference': 1.0,
                              'exclusive': False, 'cost': None}
 
-    print(default_req)
-    print(commods)
     for index, commodity in enumerate(commods):
-        print(index, commodity)
         for key, val in commodity.items():
-            print("looping", key, val)
             if isinstance(val, ts.Resource):
                 req = default_req.copy()
                 req['target'] = val
                 req['preference'] = inp['commodities'][index]['preference']
                 commods[index][key] = [req]
-                print(commods)
 
             elif isinstance(val, Mapping):
                 req = default_req.copy()
@@ -1868,7 +1862,6 @@ cpdef dict normalize_request_portfolio(object inp):
                                 'converting to portfolio: ' + repr(inp))
 
     cdef dict rtn = {'commodities': commods, 'constraints': constrs}
-    print("returned dict:", rtn)
     return rtn
 
 
