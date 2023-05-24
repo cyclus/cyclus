@@ -2267,9 +2267,12 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
         shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]](
             new cpp_cyclus.RequestPortfolio[{{cyr}}]()
             )
+    # print(port)
 
-    cdef const std_vector[cpp_cyclus.RequestPortfolio[{{cyr}}].request_ptr] mreqs
-    cdef cpp_cyclus.RequestPortfolio[{{cyr}}]request
+    cdef std_vector[cpp_cyclus.RequestPortfolio[{{cyr}}].request_ptr] mreqs
+    cdef cpp_cyclus.RequestPortfolio[{{cyr}}].request_ptr request
+    cdef cpp_cyclus.Request[{{cyr}}]* single
+
     cdef std_string commod
     cdef _{{rclsname}} targ
     cdef shared_ptr[{{cyr}}] targ_ptr
@@ -2285,12 +2288,12 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
                 if req['cost'] is not None:
                     raise ValueError('setting cost functions from Python is not yet '
                                     'supported.')
-                request.AddRequest(targ_ptr, requester, commod, req['preference'],
+                single = port.get().AddRequest(targ_ptr, requester, commod, req['preference'],
                                 req['exclusive'])
                 print("added request for", req)
-                mreqs.push_back(request)
+                #mreqs.push_back(single)
     #print(mreqs)
-    port.get().AddMutualReqs(mreqs)
+    #port.get().AddMutualReqs(mreqs)
     # add constraints
     for constr in pyport['constraints']:
         port.get().AddConstraint(
