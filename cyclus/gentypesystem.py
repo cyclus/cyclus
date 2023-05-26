@@ -2297,7 +2297,7 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
                 print("added request for", req)
                 mreqs.push_back(single_request)
     #print(mreqs)
-    #port.get().AddMutualReqs(mreqs)
+    port.get().AddMutualReqs(mreqs)
     # add constraints
     for constr in pyport['constraints']:
         port.get().AddConstraint(
