@@ -2269,7 +2269,14 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
             )
 
     cdef const std_vector[cpp_cyclus.RequestPortfolio[{{cyr}}].request_ptr] mreqs
-    cdef cpp_cyclus.RequestPortfolio[{{cyr}}]request
+    # const vector[cyclus::RequestPortfolio<cyclus::Material>::request_ptr] according to compiler
+    # cdef std_vector[cpp_cyclus.Request[{{cyr}}]*] mreqs
+    # std::vector<Request<Material>*> mreqs defined in cycamore
+   
+    
+    cdef cpp_cyclus.Request[{{cyr}}]* single_request
+    # Request<Material>* r  defined in cycamore
+  
     cdef std_string commod
     cdef _{{rclsname}} targ
     cdef shared_ptr[{{cyr}}] targ_ptr
@@ -2285,10 +2292,10 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
                 if req['cost'] is not None:
                     raise ValueError('setting cost functions from Python is not yet '
                                     'supported.')
-                request.AddRequest(targ_ptr, requester, commod, req['preference'],
+                single_request = port.get().AddRequest(targ_ptr, requester, commod, req['preference'],
                                 req['exclusive'])
                 print("added request for", req)
-                mreqs.push_back(request)
+                mreqs.push_back(single_request)
     #print(mreqs)
     port.get().AddMutualReqs(mreqs)
     # add constraints
