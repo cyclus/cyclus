@@ -2275,7 +2275,6 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
     cdef shared_ptr[{{cyr}}] targ_ptr
 
     # add requests
-    print("adding requests")
     for commodity in pyport['commodities']:
         for name, reqs in commodity.items():
             commod = str_py_to_cpp(name)
