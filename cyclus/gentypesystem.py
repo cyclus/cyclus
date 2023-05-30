@@ -2268,18 +2268,12 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
             new cpp_cyclus.RequestPortfolio[{{cyr}}]()
             )
 
-    cdef const std_vector[cpp_cyclus.RequestPortfolio[{{cyr}}].request_ptr] mreqs
-    # const vector[cyclus::RequestPortfolio<cyclus::Material>::request_ptr] according to compiler
-    # cdef std_vector[cpp_cyclus.Request[{{cyr}}]*] mreqs
-    # std::vector<Request<Material>*> mreqs defined in cycamore
-   
-    
+    cdef std_vector[cpp_cyclus.RequestPortfolio[{{cyr}}].request_ptr] mreqs
     cdef cpp_cyclus.Request[{{cyr}}]* single_request
-    # Request<Material>* r  defined in cycamore
-  
     cdef std_string commod
     cdef _{{rclsname}} targ
     cdef shared_ptr[{{cyr}}] targ_ptr
+
     # add requests
     print("adding requests")
     for commodity in pyport['commodities']:
@@ -2294,10 +2288,9 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
                                     'supported.')
                 single_request = port.get().AddRequest(targ_ptr, requester, commod, req['preference'],
                                 req['exclusive'])
-                print("added request for", req)
                 mreqs.push_back(single_request)
-    #print(mreqs)
     port.get().AddMutualReqs(mreqs)
+    
     # add constraints
     for constr in pyport['constraints']:
         port.get().AddConstraint(
