@@ -88,6 +88,7 @@ class RequestPortfolio
  public:
   typedef boost::shared_ptr<RequestPortfolio<T>> Ptr;
   typedef std::function<double(boost::shared_ptr<T>)> cost_function_t;
+  typedef Request<T>* request_ptr;
 
   RequestPortfolio() : requester_(NULL), qty_(0) {}
 
