@@ -1812,14 +1812,15 @@ cpdef dict normalize_request_portfolio(object inp):
         prefs = []
         for commodity in inp['commodities']:
             for name, reqs in commodity.items():
-                if name == 'preference':
+                if name == 'preference' or name == 'exclusive':
                     continue
+                
                 commods.append({name:reqs})
         constrs = inp.get('constraints', [])
     else:
         commods = []
         for name, reqs in inp:
-            if name == 'preference':
+            if name == 'preference' or name == 'exclusive':
                 continue
             commods.append({name:reqs})
         constrs = []
@@ -1838,6 +1839,7 @@ cpdef dict normalize_request_portfolio(object inp):
                 req = default_req.copy()
                 req['target'] = val
                 req['preference'] = inp['commodities'][index]['preference']
+                req['exclusive'] = inp['commodities'][index]['exclusive']
                 commods[index][key] = [req]
 
             elif isinstance(val, Mapping):
