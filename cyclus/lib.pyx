@@ -1621,6 +1621,19 @@ cdef class _Context:
             return
         del self.ptx
 
+    def add_recipe(self, comp, basis):
+        """Adds a new recipe to a simulation 
+
+        Parameters:
+        ----------
+        comp: dict
+            dictionary mapping nuclides to their compostion fraction
+        basis: str
+            'atom' or 'mass' to specify the type of composition fraction
+        """
+        comp = ts.composition_ptr_from_py(comp, basis)
+
+
     def del_agent(self, agent):
         """Destructs and cleans up an agent (and it's children recursively)."""
         self.ptx.DelAgent(dynamic_agent_ptr(agent))

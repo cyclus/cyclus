@@ -795,6 +795,7 @@ cdef extern from "context.h" namespace "cyclus":
         void SchedBuild(Agent*, std_string, int)
         void SchedDecom(Agent*)
         void SchedDecom(Agent*, int)
+        void AddRecipe(std_string, shared_ptr[Composition])
         Datum* NewDatum(std_string)
         #void RegisterAgent(Agent*)  # private
         void RegisterTrader(Trader*)
