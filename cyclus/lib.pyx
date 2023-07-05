@@ -1621,17 +1621,22 @@ cdef class _Context:
             return
         del self.ptx
 
-    def add_recipe(self, comp, basis):
-        """Adds a new recipe to a simulation 
+    def add_recipe(self, name, comp, basis):
+        """
+        Adds a new recipe to a simulation 
 
         Parameters:
         ----------
+        name: str
+            name for recipe
         comp: dict
             dictionary mapping nuclides to their compostion fraction
         basis: str
             'atom' or 'mass' to specify the type of composition fraction
         """
-        comp = ts.composition_ptr_from_py(comp, basis)
+        cdef std_string cpp_name = str_py_to_cpp(name)
+        cpp_comp = ts.composition_ptr_from_py(comp, basis)
+        self.ptx.AddRecipe(cpp_name, cpp_comp)
 
 
     def del_agent(self, agent):
@@ -1851,7 +1856,9 @@ cpdef dict normalize_request_portfolio(object inp):
             if isinstance(val, ts.Resource):
                 req = default_req.copy()
                 req['target'] = val
+                #if 'preference' in inp['commodities'][index]:
                 req['preference'] = inp['commodities'][index]['preference']
+                #if 'exclusive' in inp['commoditites'][index]:
                 req['exclusive'] = inp['commodities'][index]['exclusive']
                 commods[index][key] = [req]
 
