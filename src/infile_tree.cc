@@ -10,6 +10,14 @@
 
 namespace cyclus {
 
+#if LIBXMLXX_MAJOR_VERSION == 2 
+  using xmlpp::NodeSet;
+  typedef xmlpp::Node::NodeList const_NodeList;
+#else
+  using xmlpp::Node::NodeSet;
+  using xmlpp::Node::const_NodeList;
+#endif
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InfileTree::InfileTree(XMLParser& parser) : current_node_(0) {
   current_node_ = parser.Document()->get_root_node();
@@ -55,7 +63,7 @@ std::string InfileTree::GetString(std::string query, int index) {
   using xmlpp::Node;
   using xmlpp::TextNode;
   using xmlpp::Element;
-  const Node::NodeSet nodeset = current_node_->find(query);
+  const NodeSet nodeset = current_node_->find(query);
   if (nodeset.empty()) {
     throw KeyError("Could not find a node by the name: " + query);
   }
@@ -72,7 +80,7 @@ std::string InfileTree::GetString(std::string query, int index) {
                     " is not an Element node.");
   }
 
-  const Node::const_NodeList nodelist = element->get_children();
+  const const_NodeList nodelist = element->get_children();
   if (nodelist.size() != 1) {
     throw ValueError("Element node " + element->get_name() +
                      " has more content than expected.");
@@ -91,6 +99,7 @@ std::string InfileTree::GetString(std::string query, int index) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string InfileTree::GetElementName(int index) {
   using xmlpp::Node;
+
   std::vector<xmlpp::Element*> elements;
   const Node::NodeList nodelist = current_node_->get_children();
   Node::NodeList::const_iterator it;
@@ -110,7 +119,8 @@ std::string InfileTree::GetElementName(int index) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InfileTree* InfileTree::GetEngineFromQuery(std::string query, int index) {
   using xmlpp::Node;
-  const Node::NodeSet nodeset = current_node_->find(query);
+
+  const NodeSet nodeset = current_node_->find(query);
 
   if (nodeset.size() < index + 1) {
     throw ValueError("Index exceeds number of nodes in query: " + query);

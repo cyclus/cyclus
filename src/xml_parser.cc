@@ -10,6 +10,14 @@
 
 namespace cyclus {
 
+#if LIBXMLXX_MAJOR_VERSION == 2 
+  using xmlpp::NodeSet;
+  typedef xmlpp::Node::NodeList const_NodeList;
+#else
+  using xmlpp::Node::NodeSet;
+  using xmlpp::Node::const_NodeList;
+#endif
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 XMLParser::XMLParser() : parser_(NULL) {
   parser_ = new xmlpp::DomParser();
@@ -58,8 +66,8 @@ xmlpp::Document* XMLParser::Document() {
   // but which is unvalidatable. The web is truly cobbled together
   // by a race of evil gnomes.
   xmlpp::Element* root = doc->get_root_node();
-  xmlpp::Node::NodeSet have_base = root->find("//*[@xml:base]");
-  xmlpp::Node::NodeSet::iterator it = have_base.begin();
+  NodeSet have_base = root->find("//*[@xml:base]");
+  NodeSet::iterator it = have_base.begin();
   for (; it != have_base.end(); ++it) {
     reinterpret_cast<xmlpp::Element*>(*it)->remove_attribute("base", "xml");
   }
