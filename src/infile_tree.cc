@@ -11,11 +11,11 @@
 namespace cyclus {
 
 #if LIBXMLXX_MAJOR_VERSION == 2 
-  using xmlpp::NodeSet;
+  typedef xmlpp::NodeSet NodeSet;
   typedef xmlpp::Node::NodeList const_NodeList;
 #else
-  using xmlpp::Node::NodeSet;
-  using xmlpp::Node::const_NodeList;
+  typedef xmlpp::Node::NodeSet NodeSet;
+  typedef xmlpp::Node::const_NodeList const_NodeList;
 #endif
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
