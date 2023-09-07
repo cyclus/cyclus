@@ -1,0 +1,73 @@
+FROM ubuntu:22.04 as apt-base
+
+ENV TZ=America/Chicago
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+RUN apt update --fix-missing && \
+    apt install -y \
+        wget \
+        bzip2 \
+        ca-certificates \
+        libglib2.0-0 \
+        libxext6 \
+        libsm6 \
+        libxrender1 \
+        openssh-client \
+        git \
+        vim \
+        nano \
+        libssh-dev \
+        g++ \
+        gcc \
+        cmake \
+        make \
+        libglib2.0-dev \
+        libxml2-dev \
+        libxml++2.6-dev \
+        libblas-dev \
+        liblapack-dev \
+        pkg-config \
+        coinor-cbc \
+        libboost-dev \
+        libhdf5-dev \
+        libsqlite3-dev \
+        libpcre2-dev \
+        gettext-base \
+        xz-utils \
+        python3-setuptools \
+        python3-pytest \ 
+        python3-tables \
+        python3-pandas \
+        python3-jinja2 \
+        cython3 \
+        libwebsockets-dev \
+        python3-pprintpp \
+    && apt clean -y all
+
+RUN apt install -y libboost-all-dev 
+
+# required for the nosetest
+ENV PYTHONWARNINGS ignore
+RUN mkdir -p /root/.local/lib/python3.10/site-packages/
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+
+#
+
+FROM apt-base as cyclus-install
+
+COPY . /cyclus
+WORKDIR /cyclus
+
+# Uncomment the following line to run cmake in verbose mode.
+# This is sometimes useful for debugging.
+#ENV VERBOSE=1
+
+# You may add the option "--cmake-debug" to the following command
+# for further CMake debugging.
+RUN python install.py -j 2 --build-type=Release --core-version 999999.999999 
+
+FROM cyclus-install as cyclus-test
+
+RUN cyclus_unit_tests
+
+
