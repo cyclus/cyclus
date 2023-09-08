@@ -65,9 +65,9 @@ jobs:
         ubuntu_versions : [
           22.04,
           ]
-          pkg_mgr : [
-            apt,
-            conda,
+        pkg_mgr : [
+          apt,
+          conda,
           ]
   
     name: Pushing final images
