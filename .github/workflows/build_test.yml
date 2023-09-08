@@ -3,6 +3,7 @@ name: Build & Test PR
 on:
   # allows us to run workflows manually
   workflow_dispatch:
+  push:
   pull_request:
     paths-ignore:
       - 'docker/Dockerfile'
