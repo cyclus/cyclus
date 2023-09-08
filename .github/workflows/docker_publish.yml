@@ -47,8 +47,8 @@ jobs:
         uses: firehed/multistage-docker-build-action@v1
         with:
           repository: ghcr.io/${{ github.repository_owner }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
-          stages: ${{ matrix.pkg_mgr }}-deps
-          server-stage: cyclus
+          stages: ${{ matrix.pkg_mgr }}-deps, cyclus
+          server-stage: cyclus-test
           quiet: false
           parallel: true
           tag-latest-on-default: ${{ env.tag-latest-on-default }}
