@@ -1,4 +1,4 @@
-name: Build & Publish docker image for CI
+name: Build & Test PR
 
 on:
   # allows us to run workflows manually
