@@ -61,7 +61,7 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
     /bin/bash ~/miniconda.sh -b -p /opt/conda && \
     rm ~/miniconda.sh
 
-ENV PATH /root/.local/bin:/opt/conda/bin:$PATH
+ENV PATH /opt/conda/bin:$PATH
 
 RUN conda config --add channels conda-forge
 RUN conda update -n base -c defaults conda
@@ -113,7 +113,7 @@ ARG make_cores=2
 
 # required for the nosetest
 ENV PYTHONWARNINGS ignore
-RUN mkdir -p /root/.local/lib/python3.10/site-packages/
+ENV PATH /root/.local/bin:$PATH
 
 COPY . /cyclus
 WORKDIR /cyclus
