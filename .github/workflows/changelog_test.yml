@@ -30,7 +30,7 @@ jobs:
           git remote add cyclus https://github.com/cyclus/cyclus.git
           git fetch cyclus
           change=`git diff cyclus/master -- CHANGELOG.rst | wc -l`
-          git remote remove cyclys
+          git remote remove cyclus
           if [ $change -eq 0 ]; then 
             echo "CHANGELOG.rst has not been updated"
             exit 1 
