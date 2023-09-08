@@ -1,4 +1,5 @@
 ARG pkg_mgr=apt
+ARG make_cores=2
 
 FROM ubuntu:22.04 as common-base
 
@@ -108,6 +109,7 @@ ENV CPP /opt/conda/bin/x86_64-conda_cos6-linux-gnu-cpp
 ENV PYTHONPATH "/root/.local/lib/python3.10/site-packages/"
 
 FROM ${pkg_mgr}-deps as cyclus
+ARG make_cores=2
 
 # required for the nosetest
 ENV PYTHONWARNINGS ignore
@@ -122,7 +124,7 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
-RUN python install.py -j 8 --build-type=Release --core-version 999999.999999 
+RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999 
 
 FROM cyclus as cyclus-test
 
