@@ -22,7 +22,7 @@ Since last release
 **Changed:**
 
 * Moved to unified CHANGELOG Entry and check them with GithubAction (#1571)
-
+* major update and modernization of build (#1587)
 
 **Removed:**
 
