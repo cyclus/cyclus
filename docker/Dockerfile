@@ -6,15 +6,7 @@ FROM ubuntu:22.04 as common-base
 ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN apt update --fix-missing 
-
-        # libglib2.0-0-dev \
-        # libxext6 \
-        # libsm6 \
-        # libxrender1 \
-        # openssh-client \
-        # git \
-
+RUN apt update --fix-missing
 
 FROM common-base as apt-deps
 
@@ -29,7 +21,10 @@ RUN apt install -y \
         libblas-dev \
         liblapack-dev \
         pkg-config \
-        coinor-cbc \
+        coinor-libCbc-dev \
+        coinor-libClp-dev \
+        coinor-libcoinutils-dev \
+        coinor-libOsi-dev \
         libboost-all-dev \
         libhdf5-dev \
         libsqlite3-dev \
