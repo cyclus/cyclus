@@ -71,7 +71,6 @@ def check_null_sink(fname, given_spec):
 
     # No resource exchange is expected
     assert not tables_exist(outfile, illegal_paths)
-    assert 1 == 2 # FIX ME
     clean_outs()
 
 
