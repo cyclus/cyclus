@@ -106,7 +106,6 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Tell CMake where the modules are
     MESSAGE("-- CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
     LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
- #       "/opt/conda/share/cmake-3.25/Modules" 
         "${PROJECT_SOURCE_DIR}/cmake")
 
     # Include macros
