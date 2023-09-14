@@ -21,10 +21,10 @@ RUN apt install -y \
         libblas-dev \
         liblapack-dev \
         pkg-config \
-        coinor-libCbc-dev \
-        coinor-libClp-dev \
+        coinor-libcbc-dev \
+        coinor-libclp-dev \
         coinor-libcoinutils-dev \
-        coinor-libOsi-dev \
+        coinor-libosi-dev \
         libboost-all-dev \
         libhdf5-dev \
         libsqlite3-dev \
