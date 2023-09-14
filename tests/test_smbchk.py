@@ -3,6 +3,7 @@ import os
 import platform
 import sys
 from argparse import Namespace
+import pytest
 
 from tools import skip_then_continue
 
@@ -16,16 +17,16 @@ try:
 except ImportError:
     smbchk = False
 
+@pytest.mark.skip(reason="symbol test has been deprecated")
 def test_load():
-    raise DeprecatedTest("symbol test has been deprecated")
     if not smbchk:
         return
     ns = Namespace(filename=os.path.join(reldir, 'symbols.json'))
     db = smbchk.load(ns)
     assert(isinstance(db, list))
 
+@pytest.mark.skip(reason="symbol test has been deprecated")
 def test_nm():
-    raise DeprecatedTest("symbol test has been deprecated")
     if platform.system() == 'Darwin':
         skip_then_continue("Skipping for Mac")
     if not smbchk:
@@ -36,8 +37,8 @@ def test_nm():
     syms = smbchk.nm(ns)
     assert ("cyclus::Agent::Agent(cyclus::Context*)" in  syms)
 
+@pytest.mark.skip(reason="symbol test has been deprecated")
 def test_diff():
-    raise DeprecatedTest("symbol test has been deprecated")
     if not smbchk:
         return
     db = [{'symbols': ["cyclus::Agent::Agent(cyclus::Context*)"],
@@ -48,8 +49,8 @@ def test_diff():
     obs = smbchk.diff(db, 0, 1)
     assert(len(obs) > 0)
 
+@pytest.mark.skip(reason="symbol test has been deprecated")
 def test_check():
-    raise DeprecatedTest("symbol test has been deprecated")
     if not smbchk:
         return
     # adds to API
