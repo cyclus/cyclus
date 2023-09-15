@@ -700,7 +700,7 @@ TO_CPP_CONVERTERS = {
         '{valdecl}\n'
         'cdef {type} cpp{var}\n',
         'cpp{var} = {type}()\n'
-        'if not isinstance({var}, collections.Mapping):\n'
+        'if not isinstance({var}, collections.abc.Mapping):\n'
         '    {var} = dict({var})\n'
         'for {keyname}, {valname} in {var}.items():\n'
         '    {keybody.indent4}\n'
