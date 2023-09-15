@@ -13,7 +13,7 @@ ENDIF()
 # This project name is cyclus.
 PROJECT(CYCLUS)
 
-# check for and enable c++14 support (required for cyclus)
+# check for and enable c++17 support (required for cyclus)
 INCLUDE(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
 IF(COMPILER_SUPPORTS_CXX17)
