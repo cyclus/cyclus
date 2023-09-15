@@ -242,7 +242,7 @@ def get_shape(meta):
 
 ROW_NUM = 3
 PATH = 'gen_db.h5'
-def generate_and_test():
+def test_generate():
     """Generate and run tests for supported Hdf5 datatypes."""
     if sys.version_info[0] == 2:
         msg = 'Hdf5 backend gen tests do not support Python 2.x'
@@ -271,6 +271,6 @@ def generate_and_test():
         print("observed: \n", obs)
         assert_frame_equal, exp, obs
         rec.close()
-        os.remove(PATH)
+    os.remove(PATH)
 
     
