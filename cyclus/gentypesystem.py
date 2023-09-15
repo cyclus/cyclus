@@ -10,7 +10,6 @@ from __future__ import print_function, unicode_literals
 import io
 import os
 import sys
-import imp
 import json
 import argparse
 import platform
