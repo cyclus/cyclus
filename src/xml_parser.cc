@@ -61,10 +61,12 @@ void XMLParser::Validate(const std::stringstream& xml_schema_snippet) {
 xmlpp::Document* XMLParser::Document() {
   xmlpp::Document* doc = parser_->get_document();
   // This adds the capability to have nice include semantics
+  bool generate_xinclude_nodes = true;
+  bool fixup_base_uris = false;
   #if LIBXMLXX_MAJOR_VERSION == 2 
-  doc->process_xinclude(true);
+  doc->process_xinclude(generate_xinclude_nodes);
   #else
-  doc->process_xinclude(true, false);
+  doc->process_xinclude(generate_xinclude_nodes, fixup_base_uris);
   #endif
   // This removes the stupid xml:base attribute that including adds,
   // but which is unvalidatable. The web is truly cobbled together
