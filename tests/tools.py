@@ -3,7 +3,7 @@ from  __future__ import print_function
 import os
 import re
 import sys
-import imp
+import importlib
 import shutil
 import unittest
 import subprocess
@@ -73,7 +73,10 @@ def clean_import(name, paths=None):
     """
     sys.path = paths + sys.path
     origmods = set(sys.modules.keys())
-    mod = imp.load_module(name, *imp.find_module(name, paths))
+    spec =  importlib.machinery.PathFinder.find_spec(name, paths)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    sys.modules[name] = mod
     yield mod
     sys.path = sys.path[len(paths):]
     del mod
