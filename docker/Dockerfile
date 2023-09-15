@@ -106,10 +106,6 @@ ENV PYTHONPATH "/root/.local/lib/python3.10/site-packages/"
 FROM ${pkg_mgr}-deps as cyclus
 ARG make_cores=2
 
-# required for the nosetest
-ENV PYTHONWARNINGS ignore
-ENV PATH /root/.local/bin:$PATH
-
 COPY . /cyclus
 WORKDIR /cyclus
 
@@ -120,9 +116,14 @@ WORKDIR /cyclus
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
 RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999 
+ENV PATH /root/.local/bin:$PATH
+ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 
 FROM cyclus as cyclus-test
 
 RUN cyclus_unit_tests
 
+FROM cyclus-test as cyclus-pytest
+
+RUN cd tests && pytest
 
