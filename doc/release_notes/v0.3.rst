@@ -85,7 +85,7 @@ New features
 - updated namespace name to reflect directory name
 - made mock fac/inst/region/market classes to be used with testing. added the stub facility in a new stub namespace and related tests.
 - added initial stub directory and adjusted cmake files to include their tests.
-- moved all dynamic loading into xml_file_loader. Added a method for listing installed/discoverable dynamic modules to env class. added rng schema methods to test agents and removed rng files from them. removed rng installation from cmake module macro. added master and module schema dumping to cyclus binary. added schema agent test (that schema parses). moved heavy stuff out of xml-file-loader constructor. renamed LoadAll to LoadSim.
+- moved all dynamic loading into xml_file_loader. Added a method for listing installed/discoverable dynamic modules to env class. added rng schema methods to test agents and removed rng files from them. removed rng installation from cmake module macro. added main and module schema dumping to cyclus binary. added schema agent test (that schema parses). moved heavy stuff out of xml-file-loader constructor. renamed LoadAll to LoadSim.
 - i think moving loglevel and the macros into the same namespace encapsulation is more promising... still unable to confirm.
 - finishes remaining doxygen warnings
 - I believe that this will fix the warning stemming from logger.h, but I do not see the warning on my machine, so I can't be sure
@@ -201,7 +201,7 @@ New features
 - literal 0 -> 0.0 for fp compares
 - abs() -> fabs(), types they are a-changing.
 - fixes doc errors, should clear up @gonuke's cron job errors
-- fixes master schema building
+- fixes main schema building
 - updated test files so cycamore can build
 - ran all files in Core dir through astyle for style guide formatting
 - updated enrichment function names
@@ -271,7 +271,7 @@ New features
 - first cyclus ns changes.
 - made buildSchema private. Used Agent class module type list instead of custom one.
 - removed cyclus.rng.in generation - now done dynamically in cyclus core
-- modified XML loading to dynamically build the master schema by searching for installed modules
+- modified XML loading to dynamically build the main schema by searching for installed modules
 - created csv backend.
 - fixed name erro
 - updated setup with localdir as default for some params

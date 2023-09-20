@@ -58,9 +58,9 @@ class SimState(object):
         The initial registry to start the in-memory backend with. Defaults
         is True, which stores all of the tables.
     schema_path : str or None, optional:
-        The path to the cyclus master schema.
+        The path to the cyclus main schema.
     flat_schema : bool, optional
-        Whether or not to use the flat master simulation schema.
+        Whether or not to use the flat main simulation schema.
     frequency : int or float, optional
         The amount of time [sec] to sleep for in tight loops, default 1 ms.
     repeating_actions : list or None, optional
