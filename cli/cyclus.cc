@@ -240,14 +240,14 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("restart", po::value<std::string>(),
        "restart from the specified simulation snapshot [db-file]:[sim-id]:[timestep]")
       ("schema",
-       "dump the cyclus master schema including all installed module schemas")
+       "dump the cyclus main schema including all installed module schemas")
       ("agent-schema", po::value<std::string>(),
        "dump the schema for the named agent")
       ("agent-version", po::value<std::string>(),
        "print the version of the specified agent")
       ("schema-path", po::value<std::string>(),
-       "manually specify the path to the cyclus master schema")
-      ("flat-schema", "use the flat master simulation schema")
+       "manually specify the path to the cyclus main schema")
+      ("flat-schema", "use the flat main simulation schema")
       ("agent-annotations", po::value<std::string>(),
        "dump the annotations for the named agent")
       ("agent-listing,l", po::value<std::string>(),
