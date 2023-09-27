@@ -10,7 +10,6 @@ env:
 
 jobs:
   changelog_update:
-    if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
     container:
       image: alpine:3.14
@@ -23,10 +22,17 @@ jobs:
           git --version
 
       - name: Checkout repository
-        uses: actions/checkout@v2
-    
-      - name: Housekeeping
-        run: |
+        uses: actions/checkout@v3
+
+      - run: |
+          git config --global --add safe.directory ${GITHUB_WORKSPACE}
           cd $GITHUB_WORKSPACE
-          housekeeping_script/changelog_test.sh
+          git remote add cyclus https://github.com/cyclus/cyclus.git
+          git fetch cyclus
+          change=`git diff cyclus/main -- CHANGELOG.rst | wc -l`
+          git remote remove cyclus
+          if [ $change -eq 0 ]; then 
+            echo "CHANGELOG.rst has not been updated"
+            exit 1 
+          fi
 

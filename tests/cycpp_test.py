@@ -3,11 +3,11 @@ import sys
 import uuid
 import pprint
 import tempfile
+import pytest
+
 from collections import OrderedDict
 from subprocess import Popen, PIPE, STDOUT
 
-import nose
-from nose.tools import assert_equal, assert_true, assert_false, assert_raises
 
 cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'cli'))
@@ -27,8 +27,6 @@ from cycpp import CloneFilter, InitFromCopyFilter, \
         SnapshotInvFilter, InitInvFilter, DefaultPragmaFilter, AnnotationsFilter
 
 import cycpp
-
-assert_equal.__self__.maxDiff = None
 
 class MockMachine(object):
     def __init__(self):
@@ -65,117 +63,118 @@ def test_tffilt():
     """Test TypedefFilter"""
     m = MockMachine()
     f = TypedefFilter(m)
-    yield assert_false, f.isvalid("mis typedef kind")
-    yield assert_false, f.isvalid("typedef kind")
+    assert not f.isvalid("mis typedef kind")
+    assert not f.isvalid("typedef kind")
 
     statement, sep = "typedef double db", ";"
-    yield assert_true, f.isvalid(statement)
+    assert  f.isvalid(statement)
     f.transform(statement, sep)
-    yield assert_equal, len(m.aliases), 1
-    yield assert_equal, (0, "double", "db"), m.aliases.pop()
+    assert len(m.aliases) == 1
+    assert (0, "double", "db") ==  m.aliases.pop()
 
     statement, sep = "typedef struct {int a; int b;} S, *pS", ";"
-    yield assert_true, f.isvalid(statement)
+    assert  f.isvalid(statement)
 
 def test_uffilt():
     """Test UsingFilter"""
     m = MockMachine()
     f = UsingFilter(m)
-    yield assert_false, f.isvalid("not using namespace")
+    assert not f.isvalid("not using namespace")
 
     statement, sep = "using std::cout", ""
-    yield assert_true, f.isvalid(statement)
+    assert  f.isvalid(statement)
     f.transform(statement, sep)
-    yield assert_equal, len(m.aliases), 1
-    yield assert_equal, (0, "std::cout", "cout"), m.aliases.pop()
+    assert len(m.aliases) == 1
+    assert (0, "std::cout", "cout") ==  m.aliases.pop()
 
 def test_nsfilt():
     """Test NamespaceFilter"""
     m = MockMachine()
     f = NamespaceFilter(m)
-    yield assert_false, f.isvalid("olzhas is not a namespace")
+    assert not f.isvalid("olzhas is not a namespace")
 
     # anonymous namespaces
     statement, sep = " namespace ", "{"
-    yield assert_true, f.isvalid(statement)
+    assert  f.isvalid(statement)
     f.transform(statement, sep)
-    yield assert_equal, len(m.namespaces), 1
-    yield assert_equal, m.namespaces[0], (0, '<anonymous>')
+    assert len(m.namespaces) == 1
+    assert m.namespaces[0] == (0, '<anonymous>')
     f.revert(statement, sep)
-    yield assert_equal, len(m.namespaces), 0
+    assert len(m.namespaces) == 0
 
     # nymous namespace
     statement, sep = "namespace gorgus ", "{"
-    yield assert_true, f.isvalid(statement)
+    assert  f.isvalid(statement)
     f.transform(statement, sep)
-    yield assert_equal, len(m.namespaces), 1
-    yield assert_equal, m.namespaces[0], (0, "gorgus")
+    assert len(m.namespaces) == 1
+    assert m.namespaces[0] == (0, "gorgus")
     f.revert(statement, sep)
-    yield assert_equal, len(m.namespaces), 0
+    assert len(m.namespaces) == 0
 
 def test_unfilt():
     """Test UsingNamespaseFilter"""
     m = MockMachine()
     f = UsingNamespaceFilter(m)
-    yield assert_false, f.isvalid("using cycamore")
+    assert not f.isvalid("using cycamore")
 
     statement, sep = "using namespace std", ""
-    yield assert_true, f.isvalid(statement)
+    assert  f.isvalid(statement)
     f.transform(statement, sep)
-    yield assert_equal, len(m.using_namespaces), 1
-    yield assert_equal, (0, "std"), m.using_namespaces.pop()
+    assert len(m.using_namespaces) == 1
+    assert (0, "std") ==  m.using_namespaces.pop()
     f.revert(statement, sep)
-    yield assert_equal, len(m.using_namespaces), 0
+    assert len(m.using_namespaces) == 0
 
 def test_nafilter():
     """Test NamespaceAliasFilter"""
     m = MockMachine()
     f = NamespaceAliasFilter(m)
-    yield assert_false, f.isvalid("namespace cycamore")
+    assert not f.isvalid("namespace cycamore")
 
     statement, sep = "namespace cycamore = cm", ""
-    yield assert_true, f.isvalid(statement)
+    assert  f.isvalid(statement)
     f.transform(statement, sep)
-    yield assert_equal, len(m.aliases), 1
-    yield assert_equal, (0, "cm", "cycamore"), m.aliases.pop()
+    assert len(m.aliases) == 1
+    assert (0, "cm", "cycamore") ==  m.aliases.pop()
 
 def test_cfilter():
     """Test ClassFilter"""
     m = MockMachine()
     f = ClassFilter(m)
-    yield assert_false, f.isvalid("class ")
+    assert not f.isvalid("class ")
 
     statement, sep = "class Cyclus", ""
-    yield assert_true, f.isvalid(statement)
+    assert  f.isvalid(statement)
     f.transform(statement, sep)
-    yield assert_equal, len(m.classes), 1
-    yield assert_equal, m.classes[0], (0, "Cyclus")
-    yield assert_equal, m.access[tuple(m.classes)], "private"
+    assert len(m.classes) == 1
+    assert m.classes[0] == (0, "Cyclus")
+    assert m.access[tuple(m.classes)] == "private"
     f.revert(statement, sep)
-    yield assert_equal, len(m.classes), 0
+    assert len(m.classes) == 0
 
 def test_afilter():
     """Test AccessFilter"""
     m = MockMachine()
     f = AccessFilter(m)
-    yield assert_false, f.isvalid("new private")
+    assert not f.isvalid("new private")
 
     statement, sep = "private:", ""
-    yield assert_true, f.isvalid(statement)
+    assert  f.isvalid(statement)
     f.transform(statement, sep)
-    yield assert_equal, m.access[tuple(m.classes)], "private"
+    assert m.access[tuple(m.classes)] == "private"
 
 def test_synerror():
     """Test PragmaCyclusErrorFilter"""
     m = MockMachine()
     f = PragmaCyclusErrorFilter(m)
-    yield assert_false, f.isvalid("#pragma cyclus var {}")
-    yield assert_false, f.isvalid("#pragma cyclus")
+    assert not f.isvalid("#pragma cyclus var {}")
+    assert not f.isvalid("#pragma cyclus")
 
-    yield assert_true, f.isvalid('#pragma cyclus nooooo')
+    assert  f.isvalid('#pragma cyclus nooooo')
     statement, sep = "#pragma cyclus var{}", "\n"
-    yield assert_true, f.isvalid(statement)
-    yield assert_raises, SyntaxError, f.transform, statement, sep
+    assert  f.isvalid(statement)
+    with pytest.raises(SyntaxError):
+        f.transform(statement, sep)
 
 #
 # pass 2 Filters
@@ -184,26 +183,26 @@ def test_vdecorfilter():
     """Test VarDecorationFilter"""
     m = MockMachine()
     f = VarDecorationFilter(m)
-    yield assert_false, f.isvalid("#pragma cyclus")
+    assert not f.isvalid("#pragma cyclus")
 
     statement, sep = "#pragma cyclus var {'name': 'James Bond'} ", "\n"
-    yield assert_true, f.isvalid(statement)
+    assert  f.isvalid(statement)
     f.transform(statement, sep)
-    yield assert_equal, m.var_annotations, {'name': 'James Bond'}
+    assert m.var_annotations == {'name': 'James Bond'}
 
 def test_vdeclarfilter():
     """Test VarDeclarationFilter"""
     m = MockMachine()
     f = VarDeclarationFilter(m)
-    yield assert_false, f.isvalid("one ")
+    assert not f.isvalid("one ")
 
     statement, sep = "one two", "\n"
-    yield assert_true, f.isvalid(statement)
+    assert  f.isvalid(statement)
     m.classes = [(0, "trader")]
     m.access = {"trader": "public"}
     # m.var_annotations = {'name': 'James Bond'}
     f.transform(statement, sep)
-    yield assert_equal, m.var_annotations, None
+    assert m.var_annotations == None
 
 def test_vdeclarfilter_canonize_alias():
     m = MockMachine()
@@ -231,7 +230,7 @@ def test_vdeclarfilter_canonize_alias():
         ]
     for exp, t, name, alias in cases:
         obs = f.canonize_alias(t, name, alias=alias)
-        yield assert_equal, exp, obs
+        assert exp == obs
 
 def test_vdeclarfilter_canonize_ui():
     m = MockMachine()
@@ -256,33 +255,33 @@ def test_vdeclarfilter_canonize_ui():
     ]
     for exp, t, name, x in cases:
         obs = f.canonize_uilabel(t, name, uilabel=x)
-        yield assert_equal, exp, obs
+        assert exp == obs
         obs = f.canonize_tooltip(t, name, tooltip=x)
-        yield assert_equal, exp, obs
+        assert exp == obs
 
 
 def test_execfilter():
     """Test ExecFilter"""
     m = MockMachine()
     f = ExecFilter(m)
-    yield assert_false, f.isvalid("#pragma cyclus")
+    assert not f.isvalid("#pragma cyclus")
 
     statement, sep = "#pragma cyclus exec x = 42", "\n"
-    yield assert_true, f.isvalid(statement)
+    assert  f.isvalid(statement)
     f.transform(statement, sep)
     # What are the other possible tests
-    yield assert_equal, m.execns["x"], 42
+    assert m.execns["x"] == 42
 
 def test_notefilter():
     """Test NoteDecorationFilter"""
     m = MockMachine()
     f = NoteDecorationFilter(m)
-    yield assert_false, f.isvalid("#pragma cyclus")
+    assert not f.isvalid("#pragma cyclus")
 
     statement, sep = "#pragma cyclus note {'doc': 'string'} ", "\n"
-    yield assert_true, f.isvalid(statement)
+    assert  f.isvalid(statement)
     f.transform(statement, sep)
-    yield assert_equal, m.context['']['doc'], 'string'
+    assert m.context['']['doc'] == 'string'
 
 class MockAliasCodeGenMachine(object):
     """Mock machine for testing aliasing on pass 3 filters"""
@@ -328,7 +327,7 @@ def test_canon_type():
         ]
     for t, exp in cases:
         obs = sa.canonize_type(t)
-        yield assert_equal, exp, obs
+        assert exp == obs
 
 #
 # pass 3 Filters
@@ -373,7 +372,7 @@ def test_clonefilter():
     impl = f.impl()
     exp_impl = "  MyFactory* m = new MyFactory(context());\n" + \
                "  m->InitFrom(this);\n  return m;\n"
-    assert_equal(exp_impl, impl)
+    assert exp_impl ==  impl
 
 def test_ifcfilter():
     """Test InitFromCopyFilter"""
@@ -383,7 +382,7 @@ def test_ifcfilter():
 
     args = f.methodargs()
     exp_args = "MyFactory* m"
-    yield assert_equal, exp_args, args
+    assert exp_args == args
 
     impl = f.impl()
     exp_impl = ('  int rawcycpp_shape_y[1] = {42};\n'
@@ -391,7 +390,7 @@ def test_ifcfilter():
                                                    'rawcycpp_shape_y + 1);\n'
                 "  x = m->x;\n"
                 "y=m -> y;\n")
-    yield assert_equal, exp_impl, impl
+    assert exp_impl == impl
 
 def test_ifdbfilter():
     """Test InitFromDbFilter"""
@@ -401,7 +400,7 @@ def test_ifdbfilter():
 
     args = f.methodargs()
     exp_args = "cyclus::QueryableBackend* b"
-    yield assert_equal, exp_args, args
+    assert exp_args == args
 
     impl = f.impl()
     exp_impl = ('  int rawcycpp_shape_y[1] = {42};\n'
@@ -410,31 +409,31 @@ def test_ifdbfilter():
                 '  cyclus::QueryResult qr = b->Query("Info", NULL);\n'
                 '  x = qr.GetVal<int>("x");\n'
                 "WAKKA JAWAKA")
-    yield assert_equal, exp_impl, impl
+    assert exp_impl == impl
 
 def test_aliasing_schemafilter():
     impl = setup_alias(SchemaFilter)
 
-    assert_true('foo_alias' in impl)
-    assert_false('bar_var' in impl)
-    assert_true('foo_map_alias' in impl)
-    assert_false('bar_map_var' in impl)
+    assert('foo_alias' in impl)
+    assert not('bar_var' in impl)
+    assert('foo_map_alias' in impl)
+    assert not('bar_map_var' in impl)
 
 def test_aliasing_snapshotfilter():
     impl = setup_alias(SnapshotFilter)
 
-    assert_false('foo_alias' in impl)
-    assert_true('bar_var' in impl)
-    assert_false('foo_map_alias' in impl)
-    assert_true('bar_map_var' in impl)
+    assert not('foo_alias' in impl)
+    assert('bar_var' in impl)
+    assert not('foo_map_alias' in impl)
+    assert('bar_map_var' in impl)
 
 def test_aliasing_infiletodbfilter():
     impl = setup_alias(InfileToDbFilter)
 
-    assert_true('foo_alias' in impl)
-    assert_true('bar_var' in impl)
-    assert_true('foo_map_alias' in impl)
-    assert_true('bar_map_var' in impl)
+    assert('foo_alias' in impl)
+    assert('bar_var' in impl)
+    assert('foo_map_alias' in impl)
+    assert('bar_map_var' in impl)
 
 def setup_alias(filt):
     m = MockAliasCodeGenMachine()
@@ -450,14 +449,14 @@ def test_itdbfilter():
 
     args = f.methodargs()
     exp_args = "cyclus::InfileTree* tree, cyclus::DbInit di"
-    yield assert_equal, exp_args, args
+    assert exp_args == args
 
     impl = f.impl()
     exp_impl = (
         '  int rawcycpp_shape_y[1] = {42};\n  cycpp_shape_y = std::vector<int>(rawcycpp_shape_y, rawcycpp_shape_y + 1);\n  cyclus::InfileTree* sub = tree->SubTree("config/*");\n  int i;\n  int n;\n  {\n    int x_val = cyclus::Query<int>(sub, "x");\n    x = x_val;\n  }\nTHINGFISH\n  di.NewDatum("Info")\n  ->AddVal("x", x)\nABSOLUTELY FREE\n  ->Record();\n'
         )
 
-    yield assert_equal, exp_impl, impl
+    assert exp_impl == impl
 
 def test_itdbfilter_val():
     """Test InfileToDbFilter._val() Defaults"""
@@ -608,7 +607,7 @@ def test_itdbfilter_val():
 
     for t, v, name, uitype, exp in cases:
         obs = f._val(t, val=v, name=name, uitype=uitype)
-        yield assert_equal, exp, obs
+        assert exp == obs
 
 def test_schemafilter():
     """Test SchemaFilter"""
@@ -618,7 +617,7 @@ def test_schemafilter():
 
     args = f.methodargs()
     exp_args = ""
-    yield assert_equal, exp_args, args
+    assert exp_args == args
 
     impl = f.impl()
     exp_impl = ('  return ""\n'
@@ -628,12 +627,12 @@ def test_schemafilter():
                 '    "    </element>\\n"\n'
                 '    "    FREAK OUT\\n"\n'
                 '    "</interleave>\\n";\n')
-    yield assert_equal, exp_impl, impl
+    assert exp_impl == impl
 
     # schema type tests
-    yield assert_equal, 'string', f._type('std::string')
-    yield assert_equal, 'boolean', f._type('bool')
-    yield assert_equal, 'token', f._type('std::string', 'token')
+    assert 'string' == f._type('std::string')
+    assert 'boolean' == f._type('bool')
+    assert 'token' == f._type('std::string', 'token')
 
     m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
             ('x', {'type': ('std::map', 'int', 'double')}),
@@ -658,7 +657,7 @@ def test_schemafilter():
         '    "        </oneOrMore>\\n"\n'
         '    "    </element>\\n"\n'
         '    "</interleave>\\n";\n')
-    yield assert_equal, exp_impl, impl
+    assert exp_impl == impl
 
 def test_annotationsfilter():
     """Test SchemaFilter"""
@@ -668,10 +667,10 @@ def test_annotationsfilter():
 
     args = f.methodargs()
     exp_args = ""
-    yield assert_equal, exp_args, args
+    assert exp_args == args
 
     impl = f.impl()
-    yield assert_true, isinstance(impl, str)
+    assert  isinstance(impl, str)
 
 def test_snapshotfilter():
     """Test SnapshotFilter"""
@@ -681,14 +680,14 @@ def test_snapshotfilter():
 
     args = f.methodargs()
     exp_args = 'cyclus::DbInit di'
-    yield assert_equal, exp_args, args
+    assert exp_args == args
 
     impl = f.impl()
     exp_impl = ('  di.NewDatum("Info")\n'
                 '  ->AddVal("x", x)\n'
                 'JUST ANOTHER BAND FROM LA\n'
                 '  ->Record();\n')
-    yield assert_equal, exp_impl, impl
+    assert exp_impl == impl
 
 def test_sshinvfilter():
     """Test SnapshotInvFilter"""
@@ -698,19 +697,19 @@ def test_sshinvfilter():
 
     args = f.methodargs()
     exp_args = ''
-    yield assert_equal, exp_args, args
+    assert exp_args == args
 
     impl = f.impl()
     exp_impl = ("  cyclus::Inventories invs;\n"
                 "  return invs;\n")
-    yield assert_equal, exp_impl, impl
+    assert exp_impl == impl
 
     f = SnapshotInvFilter(m)
     f.given_classname = 'MyFactory'
     f.mode = 'impl'
     impl = f.impl()
     exp_impl = ("  cyclus::Inventories invs;\n")
-    yield assert_equal, exp_impl, impl
+    assert exp_impl == impl
 
 def test_intinvfilter():
     """Test InitInvFilter"""
@@ -720,11 +719,11 @@ def test_intinvfilter():
 
     args = f.methodargs()
     exp_args = "cyclus::Inventories& inv"
-    yield assert_equal, exp_args, args
+    assert exp_args == args
 
     impl = f.impl()
     exp_impl = ''
-    yield assert_equal, exp_impl, impl
+    assert exp_impl == impl
 
 def test_defpragmafilter():
     """Test DefaultPragmaFilter"""
@@ -751,7 +750,7 @@ def test_schemafilter_buildschema():
            '<data type="double" /></element></oneOrMore></element>'
            '</interleave></element></oneOrMore></element>')
     obs = f._buildschema(cpptype, schematype, uitype, names)
-    yield assert_equal, exp, obs
+    assert exp == obs
 
     cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
     names = ['streams', 'name', ['efficiencies', 'val']]
@@ -761,7 +760,7 @@ def test_schemafilter_buildschema():
            '<data type="double" /></element></oneOrMore></element>'
            '</interleave></element></oneOrMore></element>')
     obs = f._buildschema(cpptype, schematype, uitype, names)
-    yield assert_equal, exp, obs
+    assert exp == obs
 
     # test item aliasing
     cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
@@ -772,7 +771,7 @@ def test_schemafilter_buildschema():
            '<data type="double" /></element></oneOrMore></element>'
            '</interleave></element></oneOrMore></element>')
     obs = f._buildschema(cpptype, schematype, uitype, names)
-    yield assert_equal, exp, obs
+    assert exp == obs
 
 def test_escape_xml():
     """Test escape_xml"""
@@ -790,7 +789,7 @@ def test_escape_xml():
         '    "    </element>\\n"\n' \
         '    "</element>\\n"'
 
-    yield assert_equal, s, got
+    assert s == got
 
 def test_infiletodb_read_member1():
     m = MockCodeGenMachine()
@@ -902,7 +901,7 @@ def test_infiletodb_read_member1():
     #print(gen)
     #print(exp_gen)
 
-    yield assert_equal, exp_gen, gen
+    assert exp_gen == gen
 
 def test_infiletodb_read_member2():
     m = MockCodeGenMachine()
@@ -966,7 +965,7 @@ def test_infiletodb_read_member2():
     # print()
     # print(gen)
     # print(exp_gen)
-    yield assert_equal, exp_gen, gen
+    assert exp_gen == gen
 
 def test_infiletodb_read_map():
     m = MockCodeGenMachine()
@@ -1003,7 +1002,7 @@ def test_infiletodb_read_map():
         '    mymap = mymap_in;\n'
         '  }\n')
 
-    yield assert_equal, exp, obs
+    assert exp == obs
 
 def test_internal_schema():
     cases = [
@@ -1050,7 +1049,7 @@ def test_internal_schema():
         msg = 'case {0} failed\n    ---- got ----\n    {1}\n    ---- want ----\n    {2}'.format(i + 1, impl.replace('\n', '\n    '), want.replace('\n', '\n    '))
         if want != impl:
             pprint.pprint(impl)
-            assert_true(False, msg)
+            assert(False, msg)
 
 def test_internal_infiletodb():
     # the expected output (i.e. 'want':...) is set as 'throw' if the
@@ -1132,7 +1131,7 @@ def test_internal_infiletodb():
             except:
                 haderr = True
             msg = 'case {0} failed: expected raised exception, got none.'
-            assert_true(haderr, msg)
+            assert(haderr, msg)
             continue
         else:
             impl = f.impl()
@@ -1140,7 +1139,7 @@ def test_internal_infiletodb():
         msg = 'case {0} failed\n    ---- got ----\n    {1}\n    ---- want ----\n    {2}'.format(i + 1, impl.replace('\n', '\n    '), want.replace('\n', '\n    '))
         if want != impl:
             pprint.pprint(impl)
-            assert_true(False, msg)
+            assert(False, msg)
 
 def test_nuclide_uitype():
     m = MockCodeGenMachine()
@@ -1159,7 +1158,7 @@ def test_nuclide_uitype():
                 '    "        <data type=\\"string\\"/>\\n"\n'
                 '    "    </element>\\n"\n'
                 '    "</interleave>\\n";\n')
-    yield assert_equal, exp_impl, impl
+    assert exp_impl == impl
 
     # test infiletodb updates
     f = InfileToDbFilter(m)
@@ -1167,7 +1166,7 @@ def test_nuclide_uitype():
     impl = f.impl()
     exp_impl = '  cyclus::InfileTree* sub = tree->SubTree("config/*");\n  int i;\n  int n;\n  {\n    int x_val = pyne::nucname::id(cyclus::Query<std::string>(sub, "x"));\n    x = x_val;\n  }\n  di.NewDatum("Info")\n  ->AddVal("x", x)\n  ->Record();\n'
 
-    yield assert_equal, exp_impl, impl
+    assert exp_impl == impl
 
     # test bad uitypes values fail
     m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
@@ -1176,7 +1175,8 @@ def test_nuclide_uitype():
             ])}
     f = SchemaFilter(m)
     f.given_classname = 'MyFactory'
-    yield assert_raises, TypeError, f.impl
+    with pytest.raises(TypeError):
+        f.impl()
 
 def test_integration():
     inf = os.path.join(os.path.dirname(__file__), 'cycpp_tests.h')
@@ -1188,7 +1188,5 @@ def test_integration():
     else: 
         cmd = 'cycpp.py {} -o {} --cpp-path `which g++`'.format(inf, outf.name)
     p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
-    assert_equal('', p.stdout.read().decode())
+    assert '' ==  p.stdout.read().decode()
 
-if __name__ == "__main__":
-    nose.runmodule()

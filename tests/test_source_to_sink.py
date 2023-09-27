@@ -1,26 +1,35 @@
 #! /usr/bin/env python
 
-from nose.tools import assert_equal, assert_true
-from nose.plugins.skip import SkipTest
 
 from numpy.testing import assert_array_equal
 import os
 import sqlite3
 import tables
 import numpy as np
+import pytest
+
 from tools import check_cmd, cyclus_has_coin
 from helper import tables_exist, find_ids, exit_times, \
     h5out, sqliteout, clean_outs, to_ary, which_outfile
 
 INPUT = os.path.join(os.path.dirname(__file__), "input")
 
-def check_source_to_sink(fname, source_spec, sink_spec):
+@pytest.fixture(params=[("source_to_sink.xml", ":agents:Source", ":agents:Sink"),
+                        ("source_to_sink.py", ":cyclus.pyagents:Source", ":cyclus.pyagents:Sink"),
+                        ])
+def source_to_sink_case(request):
+    yield request.param
+
+def test_source_to_sink(source_to_sink_case):
     """Tests linear growth of sink inventory by checking if the transactions
     were of equal quantities and only between sink and source facilities.
     """
     clean_outs()
+
+    fname, source_spec, sink_spec = source_to_sink_case
+
     if not cyclus_has_coin():
-        raise SkipTest("Cyclus does not have COIN")
+        pytest.skip("Cyclus does not have COIN")
 
     # Cyclus simulation input for Source and Sink
     sim_inputs = [os.path.join(INPUT, fname)]
@@ -29,7 +38,7 @@ def check_source_to_sink(fname, source_spec, sink_spec):
         holdsrtn = [1]  # needed because nose does not send() to test generator
         outfile = which_outfile()
         cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
-        yield check_cmd, cmd, '.', holdsrtn
+        check_cmd(cmd, '.', holdsrtn)
         rtn = holdsrtn[0]
         if rtn != 0:
             return  # don't execute further commands
@@ -37,7 +46,7 @@ def check_source_to_sink(fname, source_spec, sink_spec):
         # Tables of interest
         paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
         # Check if these tables exist
-        yield assert_true, tables_exist(outfile, paths)
+        assert  tables_exist(outfile, paths)
         if not tables_exist(outfile, paths):
             clean_outs()
             return  # don't execute further commands
@@ -71,8 +80,8 @@ def check_source_to_sink(fname, source_spec, sink_spec):
         sink_id = find_ids(sink_spec, spec, agent_ids)
 
         # Test for only one source and one sink are deployed in the simulation
-        yield assert_equal, len(source_id), 1
-        yield assert_equal, len(sink_id), 1
+        assert len(source_id) == 1
+        assert len(sink_id) == 1
 
         # Check if transactions are only between source and sink
         sender_ids = to_ary(transactions, "SenderId")
@@ -81,12 +90,12 @@ def check_source_to_sink(fname, source_spec, sink_spec):
         expected_sender_array.fill(source_id[0])
         expected_receiver_array = np.empty(receiver_ids.size)
         expected_receiver_array.fill(sink_id[0])
-        yield assert_array_equal, sender_ids, expected_sender_array
-        yield assert_array_equal, receiver_ids, expected_receiver_array
+        assert_array_equal, sender_ids, expected_sender_array
+        assert_array_equal, receiver_ids, expected_receiver_array
 
         # Transaction ids must be equal range from 1 to the number of rows
         expected_trans_ids = np.arange(0, sender_ids.size, 1)
-        yield assert_array_equal, \
+        assert_array_equal, \
             to_ary(transactions, "TransactionId"),\
             expected_trans_ids
 
@@ -97,15 +106,9 @@ def check_source_to_sink(fname, source_spec, sink_spec):
         # Expect that every transaction quantity is the same amount
         expected_quantities.fill(quantities[0])
 
-        yield assert_array_equal, quantities, expected_quantities
+        assert_array_equal, quantities, expected_quantities
 
         clean_outs()
 
 
-def test_source_to_sink():
-    cases = [("source_to_sink.xml", ":agents:Source", ":agents:Sink"),
-             ("source_to_sink.py", ":cyclus.pyagents:Source", ":cyclus.pyagents:Sink"),
-             ]
-    for case in cases:
-        for x in check_source_to_sink(*case):
-            yield x
+

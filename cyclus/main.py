@@ -314,7 +314,7 @@ def make_parser():
                    help='restart from the specified simulation snapshot, '
                         'not supported.')
     p.add_argument('--schema', action=Schema,
-                   help='dump the cyclus master schema including all '
+                   help='dump the cyclus main schema including all '
                         'installed module schemas')
     p.add_argument('--agent-schema', action=AgentSchema,
                    dest='agent_schema',
@@ -323,10 +323,10 @@ def make_parser():
                    dest='agent_version',
                    help='dump the version for the named agent')
     p.add_argument('--schema-path', dest='schema_path', default=None,
-                   help='manually specify the path to the cyclus master schema')
+                   help='manually specify the path to the cyclus main schema')
     p.add_argument('--flat-schema', action='store_true', default=False,
                    dest='flat_schema',
-                   help='use the flat master simulation schema')
+                   help='use the flat main simulation schema')
     p.add_argument('--agent-annotations', action=AgentAnnotations,
                    dest='agent_annotations',
                    help='dump the annotations for the named agent')
@@ -364,7 +364,7 @@ def make_parser():
     p.add_argument('--rng-schema', action=RngSchema,
                    help='print the path to cyclus.rng.in')
     p.add_argument('--rng-print', action=RngPrint,
-                   help='print the master schema for the input simulation')
+                   help='print the main schema for the input simulation')
     p.add_argument('--nuc-data', action=NucData,
                    help='print the path to cyclus_nuc_data.h5')
     p.add_argument('--json-to-xml', action=JsonToXml,
@@ -407,8 +407,8 @@ def run_simulation(ns):
                                         state.si.context.sim_id)
     print(msg)
 
-def print_master_schema(ns):
-    """Prints the master schema for the simulation"""
+def print_main_schema(ns):
+    """Prints the main schema for the simulation"""
     state = SimState(input_file=ns.input_file, input_format=ns.format,
                      output_path=ns.output_path, schema_path=ns.schema_path,
                      flat_schema=ns.flat_schema, print_ms=True)
@@ -422,7 +422,7 @@ def main(args=None):
     p = make_parser()
     ns = p.parse_args(args=args)
     if(ns.rng_print):
-        print_master_schema(ns)
+        print_main_schema(ns)
     elif ns.input_file is not None:
         run_simulation(ns)
 

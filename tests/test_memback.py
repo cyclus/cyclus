@@ -1,17 +1,13 @@
 """Tests Python memory backend."""
 from __future__ import print_function, unicode_literals
 
-import nose
-from nose.tools import assert_equal, assert_true, assert_is_instance, \
-    assert_in, assert_false, assert_not_in, assert_is, assert_is_not
-
 from cyclus import memback
 from cyclus import lib
 from cyclus import typesystem as ts
 
 import numpy as np
 import pandas as pd
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 
 
 def make_rec_back(inject_sim_id=False):
@@ -34,11 +30,11 @@ def test_simple():
     exp = pd.DataFrame({"col0": [1], "col1": [42.0], "col2": ["wakka"]},
                        columns=['col0', 'col1', 'col2'])
     obs = back.query("test")
-    yield assert_frame_equal, exp, obs
+    assert_frame_equal, exp, obs
     rec.close()
 
     # test covert to JSON
-    yield assert_is_instance, obs.to_json(), str
+    assert isinstance(obs.to_json(), str)
 
 
 def test_simple_with_sim_id():
@@ -54,7 +50,7 @@ def test_simple_with_sim_id():
     rec.close()
 
     # test covert to JSON
-    yield assert_is_instance, obs.to_json(default_handler=str), str
+    assert isinstance(obs.to_json(default_handler=str), str)
 
 
 def test_many_rows_one_table():
@@ -99,7 +95,7 @@ def test_two_tables_interleaved():
         "col2": ["wakka"*i for i in range(0, n, 2)]},
         columns=['col0', 'col1', 'col2'])
     obs0 = back.query("test0")
-    yield assert_frame_equal, exp0, obs0
+    assert_frame_equal, exp0, obs0
 
     exp1 = pd.DataFrame({
         "col0": list(range(1, n, 2)),
@@ -107,7 +103,7 @@ def test_two_tables_interleaved():
         "col2": ["wakka"*i for i in range(1, n, 2)]},
         columns=['col0', 'col1', 'col2'])
     obs1 = back.query("test1")
-    yield assert_frame_equal, exp1, obs1
+    assert_frame_equal, exp1, obs1
     rec.close()
 
 
@@ -134,7 +130,7 @@ def test_three_tables_grouped():
         "col2": ["wakka"*i for i in range(n)]},
         columns=['col1', 'col2'])
     obs0 = back.query("test0")
-    yield assert_frame_equal, exp0, obs0
+    assert_frame_equal, exp0, obs0
 
     j = 1
     exp1 = pd.DataFrame({
@@ -142,7 +138,7 @@ def test_three_tables_grouped():
         "col2": ["wakka"*i for i in range(n)]},
         columns=['col0', 'col2'])
     obs1 = back.query("test1")
-    yield assert_frame_equal, exp1, obs1
+    assert_frame_equal, exp1, obs1
 
     j = 2
     exp2 = pd.DataFrame({
@@ -150,7 +146,7 @@ def test_three_tables_grouped():
         "col1": [42.0*i*j for i in range(n)]},
         columns=['col0', 'col1'])
     obs2 = back.query("test2")
-    yield assert_frame_equal, exp2, obs2
+    assert_frame_equal, exp2, obs2
     rec.close()
 
 
@@ -236,55 +232,55 @@ def test_many_cols_one_table():
 def test_registry_operations():
     n = 10
     rec, back = make_rec_back()
-    yield assert_true, back.store_all_tables
+    assert  back.store_all_tables
     rec.flush()  # test empty datalist
 
     # test storing only one table
     back.registry = ["test0"]
-    yield assert_false, back.store_all_tables
-    yield assert_is_instance, back.registry, frozenset
-    yield assert_equal, 1, len(back.registry)
-    yield assert_equal, 0, len(back.cache)
+    assert not back.store_all_tables
+    assert isinstance(back.registry, frozenset)
+    assert 1 == len(back.registry)
+    assert 0 == len(back.cache)
     make_two_interleaved(rec, n)
-    yield assert_equal, 1, len(back.cache)
-    yield assert_in, "test0", back.cache
+    assert 1 == len(back.cache)
+    assert ("test0" in  back.cache)
 
     # test removing registry with False
     back.registry = False
-    yield assert_false, back.store_all_tables
-    yield assert_is_instance, back.registry, frozenset
-    yield assert_equal, 0, len(back.cache)
+    assert not back.store_all_tables
+    assert isinstance(back.registry, frozenset)
+    assert 0 == len(back.cache)
     rec.flush()
 
     # test partial registry
     back.registry = ["test0", "test1"]
-    yield assert_false, back.store_all_tables
-    yield assert_is_instance, back.registry, frozenset
-    yield assert_equal, 2, len(back.registry)
-    yield assert_equal, 0, len(back.cache)
+    assert not back.store_all_tables
+    assert isinstance(back.registry, frozenset)
+    assert 2 == len(back.registry)
+    assert 0 == len(back.cache)
     make_two_interleaved(rec, n)
-    yield assert_equal, 2, len(back.cache)
-    yield assert_in, "test0", back.cache
-    yield assert_in, "test1", back.cache
+    assert 2 == len(back.cache)
+    assert ("test0" in  back.cache)
+    assert ("test1" in  back.cache)
     # stop following test1
     back.registry = ["test0", "test42", "test43"]
-    yield assert_equal, 3, len(back.registry)
-    yield assert_equal, 1, len(back.cache)
-    yield assert_in, "test0", back.cache
-    yield assert_not_in, "test1", back.cache
+    assert 3 == len(back.registry)
+    assert 1 == len(back.cache)
+    assert ("test0" in  back.cache)
+    assert ("test1" not in back.cache)
 
     # test removing registry with None
     back.registry = None
-    yield assert_false, back.store_all_tables
-    yield assert_is_instance, back.registry, frozenset
-    yield assert_equal, 0, len(back.cache)
+    assert not back.store_all_tables
+    assert isinstance(back.registry, frozenset)
+    assert 0 == len(back.cache)
     rec.close()
 
 
 def test_no_fallback():
     back = memback.MemBack()
-    yield assert_is, back.fallback, None
-    yield assert_is, back.query("yo"), None
+    assert (back.fallback is None)
+    assert (back.query("yo") is None)
 
 
 class FallBackend(object):
@@ -303,14 +299,14 @@ class FallBackend(object):
 def test_fallback():
     fallback = FallBackend()
     back = memback.MemBack(fallback=fallback)
-    yield assert_is_not, back.fallback, None
+    assert (back.fallback is not None)
     n = 10
     x = pd.DataFrame({
         "col0": list(range(n)),
         "col1": [42.0*i for i in range(n)],
         "col2": ["wakka"*i for i in range(n)]},
         columns=['col0', 'col1', 'col2'])
-    yield assert_frame_equal, x, back.query("yo")
+    assert_frame_equal, x, back.query("yo")
 
 
 def test_query():
@@ -325,51 +321,46 @@ def test_query():
 
     # test ==
     obs = back.query('x', [('col0', '==', 4)])
-    yield assert_equal, 1, len(obs)
-    yield assert_equal, 4, obs['col0'].loc[4]
+    assert 1 == len(obs)
+    assert 4 == obs['col0'].loc[4]
 
     # test !=
     obs = back.query('x', [('col2', '!=', 'wakka')])
-    yield assert_equal, n-1, len(obs)
-    yield assert_not_in, 1, obs['col0']
+    assert n-1 == len(obs)
+    assert (1 not in obs['col0'])
 
     # test <
     obs = back.query('x', [('col1', '<', 42.0*6.0)])
-    yield assert_equal, 6, len(obs)
-    yield assert_frame_equal, x[x.col1 < 42.0*6.0], obs
+    assert 6 == len(obs)
+    assert_frame_equal, x[x.col1 < 42.0*6.0], obs
 
     # test <=
     obs = back.query('x', [('col1', '<=', 42.0*3.1)])
-    yield assert_equal, 4, len(obs)
-    yield assert_frame_equal, x[x.col1 <= 42.0*3.1], obs
+    assert 4 == len(obs)
+    assert_frame_equal, x[x.col1 <= 42.0*3.1], obs
 
     # test <
     obs = back.query('x', [('col1', '>', 42.0*6.0)])
-    yield assert_equal, 3, len(obs)
-    yield assert_frame_equal, x[x.col1 > 42.0*6.0], obs
+    assert 3 == len(obs)
+    assert_frame_equal, x[x.col1 > 42.0*6.0], obs
 
     # test <=
     obs = back.query('x', [('col1', '>=', 42.0*3.1)])
-    yield assert_equal, 6, len(obs)
-    yield assert_frame_equal, x[x.col1 >= 42.0*3.1], obs
+    assert 6 == len(obs)
+    assert_frame_equal, x[x.col1 >= 42.0*3.1], obs
 
     # Test two conds
     obs = back.query('x', [('col1', '<', 42.0*6.0),
                            ('col1', '>=', 42.0*3.1)])
-    yield assert_equal, 2, len(obs)
-    yield assert_frame_equal, x[(x.col1 < 42.0*6.0) & (x.col1 >= 42.0*3.1)], obs
+    assert 2 == len(obs)
+    assert_frame_equal, x[(x.col1 < 42.0*6.0) & (x.col1 >= 42.0*3.1)], obs
 
     # Test three conds
     obs = back.query('x', [('col1', '<', 42.0*6.0),
                            ('col1', '>=', 42.0*3.1),
                            ('col2', '!=', 'wakka')])
-    yield assert_equal, 2, len(obs)
-    yield assert_frame_equal, x[(x.col1 < 42.0*6.0) & (x.col1 >= 42.0*3.1)], obs
+    assert 2 == len(obs)
+    assert_frame_equal, x[(x.col1 < 42.0*6.0) & (x.col1 >= 42.0*3.1)], obs
 
     # test convert to JSON
     obs.to_json()
-
-
-
-if __name__ == "__main__":
-    nose.runmodule()

@@ -3,25 +3,19 @@ from  __future__ import print_function
 import os
 import re
 import sys
-import imp
+import importlib
 import shutil
 import unittest
 import subprocess
 import tempfile
 from contextlib import contextmanager
-from functools import wraps
+import pytest
 
-from nose.tools import assert_true, assert_equal
-from nose.plugins.attrib import attr
-from nose.plugins.skip import SkipTest
 
 from cyclus import lib as libcyclus
 
 if sys.version_info[0] >= 3:
     basestring = str
-
-unit = attr('unit')
-integration = attr('integration')
 
 INPUT = os.path.join(os.path.dirname(__file__), "input")
 
@@ -55,7 +49,7 @@ def check_cmd(args, cwd, holdsrtn):
         print("STDOUT + STDERR:\n\n" + f.read().decode())
     f.close()
     holdsrtn[0] = rtn
-    assert_equal(rtn, 0)
+    assert rtn ==  0
 
 
 def cyclus_has_coin():
@@ -79,7 +73,10 @@ def clean_import(name, paths=None):
     """
     sys.path = paths + sys.path
     origmods = set(sys.modules.keys())
-    mod = imp.load_module(name, *imp.find_module(name, paths))
+    spec =  importlib.machinery.PathFinder.find_spec(name, paths)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    sys.modules[name] = mod
     yield mod
     sys.path = sys.path[len(paths):]
     del mod
@@ -121,7 +118,7 @@ def skip_then_continue(msg=""):
     and we may continue on our merry way. A message may be optionally passed
     to this function.
     """
-    raise SkipTest(msg)
+    pytest.skip(msg)
 
 @contextmanager
 def indir(d):
@@ -170,16 +167,14 @@ def libcyclus_setup():
 
 
 def dbtest(f):
-    @wraps(f)
     def wrapper():
         for fname, oname, backend in DBS:
             if os.path.exists(fname):
                 os.remove(fname)
             shutil.copy(oname, fname)
             db = backend(fname)
-            yield f, db, fname, backend
+            f(db, fname, backend)
     return wrapper
-
 
 
 

@@ -1,8 +1,6 @@
 #! /usr/bin/env python
 from __future__ import print_function
 
-import nose
-from nose.tools import assert_equal, assert_almost_equal, assert_true
 from numpy.testing import assert_array_equal
 import os
 import tables
@@ -32,11 +30,11 @@ def test_predator_only():
     outfile = which_outfile()
 
     cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
-    yield check_cmd, cmd, '.', holdsrtn
+    check_cmd(cmd, '.', holdsrtn)
     rtn = holdsrtn[0]
 
     print("Confirming valid Cyclus execution.")
-    assert_equal(rtn, 0)
+    assert rtn ==  0
 
     series = agent_time_series([prey, pred])
     print("Prey:", series[prey], "Predators:", series[pred])
@@ -44,8 +42,8 @@ def test_predator_only():
     prey_exp = [0 for n in range(10)]
     pred_exp = [1, 1] + [0 for n in range(8)]
 
-    assert_equal(series[prey], prey_exp)
-    assert_equal(series[pred], pred_exp)
+    assert series[prey] ==  prey_exp
+    assert series[pred] ==  pred_exp
 
     clean_outs()
 
@@ -60,11 +58,11 @@ def test_prey_only():
     outfile = which_outfile()
 
     cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
-    yield check_cmd, cmd, '.', holdsrtn
+    check_cmd(cmd, '.', holdsrtn)
     rtn = holdsrtn[0]
 
     print("Confirming valid Cyclus execution.")
-    assert_equal(rtn, 0)
+    assert rtn ==  0
 
     series = agent_time_series([prey, pred])
     print("Prey:", series[prey], "Predators:", series[pred])
@@ -72,8 +70,8 @@ def test_prey_only():
     prey_exp = [2**n for n in range(10)]
     pred_exp = [0 for n in range(10)]
 
-    assert_equal(series[prey], prey_exp)
-    assert_equal(series[pred], pred_exp)
+    assert series[prey] ==  prey_exp
+    assert series[pred] ==  pred_exp
 
     clean_outs()
 
@@ -97,11 +95,11 @@ def test_lotka_volterra():
     outfile = which_outfile()
 
     cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
-    yield check_cmd, cmd, '.', holdsrtn
+    check_cmd(cmd, '.', holdsrtn)
     rtn = holdsrtn[0]
 
     print("Confirming valid Cyclus execution.")
-    assert_equal(rtn, 0)
+    assert rtn ==  0
 
     series = agent_time_series([prey, pred])
     print("Prey:", series[prey], "Predators:", series[pred])
@@ -110,9 +108,7 @@ def test_lotka_volterra():
     pred_max = series[pred].index(max(series[pred]))
     print("t_prey_max:", prey_max, "t_pred_max:", pred_max)
 
-    assert_true(prey_max < pred_max)
+    assert(prey_max < pred_max)
 
     clean_outs()
 
-if __name__ == "__main__":
-    nose.runmodule()

@@ -1,6 +1,5 @@
 #! /usr/bin/env python
 
-from nose.tools import assert_false, assert_true, assert_equal
 from numpy.testing import assert_array_equal
 import os
 import tables
@@ -24,13 +23,13 @@ def test_inventories_false():
         holdsrtn = [1]  # needed because nose does not send() to test generator
         outfile = sqliteout
         cmd = ["cyclus", "-o", outfile, "--input-file", sim]
-        yield check_cmd, cmd, '.', holdsrtn
+        check_cmd(cmd, '.', holdsrtn)
         rtn = holdsrtn[0]
         if rtn != 0:
             return  # don't execute further commands
 
         # Ensure tables do not exist
-        assert_false, tables_exist(outfile, path)
+        assert not tables_exist(outfile, path)
         if tables_exist(outfile, path):
             print('Inventory table exists despite false entry in control section of input file.')
             outfile.close()
@@ -49,13 +48,13 @@ def test_inventories():
         holdsrtn = [1]  # needed because nose does not send() to test generator
         outfile = sqliteout
         cmd = ["cyclus", "-o", outfile, "--input-file", sim]
-        yield check_cmd, cmd, '.', holdsrtn
+        check_cmd(cmd, '.', holdsrtn)
         rtn = holdsrtn[0]
         if rtn != 0:
             return  # don't execute further commands
 
         # Check if inventory tables exist
-        assert_true, tables_exist(outfile, path)
+        assert tables_exist(outfile, path)
         if not tables_exist(outfile, path):
             print('Inventory table does not exist despite true entry in control section of input file.')
             outfile.close()

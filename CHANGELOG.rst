@@ -22,7 +22,8 @@ Since last release
 **Changed:**
 
 * Moved to unified CHANGELOG Entry and check them with GithubAction (#1571)
-
+* Major update and modernization of build (#1587)
+* Changed Json formatting for compatibility with current python standards (#1587)
 
 **Removed:**
 

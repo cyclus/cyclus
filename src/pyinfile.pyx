@@ -38,7 +38,7 @@ cdef public std_string py_to_json "CyclusPyToJson" (std_string cpp_infile) excep
         raise RuntimeError('simulation not found in python file.')
     if callable(sim):
         sim = sim()
-    from collections import Mapping
+    from collections.abc import Mapping
     if isinstance(sim, str):
         pass  # assume in JSON format
     elif isinstance(sim, bytes):

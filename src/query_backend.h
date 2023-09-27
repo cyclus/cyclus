@@ -23,7 +23,7 @@
 
 namespace cyclus {
 
-/// This is the master list of all supported database types.  All types must
+/// This is the primary list of all supported database types.  All types must
 /// have a constant length unless they begin with the prefix VL_, which stands
 /// for "variable length" or are implicitly variable length, such as blob.
 /// Changing the order here may invalidate previously created databases.

@@ -35,7 +35,7 @@ cdef cpp_jsoncpp.Value * tocppval(object doc) except NULL:
     cdef cpp_jsoncpp.Value * cval = NULL
     if isinstance(doc, Value):
         cval = new cpp_jsoncpp.Value(<cpp_jsoncpp.Value &> (<Value> doc)._inst[0])
-    elif isinstance(doc, collections.Mapping):
+    elif isinstance(doc, collections.abc.Mapping):
         cval = new cpp_jsoncpp.Value(<cpp_jsoncpp.ValueType> cpp_jsoncpp.objectValue)
         for k, v in doc.items():
             if not isinstance(k, basestring):

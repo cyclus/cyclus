@@ -4,10 +4,9 @@ import json
 import subprocess
 from random import randint
 import uuid
-import nose
-from nose.plugins.skip import SkipTest
 import pandas as pd
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
+import pytest
 
 from cyclus.lib import Hdf5Back, Recorder
 import cyclus.typesystem as ts
@@ -54,6 +53,8 @@ def setup():
                 CANON_TYPES.append(canon)
             CANON_TO_DB[canon] = db
             CANON_TO_VL[canon] = is_vl
+
+setup()
 
 def make_bytes(string):
     return string.encode()
@@ -241,39 +242,41 @@ def get_shape(meta):
             shape.extend(get_shape(i))
         return shape
 
+
+@pytest.fixture(params=CANON_TYPES)
+def canon_type(request):
+    ret = request.param
+    yield ret
+
 ROW_NUM = 3
 PATH = 'gen_db.h5'
-def generate_and_test():
+def test_generate(canon_type):
     """Generate and run tests for supported Hdf5 datatypes."""
     if sys.version_info[0] == 2:
         msg = 'Hdf5 backend gen tests do not support Python 2.x'
-        raise SkipTest(msg)
+        pytest.skip(msg)
     if os.path.isfile(PATH):
         os.remove(PATH)
-    for i in CANON_TYPES:
-        print(CANON_TO_DB[i],'\n')                
-        rec = Recorder(inject_sim_id=False)
-        back = Hdf5Back(PATH)
-        rec.register_backend(back)
-        data_meta = generate_meta(i)
-        shape = get_shape(data_meta)
-        print("shape: ", shape)
-        data = []
-        for j in range(ROW_NUM):
-            data.append(populate(data_meta))
-        exp = pd.DataFrame({'col0': data}, columns=['col0'])
-        print("expected: \n", exp)
-        for j in data:
-            d = rec.new_datum("test0")
-            d.add_val("col0", j, shape=shape, type=ts.IDS[CANON_TO_DB[i]])
-            d.record()
-            rec.flush()
-        obs = back.query("test0")
-        print("observed: \n", obs)
-        yield assert_frame_equal, exp, obs
-        rec.close()
-        os.remove(PATH)
+    print(CANON_TO_DB[canon_type],'\n')                
+    rec = Recorder(inject_sim_id=False)
+    back = Hdf5Back(PATH)
+    rec.register_backend(back)
+    data_meta = generate_meta(canon_type)
+    shape = get_shape(data_meta)
+    print("shape: ", shape)
+    data = []
+    for j in range(ROW_NUM):
+        data.append(populate(data_meta))
+    exp = pd.DataFrame({'col0': data}, columns=['col0'])
+    print("expected: \n", exp)
+    for j in data:
+        d = rec.new_datum("test0")
+        d.add_val("col0", j, shape=shape, type=ts.IDS[CANON_TO_DB[canon_type]])
+        d.record()
+        rec.flush()
+    obs = back.query("test0")
+    print("observed: \n", obs)
+    assert_frame_equal, exp, obs
+    rec.close()
 
-if __name__ == "__main__":
-    nose.runmodule()
     

@@ -10,6 +10,14 @@
 
 namespace cyclus {
 
+#if LIBXMLXX_MAJOR_VERSION == 2 
+  typedef xmlpp::NodeSet NodeSet;
+  typedef xmlpp::Node::NodeList const_NodeList;
+#else
+  typedef xmlpp::Node::NodeSet NodeSet;
+  typedef xmlpp::Node::const_NodeList const_NodeList;
+#endif
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InfileTree::InfileTree(XMLParser& parser) : current_node_(0) {
   current_node_ = parser.Document()->get_root_node();
@@ -53,7 +61,6 @@ int InfileTree::NMatches(std::string query) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string InfileTree::GetString(std::string query, int index) {
   using xmlpp::Node;
-  using xmlpp::NodeSet;
   using xmlpp::TextNode;
   using xmlpp::Element;
   const NodeSet nodeset = current_node_->find(query);
@@ -73,7 +80,7 @@ std::string InfileTree::GetString(std::string query, int index) {
                     " is not an Element node.");
   }
 
-  const Node::NodeList nodelist = element->get_children();
+  const const_NodeList nodelist = element->get_children();
   if (nodelist.size() != 1) {
     throw ValueError("Element node " + element->get_name() +
                      " has more content than expected.");
@@ -92,7 +99,7 @@ std::string InfileTree::GetString(std::string query, int index) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string InfileTree::GetElementName(int index) {
   using xmlpp::Node;
-  using xmlpp::NodeSet;
+
   std::vector<xmlpp::Element*> elements;
   const Node::NodeList nodelist = current_node_->get_children();
   Node::NodeList::const_iterator it;
@@ -112,7 +119,7 @@ std::string InfileTree::GetElementName(int index) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 InfileTree* InfileTree::GetEngineFromQuery(std::string query, int index) {
   using xmlpp::Node;
-  using xmlpp::NodeSet;
+
   const NodeSet nodeset = current_node_->find(query);
 
   if (nodeset.size() < index + 1) {

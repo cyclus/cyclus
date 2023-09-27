@@ -48,7 +48,7 @@ ADD_EXECUTABLE(
     ${CYCLUS_CORE_TEST_SOURCE}
     cyclus_unit_test_driver.cc
     )
-
+    
 TARGET_LINK_LIBRARIES(
     cyclus_unit_tests
     dl
@@ -57,7 +57,9 @@ TARGET_LINK_LIBRARIES(
     agents
     ${CYCLUS_TEST_LIBRARIES}
     )
-
+    MESSAGE(STATUS "(cli) CYCLUS_TEST_LIBRARIES: ${CYCLUS_TEST_LIBRARIES}")
+    MESSAGE(STATUS "(cli) CYCLUS_AGENT_TEST_LIBRARIES: ${CYCLUS_AGENT_TEST_LIBRARIES}")
+    
 INSTALL(
     TARGETS cyclus_unit_tests
     RUNTIME DESTINATION bin

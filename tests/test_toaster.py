@@ -3,7 +3,6 @@ import re
 import json
 import subprocess
 
-from nose.tools import assert_in, assert_true, assert_equals
 
 
 DEFAULTFILE = {'simulation': {'archetypes': {'spec': [
@@ -34,9 +33,9 @@ def test_pyagent_defaults():
     s = subprocess.check_output(['cyclus', '-o', 'default-toaster.h5', 'default-toaster.json'],
                                 universal_newlines=True, env=env)
     # tests default value set on facility
-    assert_in("Bread is rye", s)
+    assert ("Bread is rye" in  s)
     # tests that value in input file overrides default value
-    assert_in("Toast level is 10", s)
+    assert ("Toast level is 10" in  s)
     if os.path.exists('default-toaster.json'):
         os.remove('default-toaster.json')
     if os.path.exists('default-toaster.h5'):
@@ -75,22 +74,22 @@ def test_pyagent_attr_toasters():
     info = s.split('=== Start AttrToaster ===\n')[-1].split('\n=== End AttrToaster ===')[0]
     info = json.loads(info)
     # test ids
-    assert_true(isinstance(info['id'], int))
-    assert_true(isinstance(info['parent'], int))
-    assert_true(info['parent'] != info['id'])
-    assert_true(0 <= info['parent'] < 100)
-    assert_true(info['id'] == info['hash'])
+    assert(isinstance(info['id'], int))
+    assert(isinstance(info['parent'], int))
+    assert(info['parent'] != info['id'])
+    assert(0 <= info['parent'] < 100)
+    assert(info['id'] == info['hash'])
     # test attrs
-    assert_true(info['str'].startswith('Facility_HappyToaster'))
-    assert_equals(info['kind'], 'Facility')
-    assert_equals(info['spec'], ':toaster:AttrToaster')
-    assert_equals(info['version'], '0.0.0')
-    assert_equals(info['prototype'], 'HappyToaster')
-    assert_equals(info['enter_time'], 0)
-    assert_equals(info['lifetime'], -1)
-    assert_equals(info['exit_time'], -1)
-    assert_equals(len(info['childern']), 0)
-    assert_true(len(info['annotations']) > 0)
+    assert(info['str'].startswith('Facility_HappyToaster'))
+    assert (info['kind'] ==  'Facility')
+    assert (info['spec'] ==  ':toaster:AttrToaster')
+    assert (info['version'] ==  '0.0.0')
+    assert (info['prototype'] ==  'HappyToaster')
+    assert (info['enter_time'] ==  0)
+    assert (info['lifetime'] ==  -1)
+    assert (info['exit_time'] ==  -1)
+    assert (len(info['childern']) ==  0)
+    assert(len(info['annotations']) > 0)
     # clean up
     if os.path.exists(iname):
         os.remove(iname)
@@ -131,22 +130,22 @@ def test_pyagent_attr_toaster_company():
     info = info.split('\n=== End AttrToasterCompany ===')[0]
     info = json.loads(info)
     # test ids
-    assert_true(isinstance(info['id'], int))
-    assert_true(isinstance(info['parent'], int))
-    assert_true(info['parent'] != info['id'])
-    assert_true(0 <= info['parent'] <= 100)
-    assert_true(info['id'] == info['hash'])
+    assert(isinstance(info['id'], int))
+    assert(isinstance(info['parent'], int))
+    assert(info['parent'] != info['id'])
+    assert(0 <= info['parent'] <= 100)
+    assert(info['id'] == info['hash'])
     # test attrs
-    assert_true(info['str'].startswith('Inst_FamousToastersLLC'))
-    assert_equals(info['kind'], 'Inst')
-    assert_equals(info['spec'], ':toaster:AttrToasterCompany')
-    assert_equals(info['version'], '0.0.0')
-    assert_equals(info['prototype'], 'FamousToastersLLC')
-    assert_equals(info['enter_time'], 0)
-    assert_equals(info['lifetime'], -1)
-    assert_equals(info['exit_time'], -1)
-    assert_equals(len(info['childern']), 1)
-    assert_true(len(info['annotations']) > 0)
+    assert(info['str'].startswith('Inst_FamousToastersLLC'))
+    assert (info['kind'] ==  'Inst')
+    assert (info['spec'] ==  ':toaster:AttrToasterCompany')
+    assert (info['version'] ==  '0.0.0')
+    assert (info['prototype'] ==  'FamousToastersLLC')
+    assert (info['enter_time'] ==  0)
+    assert (info['lifetime'] ==  -1)
+    assert (info['exit_time'] ==  -1)
+    assert (len(info['childern']) ==  1)
+    assert(len(info['annotations']) > 0)
     # clean up
     if os.path.exists(iname):
         os.remove(iname)
@@ -187,22 +186,22 @@ def test_pyagent_attr_toaster_region():
     info = info.split('\n=== End AttrToasterRegion ===')[0]
     info = json.loads(info)
     # test ids
-    assert_true(isinstance(info['id'], int))
-    assert_true(isinstance(info['parent'], int))
-    assert_true(info['parent'] != info['id'])
-    assert_equals(info['parent'], -1)
-    assert_true(info['id'] == info['hash'])
+    assert(isinstance(info['id'], int))
+    assert(isinstance(info['parent'], int))
+    assert(info['parent'] != info['id'])
+    assert (info['parent'] ==  -1)
+    assert(info['id'] == info['hash'])
     # test attrs
-    assert_true(info['str'].startswith('Region_RepublicOfToast'))
-    assert_equals(info['kind'], 'Region')
-    assert_equals(info['spec'], ':toaster:AttrToasterRegion')
-    assert_equals(info['version'], '0.0.0')
-    assert_equals(info['prototype'], 'RepublicOfToast')
-    assert_equals(info['enter_time'], 0)
-    assert_equals(info['lifetime'], -1)
-    assert_equals(info['exit_time'], -1)
-    assert_equals(len(info['childern']), 1)
-    assert_true(len(info['annotations']) > 0)
+    assert(info['str'].startswith('Region_RepublicOfToast'))
+    assert (info['kind'] ==  'Region')
+    assert (info['spec'] ==  ':toaster:AttrToasterRegion')
+    assert (info['version'] ==  '0.0.0')
+    assert (info['prototype'] ==  'RepublicOfToast')
+    assert (info['enter_time'] ==  0)
+    assert (info['lifetime'] ==  -1)
+    assert (info['exit_time'] ==  -1)
+    assert (len(info['childern']) ==  1)
+    assert(len(info['annotations']) > 0)
     # clean up
     if os.path.exists(iname):
         os.remove(iname)

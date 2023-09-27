@@ -17,7 +17,7 @@ from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
 import json
 from inspect import getmro, getdoc
 from copy import deepcopy
-from collections import Mapping
+from collections.abc import Mapping
 
 from cyclus cimport cpp_cyclus
 from cyclus.cpp_cyclus cimport shared_ptr, reinterpret_pointer_cast

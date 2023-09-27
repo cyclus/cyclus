@@ -3,10 +3,9 @@ import subprocess
 import shutil
 import sys
 import tempfile
-import io
 from contextlib import contextmanager
+import pytest
 
-from nose.plugins.skip import SkipTest
 
 @contextmanager
 def tmpdir():
@@ -16,7 +15,8 @@ def tmpdir():
 
 @contextmanager
 def tmplog(fname):
-    yield io.open(fname, mode='w')
+    file_ptr = open(fname, mode='w')
+    yield file_ptr
     os.remove(fname)
 
 def test_stubs():
@@ -55,7 +55,7 @@ def test_stubs():
                                       cwd=src, stdout=f, stderr=f)
         except subprocess.CalledProcessError as e:
             print(msg)
-            raise SkipTest(msg)  # skip if we can't install for some reason.
+            pytest.skip(msg)  # skip if we can't install for some reason.
 
         # run unit tests for stub
         cmd = tst_cmd.format(pth)

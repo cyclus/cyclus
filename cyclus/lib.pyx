@@ -22,7 +22,8 @@ from cpython.pycapsule cimport PyCapsule_GetPointer
 from binascii import hexlify
 import uuid
 import os
-from collections import Mapping, Sequence, Iterable, defaultdict
+from collections import defaultdict
+from collections.abc import Mapping, Sequence, Iterable
 from importlib import import_module
 
 cimport numpy as np
@@ -853,7 +854,7 @@ class XMLFileLoader(_XMLFileLoader):
 
     Create a new loader reading from the xml simulation input file and writing
     to and initializing the backends in the recorder. The recorder must
-    already have the backend registered. schema_file identifies the master
+    already have the backend registered. schema_file identifies the main
     xml rng schema used to validate the input file. The format specifies the
     input file format from one of: "none", "xml", "json", or "py".
     """
@@ -886,7 +887,7 @@ class XMLFlatLoader(_XMLFlatLoader):
 
     Create a new loader reading from the xml simulation input file and writing
     to and initializing the backends in the recorder. The recorder must
-    already have the backend registered. schema_file identifies the master
+    already have the backend registered. schema_file identifies the main
     xml rng schema used to validate the input file. The format specifies the
     input file format from one of: "none", "xml", "json", or "py".
 

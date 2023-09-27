@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
 #taken from http://geant4.cern.ch/support/source/geant4/CMakeLists.txt
 IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(STATUS "Cyclus requires an out-of-source build.")
@@ -10,20 +10,16 @@ IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(FATAL_ERROR "in-source build detected")
 ENDIF()
 
-# Set some policies
-cmake_policy(SET CMP0040 OLD)
-cmake_policy(SET CMP0042 OLD)
-
 # This project name is cyclus.
 PROJECT(CYCLUS)
 
-# check for and enable c++11 support (required for cyclus)
+# check for and enable c++17 support (required for cyclus)
 INCLUDE(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-IF(COMPILER_SUPPORTS_CXX11)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
+IF(COMPILER_SUPPORTS_CXX17)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 ELSE()
-    MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+    MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler.")
 ENDIF()
 
 # enable assembly
@@ -108,8 +104,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     endif()
 
     # Tell CMake where the modules are
-    LIST(APPEND CMAKE_MODULE_PATH
-        "${CMAKE_DIR}/share/cmake-2.8/Modules" "${PROJECT_SOURCE_DIR}/cmake")
+    MESSAGE("-- CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+    LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
+        "${PROJECT_SOURCE_DIR}/cmake")
 
     # Include macros
     INCLUDE(CopyWhenDiffMacro)
@@ -162,24 +159,29 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("-- Dependency Binary Hints (DEPS_BIN_HINTS): ${DEPS_BIN_HINTS}")
     MESSAGE("-- Dependency Library Hints (DEPS_LIB_HINTS): ${DEPS_LIB_HINTS}")
     MESSAGE("-- Dependency Include Hints (DEPS_INCLUDE_HINTS): ${DEPS_INCLUDE_HINTS}")
+    MESSAGE("CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+
+    # Search pkg-config utility first
+    find_package(PkgConfig REQUIRED)
+
 
     # Debian installs useful LibXML2 files to /usr/include/libxml2/libxml
     # libxml2 is required for relaxng schema validation
-    FIND_PACKAGE(LibXml2 ${DEPS_HINTS})
-    IF(NOT LIBXML2_LIBRARIES)
-        FIND_LIBRARY(LibXml2 REQUIRED ${DEPS_HINTS})
-    ENDIF()
+
+    FIND_PACKAGE(LibXml2 REQUIRED)
     ADD_DEFINITIONS(${LIBXML2_DEFINITIONS})
     SET(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
+    message("-- LibXML2 Include Dir: ${LIBXML2_INCLUDE_DIR}")
 
-    # Find LibXML++ and dependencies
-    FIND_PACKAGE(LibXML++)
-    IF(NOT LibXML++_LIBRARIES)
-        FIND_LIBRARY(LibXML++ REQUIRED ${DEPS_HINTS})
-    ENDIF()
-    SET(LIBS ${LIBS} ${LibXML++_LIBRARIES})
-    message("-- LibXML++ Include Dir: ${LibXML++_INCLUDE_DIR}")
-
+    # Then use pkg-config for locate specific package
+    pkg_check_modules(LIBXMLXX IMPORTED_TARGET libxml++-4.0)
+    IF ( NOT LIBXMLXX_LIBRARIES )
+       pkg_check_modules(LIBXMLXX REQUIRED IMPORTED_TARGET libxml++-2.6)
+    ENDIF ( NOT LIBXMLXX_LIBRARIES )
+    SET(LIBS ${LIBS} ${LIBXMLXX_LIBRARIES})
+    message("-- LibXML++ Include Dir: ${LIBXMLXX_INCLUDE_DIRS}")
+    message("-- LibXML++ Librarires: ${LIBXMLXX_LIBRARIES}")
+    
     # find lapack and link to it
     FIND_PACKAGE(LAPACK REQUIRED)
     set(LIBS ${LIBS} ${LAPACK_LIBRARIES})
@@ -188,8 +190,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("-- Found BLAS Libraries: ${BLAS_LIBRARIES}")
 
     # Find Sqlite3
-    FIND_PACKAGE(Sqlite3 REQUIRED)
-    SET(LIBS ${LIBS} ${SQLITE3_LIBRARIES})
+    FIND_PACKAGE(SQLite3 REQUIRED)
+    SET(LIBS ${LIBS} ${SQLite3_LIBRARIES})
+    MESSAGE("-- Found SQLite3 Libraries: ${SQLite3_LIBRARIES}")
 
     # Find HDF5
     FIND_PACKAGE(HDF5 REQUIRED COMPONENTS HL)
@@ -300,8 +303,8 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Cython & Python Bindings
     #
     # Use new Python library finder
-    find_package(PythonInterp)
-    find_package(PythonLibs)
+    find_package (Python3 COMPONENTS Interpreter Development NumPy)
+
     execute_process(COMMAND "${PYTHON_EXECUTABLE}" -c
                             "import site; print(site.getsitepackages(['${CMAKE_INSTALL_PREFIX}'])[0])"
                     OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
@@ -321,7 +324,6 @@ IF(NOT CYCLUS_DOC_ONLY)
         endif()
         include(UseCython)
 
-        find_package(Numpy REQUIRED)
         find_package(Jinja2 REQUIRED)
         find_package(Pandas REQUIRED)
 
@@ -362,10 +364,10 @@ IF(NOT CYCLUS_DOC_ONLY)
     # ${Glibmm_INCLUDE_DIRS} breaks Ubuntu 12.04
     set(inc_dirs
         "${LIBXML2_INCLUDE_DIR}"
-        "${LibXML++_INCLUDE_DIR}"
+        "${LIBXMLXX_INCLUDE_DIRS}"
         "${Glibmm_INCLUDE_DIRS}"
-        "${LibXML++Config_INCLUDE_DIR}"
-        "${SQLITE3_INCLUDE_DIR}"
+        "${LIBXMLXXConfig_INCLUDE_DIR}"
+        "${SQLite3_INCLUDE_DIR}"
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
         "${COIN_INCLUDE_DIRS}")
@@ -376,8 +378,7 @@ IF(NOT CYCLUS_DOC_ONLY)
 
 
     if(Cython_FOUND)
-        INCLUDE_DIRECTORIES(AFTER "${PYTHON_INCLUDE_DIRS}"
-            "${NUMPY_INCLUDE_DIRS}")
+        INCLUDE_DIRECTORIES(AFTER "${PYTHON_INCLUDE_DIRS}" "${_Python3_NumPy_INCLUDE_DIR}")
     endif(Cython_FOUND)
     # set core version, one way or the other
     IF(NOT "${CORE_VERSION}" STREQUAL "")
@@ -403,7 +404,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     if(Cython_FOUND)
         ADD_SUBDIRECTORY("${CYCLUS_PYSOURCE_DIR}")
     endif(Cython_FOUND)
-
+    
     ##############################################################################################
     ####################################### end includes #########################################
     ##############################################################################################
@@ -489,7 +490,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libboost-program-options-dev (>= 1.54.0)")
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libboost-serialization-dev (>= 1.54.0)")
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libhdf5-dev (>= 1.8.11)")
-    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libxml++2.6-dev (>= 2.36.0)")
+    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libxml++2.6-dev (>= 2.6.0)")
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, coinor-libcbc-dev (>= 2.8.7)")
     MESSAGE("CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS}")
 

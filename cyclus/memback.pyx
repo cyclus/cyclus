@@ -100,7 +100,7 @@ cdef cppclass CyclusMemBack "CyclusMemBack" (cpp_cyclus.RecBackend):
             if key_exists:
                 pyobval = PyDict_GetItem(<object> this.cache, pyname)
                 pyval = <object> pyobval
-                results = pyval.append(results, ignore_index=True)
+                results = pd.concat([pyval, results], ignore_index=True)
             PyDict_SetItem(<object> this.cache, pyname, results)
 
     std_string Name():
