@@ -163,7 +163,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   bool make_req = buf_->quantity() < req_when_under_ * buf_->capacity();
   double amt;
   int cycle = freq_active_ + freq_dormant_;
-  if ((context()->time() % cycle) < freq_active_) {
+  if ((manager()->context()->time() % cycle) < freq_active_) {
     amt = TotalQty();
   }
   else {
