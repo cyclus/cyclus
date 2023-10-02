@@ -20,8 +20,8 @@ MatlBuyPolicy::MatlBuyPolicy() :
     quantize_(-1),
     fill_to_(1),
     req_when_under_(1),
-    frequency_active(1),
-    frequency_dormant(0){
+    freq_active_(1),
+    freq_dormant_(0){
   Warn<EXPERIMENTAL_WARNING>(
       "MatlBuyPolicy is experimental and its API may be subject to change");
 }
@@ -100,8 +100,6 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
-  set_fill_to(fill_to);
-  set_req_when_under(req_when_under);
   set_throughput(throughput);
   set_freq_active(freq_active);
   set_freq_dormant(freq_dormant);
@@ -165,11 +163,13 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   bool make_req = buf_->quantity() < req_when_under_ * buf_->capacity();
   double amt;
   int cycle = freq_active_ + freq_dormant_;
-  if (context()->time() % cycle) < freq_active_;
+  if ((context()->time() % cycle) < freq_active_) {
     amt = TotalQty();
-  else
+  }
+  else {
     // in dormant part of cycle, return empty portfolio
     amt = 0;
+  }
   if (!make_req || amt < eps())
     return ports;
 
