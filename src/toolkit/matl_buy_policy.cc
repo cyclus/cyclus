@@ -19,7 +19,9 @@ MatlBuyPolicy::MatlBuyPolicy() :
     throughput_(std::numeric_limits<double>::max()),
     quantize_(-1),
     fill_to_(1),
-    req_when_under_(1) {
+    req_when_under_(1),
+    frequency_active(1),
+    frequency_dormant(0){
   Warn<EXPERIMENTAL_WARNING>(
       "MatlBuyPolicy is experimental and its API may be subject to change");
 }
@@ -53,6 +55,16 @@ void MatlBuyPolicy::set_throughput(double x) {
   throughput_ = x;
 }
 
+void MatlBuyPolicy::set_freq_active(int x) {
+  assert(x > 0);
+  freq_active_ = x;
+}
+
+void MatlBuyPolicy::set_freq_dormant(int x) {
+  assert(x >= 0);
+  freq_dormant_ = x;
+}
+
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name) {
   Trader::manager_ = manager;
@@ -78,6 +90,21 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   name_ = name;
   set_fill_to(fill_to);
   set_req_when_under(req_when_under);
+  return *this;
+}
+
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
+                                   std::string name, double throughput,
+                                   int freq_active,
+                                   int freq_dormant) {
+  Trader::manager_ = manager;
+  buf_ = buf;
+  name_ = name;
+  set_fill_to(fill_to);
+  set_req_when_under(req_when_under);
+  set_throughput(throughput);
+  set_freq_active(freq_active);
+  set_freq_dormant(freq_dormant);
   return *this;
 }
 
@@ -136,7 +163,13 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   rsrc_commods_.clear();
   std::set<RequestPortfolio<Material>::Ptr> ports;
   bool make_req = buf_->quantity() < req_when_under_ * buf_->capacity();
-  double amt = TotalQty();
+  double amt;
+  int cycle = freq_active_ + freq_dormant_;
+  if (context()->time() % cycle) < freq_active_;
+    amt = TotalQty();
+  else
+    // in dormant part of cycle, return empty portfolio
+    amt = 0;
   if (!make_req || amt < eps())
     return ports;
 
