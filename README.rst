@@ -111,7 +111,7 @@ To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18
 - ``conda install -y openssh gxx_linux-64=12.2 gcc_linux-64=12.2 cmake make 
   docker-pycreds git xo python-json-logger python=3.10 glibmm glib libxml2 libxmlpp
   libblas libcblas liblapack pkg-config coincbc boost-cpp hdf5 sqlite pcre gettext 
-  bzip2 xz setuptools nose pytables pandas jinja2 cython websockets pprintpp``
+  bzip2 xz setuptools nose pytables pandas jinja2 cython=0.29 websockets pprintpp``
 
 - Use ``sudo apt install`` to install and configure git
 
