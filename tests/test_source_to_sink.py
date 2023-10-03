@@ -14,11 +14,20 @@ from helper import tables_exist, find_ids, exit_times, \
 
 INPUT = os.path.join(os.path.dirname(__file__), "input")
 
-def check_source_to_sink(fname, source_spec, sink_spec):
+@pytest.fixture(params=[("source_to_sink.xml", ":agents:Source", ":agents:Sink"),
+                        ("source_to_sink.py", ":cyclus.pyagents:Source", ":cyclus.pyagents:Sink"),
+                        ])
+def source_to_sink_case(request):
+    yield request.param
+
+def test_source_to_sink(source_to_sink_case):
     """Tests linear growth of sink inventory by checking if the transactions
     were of equal quantities and only between sink and source facilities.
     """
     clean_outs()
+
+    fname, source_spec, sink_spec = source_to_sink_case
+
     if not cyclus_has_coin():
         pytest.skip("Cyclus does not have COIN")
 
@@ -102,9 +111,3 @@ def check_source_to_sink(fname, source_spec, sink_spec):
         clean_outs()
 
 
-def test_source_to_sink():
-    cases = [("source_to_sink.xml", ":agents:Source", ":agents:Sink"),
-             ("source_to_sink.py", ":cyclus.pyagents:Source", ":cyclus.pyagents:Sink"),
-             ]
-    for case in cases:
-        check_source_to_sink(*case)

@@ -28,8 +28,6 @@ from cycpp import CloneFilter, InitFromCopyFilter, \
 
 import cycpp
 
-# assert_equal.__self__.maxDiff = None  !! this may not be necessary for pytest???
-
 class MockMachine(object):
     def __init__(self):
         self.depth = 0

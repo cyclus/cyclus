@@ -9,7 +9,6 @@ import unittest
 import subprocess
 import tempfile
 from contextlib import contextmanager
-from functools import wraps
 import pytest
 
 
@@ -17,9 +16,6 @@ from cyclus import lib as libcyclus
 
 if sys.version_info[0] >= 3:
     basestring = str
-
-#unit = attr('unit')
-#integration = attr('integration')
 
 INPUT = os.path.join(os.path.dirname(__file__), "input")
 
@@ -77,7 +73,10 @@ def clean_import(name, paths=None):
     """
     sys.path = paths + sys.path
     origmods = set(sys.modules.keys())
-    mod = imp.load_module(name, *imp.find_module(name, paths))
+    spec =  importlib.machinery.PathFinder.find_spec(name, paths)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    sys.modules[name] = mod
     yield mod
     sys.path = sys.path[len(paths):]
     del mod
@@ -168,7 +167,6 @@ def libcyclus_setup():
 
 
 def dbtest(f):
-    @wraps(f)
     def wrapper():
         for fname, oname, backend in DBS:
             if os.path.exists(fname):
@@ -177,7 +175,6 @@ def dbtest(f):
             db = backend(fname)
             f(db, fname, backend)
     return wrapper
-
 
 
 

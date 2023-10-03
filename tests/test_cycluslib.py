@@ -8,7 +8,7 @@ from cyclus import lib
 from tools import libcyclus_setup, dbtest
 
 
-#setup = libcyclus_setup
+setup = libcyclus_setup
 
 @dbtest
 def test_name(db, fname, backend):

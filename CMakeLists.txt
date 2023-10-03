@@ -13,13 +13,13 @@ ENDIF()
 # This project name is cyclus.
 PROJECT(CYCLUS)
 
-# check for and enable c++11 support (required for cyclus)
+# check for and enable c++17 support (required for cyclus)
 INCLUDE(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
-IF(COMPILER_SUPPORTS_CXX11)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
+IF(COMPILER_SUPPORTS_CXX17)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 ELSE()
-    MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++14 support. Please use a different C++ compiler.")
+    MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler.")
 ENDIF()
 
 # enable assembly
@@ -106,7 +106,6 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Tell CMake where the modules are
     MESSAGE("-- CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
     LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
- #       "/opt/conda/share/cmake-3.25/Modules" 
         "${PROJECT_SOURCE_DIR}/cmake")
 
     # Include macros
@@ -175,7 +174,10 @@ IF(NOT CYCLUS_DOC_ONLY)
     message("-- LibXML2 Include Dir: ${LIBXML2_INCLUDE_DIR}")
 
     # Then use pkg-config for locate specific package
-    pkg_check_modules(LIBXMLXX REQUIRED IMPORTED_TARGET libxml++-4.0)
+    pkg_check_modules(LIBXMLXX IMPORTED_TARGET libxml++-4.0)
+    IF ( NOT LIBXMLXX_LIBRARIES )
+       pkg_check_modules(LIBXMLXX REQUIRED IMPORTED_TARGET libxml++-2.6)
+    ENDIF ( NOT LIBXMLXX_LIBRARIES )
     SET(LIBS ${LIBS} ${LIBXMLXX_LIBRARIES})
     message("-- LibXML++ Include Dir: ${LIBXMLXX_INCLUDE_DIRS}")
     message("-- LibXML++ Librarires: ${LIBXMLXX_LIBRARIES}")
@@ -488,7 +490,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libboost-program-options-dev (>= 1.54.0)")
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libboost-serialization-dev (>= 1.54.0)")
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libhdf5-dev (>= 1.8.11)")
-    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libxml++4.0-dev (>= 4.0.0)")
+    SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, libxml++2.6-dev (>= 2.6.0)")
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "${CPACK_DEBIAN_PACKAGE_DEPENDS}, coinor-libcbc-dev (>= 2.8.7)")
     MESSAGE("CPACK_DEBIAN_PACKAGE_DEPENDS ${CPACK_DEBIAN_PACKAGE_DEPENDS}")
 

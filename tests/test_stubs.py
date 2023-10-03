@@ -3,7 +3,6 @@ import subprocess
 import shutil
 import sys
 import tempfile
-import io
 from contextlib import contextmanager
 import pytest
 
@@ -16,7 +15,8 @@ def tmpdir():
 
 @contextmanager
 def tmplog(fname):
-    yield io.open(fname, mode='w')
+    file_ptr = open(fname, mode='w')
+    yield file_ptr
     os.remove(fname)
 
 def test_stubs():

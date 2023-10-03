@@ -157,7 +157,7 @@ std::string XmlToJson(std::string s) {
   jroot[rootname] = Value(Json::objectValue);
   AddXmlToJson(&xroot, jroot[rootname], rootname);
   Json::CustomWriter writer = Json::CustomWriter("{", "}", "[", "]", ": ",
-                                                 ", ", " ", 80);
+                                                 ",", " ", 1);
   return writer.write(jroot);
 }
 

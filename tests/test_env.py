@@ -22,7 +22,7 @@ def test_paths():
         assert  isinstance(path, str)
     assert  len(ENV.env_delimiter) > 0
     assert  len(ENV.path_delimiter) > 0
-    assert  len(ENV.find_module('agents')) > 0
+    assert  len(ENV.find_module('libagents.so')) > 0
 
 
 def test_nuc_data():

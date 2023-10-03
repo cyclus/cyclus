@@ -3,9 +3,6 @@
 import os
 import sqlite3
 import pytest
-
-
-
 import numpy as np
 import tables
 from helper import tables_exist, find_ids, exit_times, \
@@ -16,12 +13,21 @@ from tools import check_cmd, cyclus_has_coin
 
 INPUT = os.path.join(os.path.dirname(__file__), "input")
 
-def check_null_sink(fname, given_spec):
+@pytest.fixture(params=[("null_sink.xml", ":agents:Sink"),
+                        ("null_sink.py", ":cyclus.pyagents:Sink")])
+def null_sink_case(request):
+    yield request.param
+
+
+def test_null_sink(null_sink_case):
     """Testing for null sink case without a source facility.
 
     No transactions are expected in this test; therefore, a table with
     transaction records must not exist in order to pass this test.
     """
+
+    fname, given_spec = null_sink_case
+
     clean_outs()
     if not cyclus_has_coin():
         pytest.skip("Cyclus does not have COIN")
@@ -73,10 +79,4 @@ def check_null_sink(fname, given_spec):
     assert not tables_exist(outfile, illegal_paths)
     clean_outs()
 
-
-def test_null_sink():
-    cases = [("null_sink.xml", ":agents:Sink"),
-             ("null_sink.py", ":cyclus.pyagents:Sink")]
-    for case in cases:
-        check_null_sink(*case)
 
