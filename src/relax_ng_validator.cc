@@ -15,7 +15,6 @@
 #include <libxml++/document.h>
 
 #include "error.h"
-#include <iostream>
 
 namespace cyclus {
 
@@ -83,11 +82,9 @@ bool RelaxNGValidator::Validate(const xmlpp::Document* doc) {
   }
 
 
-  std::cout << (xmlDocPtr)doc->cobj();
-
-  // if (res != 0) {
-  //   throw ValidationError("Document failed schema validation");
-  //}
+  if (res != 0) {
+    throw ValidationError("Document failed schema validation");
+  }
   
   return res;
 }
