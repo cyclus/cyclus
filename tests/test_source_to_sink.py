@@ -109,5 +109,3 @@ def test_source_to_sink(source_to_sink_case):
         assert_array_equal, quantities, expected_quantities
 
         clean_outs()
-
-
