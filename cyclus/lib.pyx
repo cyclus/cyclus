@@ -1856,10 +1856,10 @@ cpdef dict normalize_request_portfolio(object inp):
             if isinstance(val, ts.Resource):
                 req = default_req.copy()
                 req['target'] = val
-                #if 'preference' in inp['commodities'][index]:
-                req['preference'] = inp['commodities'][index]['preference']
-                #if 'exclusive' in inp['commoditites'][index]:
-                req['exclusive'] = inp['commodities'][index]['exclusive']
+                if 'preference' in inp['commodities'][index]:
+                    req['preference'] = inp['commodities'][index]['preference']
+                if 'exclusive' in inp['commoditites'][index]:
+                    req['exclusive'] = inp['commodities'][index]['exclusive']
                 commods[index][key] = [req]
 
             elif isinstance(val, Mapping):
