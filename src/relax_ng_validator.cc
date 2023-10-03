@@ -84,7 +84,7 @@ bool RelaxNGValidator::Validate(const xmlpp::Document* doc) {
   if (res != 0) {
     throw ValidationError("Document failed schema validation");
   }
-  
+
   return res;
 }
 
