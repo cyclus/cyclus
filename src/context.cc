@@ -22,6 +22,8 @@ SimInfo::SimInfo()
       m0(0),
       dt(kDefaultTimeStepDur),
       decay("manual"),
+      seed(kDefaultSeed),
+      stride(kDefaultStride),
       branch_time(-1),
       explicit_inventory(false),
       explicit_inventory_compact(false),
@@ -34,6 +36,8 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
       m0(m0),
       dt(kDefaultTimeStepDur),
       decay("manual"),
+      seed(kDefaultSeed),
+      stride(kDefaultStride),
       branch_time(-1),
       handle(handle),
       explicit_inventory(false),
@@ -47,6 +51,8 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d)
       m0(m0),
       dt(kDefaultTimeStepDur),
       decay(d),
+      seed(kDefaultSeed),
+      stride(kDefaultStride),
       branch_time(-1),
       handle(handle),
       explicit_inventory(false),
@@ -62,6 +68,8 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
       m0(-1),
       dt(kDefaultTimeStepDur),
       decay("manual"),
+      seed(kDefaultSeed),
+      stride(kDefaultStride),
       parent_sim(parent_sim),
       parent_type(parent_type),
       branch_time(branch_time),
@@ -184,6 +192,8 @@ void Context::InitSim(SimInfo si) {
       ->AddVal("InitialYear", si.y0)
       ->AddVal("InitialMonth", si.m0)
       ->AddVal("Duration", si.duration)
+      ->AddVal("Seed", si.seed)
+      ->AddVal("Stride", si.stride)
       ->AddVal("ParentSimId", si.parent_sim)
       ->AddVal("ParentType", si.parent_type)
       ->AddVal("BranchTime", si.branch_time)
@@ -209,6 +219,11 @@ void Context::InitSim(SimInfo si) {
   // be removed.
   NewDatum("TimeStepDur")
       ->AddVal("DurationSecs", static_cast<int>(si.dt))
+      ->Record();
+
+  NewDatum("RNGInfo")
+      ->AddVal("Seed", static_cast<int>(si.seed))
+      ->AddVal("Stride", static_cast<int>(si.stride))
       ->Record();
 
   NewDatum("Epsilon")

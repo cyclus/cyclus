@@ -451,6 +451,11 @@ void XMLFileLoader::LoadControlParams() {
   double eps_rsrc_ = OptionalQuery<double>(qe, "tolerance_resource", 1e-6);
   cy_eps_rsrc = si.eps_rsrc = eps_rsrc_;
 
+    // get seed
+  si.seed = OptionalQuery<int>(qe, "seed", kDefaultSeed);
+
+  // get stride
+  si.stride = OptionalQuery<int>(qe, "stride", kDefaultStride);
 
   ctx_->InitSim(si);
 }

@@ -21,6 +21,10 @@
 
 const uint64_t kDefaultTimeStepDur = 2629846;
 
+const uint64_t kDefaultSeed = 0;
+
+const uint64_t kDefaultStride = 10000;
+
 class SimInitTest;
 
 namespace cyclus {
@@ -114,6 +118,13 @@ class SimInfo {
   /// every time step in a table (i.e. agent ID, Time, Quantity,
   /// Composition-object and/or reference).
   bool explicit_inventory_compact;
+
+  /// Seed for random number generator
+  uint64_t seed;
+
+  /// Stride length. Each agent will initialize a new random number generator
+  /// from the seed plus the agent's id times the stride length.
+  uint64_t stride;
 };
 
 /// A simulation context provides access to necessary simulation-global
@@ -236,6 +247,12 @@ class Context {
 
   /// Returns the duration of a single time step in seconds.
   inline uint64_t dt() {return si_.dt;};
+
+  /// Returns the seed for the random number generator.
+  inline uint64_t seed() {return si_.seed;};
+
+  /// Returns the stride for the random number generator.
+  inline uint64_t stride() {return si_.stride;};
 
   /// Return static simulation info.
   inline SimInfo sim_info() const {

@@ -159,6 +159,8 @@ void SimInit::LoadInfo() {
   // TODO: when the backends support uint64_t, the int template here
   // should be updated to uint64_t.
   si_.dt = qr.GetVal<int>("DurationSecs");
+  si_.seed = qr.GetVal<int>("Seed");
+  si_.stride = qr.GetVal<int>("Stride");
 
   qr = b_->Query("Epsilon", NULL);
   si_.eps = qr.GetVal<double>("GenericEpsilon");
