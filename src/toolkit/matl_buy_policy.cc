@@ -20,8 +20,8 @@ MatlBuyPolicy::MatlBuyPolicy() :
     quantize_(-1),
     fill_to_(1),
     req_when_under_(1),
-    freq_active_(1),
-    freq_dormant_(0){
+    active_(1),
+    dormant_(0){
   Warn<EXPERIMENTAL_WARNING>(
       "MatlBuyPolicy is experimental and its API may be subject to change");
 }
@@ -55,14 +55,14 @@ void MatlBuyPolicy::set_throughput(double x) {
   throughput_ = x;
 }
 
-void MatlBuyPolicy::set_freq_active(int x) {
+void MatlBuyPolicy::set_active(int x) {
   assert(x > 0);
-  freq_active_ = x;
+  active_ = x;
 }
 
-void MatlBuyPolicy::set_freq_dormant(int x) {
+void MatlBuyPolicy::set_dormant(int x) {
   assert(x >= 0);
-  freq_dormant_ = x;
+  dormant_ = x;
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
@@ -95,14 +95,16 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name, double throughput,
-                                   int freq_active,
-                                   int freq_dormant) {
+                                   int active,
+                                   int dormant) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
   set_throughput(throughput);
-  set_freq_active(freq_active);
-  set_freq_dormant(freq_dormant);
+  set_active(active);
+  set_dormant(dormant);
+  LGH(INFO3) << "has buy policy with active = " << active_ \
+             << "time steps and dormant = " << dormant_ << " time steps." ;
   return *this;
 }
 
@@ -162,13 +164,14 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   std::set<RequestPortfolio<Material>::Ptr> ports;
   bool make_req = buf_->quantity() < req_when_under_ * buf_->capacity();
   double amt;
-  int cycle = freq_active_ + freq_dormant_;
-  if ((manager()->context()->time() % cycle) < freq_active_) {
+  
+  if (manager()->context()->time() % (active_ + dormant_) < active_) {
     amt = TotalQty();
   }
   else {
     // in dormant part of cycle, return empty portfolio
     amt = 0;
+    LGH(INFO3) << "in dormant period for time step " << manager()->context()->time() << ", requesting " << amt << " kg." ;
   }
   if (!make_req || amt < eps())
     return ports;

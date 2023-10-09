@@ -84,8 +84,8 @@ class MatlBuyPolicy : public Trader {
   /// capacity.  The "on" and "off" phases are sampled and rounded to the
   /// nearest integer number of time steps from a truncated normal
   /// distribution from a mean, standard deviation, min, and max value.
-  /// @param freq_active the length of the on, actively buying period
-  /// @param freq_dormant the length of the dormant period
+  /// @param active the length of the on, actively buying period
+  /// @param dormant the length of the dormant period
   /// @{
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
@@ -93,8 +93,8 @@ class MatlBuyPolicy : public Trader {
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       double fill_to, double req_when_under);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      double throughput, int freq_active,
-                      int freq_dormant);
+                      double throughput, int active,
+                      int dormant);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       double throughput, double fill_to,
                       double req_when_under, double quantize);
@@ -172,13 +172,13 @@ class MatlBuyPolicy : public Trader {
   void set_req_when_under(double x);
   void set_quantize(double x);
   void set_throughput(double x);
-  void set_freq_active(int x);
-  void set_freq_dormant(int x);
+  void set_active(int x);
+  void set_dormant(int x);
 
   ResBuf<Material>* buf_;
   std::string name_;
   double fill_to_, req_when_under_, quantize_, throughput_;
-  int freq_active_, freq_dormant_;
+  int active_, dormant_;
   std::map<Material::Ptr, std::string> rsrc_commods_;
   std::map<std::string, CommodDetail> commod_details_;
 };
