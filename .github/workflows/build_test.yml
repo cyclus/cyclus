@@ -1,0 +1,51 @@
+name: Linux Build/Test for PR and collaborator push
+
+on:
+  # allows us to run workflows manually
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/workflows/build_test_publish.yml'
+      - '.github/workflows/changelog_test.yml'
+      - 'docker/**'
+      - 'doc/**'
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '.github/workflows/build_test_publish.yml'
+      - '.github/workflows/changelog_test.yml'
+      - 'docker/**'
+      - 'doc/**'
+
+jobs:
+  BuildTest:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        ubuntu_versions : [
+          22.04,
+          ]
+        pkg_mgr : [
+            apt,
+            conda
+        ]
+
+    container:
+      image: ghcr.io/${{ github.repository_owner }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Building Cyclus
+        run: python install.py -j 2 --build-type=Release --core-version 999999.999999 
+
+      - name: Cyclus Unit Tests
+        run: cyclus_unit
+
+      - name: Cyclus Python Tests
+        run: pytest tests
