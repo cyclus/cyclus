@@ -46,7 +46,7 @@ jobs:
         run: python install.py -j 2 --build-type=Release --core-version 999999.999999 
 
       - name: Cyclus Unit Tests
-        run: /root/.local/bin/cyclus_unit_tests
+        run: ./build/bin/cyclus_unit_tests
 
       - name: Cyclus Python Tests
-        run: pytest-3 tests
+        run: cd tests && python -m pytest
