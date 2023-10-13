@@ -8,7 +8,6 @@ on:
       - main
     paths-ignore:
       - '.github/workflows/build_test_publish.yml'
-      - '.github/workflows/build_test.yml'
       - '.github/workflows/changelog_test.yml'
       - 'docker/**'
       - 'doc/**'
@@ -47,7 +46,7 @@ jobs:
         run: python install.py -j 2 --build-type=Release --core-version 999999.999999 
 
       - name: Cyclus Unit Tests
-        run: cyclus_unit_test
+        run: cyclus_unit_tests
 
       - name: Cyclus Python Tests
         run: pytest tests
