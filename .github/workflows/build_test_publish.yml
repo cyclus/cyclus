@@ -1,4 +1,4 @@
-name: Build, Test & Publish docker images for future CI and other users
+name: Build and Test Dependency Images
 
 on:
   # allows us to run workflows manually

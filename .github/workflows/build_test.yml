@@ -1,4 +1,4 @@
-name: Linux Build/Test for PR and collaborator push
+name: Build/Test for PR and collaborator push
 
 on:
   # allows us to run workflows manually
@@ -35,7 +35,7 @@ jobs:
         ]
 
     container:
-      image: ghcr.io/${{ github.repository_owner }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
+      image: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps
 
     steps:
       - name: Checkout repository
