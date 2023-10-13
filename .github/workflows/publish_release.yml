@@ -1,8 +1,6 @@
 name: Publish Cyclus Release
 
 on:
-  # allows us to run workflows manually
-  workflow_dispatch:
   release:
     types: [published, created, edited]
 
@@ -46,7 +44,7 @@ jobs:
         uses: firehed/multistage-docker-build-action@v1
         with:
           repository: ghcr.io/${{ github.repository_owner }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}_${{ github.ref }}
-          stages: ${{ matrix.pkg_mgr }}-deps, cyclus # nice to have the deps image pushed for a release
+          stages: ${{ matrix.pkg_mgr }}-deps, cyclus
           server-stage: cyclus-test
           quiet: false
           parallel: true
