@@ -45,11 +45,8 @@ jobs:
       - name: Building Cyclus
         run: python install.py -j 2 --build-type=Release --core-version 999999.999999 
 
-      - name: Add Cyclus binaries to PATH
-        run: echo "PATH=/root/.local/bin:$PATH" >> "$GITHUB_ENV"
-
       - name: Cyclus Unit Tests
-        run: cyclus_unit_tests
+        run: /root/.local/bin/cyclus_unit_tests
 
       - name: Cyclus Python Tests
-        run: pytest tests
+        run: pytest-3 tests
