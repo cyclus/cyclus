@@ -9,8 +9,6 @@ on:
       - '.github/workflows/build_test_publish.yml'
       - '.github/workflows/changelog_test.yml'
       - 'docker/**'
-    paths-ignore:
-      - 'doc/**'
 
 jobs:
   build-dependency-and-test-img:
