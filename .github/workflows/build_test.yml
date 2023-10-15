@@ -47,11 +47,11 @@ jobs:
 
       - name: Add bins to PATH
         run: |
-          echo "PATH=/root/.local/bin:$PATH" >> $GITHUB_ENV
+          echo "PATH=/root/.local/bin:$PATH" >> "$GITHUB_ENV"
 
       - name: Add libs to LD_LIBRARY_PATH
         run: |
-          echo "LD_LIBRARY_PATH=/root/.local/lib:/root/.local/lib/cyclus:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=/root/.local/lib:/root/.local/lib/cyclus:$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
 
       - name: Confirm PATH
         run: |
