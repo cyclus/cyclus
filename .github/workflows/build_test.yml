@@ -53,17 +53,9 @@ jobs:
         run: |
           echo "LD_LIBRARY_PATH=/root/.local/lib:/root/.local/lib/cyclus:$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
 
-      - name: Confirm PATH
-        run: |
-          echo $PATH
-
-      - name: Confirm LD_LIBRARY_PATH
-        run: |
-          echo $LD_LIBRARY_PATH
-
       - name: Cyclus Unit Tests
         run: |
-          cyclus_unit_tests
+          /root/.local/bin/cyclus_unit_tests
 
       - name: Cyclus Python Tests
         run: |
