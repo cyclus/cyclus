@@ -46,10 +46,10 @@ jobs:
         run: python install.py -j 2 --build-type=Release --core-version 999999.999999 
 
       - name: Add bins to PATH
-        run: echo "/root/.local/bin:$PATH" >> $GITHUB_ENV
+        run: echo "PATH=/root/.local/bin:$PATH" >> $GITHUB_ENV
 
       - name: Add libs to LD_LIBRARY_PATH
-        run: echo "/root/.local/lib:/root/.local/lib/cyclus:$LD_LIBRARY_PATH" >> $GITHUB_ENV
+        run: echo "LD_LIBRARY_PATH=/root/.local/lib:/root/.local/lib/cyclus:$LD_LIBRARY_PATH" >> $GITHUB_ENV
 
       - name: Cyclus Unit Tests
         run: cyclus_unit_tests
