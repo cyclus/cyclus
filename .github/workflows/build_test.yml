@@ -34,7 +34,7 @@ jobs:
             apt,
             conda
         ]
-
+    
     container:
       image: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps
 
@@ -45,8 +45,14 @@ jobs:
       - name: Building Cyclus
         run: python install.py -j 2 --build-type=Release --core-version 999999.999999 
 
+      - name: Add bins to PATH
+        run: echo "/root/.local/bin:$PATH" >> $GITHUB_PATH
+
+      - name: Add libs to LD_LIBRARY_PATH
+        run: echo "/root/.local/lib:/root/.local/lib/cyclus:$LD_LIBRARYPATH" >> $GITHUB_PATH
+
       - name: Cyclus Unit Tests
-        run: ./build/bin/cyclus_unit_tests
+        run: cyclus_unit_tests
 
       - name: Cyclus Python Tests
         run: cd tests && python -m pytest --ignore test_main.py
