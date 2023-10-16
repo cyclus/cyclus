@@ -41,14 +41,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Building Cyclus
-        run: python install.py -j 2 --build-type=Release --core-version 999999.999999 
-
-      - name: Add bins to PATH
         run: |
+          python install.py -j 2 --build-type=Release --core-version 999999.999999 
           echo "PATH=${HOME}/.local/bin:$PATH" >> "$GITHUB_ENV"
-
-      - name: Add libs to LD_LIBRARY_PATH
-        run: |
           echo "LD_LIBRARY_PATH=${HOME}/.local/lib:${HOME}/.local/lib/cyclus:$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
 
       - name: Cyclus Unit Tests
