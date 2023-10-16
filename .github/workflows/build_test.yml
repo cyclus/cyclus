@@ -12,8 +12,6 @@ on:
       - 'docker/**'
       - 'doc/**'
   push:
-    branches:
-      - main
     paths-ignore:
       - '.github/workflows/build_test_publish.yml'
       - '.github/workflows/changelog_test.yml'
