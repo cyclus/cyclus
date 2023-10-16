@@ -59,8 +59,13 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
 ENV PATH /opt/conda/bin:$PATH
 
 RUN conda config --add channels conda-forge
+# RUN conda config --set channel_priority flexible
 RUN conda update -n base -c defaults conda
+RUN conda install -y conda-libmamba-solver
+RUN conda config --set solver libmamba
 RUN conda install -y mamba
+RUN conda uninstall conda-libmamba-solver
+RUN conda config --set solver classic
 RUN conda update -y --all && \
     mamba install -y \
                openssh \
