@@ -18,6 +18,7 @@
 #include "greedy_solver.h"
 #include "pyhooks.h"
 #include "recorder.h"
+#include "random_number_generator.h"
 
 const uint64_t kDefaultTimeStepDur = 2629846;
 
@@ -37,6 +38,7 @@ class Timer;
 class TimeListener;
 class SimInit;
 class DynamicModule;
+class RandomNumberGenerator;
 
 /// Container for a static simulation-global parameters that both describe
 /// the simulation and affect its behavior.
@@ -122,8 +124,10 @@ class SimInfo {
   /// Seed for random number generator
   uint64_t seed;
 
-  /// Stride length. Each agent will initialize a new random number generator
-  /// from the seed plus the agent's id times the stride length.
+  /// Stride length. Currently unused, but available for future development 
+  /// that may wish to initiate multiple random number generators from the
+  /// same seed, skipping forward in the sequence by the stride length times
+  /// some parameter, such as the agent_id. 
   uint64_t stride;
 };
 
@@ -245,6 +249,9 @@ class Context {
   /// Returns the current simulation timestep.
   virtual int time();
 
+  /// Returns the next random number.
+  virtual int randomnumber();
+
   /// Returns the duration of a single time step in seconds.
   inline uint64_t dt() {return si_.dt;};
 
@@ -329,6 +336,7 @@ class Context {
   ExchangeSolver* solver_;
   Recorder* rec_;
   int trans_id_;
+  RandomNumberGenerator* rng_;
 };
 
 }  // namespace cyclus

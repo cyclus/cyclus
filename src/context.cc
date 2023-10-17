@@ -237,10 +237,16 @@ void Context::InitSim(SimInfo si) {
 
   si_ = si;
   ti_->Initialize(this, si);
+  rng_->Initialize(this,si);
+
 }
 
 int Context::time() {
   return ti_->time();
+}
+
+int Context::randomnumber() {
+  return rng_->randomnumber();
 }
 
 void Context::RegisterTimeListener(TimeListener* tl) {
