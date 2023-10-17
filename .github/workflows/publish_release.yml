@@ -1,41 +1,35 @@
-name: Build and Test Dependency Images
+name: Publish Cyclus Release
 
 on:
-  # allows us to run workflows manually
-  workflow_dispatch:
-  pull_request:
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/build_test_publish.yml'
-      - 'docker/**'
+  release:
+    types: [published, created, edited]
 
 jobs:
-  build-dependency-and-test-img:
+  build-and-test-for-release:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         ubuntu_versions : [
           22.04,
-          ]
+        ]
         pkg_mgr : [
           apt,
-          conda,
+          conda
         ]
 
     name: Installing Dependencies, Building cyclus and running tests
     steps:
       - name: default environment
         run: |
-          echo "tag-latest-on-default=false" >> "$GITHUB_ENV"
-
+            echo "tag-latest-on-default=false" >> "$GITHUB_ENV"
+    
       - name: condition on trigger parameters
-        if: ${{ github.repository_owner == 'cyclus' && github.ref == 'refs/heads/main' }}
+        if: ${{ github.repository_owner == 'cyclus' }}
         run: |
-          echo "tag-latest-on-default=true" >> "$GITHUB_ENV"
-
+            echo "tag-latest-on-default=true" >> "$GITHUB_ENV"
+    
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:
@@ -49,7 +43,7 @@ jobs:
       - name: Installing Dependencies in Docker image
         uses: firehed/multistage-docker-build-action@v1
         with:
-          repository: ghcr.io/${{ github.repository_owner }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
+          repository: ghcr.io/${{ github.repository_owner }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}_${{ github.ref }}
           stages: ${{ matrix.pkg_mgr }}-deps, cyclus
           server-stage: cyclus-test
           quiet: false
