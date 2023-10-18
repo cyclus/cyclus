@@ -1,7 +1,8 @@
 ARG pkg_mgr=apt
 ARG make_cores=2
+ARG ubuntu_version=22.04
 
-FROM ubuntu:22.04 as common-base
+FROM ubuntu:${ubuntu_version} as common-base
 
 ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
