@@ -4,6 +4,9 @@ on:
   # allows us to run workflows manually
   workflow_dispatch:
   pull_request:
+    paths:
+      - '.github/workflows/build_test_publish.yml'
+      - 'docker/**'
   push:
     branches:
       - main
