@@ -18,6 +18,7 @@ Since last release
   correct python3 version (#1558)
 * build and test are now fown on githubAction in place or CircleCI (#1569)
 * Have separate workflows for testing, publishing dependency images, and publishing release images (#1597)
+* Add Ubuntu 20.04 to the workflow matrices (#1603)
 
 
 **Changed:**
