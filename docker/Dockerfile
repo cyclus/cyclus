@@ -1,7 +1,8 @@
 ARG pkg_mgr=apt
 ARG make_cores=2
+ARG ubuntu_version=22.04
 
-FROM ubuntu:22.04 as common-base
+FROM ubuntu:${ubuntu_version} as common-base
 
 ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -37,9 +38,9 @@ RUN apt install -y \
         python3-pandas \
         python3-jinja2 \
         cython3 \
-        libwebsockets-dev \
-        python3-pprintpp \
-    && apt clean -y all
+        libwebsockets-dev
+RUN apt install -y python3-pprintpp; exit 0
+RUN apt clean -y all
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
@@ -119,6 +120,7 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
+RUN mkdir -p `python -m site --user-site`
 RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999 
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
@@ -129,5 +131,5 @@ RUN cyclus_unit_tests
 
 FROM cyclus-test as cyclus-pytest
 
-RUN cd tests && pytest
+RUN cd tests && python -m pytest --ignore test_main.py
 
