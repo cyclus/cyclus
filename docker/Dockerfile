@@ -38,7 +38,8 @@ RUN apt install -y \
         python3-pandas \
         python3-jinja2 \
         cython3 \
-        libwebsockets-dev
+        libwebsockets-dev 
+
 RUN apt install -y python3-pprintpp; exit 0
 RUN apt clean -y all
 
