@@ -51,3 +51,4 @@ jobs:
       - name: Cyclus Python Tests
         run: |
           cd tests && python -m pytest --ignore test_main.py
+          
