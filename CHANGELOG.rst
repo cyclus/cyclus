@@ -36,6 +36,7 @@ Since last release
 * Issue #1312. (#1560)
 * fix sell_policy that was offering bids when capacity was inbetween 0 and the
   quantize, bids that one was not able to fullfill and caused cyclus to crash. (#1552)
+* Deprecation warnings involving <boost/detail/sp_typeinfo.hpp> (#1611)
 
 
 
