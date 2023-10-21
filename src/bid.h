@@ -2,6 +2,7 @@
 #define CYCLUS_SRC_BID_H_
 
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 #include <limits>
 
 #include "request.h"

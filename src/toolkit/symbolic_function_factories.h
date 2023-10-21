@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <sstream>
+#include <boost/shared_ptr.hpp>
 
 #include "symbolic_functions.h"
 
