@@ -45,7 +45,6 @@ RUN apt clean -y all
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 RUN mkdir -p `python -m site --user-site`
-ENV PYTHONPATH `python -m site --user-site`
 
 FROM common-base as conda-deps
 
@@ -107,7 +106,6 @@ RUN conda update -y --all && \
     mamba install -y --force-reinstall libsqlite && \
     conda clean -y --all
 RUN mkdir -p `python -m site --user-site`
-ENV PYTHONPATH `python -m site --user-site`
 ENV CC /opt/conda/bin/x86_64-conda_cos6-linux-gnu-gcc
 ENV CXX /opt/conda/bin/x86_64-conda_cos6-linux-gnu-g++
 ENV CPP /opt/conda/bin/x86_64-conda_cos6-linux-gnu-cpp
