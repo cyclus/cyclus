@@ -44,6 +44,8 @@ RUN apt install -y python3-pprintpp; exit 0
 RUN apt clean -y all
 
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+RUN mkdir -p `python -m site --user-site`
+ENV PYTHONPATH `python -m site --user-site`
 
 FROM common-base as conda-deps
 
@@ -104,10 +106,11 @@ RUN conda update -y --all && \
                && \
     mamba install -y --force-reinstall libsqlite && \
     conda clean -y --all
+RUN mkdir -p `python -m site --user-site`
+ENV PYTHONPATH `python -m site --user-site`
 ENV CC /opt/conda/bin/x86_64-conda_cos6-linux-gnu-gcc
 ENV CXX /opt/conda/bin/x86_64-conda_cos6-linux-gnu-g++
 ENV CPP /opt/conda/bin/x86_64-conda_cos6-linux-gnu-cpp
-ENV PYTHONPATH "/root/.local/lib/python3.10/site-packages/"
 
 FROM ${pkg_mgr}-deps as cyclus
 ARG make_cores=2
@@ -121,7 +124,6 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
-RUN mkdir -p `python -m site --user-site`
 RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999 
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
