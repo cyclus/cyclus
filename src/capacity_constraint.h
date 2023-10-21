@@ -1,6 +1,7 @@
 #ifndef CYCLUS_SRC_CAPACITY_CONSTRAINT_H_
 #define CYCLUS_SRC_CAPACITY_CONSTRAINT_H_
 
+#include <boost/core/typeinfo.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "error.h"

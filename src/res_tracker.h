@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <boost/core/typeinfo.hpp>
 
 #include "context.h"
 #include "resource.h"

@@ -5,6 +5,7 @@
 #include <sstream>
 #include <string>
 
+#include <boost/core/typeinfo.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "bid.h"

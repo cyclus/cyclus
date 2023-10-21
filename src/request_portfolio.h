@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/core/typeinfo.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "capacity_constraint.h"
