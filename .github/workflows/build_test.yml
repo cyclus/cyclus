@@ -39,11 +39,6 @@ jobs:
       - name: Checkout and Build Cyclus
         uses: actions/checkout@v3
 
-      - name: echo some stuff
-        run: |
-          python -m site --user-site
-          ls /github/home/.local/lib/python3.8/site-packages
-
       - name: Building Cyclus
         run: |
           mkdir `python -m site --user-site`
