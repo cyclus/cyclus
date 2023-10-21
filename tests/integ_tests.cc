@@ -1,6 +1,7 @@
 #include <cmath>
 
 #include <gtest/gtest.h>
+#include <boost/shared_ptr.hpp>
 
 #include "cyclus.h"
 #include "platform.h"
