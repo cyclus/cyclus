@@ -4,7 +4,6 @@
 #include <map>
 #include <string>
 #include <sstream>
-#include <boost/core/typeinfo.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "composition.h"

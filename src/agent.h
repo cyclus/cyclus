@@ -6,8 +6,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/core/typeinfo.hpp>
-
 #include "db_init.h"
 #include "dynamic_module.h"
 #include "infile_tree.h"
