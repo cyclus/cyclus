@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <boost/core/typeinfo.hpp>
 
 #include "context.h"
 #include "resource.h"

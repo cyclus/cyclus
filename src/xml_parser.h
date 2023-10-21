@@ -2,7 +2,6 @@
 #define CYCLUS_SRC_XML_PARSER_H_
 
 #include <sstream>
-#include <boost/core/typeinfo.hpp>
 
 namespace xmlpp {
   class DomParser;

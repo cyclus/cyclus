@@ -2,7 +2,6 @@
 #define CYCLUS_SRC_MATERIAL_H_
 
 #include <list>
-#include <boost/core/typeinfo.hpp>
 #include <boost/shared_ptr.hpp>
 
 #include "composition.h"

@@ -7,7 +7,6 @@
 #include <utility>
 #include <vector>
 
-#include <boost/core/typeinfo.hpp>
 #include <boost/weak_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
