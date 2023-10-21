@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <boost/core/typeinfo.hpp>
 #include <boost/shared_ptr.hpp>
 
 class SimInitTest;

@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
+#include <boost/core/typeinfo.hpp>
 
 #include "db_init.h"
 #include "dynamic_module.h"
