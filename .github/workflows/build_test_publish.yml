@@ -21,7 +21,6 @@ jobs:
     strategy:
       matrix:
         ubuntu_versions : [
-          20.04,
           22.04,
           ]
         pkg_mgr : [
@@ -60,4 +59,4 @@ jobs:
           parallel: true
           tag-latest-on-default: ${{ env.tag-latest-on-default }}
           dockerfile: docker/Dockerfile
-          build-args: pkg_mgr=${{ matrix.pkg_mgr }}, ubuntu_version=${{ matrix.ubuntu_versions }}
+          build-args: pkg_mgr=${{ matrix.pkg_mgr }}
