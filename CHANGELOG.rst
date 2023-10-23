@@ -21,6 +21,7 @@ Since last release
 * Add Ubuntu 20.04 to the list of supported platforms (#1605, #1608)
 * Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599)
 * Adds active and dormant buying cycles in buy policy (#1596)
+* Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599)
 
 **Changed:**
 
