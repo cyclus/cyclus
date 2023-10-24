@@ -19,6 +19,7 @@ Since last release
 * build and test are now fown on githubAction in place or CircleCI (#1569)
 * Have separate workflows for testing, publishing dependency images, and publishing release images (#1597, #1602, #1606, #1609)
 * Add Ubuntu 20.04 to the list of supported platforms (#1605, #1608)
+* AddMutalReqs and AddReciepe functions and exclusive bids in python API of DRE (#1584)
 
 **Changed:**
 
