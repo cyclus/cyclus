@@ -232,7 +232,7 @@ void Context::InitSim(SimInfo si) {
 
   si_ = si;
   ti_->Initialize(this, si);
-  rng_->Initialize(this,si);
+  rng_->Initialize(si);
 
 }
 
@@ -240,8 +240,30 @@ int Context::time() {
   return ti_->time();
 }
 
-int Context::randomnumber() {
-  return rng_->randomnumber();
+int Context::random() {
+  return rng_->random();
+}
+
+double Context::random_01() {
+  return rng_->random_01();
+}
+
+int Context::random_uniform_int(int low, int high) {
+  return rng_->random_uniform_int(low, high);
+}
+
+double Context::random_uniform_real(double low, double high) {
+  return rng_->random_uniform_real(low, high);
+}
+
+double Context::random_normal_real(double mean, double std_dev, double low,
+                                     double high) {
+  return rng_->random_normal_real(mean, std_dev, low, high);
+}
+
+int Context::random_normal_int(double mean, double std_dev, int low,
+                                 int high) {
+  return rng_->random_normal_int(mean, std_dev, low, high);
 }
 
 void Context::RegisterTimeListener(TimeListener* tl) {

@@ -249,8 +249,24 @@ class Context {
   /// Returns the current simulation timestep.
   virtual int time();
 
-  /// Returns the next random number.
-  virtual int randomnumber();
+  int random();
+
+  /// Generates a random number on the range [0,1)]
+  double random_01();
+
+  /// Returns a random number from a uniform integer distribution.
+  int random_uniform_int(int low, int high);
+
+  /// Returns a random number from a uniform real distribution.
+  double random_uniform_real(double low, double high);
+
+  /// Returns a random number from a normal distribution.
+  double random_normal_real(double mean, double std_dev, double low=0,
+                            double high=std::numeric_limits<double>::max());
+
+  /// Returns a random number from a lognormal distribution.
+  int random_normal_int(double mean, double std_dev, int low=0,
+                        int high=std::numeric_limits<int>::max());
 
   /// Returns the duration of a single time step in seconds.
   inline uint64_t dt() {return si_.dt;};
