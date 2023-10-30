@@ -22,7 +22,7 @@
 
 const uint64_t kDefaultTimeStepDur = 2629846;
 
-const uint64_t kDefaultSeed = 0;
+const uint64_t kDefaultSeed = 20160212;
 
 const uint64_t kDefaultStride = 10000;
 

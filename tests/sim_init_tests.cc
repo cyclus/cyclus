@@ -441,8 +441,13 @@ TEST_F(SimInitTest, RestartSimInfo) {
   EXPECT_EQ(2, info.branch_time);
 }
 
+TEST_F(SimInitTest, GetRandom) {
+  std::uint32_t r = ctx->random();
+  EXPECT_GE(r, 0);
+}
+
 TEST_F(SimInitTest, GetRandom01) {
-  std::uint32_t r = ctx->random_01();
+  double r = ctx->random_01();
   EXPECT_GE(r, 0);
   EXPECT_LE(r, 1);
 }
