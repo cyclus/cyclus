@@ -9,6 +9,8 @@
 
 namespace cyclus{
 
+    Generator RandomNumberGenerator::gen_;
+
     void RandomNumberGenerator::Initialize(SimInfo si){
 
         gen_.seed(si.seed);

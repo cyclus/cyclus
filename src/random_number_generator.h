@@ -19,7 +19,7 @@ class RandomNumberGenerator {
 
   private:
     /// Returns a random number for use in a distribution
-    Generator gen_;
+    static Generator gen_;
 
   public:
     RandomNumberGenerator();
@@ -48,7 +48,7 @@ class RandomNumberGenerator {
     // }
     //
     
-    static NormalDist& makeNormalDist(mean, std_dev, min, max) {
+    static NormalDist makeNormalDist(double mean, double std_dev, double min, double max) {
         boost::random::normal_distribution<> dist(mean, std_dev);
         boost::random::variate_generator<Generator&, boost::random::normal_distribution<> > rn(gen_, dist);
 
