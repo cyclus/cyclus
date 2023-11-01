@@ -82,7 +82,10 @@ Context::Context(Timer* ti, Recorder* rec)
       rec_(rec),
       solver_(NULL),
       trans_id_(0),
-      si_(0) {}
+      si_(0) {
+
+        rng_ = new RandomNumberGenerator();
+      }
 
 Context::~Context() {
   if (solver_ != NULL) {

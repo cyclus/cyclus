@@ -10,14 +10,17 @@ namespace cyclus {
 class Context;
 class SimInfo;
 
-typedef boost::mt19937 Generator;
+typedef boost::random::mt19937 Generator;
+typedef boost::random::variate_generator<Generator&, boost::random::normal_distribution<> > NormalDist;
 
 /// A random number generator.
 class RandomNumberGenerator {
     friend class ::SimInitTest;
+
   private:
     /// Returns a random number for use in a distribution
-    Generator& gen_;
+    Generator gen_;
+
   public:
     RandomNumberGenerator();
 
@@ -27,6 +30,30 @@ class RandomNumberGenerator {
     void Initialize(SimInfo si);
 
     std::uint32_t random();
+
+    // in archetype code
+    //
+    // #include "random_number_generator.h"
+    //
+    // class Foo:
+    //    private:
+    //       NormalDist myNormalDist;
+    //
+    // Foo::Foo() {
+    //    myNormalDist = RandomNumberGenerator::makeNormalDist(mean, std_dev, min, max);
+    // }
+    //
+    // void Foo::Tick() {
+    //     bar = myNormalDist();
+    // }
+    //
+    
+    static NormalDist& makeNormalDist(mean, std_dev, min, max) {
+        boost::random::normal_distribution<> dist(mean, std_dev);
+        boost::random::variate_generator<Generator&, boost::random::normal_distribution<> > rn(gen_, dist);
+
+        return rn;
+    }
 
     /// wrappers for boost::random distributions
 
