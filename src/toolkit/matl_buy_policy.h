@@ -179,7 +179,11 @@ class MatlBuyPolicy : public Trader {
   std::string name_;
   double fill_to_, req_when_under_, quantize_, throughput_;
   int active_, dormant_;
+  std::map<Material::Ptr, std::string> rsrc_commods_;
   std::map<std::string, CommodDetail> commod_details_;
+};
+  
+}  // namespace toolkit
 }  // namespace cyclus
 
 #endif
