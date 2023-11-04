@@ -86,7 +86,7 @@ RUN conda update -y --all && \
                libcblas \
                liblapack \
                pkg-config \
-               coincbc \
+            #    coincbc \
                boost-cpp \
                hdf5 \
                sqlite \
@@ -110,8 +110,19 @@ ENV CC /opt/conda/bin/x86_64-conda_cos6-linux-gnu-gcc
 ENV CXX /opt/conda/bin/x86_64-conda_cos6-linux-gnu-g++
 ENV CPP /opt/conda/bin/x86_64-conda_cos6-linux-gnu-cpp
 
-FROM ${pkg_mgr}-deps as cyclus
-ARG make_cores=2
+# INSTALLING COIN FROM SOURCE
+RUN mkdir /coin && apt install -y patch gfortran make git wget tar dos2unix pkg-config
+
+# RUN apt install locales && locale-gen en_US.UTF-8 && echo -e 'LANG="en_US.UTF-8"\nLANGUAGE="en_US:en"\n' > /etc/default/locale
+WORKDIR /coin
+
+RUN wget https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew && \
+    chmod +x coinbrew && \
+    ./coinbrew fetch Cbc --no-prompt 
+#     ./coinbrew build Cbc --no-prompt --enable-debug
+
+# FROM ${pkg_mgr}-deps as cyclus
+# ARG make_cores=2
 
 COPY . /cyclus
 WORKDIR /cyclus
@@ -122,15 +133,15 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
-RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999 
-ENV PATH /root/.local/bin:$PATH
-ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
+# RUN python install.py -j ${make_cores} --build-type=Debug --core-version 999999.999999 --clean-build
+# ENV PATH /root/.local/bin:$PATH
+# ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 
-FROM cyclus as cyclus-test
+# FROM cyclus as cyclus-test
 
-RUN cyclus_unit_tests
+# RUN cyclus_unit_tests
 
-FROM cyclus-test as cyclus-pytest
+# FROM cyclus-test as cyclus-pytest
 
-RUN cd tests && python -m pytest --ignore test_main.py
+# RUN cd tests && python -m pytest --ignore test_main.py
 
