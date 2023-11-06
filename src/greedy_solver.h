@@ -1,6 +1,7 @@
 #ifndef CYCLUS_SRC_GREEDY_SOLVER_H_
 #define CYCLUS_SRC_GREEDY_SOLVER_H_
 
+#include <boost/shared_ptr.hpp>
 #include "exchange_graph.h"
 #include "exchange_solver.h"
 #include "greedy_preconditioner.h"
