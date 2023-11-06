@@ -232,12 +232,10 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("--    Boost Serialization location: ${Boost_SERIALIZATION_LIBRARY}")
 
     # find coin and link to it
-    FIND_PACKAGE(COIN)
-    MESSAGE("-- COIN Version: ${COIN_VERSION}")
-    set(LIBS ${LIBS} ${COIN_LIBRARIES})
-    if(NOT COIN_FOUND)
-      # no COIN, so no MILPs
-      set(DEFAULT_ALLOW_MILPS false)
+    if (DEFAULT_ALLOW_MILPS)
+        FIND_PACKAGE(COIN REQUIRED)
+        MESSAGE("-- COIN Version: ${COIN_VERSION}")
+        set(LIBS ${LIBS} ${COIN_LIBRARIES})
     endif()
 
     #
