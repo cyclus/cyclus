@@ -42,7 +42,7 @@ jobs:
       - name: Building Cyclus
         run: |
           mkdir -p `python -m site --user-site`
-          python install.py -j 2 --build-type=Release --core-version 999999.999999 
+          python install.py -j 2 --build-type=Release --core-version 999999.999999 --allow-milps
           echo "PATH=${HOME}/.local/bin:$PATH" >> "$GITHUB_ENV"
           echo "LD_LIBRARY_PATH=${HOME}/.local/lib:${HOME}/.local/lib/cyclus:$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
 
