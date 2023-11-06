@@ -128,10 +128,11 @@ void SolveProg(OsiSolverInterface* si, double greedy_obj, bool verbose) {
     int argc = 5;
     CbcModel model(*si);
     ObjValueHandler handler(greedy_obj);
-    CbcMain0(model);
-    model.passInEventHandler(&handler);
-    CbcMain1(argc, argv, model, CbcCallBack);
-    si->setColSolution(model.getColSolution());
+    model.branchAndBound();
+    // CbcMain0(model);
+    // model.passInEventHandler(&handler);
+    // CbcMain1(argc, argv, model, CbcCallBack);
+    si->setColSolution(model.bestSolution());
     if (verbose) {
       std::cout << "Greedy equivalent time: " << handler.time()
                 << " and obj " << handler.obj()
