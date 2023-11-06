@@ -9,6 +9,7 @@
 #include "pyhooks.h"
 #include "sim_init.h"
 #include "timer.h"
+#include "random_number_generator.h"
 #include "version.h"
 
 namespace cyclus {
@@ -91,7 +92,9 @@ Context::~Context() {
   if (solver_ != NULL) {
     delete solver_;
   }
-
+  if (rng_ != NULL) {
+    delete rng_;
+  }
   // initiate deletion of agents that don't have parents.
   // dealloc will propagate through hierarchy as agents delete their children
   std::vector<Agent*> to_del;

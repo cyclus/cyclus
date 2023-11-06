@@ -18,7 +18,6 @@
 #include "greedy_solver.h"
 #include "pyhooks.h"
 #include "recorder.h"
-#include "random_number_generator.h"
 
 const uint64_t kDefaultTimeStepDur = 2629846;
 

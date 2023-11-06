@@ -7,7 +7,6 @@ class SimInitTest;
 
 namespace cyclus {
 
-class Context;
 class SimInfo;
 
 typedef boost::random::mt19937 Generator;
@@ -22,9 +21,9 @@ class RandomNumberGenerator {
     static Generator gen_;
 
   public:
-    RandomNumberGenerator();
+    RandomNumberGenerator() {};
 
-    ~RandomNumberGenerator();
+    ~RandomNumberGenerator() {};
 
     /// Initialize from seed
     void Initialize(SimInfo si);
