@@ -124,14 +124,13 @@ void SolveProg(OsiSolverInterface* si, double greedy_obj, bool verbose) {
     ReportProg(si);
 
   if (HasInt(si)) {
-    const char *argv[] = {"exchng", "-log", "0", "-solve", "-quit"};
-    int argc = 5;
     CbcModel model(*si);
     ObjValueHandler handler(greedy_obj);
+    
+    model.passInEventHandler(&handler);
+    model.setLogLevel(0);
+    model.initialSolve();
     model.branchAndBound();
-    // CbcMain0(model);
-    // model.passInEventHandler(&handler);
-    // CbcMain1(argc, argv, model, CbcCallBack);
     si->setColSolution(model.bestSolution());
     if (verbose) {
       std::cout << "Greedy equivalent time: " << handler.time()
