@@ -21,10 +21,6 @@ class RandomNumberGenerator {
     static Generator gen_;
 
   public:
-    RandomNumberGenerator() {};
-
-    ~RandomNumberGenerator() {};
-
     /// Initialize from seed
     void Initialize(SimInfo si);
 
@@ -49,7 +45,7 @@ class RandomNumberGenerator {
     
     static NormalDist makeNormalDist(double mean, double std_dev, double min, double max) {
         boost::random::normal_distribution<> dist(mean, std_dev);
-        boost::random::variate_generator<Generator&, boost::random::normal_distribution<> > rn(gen_, dist);
+        NormalDist rn(gen_, dist);
 
         return rn;
     }
