@@ -53,3 +53,18 @@ jobs:
       - name: Cyclus Python Tests
         run: |
           cd tests && python -m pytest --ignore test_main.py
+
+      - name: Run LCOV
+        run: |
+          apt install -y lcov && lcov --capture -d build/src -o coverage.info
+
+      - name: Setup LCOV
+        uses: hrishikesh-kadam/setup-lcov@v1
+
+      - name: Report code coverage
+        uses: zgosalvez/github-actions-report-lcov@v3
+        with:
+          coverage-files: coverage.info
+          minimum-coverage: 50
+          artifact-name: code-coverage-report
+          github-token: ${{ secrets.GITHUB_TOKEN }}

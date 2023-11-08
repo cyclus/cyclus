@@ -22,6 +22,12 @@ ELSE()
     MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler.")
 ENDIF()
 
+# check for code coverage support and add necessary flags
+IF(CODE_COVERAGE)
+    MESSAGE(STATUS "Compiling with --coverage flag for code coverage analysis")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+ENDIF()
+
 # enable assembly
 enable_language(ASM)
 

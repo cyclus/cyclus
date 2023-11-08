@@ -85,6 +85,8 @@ def install_cyclus(args):
             cmake_cmd += ['-D' + x for x in args.D]
         if args.cmake_debug:
             cmake_cmd += ['-Wdev', '--debug-output']
+        if args.code_coverage is not None:
+            cmake_cmd += ['-DCODE_COVERAGE=' + ('TRUE' if args.code_coverage else 'FALSE')]
         if args.fast is not None:
             fast = 'TRUE' if args.fast else 'FALSE'
             cmake_cmd.append('-DCYCLUS_FAST_COMPILE=' + fast)
@@ -196,6 +198,8 @@ def main():
     parser.add_argument('--cmake-debug', action='store_true', default=False,
                         dest='cmake_debug', help='puts CMake itself in a debug mode '
                                                  'when dealing with build system issues.')
+    code_coverage = "enable code coverage analysis using gcov/lcov"
+    parser.add_argument('--code_coverage', help=code_coverage, default=False, action="store_true")
     parser.add_argument('--fast', default=None, dest='fast',
                         action='store_true', help="Will try to compile "
                         "from assembly, if possible. This is faster than "
