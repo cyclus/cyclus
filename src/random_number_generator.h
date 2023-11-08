@@ -4,6 +4,7 @@
 #include <boost/random.hpp>
 
 class SimInitTest;
+class RandomTest;
 
 namespace cyclus {
 
@@ -15,6 +16,7 @@ typedef boost::random::variate_generator<Generator&, boost::random::normal_distr
 /// A random number generator.
 class RandomNumberGenerator {
     friend class ::SimInitTest;
+    friend class ::RandomTest;
 
   private:
     /// Returns a random number for use in a distribution

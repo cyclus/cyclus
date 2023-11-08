@@ -8,6 +8,7 @@
 
 // for testing
 class SimInitTest;
+class RandomTest;
 
 namespace cyclus {
 
@@ -94,9 +95,10 @@ class DynamicModule {
   /// added to this map when loaded.
   static std::map<std::string, DynamicModule*> modules_;
 
-  /// for testing - see sim_init_tests
+  /// for testing - see sim_init_tests and random_tests
   friend class ::SimInitTest;
-  /// for testing - see sim_init_tests
+  friend class ::RandomTest;
+  /// for testing - see sim_init_tests and random_tests
   static std::map<std::string, AgentCtor*> man_ctors_;
 
   /// the name of the module

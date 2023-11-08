@@ -8,6 +8,7 @@
 #include "res_tracker.h"
 
 class SimInitTest;
+class RandomTest;
 
 namespace cyclus {
 
@@ -18,6 +19,7 @@ namespace cyclus {
 class Product : public Resource {
   friend class SimInit;
   friend class ::SimInitTest;
+  friend class ::RandomTest;
 
  public:
   typedef

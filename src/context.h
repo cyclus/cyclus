@@ -26,6 +26,7 @@ const uint64_t kDefaultSeed = 20160212;
 const uint64_t kDefaultStride = 10000;
 
 class SimInitTest;
+class RandomTest;
 
 namespace cyclus {
 
@@ -144,6 +145,7 @@ class SimInfo {
 class Context {
  public:
   friend class ::SimInitTest;
+  friend class ::RandomTest;
   friend class SimInit;
   friend class Agent;
   friend class Timer;
