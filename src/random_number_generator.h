@@ -2,6 +2,7 @@
 #define CYCLUS_SRC_RNG_H
 
 #include <boost/random.hpp>
+#include <cstdint>
 
 class SimInitTest;
 class RandomTest;
