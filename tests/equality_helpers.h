@@ -85,6 +85,19 @@ void array_double_eq(const T* const expected, const T* const actual,
 }
 
 template <class T>
+void array_double_near(const T* const expected, const T* const actual,
+                     unsigned long length, const T margin, std::string name = "") {
+  for (unsigned long index = 0; index < length; index++) {
+    T exp = expected[index];
+    T act = actual[index];
+    EXPECT_NEAR(exp, act, margin) << name << " arrays differ at index "
+                               << index << "\n"
+                               << " exp: " << exp << "\n"
+                               << " act: " << act << "\n";
+  }
+}
+
+template <class T>
 void pair_double_eq(const std::pair<T, double>& p1,
                     const std::pair<T, double>& p2) {
   EXPECT_EQ(p1.first, p2.first);

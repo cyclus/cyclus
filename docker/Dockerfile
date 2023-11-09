@@ -122,7 +122,7 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
-RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999 
+RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999 --allow-milps
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 

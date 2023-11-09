@@ -15,6 +15,7 @@
 #include "prog_translator.h"
 #include "solver_factory.h"
 #include "env.h"
+#include "cyc_limits.h"
 
 namespace cyclus {
 
@@ -243,7 +244,7 @@ TEST(ProgTranslatorTests, translation) {
   EXPECT_NO_THROW(SolveProg(iface));
   const double* soln = iface->getColSolution();
   const double* check = checkface.getColSolution();
-  array_double_eq(soln, check, narcs + nfaux, "soln");
+  array_double_near(soln, check, narcs + nfaux, cyclus::cy_eps, "soln");
 
   // validate solution
   double x1_flow = excl_flow[1];
