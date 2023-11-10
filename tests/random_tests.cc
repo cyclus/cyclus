@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include "context.h"
-#include "facility.h"
 #include "pyhooks.h"
 #include "recorder.h"
 #include "sim_init.h"
@@ -12,65 +11,12 @@
 // special name to tell sqlite to use in-mem db
 static const char* dbpath = ":memory:";
 
-using cyclus::Agent;
-
-class RandomInver : public cyclus::Facility {
- public:
-  RandomInver(cyclus::Context* ctx) : cyclus::Facility(ctx), val1(0) {}
-  virtual ~RandomInver() {}
-
-  virtual Agent* Clone() {
-    RandomInver* i = new RandomInver(context());
-    i->InitFrom(this);
-    return i;
-  }
-
-  virtual void InitFrom(RandomInver* a) {
-    cyclus::Facility::InitFrom(a);
-    val1 = a->val1;
-  }
-
-  virtual void InitFrom(cyclus::QueryableBackend* b) {
-    cyclus::Facility::InitFrom(b);
-    cyclus::QueryResult qr = b->Query("Info", NULL);
-    val1 = qr.GetVal<int>("val1");
-  }
-
-  virtual void Snapshot(cyclus::DbInit di) {
-    di.NewDatum("Info")
-        ->AddVal("val1", val1)
-        ->Record();
-  }
-
-  virtual void Build(Agent* parent) {
-    cyclus::Facility::Build(parent);
-  }
-
-  virtual void InitInv(cyclus::Inventories& inv) {}
-
-  virtual cyclus::Inventories SnapshotInv() {
-    cyclus::Inventories invs;
-    return invs;
-  }
-  virtual void Tick() { context()->Snapshot(); }
-  virtual void Tock() {};
-
-  int val1;
-};
-
-Agent* ConstructRandomInver(cyclus::Context* ctx) {
-  return new RandomInver(ctx);
-}
-
 class RandomTest : public ::testing::Test {
  public:
   RandomTest() : rec((unsigned int) 300) {}
 
  protected:
   virtual void SetUp() {
-    resetnextids();
-    cyclus::DynamicModule::man_ctors_[":Inver:Inver"] = ConstructRandomInver;
-
     b = new cyclus::SqliteBack(dbpath);
     rec.RegisterBackend(b);
     ctx = new cyclus::Context(&ti, &rec);
@@ -84,14 +30,6 @@ class RandomTest : public ::testing::Test {
     rec.Close();
     delete ctx;
     delete b;
-  }
-
-  void resetnextids() {
-    Agent::next_id_ = 0;
-    cyclus::Resource::nextstate_id_ = 1;
-    cyclus::Resource::nextobj_id_ = 1;
-    cyclus::Composition::next_id_ = 1;
-    cyclus::Product::next_qualid_ = 1;
   }
 
   cyclus::Context* ctx;
