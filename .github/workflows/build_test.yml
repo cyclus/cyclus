@@ -29,7 +29,7 @@ jobs:
           ]
         pkg_mgr : [
             apt,
-            conda
+            conda,
         ]
     
     container:
