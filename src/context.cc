@@ -9,6 +9,7 @@
 #include "pyhooks.h"
 #include "sim_init.h"
 #include "timer.h"
+#include "random_number_generator.h"
 #include "version.h"
 
 namespace cyclus {
@@ -26,7 +27,9 @@ SimInfo::SimInfo()
       explicit_inventory(false),
       explicit_inventory_compact(false),
       parent_sim(boost::uuids::nil_uuid()),
-      parent_type("init") {}
+      parent_type("init"),
+      seed(kDefaultSeed),
+      stride(kDefaultStride) {}
 
 SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
     : duration(dur),
@@ -39,7 +42,9 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
       explicit_inventory(false),
       explicit_inventory_compact(false),
       parent_sim(boost::uuids::nil_uuid()),
-      parent_type("init") {}
+      parent_type("init"),
+      seed(kDefaultSeed),
+      stride(kDefaultStride) {}
 
 SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d)
     : duration(dur),
@@ -52,7 +57,9 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d)
       explicit_inventory(false),
       explicit_inventory_compact(false),
       parent_sim(boost::uuids::nil_uuid()),
-      parent_type("init") {}
+      parent_type("init"),
+      seed(kDefaultSeed),
+      stride(kDefaultStride) {}
 
 SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
                  int branch_time, std::string parent_type,
@@ -67,20 +74,27 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
       branch_time(branch_time),
       explicit_inventory(false),
       explicit_inventory_compact(false),
-      handle(handle) {}
+      handle(handle),
+      seed(kDefaultSeed),
+      stride(kDefaultStride) {}
 
 Context::Context(Timer* ti, Recorder* rec)
     : ti_(ti),
       rec_(rec),
       solver_(NULL),
       trans_id_(0),
-      si_(0) {}
+      si_(0) {
+
+        rng_ = new RandomNumberGenerator();
+      }
 
 Context::~Context() {
   if (solver_ != NULL) {
     delete solver_;
   }
-
+  if (rng_ != NULL) {
+    delete rng_;
+  }
   // initiate deletion of agents that don't have parents.
   // dealloc will propagate through hierarchy as agents delete their children
   std::vector<Agent*> to_del;
@@ -184,6 +198,8 @@ void Context::InitSim(SimInfo si) {
       ->AddVal("InitialYear", si.y0)
       ->AddVal("InitialMonth", si.m0)
       ->AddVal("Duration", si.duration)
+      ->AddVal("Seed", static_cast<int>(si.seed))
+      ->AddVal("Stride", static_cast<int>(si.stride))
       ->AddVal("ParentSimId", si.parent_sim)
       ->AddVal("ParentType", si.parent_type)
       ->AddVal("BranchTime", si.branch_time)
@@ -222,10 +238,38 @@ void Context::InitSim(SimInfo si) {
 
   si_ = si;
   ti_->Initialize(this, si);
+  rng_->Initialize(si);
+
 }
 
 int Context::time() {
   return ti_->time();
+}
+
+int Context::random() {
+  return rng_->random();
+}
+
+double Context::random_01() {
+  return rng_->random_01();
+}
+
+int Context::random_uniform_int(int low, int high) {
+  return rng_->random_uniform_int(low, high);
+}
+
+double Context::random_uniform_real(double low, double high) {
+  return rng_->random_uniform_real(low, high);
+}
+
+double Context::random_normal_real(double mean, double std_dev, double low,
+                                     double high) {
+  return rng_->random_normal_real(mean, std_dev, low, high);
+}
+
+int Context::random_normal_int(double mean, double std_dev, int low,
+                                 int high) {
+  return rng_->random_normal_int(mean, std_dev, low, high);
 }
 
 void Context::RegisterTimeListener(TimeListener* tl) {
