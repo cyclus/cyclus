@@ -13,7 +13,6 @@
 #include "comp_math.h"
 
 class SimInitTest;
-class RandomTest;
 
 namespace cyclus {
 
@@ -22,7 +21,6 @@ class Agent;
 /// Controls simulation timestepping and inter-timestep phases.
 class Timer {
   friend class ::SimInitTest;
-  friend class ::RandomTest;
  public:
   Timer();
 

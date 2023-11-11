@@ -21,7 +21,6 @@
 #endif
 
 class SimInitTest;
-class RandomTest;
 
 namespace cyclus {
 
@@ -50,7 +49,6 @@ typedef std::map<std::string, std::vector<Resource::Ptr> > Inventories;
 class Agent : public StateWrangler, virtual public Ider {
   friend class SimInit;
   friend class ::SimInitTest;
-  friend class ::RandomTest;
 
  public:
   /// Creates a new agent that is managed by the given context. Note that the

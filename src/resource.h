@@ -6,7 +6,6 @@
 #include <boost/shared_ptr.hpp>
 
 class SimInitTest;
-class RandomTest;
 
 namespace cyclus {
 
@@ -20,7 +19,6 @@ typedef std::string ResourceType;
 class Resource {
   friend class SimInit;
   friend class ::SimInitTest;
-  friend class ::RandomTest;
 
  public:
   typedef boost::shared_ptr<Resource> Ptr;
