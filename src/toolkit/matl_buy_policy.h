@@ -84,17 +84,18 @@ class MatlBuyPolicy : public Trader {
   /// capacity.  The "on" and "off" phases are sampled and rounded to the
   /// nearest integer number of time steps from a truncated normal
   /// distribution from a mean, standard deviation, min, and max value.
+  /// Note that the (s, S) policy is not currently compatible with active and
+  /// dormant buying perionds 
   /// @param active the length of the on, actively buying period
   /// @param dormant the length of the dormant period
+  /// Note that active and dormant periods are note currently compatible with
+  /// (s, S) inventory management
   /// @{
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      double throughput);
+                      double throughput, int active = 1, int dormant = 0);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       double fill_to, double req_when_under);
-  MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      double throughput, int active,
-                      int dormant);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       double throughput, double fill_to,
                       double req_when_under, double quantize);

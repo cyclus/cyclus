@@ -74,11 +74,15 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name, double throughput) {
+                                   std::string name, double throughput, int active, int dormant) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
   set_throughput(throughput);
+  set_active(active);
+  set_dormant(dormant);
+  LGH(INFO3) << "has buy policy with active = " << active_ \
+             << "time steps and dormant = " << dormant_ << " time steps." ;
   return *this;
 }
 
@@ -90,21 +94,6 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   name_ = name;
   set_fill_to(fill_to);
   set_req_when_under(req_when_under);
-  return *this;
-}
-
-MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name, double throughput,
-                                   int active,
-                                   int dormant) {
-  Trader::manager_ = manager;
-  buf_ = buf;
-  name_ = name;
-  set_throughput(throughput);
-  set_active(active);
-  set_dormant(dormant);
-  LGH(INFO3) << "has buy policy with active = " << active_ \
-             << "time steps and dormant = " << dormant_ << " time steps." ;
   return *this;
 }
 
@@ -168,10 +157,12 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   if (dormant_ > 0 && manager()->context()->time() % (active_ + dormant_) < active_) {
     amt = TotalQty();
   }
+  else if (dormant_ == 0)
+    amt = TotalQty();
   else {
     // in dormant part of cycle, return empty portfolio
     amt = 0;
-    LGH(INFO3) << "in dormant period for time step " << manager()->context()->time() << ", requesting " << amt << " kg." ;
+    LGH(INFO3) << "in dormant period, no request";
   }
   if (!make_req || amt < eps())
     return ports;
