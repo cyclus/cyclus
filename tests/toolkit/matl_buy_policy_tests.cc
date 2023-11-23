@@ -11,6 +11,7 @@
 
 #include "test_context.h"
 #include "test_agents/test_facility.h"
+#include "cyclus.h"
 
 namespace cyclus {
 namespace toolkit {
@@ -24,6 +25,9 @@ class MatlBuyPolicyTests: public ::testing::Test {
  protected:
   TestContext tc;
   TestFacility* fac1;
+  cyclus::Timer ti;
+  cyclus::Recorder rec;
+  cyclus::Context* ctx;
 
   virtual void SetUp() {
     fac1 = new TestFacility(tc.get());
@@ -88,6 +92,22 @@ TEST_F(MatlBuyPolicyTests, StartStop) {
   ASSERT_THROW(p.Stop(), ValueError);
 }
 
+TEST_F(MatlBuyPolicyTests, OneReq) {
+  double cap = 5;
+  ResBuf<Material> buff;
+  buff.capacity(cap);
+  std::string commod1("foo"), commod2("bar");
+  double p2 = 2.5;
+  cyclus::Composition::Ptr c1 = cyclus::Composition::Ptr(new TestComp()); 
+  cyclus::Composition::Ptr c2 = cyclus::Composition::Ptr(new TestComp()); 
+  MatlBuyPolicy p;
+
+  p.Init(fac1, &buff, "").Set(commod1, c1);
+  std::set<RequestPortfolio<Material>::Ptr> obs = p.GetMatlRequests();
+  ASSERT_EQ(obs.size(), 1);
+  ASSERT_EQ((*obs.begin())->requests().size(), 1);
+}
+
 TEST_F(MatlBuyPolicyTests, Reqs) {
   double cap = 5;
   ResBuf<Material> buff;
@@ -124,6 +144,31 @@ TEST_F(MatlBuyPolicyTests, Reqs) {
   req = (*obs.begin())->requests().at(0);
   ASSERT_TRUE(req->exclusive());
   ASSERT_FLOAT_EQ(req->target()->quantity(), quantize);
+}
+
+TEST_F(MatlBuyPolicyTests, ActiveDormant) {
+  int active = 2;
+  int dormant = 3;
+  int dur = 4;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", throughput, active, dormant)
+        .Set("commod1").Start();
+
+  cyclus::Composition::Ptr c1 = cyclus::Composition::Ptr(new TestComp()); 
+
+  EXPECT_NO_THROW(sim.Run());
+  EXPECT_DOUBLE_EQ(2, inbuf.quantity());
 }
 
 }
