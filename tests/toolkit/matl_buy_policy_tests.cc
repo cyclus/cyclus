@@ -92,23 +92,25 @@ TEST_F(MatlBuyPolicyTests, StartStop) {
   ASSERT_THROW(p.Stop(), ValueError);
 }
 
+// Tests that matlbuypolicy sends out a request properly
 TEST_F(MatlBuyPolicyTests, OneReq) {
   double cap = 5;
   ResBuf<Material> buff;
   buff.capacity(cap);
-  std::string commod1("foo"), commod2("bar");
-  double p2 = 2.5;
   cyclus::Composition::Ptr c1 = cyclus::Composition::Ptr(new TestComp()); 
-  cyclus::Composition::Ptr c2 = cyclus::Composition::Ptr(new TestComp()); 
   MatlBuyPolicy p;
 
-  p.Init(fac1, &buff, "").Set(commod1, c1);
+  p.Init(fac1, &buff, "").Set("commod1", c1);
   std::set<RequestPortfolio<Material>::Ptr> obs = p.GetMatlRequests();
   ASSERT_EQ(obs.size(), 1);
   ASSERT_EQ((*obs.begin())->requests().size(), 1);
+  Request<Material>* req = (*obs.begin())->requests().at(0);
+  ASSERT_EQ(req->commodity(), "commod1");
+  ASSERT_FLOAT_EQ(req->target()->quantity(), cap);
 }
 
-TEST_F(MatlBuyPolicyTests, Reqs) {
+// Tests that matlbuypolicy can send out requests for multiple commodities
+TEST_F(MatlBuyPolicyTests, MultipleReqs) {
   double cap = 5;
   ResBuf<Material> buff;
   buff.capacity(cap);
@@ -133,19 +135,54 @@ TEST_F(MatlBuyPolicyTests, Reqs) {
   }
   ASSERT_FALSE(req->exclusive());
   ASSERT_FLOAT_EQ(req->target()->quantity(), cap);
-  
-  // two portfolios with quantize
+}
+
+// Test single quantized request
+TEST_F(MatlBuyPolicyTests, Quantize) {
+  double cap = 5;
+  ResBuf<Material> buff;
+  buff.capacity(cap);
+  double p2 = 2.5;
+  cyclus::Composition::Ptr c1 = cyclus::Composition::Ptr(new TestComp()); 
+  MatlBuyPolicy p;
+
   double quantize = 2.5;
-  p.Init(fac1, &buff, "", std::numeric_limits<double>::max(), 1, 1, quantize);
-  obs = p.GetMatlRequests();
+  p.Init(fac1, &buff, "", std::numeric_limits<double>::max(), 1, 1, quantize).Set("commod1", c1);
+  std::set<RequestPortfolio<Material>::Ptr> obs = p.GetMatlRequests();
   ASSERT_EQ(obs.size(), 2);
-  ASSERT_EQ((*obs.begin())->requests().size(), 2);
-  ASSERT_EQ((*(obs.begin()++))->requests().size(), 2);
-  req = (*obs.begin())->requests().at(0);
+  ASSERT_EQ((*obs.begin())->requests().size(), 1);
+  Request<Material>* req = (*obs.begin())->requests().at(0);
   ASSERT_TRUE(req->exclusive());
   ASSERT_FLOAT_EQ(req->target()->quantity(), quantize);
 }
 
+// Test two quantized requests
+TEST_F(MatlBuyPolicyTests, MultiReqQuantize) {
+    double cap = 5;
+  ResBuf<Material> buff;
+  buff.capacity(cap);
+  cyclus::Composition::Ptr c1 = cyclus::Composition::Ptr(new TestComp()); 
+  cyclus::Composition::Ptr c2 = cyclus::Composition::Ptr(new TestComp()); 
+  MatlBuyPolicy p;
+  
+  // two portfolios with quantize
+  double quantize = 2.5;
+  p.Init(fac1, &buff, "", std::numeric_limits<double>::max(), 1, 1, quantize).Set("commod1", c1).Set("commod2", c2);
+  std::set<RequestPortfolio<Material>::Ptr> obs = p.GetMatlRequests();
+  ASSERT_EQ(obs.size(), 2);
+  ASSERT_EQ((*obs.begin())->requests().size(), 2);
+  ASSERT_EQ((*(obs.begin()++))->requests().size(), 2);
+  Request<Material>* req = (*obs.begin())->requests().at(0);
+  ASSERT_TRUE(req->exclusive());
+  ASSERT_FLOAT_EQ(req->target()->quantity(), quantize);
+
+  req = (*(obs.begin()++))->requests().at(0);
+  ASSERT_TRUE(req->exclusive());
+  ASSERT_FLOAT_EQ(req->target()->quantity(), quantize);
+}
+
+// Tests that agent cycles between active and dormant cycles during a mock
+// sim, only buying when active.
 TEST_F(MatlBuyPolicyTests, ActiveDormant) {
   int active = 2;
   int dormant = 3;
@@ -164,8 +201,6 @@ TEST_F(MatlBuyPolicyTests, ActiveDormant) {
   cyclus::toolkit::MatlBuyPolicy policy;
   policy.Init(fac, &inbuf, "inbuf", throughput, active, dormant)
         .Set("commod1").Start();
-
-  cyclus::Composition::Ptr c1 = cyclus::Composition::Ptr(new TestComp()); 
 
   EXPECT_NO_THROW(sim.Run());
   EXPECT_DOUBLE_EQ(2, inbuf.quantity());
