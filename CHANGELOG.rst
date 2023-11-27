@@ -17,7 +17,7 @@ Since last release
   will fail unless update-alternatives has been used to point python at the 
   correct python3 version (#1558)
 * build and test are now fown on githubAction in place or CircleCI (#1569)
-* Have separate workflows for testing, publishing dependency images, and publishing release images (#1597, #1602, #1606, #1609)
+* Have separate workflows for testing, publishing dependency images, and publishing release images (#1597, #1602, #1606, #1609, #1629)
 * Add Ubuntu 20.04 to the list of supported platforms (#1605, #1608)
 * Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599)
 
