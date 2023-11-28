@@ -204,6 +204,46 @@ TEST_F(MatlBuyPolicyTests, ActiveDormant) {
 
   EXPECT_NO_THROW(sim.Run());
   EXPECT_DOUBLE_EQ(2, inbuf.quantity());
+
+  delete a;
+}
+
+TEST_F(MatlBuyPolicyTests, ActiveDormantMultipleCycles) {
+  using cyclus::QueryResult;
+
+  int active = 2;
+  int dormant = 3;
+  int dur = 15;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", throughput, active, dormant)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  // confirm that transactions are only occurring during active periods
+  int first_cycle = qr.GetVal<int>("Time", 0);
+  EXPECT_EQ(0, first_cycle);
+  int second_cycle = qr.GetVal<int>("Time", 2);
+  EXPECT_EQ(5, second_cycle);
+  int third_cycle = qr.GetVal<int>("Time", 5);
+  EXPECT_EQ(11, third_cycle);
+
+  // confirm total inbuf recieved material
+  EXPECT_DOUBLE_EQ(7, inbuf.quantity());
+
+  delete a;
 }
 
 }
