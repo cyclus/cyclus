@@ -213,7 +213,7 @@ TEST_F(MatlBuyPolicyTests, ActiveDormantMultipleCycles) {
 
   int active = 2;
   int dormant = 3;
-  int dur = 15;
+  int dur = 16;
   double throughput = 1;
 
   cyclus::MockSim sim(dur);
