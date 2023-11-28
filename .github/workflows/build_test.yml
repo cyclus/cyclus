@@ -9,12 +9,14 @@ on:
       - '.github/workflows/changelog_test.yml'
       - 'docker/**'
       - 'doc/**'
+      - 'CHANGELOG.rst'
   push:
     paths-ignore:
       - '.github/workflows/build_test_publish.yml'
       - '.github/workflows/changelog_test.yml'
       - 'docker/**'
       - 'doc/**'
+      - 'CHANGELOG.rst'
 
 jobs:
   build-and-test:

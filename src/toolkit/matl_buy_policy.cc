@@ -19,7 +19,9 @@ MatlBuyPolicy::MatlBuyPolicy() :
     throughput_(std::numeric_limits<double>::max()),
     quantize_(-1),
     fill_to_(1),
-    req_when_under_(1) {
+    req_when_under_(1),
+    active_(1),
+    dormant_(0){
   Warn<EXPERIMENTAL_WARNING>(
       "MatlBuyPolicy is experimental and its API may be subject to change");
 }
@@ -53,6 +55,16 @@ void MatlBuyPolicy::set_throughput(double x) {
   throughput_ = x;
 }
 
+void MatlBuyPolicy::set_active(int x) {
+  assert(x > 0);
+  active_ = x;
+}
+
+void MatlBuyPolicy::set_dormant(int x) {
+  assert(x >= 0);
+  dormant_ = x;
+}
+
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name) {
   Trader::manager_ = manager;
@@ -62,11 +74,15 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name, double throughput) {
+                                   std::string name, double throughput, int active, int dormant) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
   set_throughput(throughput);
+  set_active(active);
+  set_dormant(dormant);
+  LGH(INFO3) << "has buy policy with active = " << active_ \
+             << "time steps and dormant = " << dormant_ << " time steps." ;
   return *this;
 }
 
@@ -136,7 +152,18 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   rsrc_commods_.clear();
   std::set<RequestPortfolio<Material>::Ptr> ports;
   bool make_req = buf_->quantity() < req_when_under_ * buf_->capacity();
-  double amt = TotalQty();
+  double amt;
+  
+  if (dormant_ > 0 && manager()->context()->time() % (active_ + dormant_) < active_) {
+    amt = TotalQty();
+  }
+  else if (dormant_ == 0)
+    amt = TotalQty();
+  else {
+    // in dormant part of cycle, return empty portfolio
+    amt = 0;
+    LGH(INFO3) << "in dormant period, no request";
+  }
   if (!make_req || amt < eps())
     return ports;
 
