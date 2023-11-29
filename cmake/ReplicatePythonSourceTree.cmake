@@ -1,7 +1,7 @@
 # Note: when executed in the build dir, then CMAKE_CURRENT_SOURCE_DIR is the
 # build dir.
 file(COPY cli/cycpp.py DESTINATION cyclus)
-file(COPY cyclus setup.py README.rst LICENSE.rst DESTINATION "${CMAKE_ARGV3}"
+file(COPY cyclus setup.py pyproject.toml README.rst LICENSE.rst DESTINATION "${CMAKE_ARGV3}"
      FILES_MATCHING PATTERN "*.py"
                     PATTERN "*.pyi"
                     PATTERN "*.pyw"
@@ -12,4 +12,5 @@ file(COPY cyclus setup.py README.rst LICENSE.rst DESTINATION "${CMAKE_ARGV3}"
                     PATTERN "*.html"
                     PATTERN "*.pxi"
                     PATTERN "*.pxd"
+                    PATTERN "*.toml"
                     )

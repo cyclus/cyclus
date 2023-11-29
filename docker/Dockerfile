@@ -37,6 +37,8 @@ RUN apt install -y \
         python3-tables \
         python3-pandas \
         python3-jinja2 \
+        python3-pip \
+        python3-build \
         cython3 \
         libwebsockets-dev 
 
@@ -102,6 +104,8 @@ RUN conda update -y --all && \
                "cython<3" \
                websockets \
                pprintpp \
+               pip \
+               build \
                && \
     mamba install -y --force-reinstall libsqlite && \
     conda clean -y --all
@@ -118,7 +122,7 @@ WORKDIR /cyclus
 
 # Uncomment the following line to run cmake in verbose mode.
 # This is sometimes useful for debugging.
-#ENV VERBOSE=1
+# ENV VERBOSE=1
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
