@@ -111,10 +111,13 @@ To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18
 
 - ``conda config --add channels conda-forge``
 
-- ``conda install -y openssh gxx_linux-64 gcc_linux-64 cmake make docker-pycreds git xo
-  python-json-logger python=3.6 glibmm glib=2.56 libxml2 libxmlpp libblas libcblas
-  liblapack pkg-config coincbc=2.9 boost-cpp hdf5 sqlite pcre gettext bzip2 xz
-  setuptools nose pytables pandas jinja2 cython==0.26 websockets pprintpp``
+- ``conda create -n cyclus python=3.11``
+
+- ``conda activate cyclus``
+
+- ``conda install -y openssh gxx_linux-64 gcc_linux-64 cmake make docker-pycreds git xo python-json-logger glib glibmm libxml2 libxmlpp libxmlpp-4.0 libblas libcblas liblapack pkg-config coincbc boost-cpp hdf5 sqlite pcre gettext bzip2 xz setuptools pytest pytables pandas jinja2 "cython<3" websockets pprintpp``
+
+- ``conda install -y --force-reinstall libsqlite``
 
 - Use ``sudo apt install`` to install and configure git
 

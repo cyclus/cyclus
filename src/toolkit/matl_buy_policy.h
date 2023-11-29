@@ -78,10 +78,22 @@ class MatlBuyPolicy : public Trader {
   /// be sent to fill the buffer's empty space.
   /// @warning, (s, S) policy values are ambiguous for buffers with a capacity
   /// in (0, 1]. However that is a rare case.
+  /// The following features, if used, will set the policy to so that agents
+  /// cycle through "on" phases, where the buf will attemp to be filled, and
+  /// "off" or dormant phases, where no requests will be made regardless of
+  /// capacity.  The "on" and "off" phases are sampled and rounded to the
+  /// nearest integer number of time steps from a truncated normal
+  /// distribution from a mean, standard deviation, min, and max value.
+  /// Note that the (s, S) policy is not currently compatible with active and
+  /// dormant buying perionds 
+  /// @param active the length of the on, actively buying period
+  /// @param dormant the length of the dormant period
+  /// Note that active and dormant periods are note currently compatible with
+  /// (s, S) inventory management
   /// @{
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      double throughput);
+                      double throughput, int active = 1, int dormant = 0);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       double fill_to, double req_when_under);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
@@ -161,14 +173,17 @@ class MatlBuyPolicy : public Trader {
   void set_req_when_under(double x);
   void set_quantize(double x);
   void set_throughput(double x);
+  void set_active(int x);
+  void set_dormant(int x);
 
   ResBuf<Material>* buf_;
   std::string name_;
   double fill_to_, req_when_under_, quantize_, throughput_;
+  int active_, dormant_;
   std::map<Material::Ptr, std::string> rsrc_commods_;
   std::map<std::string, CommodDetail> commod_details_;
 };
-
+  
 }  // namespace toolkit
 }  // namespace cyclus
 
