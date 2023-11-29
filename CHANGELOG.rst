@@ -20,6 +20,7 @@ Since last release
 * Have separate workflows for testing, publishing dependency images, and publishing release images (#1597, #1602, #1606, #1609, #1629)
 * Add Ubuntu 20.04 to the list of supported platforms (#1605, #1608)
 * Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599)
+* Added code coverage reporting to GitHub workflows (#1616)
 * Adds active and dormant buying cycles in buy policy (#1596)
 * Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599)
 
