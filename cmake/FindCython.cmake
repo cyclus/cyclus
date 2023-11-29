@@ -28,9 +28,9 @@
 
 # Use the Cython executable that lives next to the Python executable
 # if it is a local installation.
-find_package( PythonInterp )
-if( PYTHONINTERP_FOUND )
-  get_filename_component( _python_path ${PYTHON_EXECUTABLE} PATH )
+find_package( Python3 )
+if( Python3_FOUND )
+  get_filename_component( _python_path ${Python3_EXECUTABLE} PATH )
   find_program(CYTHON_EXECUTABLE
     NAMES cython cython.bat cython3 cython-2.7 cython-3.3 cython-3.4 cython-3.5 cython-3.6 cython-3.7
     HINTS ENV PATH ${_python_path}

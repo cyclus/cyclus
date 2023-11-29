@@ -120,7 +120,7 @@ WORKDIR /cyclus
 
 # Uncomment the following line to run cmake in verbose mode.
 # This is sometimes useful for debugging.
-#ENV VERBOSE=1
+# ENV VERBOSE=1
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
