@@ -36,4 +36,4 @@ homepage = "https://fuelcycle.org"
 where = ['cyclus']
 
 [tool.setuptools.package-data]
-mypkg = ['*.pxd', '*.so', '*.dylib']
+cyclus = ['*.pxd', '*.so', '*.dylib']
