@@ -38,7 +38,6 @@ RUN apt install -y \
         python3-pandas \
         python3-jinja2 \
         python3-pip \
-        python3-build \
         cython3 \
         libwebsockets-dev 
 
@@ -105,7 +104,6 @@ RUN conda update -y --all && \
                websockets \
                pprintpp \
                pip \
-               build \
                && \
     mamba install -y --force-reinstall libsqlite && \
     conda clean -y --all
