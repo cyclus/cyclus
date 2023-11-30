@@ -32,8 +32,13 @@ test = ['pytest']
 [project.urls]
 homepage = "https://fuelcycle.org"
 
+[tool.setuptools]
+package-dir = { cyclus = "cyclus" }
+
 [tool.setuptools.packages.find]
-where = ['cyclus']
+where = [""]
+include = ["cyclus"]
+namespaces = false
 
 [tool.setuptools.package-data]
 cyclus = ['*.pxd', '*.so', '*.dylib']
