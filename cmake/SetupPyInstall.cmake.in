@@ -16,7 +16,7 @@ execute_process(COMMAND ${PYTHON_EXECUTABLE} -m site --user-site
                 OUTPUT_STRIP_TRAILING_WHITESPACE
                 RESULT_VARIABLE res_var)
 message("  PYTHON_SITE_PACKAGES: ${site_packages}")
-execute_process(COMMAND ${PYTHON_EXECUTABLE} -m build . 
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -m build --no-isolation . 
                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                 RESULT_VARIABLE res_var)
 if(NOT "${res_var}" STREQUAL "0")
