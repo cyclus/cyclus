@@ -12,7 +12,6 @@ jobs:
       fail-fast: false
       matrix:
         ubuntu_versions : [
-          20.04,
           22.04,
         ]
         pkg_mgr : [
