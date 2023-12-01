@@ -10,9 +10,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - '.github/workflows/build_test_publish.yml'
-      - 'docker/**'
 
 jobs:
   build-dependency-and-test-img:
