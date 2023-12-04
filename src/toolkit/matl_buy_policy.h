@@ -85,15 +85,38 @@ class MatlBuyPolicy : public Trader {
   /// nearest integer number of time steps from a truncated normal
   /// distribution from a mean, standard deviation, min, and max value.
   /// Note that the (s, S) policy is not currently compatible with active and
-  /// dormant buying perionds 
-  /// @param active the length of the on, actively buying period
-  /// @param dormant the length of the dormant period
+  /// Active and dormant buying perionds 
+  /// Active parameters:
+  /// @param active_type, the type of buying behavior to implement. Options:
+  /// 'Fixed' (default), 'UniformInt', 'NormalInt', and 'Cumulative'.
+  /// @param active_mean the length of the on, actively buying period when
+  /// using fixed active behavior, or the mean when using normal behavior
+  /// @param active_stddev the standard deviation when using normal
+  /// distribution in active buying
+  /// @param active_min the minimum allowable distribution value. Default 1,
+  /// optional parameter when using uniform or normal distributions in active
+  /// @param active_max the maximum allowable active buying value. Required for
+  /// uniform distribution, optional for normal distrbution
+  /// @param cumulative_capacity the cumulative amount to be purchased before
+  /// entering a dormant cycle. Resets at the end of dormant cycle. Required
+  /// when using cumulative active_type
+  /// Dormant parameters:
+  /// @param dormant_type, the type of dormant buying behavior to implement.
+  /// Options: 'Fixed' (default), 'UniformInt', 'NormalInt'.
+  /// @param dormant_mean the length of the dormant buying period when
+  /// using fixed dormant behavior, or the mean when using normal behavior
+  /// @param dormant_stddev the standard deviation when using normal
+  /// distribution in dormant buying
+  /// @param dormant_min the minimum allowable distribution value. Default 1,
+  /// optional parameter when using uniform or normal distributions in dormant
+  /// @param dormant_max the maximum allowable dormant buying value. Required 
+  /// for uniform distribution, optional for normal distrbution
   /// Note that active and dormant periods are note currently compatible with
   /// (s, S) inventory management
   /// @{
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      double throughput, int active = 1, int dormant = 0);
+                      double throughput, std::string active_type = "Fixed", std::string dormant_type = "Fixed", int active_mean = 1, int dormant_mean = 0);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       double fill_to, double req_when_under);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
@@ -159,6 +182,9 @@ class MatlBuyPolicy : public Trader {
   virtual std::set<RequestPortfolio<Material>::Ptr> GetMatlRequests();
   virtual void AcceptMatlTrades(
       const std::vector<std::pair<Trade<Material>, Material::Ptr> >& resps);
+
+  virtual void SetNextActiveTime();
+  virtual void SetNextDormantTime();
   /// }@
 
  private:
@@ -173,13 +199,29 @@ class MatlBuyPolicy : public Trader {
   void set_req_when_under(double x);
   void set_quantize(double x);
   void set_throughput(double x);
-  void set_active(int x);
-  void set_dormant(int x);
+  void set_active_type(std::string x);
+  void set_dormant_type(std::string x);
+  void set_active_mean(int x);
+  void set_dormant_mean(int x);
+  void set_active_min(int x);
+  void set_dormant_min(int x);
+  void set_active_max(int x);
+  void set_dormant_max(int x);
+  void set_active_stddev(double x);
+  void set_dormant_stddev(double x);
+  void set_default_active_dormant_behavior();
 
   ResBuf<Material>* buf_;
   std::string name_;
   double fill_to_, req_when_under_, quantize_, throughput_;
-  int active_, dormant_;
+  
+  std::string active_type_, dormant_type_;
+  int active_mean_, dormant_mean_, active_min_, dormant_min_, active_max_, dormant_max_;
+  double cumulative_capacity_, active_stddev_, dormant_stddev_;
+
+  int next_active_end_;
+  int next_dormant_end_= -1;
+  
   std::map<Material::Ptr, std::string> rsrc_commods_;
   std::map<std::string, CommodDetail> commod_details_;
 };

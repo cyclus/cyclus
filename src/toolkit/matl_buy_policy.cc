@@ -20,8 +20,10 @@ MatlBuyPolicy::MatlBuyPolicy() :
     quantize_(-1),
     fill_to_(1),
     req_when_under_(1),
-    active_(1),
-    dormant_(0){
+    active_type_("Fixed"),
+    dormant_type_("Fixed"),
+    active_mean_(1),
+    dormant_mean_(0){
   Warn<EXPERIMENTAL_WARNING>(
       "MatlBuyPolicy is experimental and its API may be subject to change");
 }
@@ -55,14 +57,63 @@ void MatlBuyPolicy::set_throughput(double x) {
   throughput_ = x;
 }
 
-void MatlBuyPolicy::set_active(int x) {
-  assert(x > 0);
-  active_ = x;
+void MatlBuyPolicy::set_active_type(std::string x) {
+  std::set<std::string> active_options = {"Fixed", "UniformInt", "NormalInt", "Cumulative"};
+  assert(active_options.count(x));
+  active_type_ = x;
 }
 
-void MatlBuyPolicy::set_dormant(int x) {
+void MatlBuyPolicy::set_dormant_type(std::string x) {
+  std::set<std::string> dormant_options = {"Fixed", "UniformInt", "NormalInt"};
+  assert(dormant_options.count(x));
+  dormant_type_ = x;
+}
+
+void MatlBuyPolicy::set_active_mean(int x) {
+  assert(x > 0);
+  active_mean_ = x;
+}
+
+void MatlBuyPolicy::set_dormant_mean(int x) {
   assert(x >= 0);
-  dormant_ = x;
+  dormant_mean_ = x;
+}
+
+void MatlBuyPolicy::set_active_min(int x) {
+  assert(x > 0);
+  active_min_ = x;
+}
+
+void MatlBuyPolicy::set_dormant_min(int x) {
+  assert(x >= 0);
+  dormant_min_ = x;
+}
+
+void MatlBuyPolicy::set_active_max(int x) {
+  assert(x > 0);
+  active_max_ = x;
+}
+
+void MatlBuyPolicy::set_dormant_max(int x) {
+  assert(x >= 0);
+  dormant_max_ = x;
+}
+
+void MatlBuyPolicy::set_active_stddev(double x) {
+  assert(x > 0);
+  active_stddev_ = x;
+}
+
+void MatlBuyPolicy::set_dormant_stddev(double x) {
+  assert(x > 0);
+  dormant_stddev_ = x;
+}
+
+void MatlBuyPolicy::set_default_active_dormant_behavior() {
+  active_type_ = "Fixed";
+  dormant_type_ = "Fixed";
+  next_active_end_ = 1e299;
+  next_dormant_end_ = -1;
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
@@ -70,19 +121,23 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
+  set_default_active_dormant_behavior();
   return *this;
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name, double throughput, int active, int dormant) {
+                                   std::string name, double throughput, std::string active_type, std::string dormant_type, int active_mean, int dormant_mean) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
   set_throughput(throughput);
-  set_active(active);
-  set_dormant(dormant);
-  LGH(INFO3) << "has buy policy with active = " << active_ \
-             << "time steps and dormant = " << dormant_ << " time steps." ;
+  set_active_type(active_type);
+  set_dormant_type(dormant_type);
+  set_active_mean(active_mean);
+  set_dormant_mean(dormant_mean);
+  LGH(INFO3) << "has buy policy with active = " << active_mean_ \
+             << "time steps and dormant = " << dormant_mean_ << " time steps." ;
+  SetNextActiveTime();
   return *this;
 }
 
@@ -94,6 +149,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   name_ = name;
   set_fill_to(fill_to);
   set_req_when_under(req_when_under);
+  set_default_active_dormant_behavior();
   return *this;
 }
 
@@ -153,17 +209,42 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   std::set<RequestPortfolio<Material>::Ptr> ports;
   bool make_req = buf_->quantity() < req_when_under_ * buf_->capacity();
   double amt;
-  
-  if (dormant_ > 0 && manager()->context()->time() % (active_ + dormant_) < active_) {
+
+  int current_time_ = manager()->context()->time();
+
+  if (current_time_ < next_active_end_) {
+    // currently in the middle of active buying period
     amt = TotalQty();
   }
-  else if (dormant_ == 0)
-    amt = TotalQty();
-  else {
-    // in dormant part of cycle, return empty portfolio
+  else if (current_time_ < next_dormant_end_) {
+    // currently in the middle of dormant period
     amt = 0;
     LGH(INFO3) << "in dormant period, no request";
   }
+  else if (current_time_ == next_active_end_) {
+    // finished active. starting dormancy and sample/set length of dormant period
+    amt = 0;
+    LGH(INFO3) << "in dormant period, no request";
+    SetNextDormantTime();
+    LGH(INFO4) << "Dormant period will end at time step " << next_dormant_end_;
+  }
+  else if (current_time_ == next_dormant_end_) {
+    // finished dormant. starting buying and sample/set length of active period
+    amt = TotalQty();
+    SetNextActiveTime();
+    LGH(INFO4) << "Active period will end at time step " << next_active_end_;
+  }
+  
+  // if (dormant_mean_ > 0 && manager()->context()->time() % (active_mean_ + dormant_mean_) < active_mean_) {
+  //   amt = TotalQty();
+  // }
+  // else if (dormant_mean_ == 0)
+  //   amt = TotalQty();
+  // else {
+  //   // in dormant part of cycle, return empty portfolio
+  //   amt = 0;
+  //   LGH(INFO3) << "in dormant period, no request";
+  // }
   if (!make_req || amt < eps())
     return ports;
 
@@ -202,6 +283,41 @@ void MatlBuyPolicy::AcceptMatlTrades(
                << it->first.request->commodity();
     buf_->Push(it->second);
   }
+}
+
+void MatlBuyPolicy::SetNextActiveTime() {
+  if (active_type_ == "Fixed" && dormant_mean_ == 0) {
+    next_active_end_ = 1e299;
+    next_dormant_end_ = -1;
+  }
+  else if (active_type_ == "Fixed") {
+    next_active_end_ = manager()->context()->time() + active_mean_;
+  }
+  else if (active_type_ == "UniformInt") {
+    next_active_end_ = manager()->context()->time() + manager()->context()->random_uniform_int(active_min_, active_max_);
+  }
+  else if (active_type_ == "NormalInt") {
+    next_active_end_ = manager()->context()->time() + manager()->context()->random_normal_int(active_mean_, active_stddev_, active_min_, active_max_);
+  }
+  // if (dormant_mean_ > 0 && manager()->context()->time() % (active_mean_ + dormant_mean_) < active_mean_) {
+  //   amt = TotalQty();
+  // }
+  // else if (dormant_mean_ == 0)
+  //   amt = TotalQty();
+  return;
+};
+
+void MatlBuyPolicy::SetNextDormantTime() {
+  if (dormant_type_ == "Fixed") {
+    next_dormant_end_ = manager()->context()->time() + dormant_mean_;
+  }
+  else if (dormant_type_ == "UniformInt") {
+    next_dormant_end_ = manager()->context()->time() + manager()->context()->random_uniform_int(dormant_min_, dormant_max_);
+  }
+  else if (dormant_type_ == "NormalInt") {
+    next_dormant_end_ = manager()->context()->time() + manager()->context()->random_normal_int(dormant_mean_, dormant_stddev_, dormant_min_, dormant_max_);
+  }
+  return;
 }
 
 }  // namespace toolkit

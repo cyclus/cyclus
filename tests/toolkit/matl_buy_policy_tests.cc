@@ -184,7 +184,9 @@ TEST_F(MatlBuyPolicyTests, MultiReqQuantize) {
 // Tests that agent cycles between active and dormant cycles during a mock
 // sim, only buying when active.
 TEST_F(MatlBuyPolicyTests, ActiveDormant) {
+  std::string active_type = "Fixed";
   int active = 2;
+  std::string dormant_type = "Fixed";
   int dormant = 3;
   int dur = 4;
   double throughput = 1;
@@ -199,7 +201,7 @@ TEST_F(MatlBuyPolicyTests, ActiveDormant) {
 
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
   cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", throughput, active, dormant)
+  policy.Init(fac, &inbuf, "inbuf", throughput, active_type, dormant_type, active, dormant)
         .Set("commod1").Start();
 
   EXPECT_NO_THROW(sim.Run());
@@ -210,8 +212,9 @@ TEST_F(MatlBuyPolicyTests, ActiveDormant) {
 
 TEST_F(MatlBuyPolicyTests, ActiveDormantMultipleCycles) {
   using cyclus::QueryResult;
-
+  std::string active_type = "Fixed";
   int active = 2;
+  std::string dormant_type = "Fixed";
   int dormant = 3;
   int dur = 16;
   double throughput = 1;
@@ -226,7 +229,7 @@ TEST_F(MatlBuyPolicyTests, ActiveDormantMultipleCycles) {
 
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
   cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", throughput, active, dormant)
+  policy.Init(fac, &inbuf, "inbuf", throughput, active_type, dormant_type, active, dormant)
         .Set("commod1").Start();
 
   EXPECT_NO_THROW(sim.Run());
