@@ -2703,9 +2703,9 @@ cdef dict {{rfname}}_responses_to_py(const std_vector[std_pair[cpp_cyclus.Trade[
 
 {% endfor %}
 
-cpdef tuple request_types
-cpdef tuple bid_types
-cpdef tuple trade_types
+cdef tuple request_types
+cdef tuple bid_types
+cdef tuple trade_types
 ''')
 
 def typesystem_pxd(ts, ns):
