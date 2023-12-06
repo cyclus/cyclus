@@ -201,11 +201,11 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
                 reinterpret_cast[region_shim_ptr]((<_Agent> a).shim))
 
     void InitFromAgent "InitFrom" (CyclusRegionShim* a) except +:
-        cpp_cyclus.Region.InitFromAgent(a)
+        cpp_cyclus.Region.Region_InitFromAgent(a)
         (<object> this.self).init_from_agent(<object> a.self)
 
     void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di) except +:
-        cpp_cyclus.Region.InfileToDb(tree, di)
+        cpp_cyclus.Region.Region_InfileToDb(tree, di)
         # wrap interface
         cdef lib._InfileTree py_tree = lib.InfileTree(free=False)
         py_tree.ptx = tree
@@ -215,7 +215,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         (<object> this.self).infile_to_db(py_tree, py_di)
 
     void InitFrom(cpp_cyclus.QueryableBackend* b) except +:
-        cpp_cyclus.Region.InitFrom(b)
+        cpp_cyclus.Region.Region_InitFrom(b)
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         # call generic python
@@ -245,12 +245,12 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         return lib.str_to_json_value(pyanno)
 
     void Build(cpp_cyclus.Agent* parent) except +:
-        cpp_cyclus.Region.Build(parent)
+        cpp_cyclus.Region.Region_Build(parent)
         pyrent = lib.agent_to_py(parent, None)
         (<object> this.self).build(pyrent)
 
     void EnterNotify() except +:
-        cpp_cyclus.Region.EnterNotify()
+        cpp_cyclus.Region.Region_EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify() except +:
@@ -334,11 +334,11 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
                 reinterpret_cast[institution_shim_ptr]((<_Agent> a).shim))
 
     void InitFromAgent "InitFrom" (CyclusInstitutionShim* a) except +:
-        cpp_cyclus.Institution.InitFromAgent(a)
+        cpp_cyclus.Institution.Institution_InitFromAgent(a)
         (<object> this.self).init_from_agent(<object> a.self)
 
     void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di) except +:
-        cpp_cyclus.Institution.InfileToDb(tree, di)
+        cpp_cyclus.Institution.Institution_InfileToDb(tree, di)
         # wrap interface
         cdef lib._InfileTree py_tree = lib.InfileTree(free=False)
         py_tree.ptx = tree
@@ -348,7 +348,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         (<object> this.self).infile_to_db(py_tree, py_di)
 
     void InitFrom(cpp_cyclus.QueryableBackend* b) except +:
-        cpp_cyclus.Institution.InitFrom(b)
+        cpp_cyclus.Institution.Institution_InitFrom(b)
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         # call generic python
@@ -378,12 +378,12 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         return lib.str_to_json_value(pyanno)
 
     void Build(cpp_cyclus.Agent* parent) except +:
-        cpp_cyclus.Institution.Build(parent)
+        cpp_cyclus.Institution.Institution_Build(parent)
         pyrent = lib.agent_to_py(parent, None)
         (<object> this.self).build(pyrent)
 
     void EnterNotify() except +:
-        cpp_cyclus.Institution.EnterNotify()
+        cpp_cyclus.Institution.Institution_EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify() except +:
@@ -438,7 +438,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         (<object> this.self).tick()
 
     void Tock() except +:
-        cpp_cyclus.Institution.Tock()
+        cpp_cyclus.Institution.Institution_Tock()
         (<object> this.self).tock()
 
     void Decision() except +:
@@ -476,11 +476,11 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
                 reinterpret_cast[facility_shim_ptr]((<_Agent> a).shim))
 
     void InitFromAgent "InitFrom" (CyclusFacilityShim* a) except +:
-        cpp_cyclus.Facility.InitFromAgent(a)
+        cpp_cyclus.Facility.Facility_InitFromAgent(a)
         (<object> this.self).init_from_agent(<object> a.self)
 
     void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di) except +:
-        cpp_cyclus.Facility.InfileToDb(tree, di)
+        cpp_cyclus.Facility.Facility_InfileToDb(tree, di)
         # wrap interface
         cdef lib._InfileTree py_tree = lib.InfileTree(free=False)
         py_tree.ptx = tree
@@ -490,7 +490,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         (<object> this.self).infile_to_db(py_tree, py_di)
 
     void InitFrom(cpp_cyclus.QueryableBackend* b) except +:
-        cpp_cyclus.Facility.InitFrom(b)
+        cpp_cyclus.Facility.Facility_InitFrom(b)
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         # call generic python
@@ -520,12 +520,12 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         return lib.str_to_json_value(pyanno)
 
     void Build(cpp_cyclus.Agent* parent) except +:
-        cpp_cyclus.Facility.Build(parent)
+        cpp_cyclus.Facility.Facility_Build(parent)
         pyrent = lib.agent_to_py(parent, None)
         (<object> this.self).build(pyrent)
 
     void EnterNotify() except +:
-        cpp_cyclus.Facility.EnterNotify()
+        cpp_cyclus.Facility.Facility_EnterNotify()
         (<object> this.self).enter_notify()
 
     void BuildNotify() except +:
