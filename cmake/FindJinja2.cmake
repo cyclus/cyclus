@@ -2,10 +2,10 @@
 # Finds Jinja2 by trying to import it.
 #
 
-FIND_PACKAGE( PythonInterp )
+FIND_PACKAGE( Python3 )
 
-IF( PYTHONINTERP_FOUND )
-  EXECUTE_PROCESS( COMMAND ${PYTHON_EXECUTABLE} "-c" "import jinja2;print(jinja2.__version__)"
+IF( Python3_FOUND )
+  EXECUTE_PROCESS( COMMAND ${Python3_EXECUTABLE} "-c" "import jinja2;print(jinja2.__version__)"
     OUTPUT_VARIABLE JINJA2_VERSION_STRING )
 ENDIF()
 

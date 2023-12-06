@@ -1,7 +1,7 @@
 #
 # Runs setup.py install
 #
-set(PYTHON_EXECUTABLE @PYTHON_EXECUTABLE@)
+set(PYTHON_EXECUTABLE @Python3_EXECUTABLE@)
 set(core_version @core_version@)
 set(ENV{CYCLUS_CORE_VERSION} "${core_version}")
 message("############### Begin Python Install ###############")
@@ -10,10 +10,16 @@ message("  PYTHON_EXECUTABLE: ${PYTHON_EXECUTABLE}")
 message("  CYCLUS_CORE_VERSION: $ENV{CYCLUS_CORE_VERSION}")
 message("  CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
 message("  CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
-execute_process(COMMAND ${PYTHON_EXECUTABLE} setup.py install "--prefix=${CMAKE_INSTALL_PREFIX}"
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -m site --user-site
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                OUTPUT_VARIABLE site_packages
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                RESULT_VARIABLE res_var)
+message("  PYTHON_SITE_PACKAGES: ${site_packages}")
+execute_process(COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${site_packages} --force-reinstall --upgrade --no-deps .
                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                 RESULT_VARIABLE res_var)
 if(NOT "${res_var}" STREQUAL "0")
-  message(FATAL_ERROR "Process setup.py install failed, res_var = '${res_var}'")
+  message(FATAL_ERROR "Process python -m pip install failed, res_var = '${res_var}'")
 endif()
 message("###############  End Python Install  ###############")
