@@ -2476,9 +2476,9 @@ cdef dict {{rfname}}_responses_to_py(const std_vector[std_pair[cpp_cyclus.Trade[
 {% endfor %}
 
 
-cpdef tuple request_types = ({% for r in ts.resources %}{{ ts.classname(r) }}Request, {% endfor %})
-cpdef tuple bid_types = ({% for r in ts.resources %}{{ ts.classname(r) }}Bid, {% endfor %})
-cpdef tuple trade_types = ({% for r in ts.resources %}{{ ts.classname(r) }}Trade, {% endfor %})
+cdef tuple request_types = ({% for r in ts.resources %}{{ ts.classname(r) }}Request, {% endfor %})
+cdef tuple bid_types = ({% for r in ts.resources %}{{ ts.classname(r) }}Bid, {% endfor %})
+cdef tuple trade_types = ({% for r in ts.resources %}{{ ts.classname(r) }}Trade, {% endfor %})
 
 
 #
@@ -2571,11 +2571,11 @@ cdef class _{{tclassname}}:
 #
 # raw
 #
-cpdef dict C_RANKS
-cpdef dict C_NAMES
-cpdef dict C_IDS
-cpdef dict C_CPPTYPES
-cpdef dict C_NORMS
+cdef dict C_RANKS
+cdef dict C_NAMES
+cdef dict C_IDS
+cdef dict C_CPPTYPES
+cdef dict C_NORMS
 
 #
 # typedefs

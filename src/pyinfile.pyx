@@ -27,7 +27,7 @@ cdef public std_string py_to_json "CyclusPyToJson" (std_string cpp_infile) excep
     infile = std_string_to_py(cpp_infile)
     if not infile.endswith('\n'):
         infile += '\n'
-    cpdef dict ctx = {}
+    cdef dict ctx = {}
     exec(infile, ctx, ctx)
     names = ('simulation', 'SIMULATION', 'Simulation')
     for name in names:
