@@ -100,7 +100,7 @@ RUN conda update -y --all && \
                pytables \
                pandas \
                jinja2 \
-               "cython<3" \
+               cython \
                websockets \
                pprintpp \
                pip \
