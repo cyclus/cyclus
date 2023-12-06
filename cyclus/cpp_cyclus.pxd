@@ -762,7 +762,7 @@ cdef extern from "facility.h" namespace "cyclus":
         set[BidPortfolio[Product].Ptr] GetProductBids(CommodMap[Product].type&)
         void AdjustMatlPrefs(PrefMap[Material].type&)
         void AdjustProductPrefs(PrefMap[Product].type&)
-        void GetMatlTrades(const const vector[Trade[Material]]&,
+        void GetMatlTrades(const vector[Trade[Material]]&,
                            vector[pair[Trade[Material], Material.Ptr]]&)
         void GetProductTrades(const vector[Trade[Product]]&,
                               vector[pair[Trade[Product], Product.Ptr]]&)
