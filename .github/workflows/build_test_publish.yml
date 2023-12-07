@@ -84,7 +84,7 @@ jobs:
           conda,
         ]
 
-    name: Installing Dependencies, Building cyclus and running tests
+    name: Building Cyclus
     steps:
       - name: default environment
         run: |
@@ -125,16 +125,9 @@ jobs:
           file: docker/cyclus.dockerfile
           push: true
           tags: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}${{ env.tag }}
-          outputs: type=docker,dest=/tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          path: /tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
 
   push-deps-img:
     runs-on: ubuntu-latest
