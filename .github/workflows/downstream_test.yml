@@ -18,22 +18,22 @@ on:
       - 'CHANGELOG.rst'
 
 jobs:
-  build-cyclus:
+  build-test-cyclus:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         ubuntu_versions:
-          - 20.04
+          # - 20.04
           - 22.04
         pkg_mgr:
           - apt
-          - conda
+          # - conda
 
     name: Build Cyclus Docker Image
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -44,36 +44,109 @@ jobs:
           context: .
           file: docker/Dockerfile
           push: false
-          tags: cyclus:${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          outputs: type=docker,dest=/tmp/${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
+          tags: ghcr.io/cyclus/cyclus_${{ ubuntu_version }}_${{ matrix.pkg_mgr }}/cyclus
+          outputs: type=docker,dest=/tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          path: /tmp/${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
+          name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          path: /tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
 
-  build-cycamore:
+  build-test-cycamore:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
         ubuntu_versions:
-          - 20.04
+          # - 20.04
           - 22.04
         pkg_mgr:
           - apt
-          - conda
+          # - conda
 
-    needs: build-cyclus
+    needs: build-test-cyclus
 
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v3
         with:
-          name: ${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
           path: /tmp
-      - name: Load image
+
+      - name: Load Cyclus Docker Image
         run: |
-          docker load --input /tmp/${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
+          docker load --input /tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
           docker image ls -a
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: cyclus/cycamore
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and export
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: false
+          tags: ghcr.io/cyclus/cycamore_${{ ubuntu_version }}_${{ matrix.pkg_mgr }}/cycamore
+          outputs: type=docker,dest=/tmp/cycamore-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cycamore-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          path: /tmp/cycamore-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
+
+  build-test-cymetric:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        ubuntu_versions:
+          # - 20.04
+          - 22.04
+        pkg_mgr:
+          - apt
+          # - conda
+
+    needs: [build-test-cyclus, build-test-cycamore]
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: cycamore-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          path: /tmp
+
+      - name: Load Cycamore Docker Image
+        run: |
+          docker load --input /tmp/cycamore-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
+          docker image ls -a
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          repository: cyclus/cymetric
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and export
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/Dockerfile
+          push: false
+          tags: ghcr.io/cyclus/cymetric_${{ ubuntu_version }}_${{ matrix.pkg_mgr }}/cymetric
+          outputs: type=docker,dest=/tmp/cymetric-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cymetric-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          path: /tmp/cymetric-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
