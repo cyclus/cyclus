@@ -1,5 +1,4 @@
 ARG pkg_mgr=apt
-ARG make_cores=2
 ARG ubuntu_version=22.04
 
 FROM ubuntu:${ubuntu_version} as common-base
