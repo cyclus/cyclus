@@ -1,61 +1,12 @@
 name: Downstream Testing
 
 on:
-  workflow_dispatch:
-  pull_request:
-    paths-ignore:
-      - '.github/workflows/build_test.yml'
-      - '.github/workflows/build_test_publish.yml'
-      - '.github/workflows/changelog_test.yml'
-      - 'doc/**'
-      - 'CHANGELOG.rst'
-  push:
-    paths-ignore:
-      - '.github/workflows/build_test.yml'
-      - '.github/workflows/build_test_publish.yml'
-      - '.github/workflows/changelog_test.yml'
-      - 'doc/**'
-      - 'CHANGELOG.rst'
+  workflow_run:
+    workflows: [Build/Test Cyclus]
+    types:
+      - completed
 
 jobs:
-  build-test-cyclus:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        ubuntu_versions:
-          - 20.04
-          - 22.04
-        pkg_mgr:
-          - apt
-          - conda
-
-    name: Build/Test Cyclus
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and export
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: docker/Dockerfile
-          push: false
-          tags: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus
-          outputs: type=docker,dest=/tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
-          build-args: |
-            pkg_mgr=${{ matrix.pkg_mgr }}
-            ubuntu_version=${{ matrix.ubuntu_versions }}
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          path: /tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
-
   build-test-cycamore:
     runs-on: ubuntu-latest
 
@@ -68,13 +19,13 @@ jobs:
           - apt
           - conda
 
-    needs: build-test-cyclus
-
     name: Build/Test Cycamore
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: dawidd6/action-download-artifact@v2
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          run_id: ${{ github.event.workflow_run.id }}
           name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
           path: /tmp
 
@@ -120,13 +71,15 @@ jobs:
           - apt
           - conda
 
-    needs: [build-test-cyclus, build-test-cycamore]
+    needs: build-test-cycamore
 
     name: Build/Test Cymetric
     steps:
       - name: Download artifact
-        uses: actions/download-artifact@v3
+        uses: dawidd6/action-download-artifact@v2
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          run_id: ${{ github.event.workflow_run.id }}
           name: cycamore-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
           path: /tmp
 

@@ -12,8 +12,66 @@ on:
       - main
 
 jobs:
-  build-dependency-and-test-img:
+  build-dependency-img:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        ubuntu_versions : [
+          20.04,
+          22.04,
+        ]
+        pkg_mgr : [
+          apt,
+          conda,
+        ]
+
+    name: Building Dependency Image
+    steps:
+      - name: default environment
+        run: |
+          echo "tag=" >> "$GITHUB_ENV"
+
+      - name: condition on trigger parameters
+        if: ${{ github.repository_owner == 'cyclus' && github.ref == 'refs/heads/main' }}
+        run: |
+          echo "tag=:latest" >> "$GITHUB_ENV"
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and export
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/deps.dockerfile
+          push: false
+          tags: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps${{ env.tag }}
+          outputs: type=docker,dest=/tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps.tar
+          build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps
+          path: /tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps.tar
+
+  build-cyclus-img:
+    runs-on: ubuntu-latest
+
+    needs: build-dependency-img
 
     strategy:
       matrix:
@@ -30,12 +88,12 @@ jobs:
     steps:
       - name: default environment
         run: |
-          echo "tag-latest-on-default=false" >> "$GITHUB_ENV"
+          echo "tag=" >> "$GITHUB_ENV"
 
       - name: condition on trigger parameters
         if: ${{ github.repository_owner == 'cyclus' && github.ref == 'refs/heads/main' }}
         run: |
-          echo "tag-latest-on-default=true" >> "$GITHUB_ENV"
+          echo "tag=:latest" >> "$GITHUB_ENV"
 
       - name: Log in to the Container registry
         uses: docker/login-action@v2
@@ -44,17 +102,100 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Installing Dependencies in Docker image
-        uses: firehed/multistage-docker-build-action@v1
+      - name: Download Dependency Image Artifact
+        uses: actions/download-artifact@v3
         with:
-          repository: ghcr.io/${{ github.repository_owner }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
-          stages: ${{ matrix.pkg_mgr }}-deps, cyclus
-          server-stage: cyclus-test
-          quiet: false
-          parallel: true
-          tag-latest-on-default: ${{ env.tag-latest-on-default }}
-          dockerfile: docker/Dockerfile
-          build-args: pkg_mgr=${{ matrix.pkg_mgr }}, ubuntu_version=${{ matrix.ubuntu_versions }}
+          name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps
+          path: /tmp
+
+      - name: Load Dependency Image
+        run: |
+          docker load --input /tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps.tar
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Cyclus
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/cyclus.dockerfile
+          push: true
+          tags: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}${{ env.tag }}
+          outputs: type=docker,dest=/tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
+          build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          path: /tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
+
+  push-deps-img:
+    runs-on: ubuntu-latest
+
+    needs: [build-dependency-img, build-cyclus-img]
+
+    strategy:
+      matrix:
+        ubuntu_versions : [
+          20.04,
+          22.04,
+        ]
+        pkg_mgr : [
+          apt,
+          conda,
+        ]
+
+    name: Push Dependency Image
+    steps:
+      - name: default environment
+        run: |
+          echo "tag=" >> "$GITHUB_ENV"
+
+      - name: condition on trigger parameters
+        if: ${{ github.repository_owner == 'cyclus' && github.ref == 'refs/heads/main' }}
+        run: |
+          echo "tag=:latest" >> "$GITHUB_ENV"
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download Dependency Image Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps
+          path: /tmp
+
+      - name: Load Dependency Image
+        run: |
+          docker load --input /tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps.tar
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Push Dependency Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/deps.dockerfile
+          push: true
+          tags: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps${{ env.tag }}
+          build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
+
+
+  
