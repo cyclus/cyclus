@@ -1,15 +1,21 @@
-name: Build and Test Dependency Images
+name: Downstream Testing
 
 on:
-  # allows us to run workflows manually
   workflow_dispatch:
   pull_request:
-    paths:
+    paths-ignore:
       - '.github/workflows/build_test_publish.yml'
+      - '.github/workflows/changelog_test.yml'
       - 'docker/**'
+      - 'doc/**'
+      - 'CHANGELOG.rst'
   push:
-    branches:
-      - main
+    paths-ignore:
+      - '.github/workflows/build_test_publish.yml'
+      - '.github/workflows/changelog_test.yml'
+      - 'docker/**'
+      - 'doc/**'
+      - 'CHANGELOG.rst'
 
 jobs:
   build-cyclus:
@@ -17,50 +23,46 @@ jobs:
 
     strategy:
       matrix:
-        ubuntu_versions : [
-          20.04,
-          22.04,
-        ]
-        pkg_mgr : [
-          apt,
-          conda,
-        ]
+        ubuntu_versions:
+          - 20.04
+          - 22.04
+        pkg_mgr:
+          - apt
+          - conda
 
     name: Build Cyclus Docker Image
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Build and export
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        push: false
-        tags: cyclus:${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-        outputs: type=docker,dest=/tmp/${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
+      - name: Build and export
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: cyclus:${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          outputs: type=docker,dest=/tmp/${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: ${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-        path: /tmp/${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          path: /tmp/${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
 
   build-cycamore:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        ubuntu_versions : [
-          20.04,
-          22.04,
-        ]
-        pkg_mgr : [
-          apt,
-          conda,
-        ]
+        ubuntu_versions:
+          - 20.04
+          - 22.04
+        pkg_mgr:
+          - apt
+          - conda
 
     needs: build-cyclus
 
@@ -73,4 +75,4 @@ jobs:
       - name: Load image
         run: |
           docker load --input /tmp/${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
-          docker image ls -a     
+          docker image ls -a
