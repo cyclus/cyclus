@@ -44,7 +44,7 @@ jobs:
           context: .
           file: docker/Dockerfile
           push: false
-          tags: ghcr.io/cyclus/cyclus_${{ ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus
+          tags: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus
           outputs: type=docker,dest=/tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
 
       - name: Upload artifact
@@ -93,7 +93,7 @@ jobs:
           context: .
           file: docker/Dockerfile
           push: false
-          tags: ghcr.io/cyclus/cycamore_${{ ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore
+          tags: ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore
           outputs: type=docker,dest=/tmp/cycamore-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
 
       - name: Upload artifact
@@ -142,7 +142,7 @@ jobs:
           context: .
           file: docker/Dockerfile
           push: false
-          tags: ghcr.io/cyclus/cymetric_${{ ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric
+          tags: ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric
           outputs: type=docker,dest=/tmp/cymetric-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
 
       - name: Upload artifact
