@@ -24,11 +24,11 @@ jobs:
     strategy:
       matrix:
         ubuntu_versions:
-          # - 20.04
+          - 20.04
           - 22.04
         pkg_mgr:
           - apt
-          # - conda
+          - conda
 
     name: Build Cyclus Docker Image
     steps:
@@ -59,11 +59,11 @@ jobs:
     strategy:
       matrix:
         ubuntu_versions:
-          # - 20.04
+          - 20.04
           - 22.04
         pkg_mgr:
           - apt
-          # - conda
+          - conda
 
     needs: build-test-cyclus
 
@@ -108,11 +108,11 @@ jobs:
     strategy:
       matrix:
         ubuntu_versions:
-          # - 20.04
+          - 20.04
           - 22.04
         pkg_mgr:
           - apt
-          # - conda
+          - conda
 
     needs: [build-test-cyclus, build-test-cycamore]
 
