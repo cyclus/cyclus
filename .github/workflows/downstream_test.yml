@@ -4,16 +4,16 @@ on:
   workflow_dispatch:
   pull_request:
     paths-ignore:
+      - '.github/workflows/build_test.yml'
       - '.github/workflows/build_test_publish.yml'
       - '.github/workflows/changelog_test.yml'
-      - 'docker/**'
       - 'doc/**'
       - 'CHANGELOG.rst'
   push:
     paths-ignore:
+      - '.github/workflows/build_test.yml'
       - '.github/workflows/build_test_publish.yml'
       - '.github/workflows/changelog_test.yml'
-      - 'docker/**'
       - 'doc/**'
       - 'CHANGELOG.rst'
 
@@ -32,6 +32,9 @@ jobs:
 
     name: Build Cyclus Docker Image
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -39,6 +42,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: docker/Dockerfile
           push: false
           tags: cyclus:${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
           outputs: type=docker,dest=/tmp/${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
