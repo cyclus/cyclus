@@ -4,16 +4,16 @@ on:
   workflow_dispatch:
   pull_request:
     paths-ignore:
-      - '.github/workflows/build_test.yml'
       - '.github/workflows/build_test_publish.yml'
       - '.github/workflows/changelog_test.yml'
+      - 'docker/**'
       - 'doc/**'
       - 'CHANGELOG.rst'
   push:
     paths-ignore:
-      - '.github/workflows/build_test.yml'
       - '.github/workflows/build_test_publish.yml'
       - '.github/workflows/changelog_test.yml'
+      - 'docker/**'
       - 'doc/**'
       - 'CHANGELOG.rst'
 
@@ -39,7 +39,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: docker/Dockerfile
           push: false
           tags: cyclus:${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
           outputs: type=docker,dest=/tmp/${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
