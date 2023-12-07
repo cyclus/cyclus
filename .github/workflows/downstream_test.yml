@@ -2,7 +2,8 @@ name: Downstream Testing
 
 on:
   workflow_run:
-    workflows: [Build/Test Cyclus]
+    workflows: 
+      - Build/Test Cyclus
     types:
       - completed
 
