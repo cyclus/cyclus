@@ -30,7 +30,7 @@ jobs:
           - apt
           - conda
 
-    name: Build Cyclus Docker Image
+    name: Build/Test Cyclus
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -67,6 +67,7 @@ jobs:
 
     needs: build-test-cyclus
 
+    name: Build/Test Cycamore
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v3
@@ -115,6 +116,7 @@ jobs:
 
     needs: [build-test-cyclus, build-test-cycamore]
 
+    name: Build/Test Cymetric
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v3
