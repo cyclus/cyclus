@@ -38,13 +38,9 @@ jobs:
       image: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref }}
 
       - name: Build Cyclus
-        uses: ./.github/actions/build-image
+        uses: bennibbelink/cyclus-ci-action@v1.0.1
         with:
           repository: cyclus/cyclus
           repository-ref: ${{ github.ref }}
@@ -74,14 +70,10 @@ jobs:
         ]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref }}
 
       - name: Build Cycamore
         id: build-cycamore
-        uses: ./.github/actions/build-image
+        uses: bennibbelink/cyclus-ci-action@v1.0.1
         with:
           repository: cyclus/cycamore
           repository-ref: main
@@ -118,14 +110,9 @@ jobs:
         ]
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref }}
-
       - name: Build Cymetric
         id: build-cymetric
-        uses: ./.github/actions/build-image
+        uses: bennibbelink/cyclus-ci-action@v1.0.1
         with:
           repository: cyclus/cymetric
           repository-ref: main
