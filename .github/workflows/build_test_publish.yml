@@ -37,12 +37,11 @@ jobs:
         run: |
           echo "tag=latest" >> "$GITHUB_ENV"
 
-      - name: Build Docker Image
-        id: build-cyclus
+      - name: Build deps.dockerfile Image
         uses: bennibbelink/cyclus-ci-action@v1.0.1
         with:
           repository: cyclus/cyclus
-          repository-ref: ${{ github.ref }}
+          repository-ref: ${{ github.sha }}
           artifact-out-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps
           artifact-out-tag: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps:${{ env.tag }}
           dockerfile-path: docker/deps.dockerfile
@@ -67,11 +66,12 @@ jobs:
 
     name: Building Cyclus
     steps:
-      - name: Build Cyclus
-        uses: bennibbelink/cyclus-ci-action@v1.0.1
+      - name: Build cyclus.dockerfile Image
+        uses: bennibbelink/cyclus-ci-action@v1.0.2
         with:
           repository: cyclus/cyclus
-          repository-ref: ${{ github.ref }}
+          repository-ref: ${{ github.sha }}
+          push-image: ${{ github.event_name == 'push'}} # push new cyclus image only on merge
           artifact-in-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps
           dockerfile-path: docker/cyclus.dockerfile
           docker-build-args: |
