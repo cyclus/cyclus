@@ -40,10 +40,9 @@ jobs:
     steps:
 
       - name: Build Cyclus
-        uses: bennibbelink/cyclus-ci-action@v1.0.1
+        uses: bennibbelink/cyclus-ci-action
         with:
           repository: cyclus/cyclus
-          repository-ref: ${{ github.ref_name }}
           artifact-out-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
           artifact-out-tag: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
           dockerfile-path: docker/cyclus.dockerfile
@@ -72,7 +71,7 @@ jobs:
     steps:
       - name: Build Cycamore
         id: build-cycamore
-        uses: bennibbelink/cyclus-ci-action@v1.0.1
+        uses: bennibbelink/cyclus-ci-action
         with:
           repository: cyclus/cycamore
           repository-ref: main
@@ -111,7 +110,7 @@ jobs:
     steps:
       - name: Build Cymetric
         id: build-cymetric
-        uses: bennibbelink/cyclus-ci-action@v1.0.1
+        uses: bennibbelink/cyclus-ci-action
         with:
           repository: cyclus/cymetric
           repository-ref: main
