@@ -59,6 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-test-cyclus
     if: ${{ github.event_name == 'pull_request' }}
+    continue-on-error: true
 
     strategy:
       fail-fast: false
@@ -79,6 +80,7 @@ jobs:
           ref: ${{ github.ref }}
 
       - name: Build Cycamore
+        id: build-cycamore
         uses: ./.github/actions/build-image
         with:
           repository: cyclus/cycamore
@@ -90,11 +92,18 @@ jobs:
           docker-build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
+      
+      - name: Failure Warning
+        if: steps.build-cycamore.outcome != 'success'
+        run: |
+          echo "::warning title=Downstream Failure::Cycamore Build/Test Failed"
+
 
   downstream-cymetric:
     runs-on: ubuntu-latest
     needs: [build-test-cyclus, downstream-cycamore]
     if: ${{ github.event_name == 'pull_request' }}
+    continue-on-error: true
 
     strategy:
       fail-fast: false
@@ -114,7 +123,8 @@ jobs:
         with:
           ref: ${{ github.ref }}
 
-      - name: Build Cycamore
+      - name: Build Cymetric
+        id: build-cymetric
         uses: ./.github/actions/build-image
         with:
           repository: cyclus/cymetric
@@ -126,3 +136,8 @@ jobs:
           docker-build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
+
+      - name: Failure Warning
+        if: steps.build-cymetric.outcome != 'success'
+        run: |
+          echo "::warning title=Downstream Failure::Cymetric Build/Test Failed"
