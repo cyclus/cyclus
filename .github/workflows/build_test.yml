@@ -40,7 +40,7 @@ jobs:
     steps:
 
       - name: Build Cyclus
-        uses: bennibbelink/cyclus-ci-action
+        uses: bennibbelink/cyclus-ci-action@main
         with:
           repository: cyclus/cyclus
           artifact-out-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
@@ -71,7 +71,7 @@ jobs:
     steps:
       - name: Build Cycamore
         id: build-cycamore
-        uses: bennibbelink/cyclus-ci-action
+        uses: bennibbelink/cyclus-ci-action@main
         with:
           repository: cyclus/cycamore
           repository-ref: main
@@ -110,7 +110,7 @@ jobs:
     steps:
       - name: Build Cymetric
         id: build-cymetric
-        uses: bennibbelink/cyclus-ci-action
+        uses: bennibbelink/cyclus-ci-action@main
         with:
           repository: cyclus/cymetric
           repository-ref: main

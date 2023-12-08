@@ -38,7 +38,7 @@ jobs:
           echo "tag=latest" >> "$GITHUB_ENV"
 
       - name: Build deps.dockerfile Image
-        uses: bennibbelink/cyclus-ci-action
+        uses: bennibbelink/cyclus-ci-action@main
         with:
           repository: cyclus/cyclus
           artifact-out-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps
@@ -66,7 +66,7 @@ jobs:
     name: Building Cyclus
     steps:
       - name: Build cyclus.dockerfile Image
-        uses: bennibbelink/cyclus-ci-action
+        uses: bennibbelink/cyclus-ci-action@main
         with:
           repository: cyclus/cyclus
           push-image: ${{ github.event_name == 'push'}} # push new cyclus image only on merge
