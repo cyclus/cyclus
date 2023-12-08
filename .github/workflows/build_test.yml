@@ -19,7 +19,7 @@ on:
       - 'CHANGELOG.rst'
 
 jobs:
-  build-and-test:
+  build-test-cyclus:
     runs-on: ubuntu-latest
 
     strategy:
@@ -30,8 +30,8 @@ jobs:
           22.04,
         ]
         pkg_mgr : [
-            apt,
-            conda,
+          apt,
+          conda,
         ]
     
     container:
@@ -46,9 +46,83 @@ jobs:
       - name: Build Cyclus
         uses: ./.github/actions/build-image
         with:
-          repository: 'cyclus/cyclus'
+          repository: cyclus/cyclus
           repository-ref: ${{ github.ref }}
-          dockerfile-path: 'docker/cyclus.dockerfile'
+          artifact-out-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          artifact-out-tag: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
+          dockerfile-path: docker/cyclus.dockerfile
+          docker-build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
+
+  downstream-cycamore:
+    runs-on: ubuntu-latest
+    needs: build-test-cyclus
+    if: ${{ github.event_name == 'pull_request' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_versions : [
+          20.04,
+          22.04,
+        ]
+        pkg_mgr : [
+          apt,
+          conda,
+        ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Build Cycamore
+        uses: ./.github/actions/build-image
+        with:
+          repository: cyclus/cycamore
+          repository-ref: main
+          artifact-in-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          artifact-out-name: cycamore-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          artifact-out-tag: ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
+          dockerfile-path: docker/Dockerfile
+          docker-build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
+
+  downstream-cymetric:
+    runs-on: ubuntu-latest
+    needs: [build-test-cyclus, downstream-cycamore]
+    if: ${{ github.event_name == 'pull_request' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_versions : [
+          20.04,
+          22.04,
+        ]
+        pkg_mgr : [
+          apt,
+          conda,
+        ]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Build Cycamore
+        uses: ./.github/actions/build-image
+        with:
+          repository: cyclus/cymetric
+          repository-ref: main
+          artifact-in-name: cycamore-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          artifact-out-name: cymetric-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          artifact-out-tag: ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
+          dockerfile-path: docker/Dockerfile
           docker-build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
