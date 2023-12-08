@@ -34,6 +34,7 @@ runs:
 
     - name: Load Cyclus Docker Image
       if: ${{ inputs.artifact-in-name }}
+      shell: bash
       run: |
         docker load --input /tmp/${{ inputs.artifact-in-name }}.tar
 
