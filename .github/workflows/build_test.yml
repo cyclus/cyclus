@@ -43,7 +43,7 @@ jobs:
         uses: bennibbelink/cyclus-ci-action@v1.0.1
         with:
           repository: cyclus/cyclus
-          repository-ref: ${{ github.sha }}
+          repository-ref: ${{ github.ref_name }}
           artifact-out-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
           artifact-out-tag: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
           dockerfile-path: docker/cyclus.dockerfile

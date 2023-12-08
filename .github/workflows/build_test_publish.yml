@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: default environment
         run: |
-          echo "tag=${{ github.sha }}" >> "$GITHUB_ENV"
+          echo "tag=${{ github.ref_name }}" >> "$GITHUB_ENV"
 
       - name: condition on trigger parameters
         if: ${{ github.repository_owner == 'cyclus' && github.ref == 'refs/heads/main' }}
@@ -41,7 +41,7 @@ jobs:
         uses: bennibbelink/cyclus-ci-action@v1.0.1
         with:
           repository: cyclus/cyclus
-          repository-ref: ${{ github.sha }}
+          repository-ref: ${{ github.ref_name }}
           artifact-out-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps
           artifact-out-tag: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps:${{ env.tag }}
           dockerfile-path: docker/deps.dockerfile
@@ -70,7 +70,7 @@ jobs:
         uses: bennibbelink/cyclus-ci-action@v1.0.2
         with:
           repository: cyclus/cyclus
-          repository-ref: ${{ github.sha }}
+          repository-ref: ${{ github.ref_name }}
           push-image: ${{ github.event_name == 'push'}} # push new cyclus image only on merge
           artifact-in-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps
           dockerfile-path: docker/cyclus.dockerfile
