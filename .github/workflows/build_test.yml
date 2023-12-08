@@ -38,7 +38,6 @@ jobs:
       image: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps
 
     steps:
-
       - name: Build Cyclus
         uses: bennibbelink/cyclus-ci-action@main
         with:
