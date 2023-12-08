@@ -40,12 +40,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Build Cyclus
         uses: ./.github/actions/build-image
         with:
           repository: 'cyclus/cyclus'
-          dockerfile-path: docker/cyclus.dockerfile
+          dockerfile-path: 'docker/cyclus.dockerfile'
           docker-build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
