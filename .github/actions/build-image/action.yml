@@ -44,6 +44,7 @@ runs:
       uses: docker/setup-buildx-action@v3
 
     - name: Debug
+      shell: bash
       run: |
         pwd
         ls
