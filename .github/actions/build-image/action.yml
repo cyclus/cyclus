@@ -7,15 +7,12 @@ inputs:
   artifact-in-name:
     description: "input docker image artifact"
     required: false
-    default: "in_artifact"
   artifact-out-tag:
     description: "tag for output docker image"
     required: false
-    default: "default_tag"
   artifact-out-name:
     description: "name for output docker image"
     required: false
-    default: "out_artifact"
   dockerfile-path:
     description: "path to dockerfile in the repo"
     required: true
