@@ -39,26 +39,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and Push Cyclus
-        uses: docker/build-push-action@v5
+        uses: ./.github/actions/build-image
         with:
-          context: .
-          file: docker/cyclus.dockerfile
-          push: false
-          tags: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
-          outputs: type=docker,dest=/tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
-          build-args: |
+          repository: "cyclus/cyclus"
+          dockerfile-path: docker/cyclus.dockerfile
+          docker-build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          path: /tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}.tar
-
