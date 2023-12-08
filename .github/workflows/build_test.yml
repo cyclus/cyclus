@@ -45,6 +45,7 @@ jobs:
         uses: ./.github/actions/build-image
         with:
           repository: 'cyclus/cyclus'
+          repository-ref: ${{ github.ref }}
           dockerfile-path: 'docker/cyclus.dockerfile'
           docker-build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
