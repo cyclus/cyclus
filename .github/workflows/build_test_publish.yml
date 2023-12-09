@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: default environment
         run: |
-          echo "tag=${{ github.event.after }}" >> "$GITHUB_ENV"
+          echo "tag=${{ github.sha }}" >> "$GITHUB_ENV"
 
       - name: condition on trigger parameters
         if: ${{ github.repository_owner == 'cyclus' && github.ref == 'refs/heads/main' }}
