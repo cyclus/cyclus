@@ -5,15 +5,7 @@ on:
   workflow_dispatch:
   pull_request:
     paths-ignore:
-      - '.github/workflows/build_test_publish.yml'
-      - '.github/workflows/changelog_test.yml'
-      - 'docker/**'
-      - 'doc/**'
-      - 'CHANGELOG.rst'
-  push:
-    paths-ignore:
-      - '.github/workflows/build_test_publish.yml'
-      - '.github/workflows/changelog_test.yml'
+      - '.github/workflows/**''
       - 'docker/**'
       - 'doc/**'
       - 'CHANGELOG.rst'
@@ -30,8 +22,8 @@ jobs:
           22.04,
         ]
         pkg_mgr : [
-            apt,
-            conda,
+          apt,
+          conda,
         ]
     
     container:
