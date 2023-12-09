@@ -22,15 +22,6 @@ jobs:
 
     name: Installing Dependencies, Building cyclus and running tests
     steps:
-      - name: default environment
-        run: |
-            echo "tag-latest-on-default=false" >> "$GITHUB_ENV"
-    
-      - name: condition on trigger parameters
-        if: ${{ github.repository_owner == 'cyclus' }}
-        run: |
-            echo "tag-latest-on-default=true" >> "$GITHUB_ENV"
-    
       - name: Log in to the Container registry
         uses: docker/login-action@v2
         with:
@@ -38,17 +29,14 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Installing Dependencies in Docker image
-        uses: firehed/multistage-docker-build-action@v1
+      - name: Build cyclus.dockerfile Image
+        uses: bennibbelink/cyclus-ci-action@main
         with:
-          repository: ghcr.io/${{ github.repository_owner }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}_${{ github.ref }}
-          stages: ${{ matrix.pkg_mgr }}-deps, cyclus
-          server-stage: cyclus-test
-          quiet: false
-          parallel: true
-          tag-latest-on-default: ${{ env.tag-latest-on-default }}
-          dockerfile: docker/Dockerfile
-          build-args: pkg_mgr=${{ matrix.pkg_mgr }}, ubuntu_version=${{ matrix.ubuntu_versions }}
+          repository: cyclus/cyclus
+          push-image: true
+          artifact-out-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          artifact-out-tag: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ github.ref_name }}
+          dockerfile-path: docker/cyclus.dockerfile
+          docker-build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
