@@ -66,6 +66,7 @@ void RunSim(std::string infile, SqliteBack* back) {
 TEST(IntegTests, RunAllInfiles) {
   std::vector<std::string> infiles;
   infiles.push_back("custom_dt.xml");
+  infiles.push_back("custom_seed.xml");
   infiles.push_back("inventory.xml");
   infiles.push_back("inventory_compact.xml");
   infiles.push_back("inventory_compact_false.xml");
@@ -104,6 +105,14 @@ TEST(IntegTests, CustomTimestepDurFlat) {
     QueryResult qr = back.Query("TimeStepDur", NULL);
     EXPECT_EQ(86400, qr.GetVal<int>("DurationSecs"));
   }
+}
+
+TEST(IntegTests, CustomSeed) {
+  SqliteBack back(":memory:");
+    RunSim("custom_seed.xml", &back);
+    QueryResult qr = back.Query("Info", NULL);
+    EXPECT_EQ(20240101, qr.GetVal<int>("Seed"));
+    EXPECT_EQ(1234, qr.GetVal<int>("Stride"));
 }
 
 }  // namespace cyclus

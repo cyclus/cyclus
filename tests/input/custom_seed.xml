@@ -1,0 +1,59 @@
+<simulation>
+    <control>
+      <duration>1</duration>
+      <startmonth>1</startmonth>
+      <startyear>2000</startyear>
+      <seed>20240101</seed>
+      <stride>1234</stride>
+    </control>
+  
+    <archetypes>
+      <spec><lib>agents</lib><name>Source</name></spec>
+      <spec><lib>agents</lib><name>Sink</name></spec>
+      <spec><lib>agents</lib><name>NullRegion</name></spec>
+      <spec><lib>agents</lib><name>NullInst</name></spec>
+    </archetypes>
+  
+    <facility>
+      <name>src</name>
+      <lifetime>1</lifetime>
+      <config>
+        <Source>
+          <commod>commod</commod>
+          <capacity>1</capacity>
+        </Source>
+      </config>
+    </facility>
+  
+    <facility>
+      <name>snk</name>
+      <config>
+        <Sink>
+          <in_commods><val>commod</val></in_commods>
+          <recipe_name>commod_recipe</recipe_name>
+          <capacity>1</capacity>
+        </Sink>
+      </config>
+    </facility>
+  
+    <region>
+      <name>SingleRegion</name>
+      <config> <NullRegion/> </config>
+      <institution>
+        <name>SingleInstitution</name>
+        <initialfacilitylist>
+          <entry> <prototype>src</prototype> <number>1</number> </entry>
+          <entry> <prototype>snk</prototype> <number>1</number> </entry>
+        </initialfacilitylist>
+        <config> <NullInst/> </config>
+      </institution>
+    </region>
+  
+    <recipe>
+      <name>commod_recipe</name>
+      <basis>mass</basis>
+      <nuclide> <id>cs137</id> <comp>1</comp> </nuclide>
+    </recipe>
+  
+  </simulation>
+  

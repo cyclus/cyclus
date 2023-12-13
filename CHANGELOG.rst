@@ -22,7 +22,7 @@ Since last release
 * Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599)
 * Added code coverage reporting to GitHub workflows (#1616)
 * Adds active and dormant buying cycles in buy policy (#1596)
-* Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599)
+* Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599, #1639)
 
 **Changed:**
 

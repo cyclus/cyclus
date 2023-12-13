@@ -34,6 +34,12 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
           <element name="tolerance_resource"><data type="double"/></element>
       </optional>
       <optional>
+          <element name="seed"><data type="positiveInteger" /></element>
+      </optional>
+      <optional>
+          <element name="stride"><data type="positiveInteger" /></element>
+      </optional>
+      <optional>
         <element name="solver"> 
           <interleave>
             <optional><element name="config">
