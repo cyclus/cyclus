@@ -19,11 +19,7 @@ MatlBuyPolicy::MatlBuyPolicy() :
     throughput_(std::numeric_limits<double>::max()),
     quantize_(-1),
     fill_to_(1),
-    req_when_under_(1),
-    active_type_("Fixed"),
-    dormant_type_("Fixed"),
-    active_mean_(1),
-    dormant_mean_(0){
+    req_when_under_(1){
   Warn<EXPERIMENTAL_WARNING>(
       "MatlBuyPolicy is experimental and its API may be subject to change");
 }
@@ -57,63 +53,22 @@ void MatlBuyPolicy::set_throughput(double x) {
   throughput_ = x;
 }
 
-void MatlBuyPolicy::set_active_type(std::string x) {
-  std::set<std::string> active_options = {"Fixed", "UniformInt", "NormalInt", "Cumulative"};
-  assert(active_options.count(x));
-  active_type_ = x;
+void MatlBuyPolicy::set_default_distributions() {
+  active_dist_ = new FixedIntDist(1);
+  dormant_dist_ = new FixedIntDist(-1);
+  size_dist_ = new FixedDoubleDist(1.0);
+  init_active_dormant();
 }
 
-void MatlBuyPolicy::set_dormant_type(std::string x) {
-  std::set<std::string> dormant_options = {"Fixed", "UniformInt", "NormalInt"};
-  assert(dormant_options.count(x));
-  dormant_type_ = x;
-}
-
-void MatlBuyPolicy::set_active_mean(int x) {
-  assert(x > 0);
-  active_mean_ = x;
-}
-
-void MatlBuyPolicy::set_dormant_mean(int x) {
-  assert(x >= 0);
-  dormant_mean_ = x;
-}
-
-void MatlBuyPolicy::set_active_min(int x) {
-  assert(x > 0);
-  active_min_ = x;
-}
-
-void MatlBuyPolicy::set_dormant_min(int x) {
-  assert(x >= 0);
-  dormant_min_ = x;
-}
-
-void MatlBuyPolicy::set_active_max(int x) {
-  assert(x > 0);
-  active_max_ = x;
-}
-
-void MatlBuyPolicy::set_dormant_max(int x) {
-  assert(x >= 0);
-  dormant_max_ = x;
-}
-
-void MatlBuyPolicy::set_active_stddev(double x) {
-  assert(x > 0);
-  active_stddev_ = x;
-}
-
-void MatlBuyPolicy::set_dormant_stddev(double x) {
-  assert(x > 0);
-  dormant_stddev_ = x;
-}
-
-void MatlBuyPolicy::set_default_active_dormant_behavior() {
-  active_type_ = "Fixed";
-  dormant_type_ = "Fixed";
-  next_active_end_ = 1e299;
-  next_dormant_end_ = -1;
+void MatlBuyPolicy::init_active_dormant() {
+  next_active_end_ = active_dist_->sample();
+  int dormant_len = dormant_dist_->sample();
+  if (dormant_len < 0) {
+    next_dormant_end_ = -1;
+  }
+  else {
+    next_dormant_end_ = dormant_len + next_active_end_;
+  }
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
@@ -121,23 +76,22 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
-  set_default_active_dormant_behavior();
+  set_default_distributions();
   return *this;
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name, double throughput, std::string active_type, std::string dormant_type, int active_mean, int dormant_mean) {
+                                   std::string name, double throughput, IntDistribution* active_dist,
+                                   IntDistribution* dormant_dist,
+                                   DoubleDistribution* size_dist) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
   set_throughput(throughput);
-  set_active_type(active_type);
-  set_dormant_type(dormant_type);
-  set_active_mean(active_mean);
-  set_dormant_mean(dormant_mean);
-  LGH(INFO3) << "has buy policy with active = " << active_mean_ \
-             << "time steps and dormant = " << dormant_mean_ << " time steps." ;
-  SetNextActiveTime();
+  active_dist_ = active_dist;
+  dormant_dist_ = dormant_dist;
+  size_dist_ = size_dist;
+  init_active_dormant();
   return *this;
 }
 
@@ -149,7 +103,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   name_ = name;
   set_fill_to(fill_to);
   set_req_when_under(req_when_under);
-  set_default_active_dormant_behavior();
+  set_default_distributions();
   return *this;
 }
 
@@ -164,6 +118,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   set_req_when_under(req_when_under);
   set_quantize(quantize);
   set_throughput(throughput);
+  set_default_distributions();
   return *this;
 }
 
@@ -212,46 +167,36 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
 
   int current_time_ = manager()->context()->time();
 
-  if (current_time_ < next_active_end_) {
+  if (current_time_ < next_active_end_ || next_dormant_end_ < 0) {
     // currently in the middle of active buying period
     amt = TotalQty();
   }
   else if (current_time_ < next_dormant_end_) {
     // currently in the middle of dormant period
     amt = 0;
-    LGH(INFO3) << "in dormant period, no request";
+    LGH(INFO3) << "in dormant period, no request" << std::endl;
   }
   else if (current_time_ == next_active_end_) {
     // finished active. starting dormancy and sample/set length of dormant period
     amt = 0;
-    LGH(INFO3) << "in dormant period, no request";
     SetNextDormantTime();
-    LGH(INFO4) << "Dormant period will end at time step " << next_dormant_end_;
+
   }
-  else if (current_time_ == next_dormant_end_) {
+  // the following is an if rather than if-else statement because if dormant
+  // length is zero, buy policy should return to active immediately
+  if (current_time_ == next_dormant_end_) {
     // finished dormant. starting buying and sample/set length of active period
     amt = TotalQty();
     SetNextActiveTime();
-    LGH(INFO4) << "Active period will end at time step " << next_active_end_;
   }
-  
-  // if (dormant_mean_ > 0 && manager()->context()->time() % (active_mean_ + dormant_mean_) < active_mean_) {
-  //   amt = TotalQty();
-  // }
-  // else if (dormant_mean_ == 0)
-  //   amt = TotalQty();
-  // else {
-  //   // in dormant part of cycle, return empty portfolio
-  //   amt = 0;
-  //   LGH(INFO3) << "in dormant period, no request";
-  // }
+
   if (!make_req || amt < eps())
     return ports;
 
   bool excl = Excl();
   double req_amt = ReqQty();
   int n_req = NReq();
-  LGH(INFO3) << "requesting " << amt << " kg via " << n_req << " request(s)";
+  LGH(INFO3) << "requesting " << amt << " kg via " << n_req << " request(s)"  << std::endl;
 
   // one portfolio for each request
   for (int i = 0; i != n_req; i++) {
@@ -280,42 +225,20 @@ void MatlBuyPolicy::AcceptMatlTrades(
   for (it = resps.begin(); it != resps.end(); ++it) {
     rsrc_commods_[it->second] = it->first.request->commodity();
     LGH(INFO3) << "got " << it->second->quantity() << " kg of "
-               << it->first.request->commodity();
+               << it->first.request->commodity()  << std::endl;
     buf_->Push(it->second);
   }
 }
 
 void MatlBuyPolicy::SetNextActiveTime() {
-  if (active_type_ == "Fixed" && dormant_mean_ == 0) {
-    next_active_end_ = 1e299;
-    next_dormant_end_ = -1;
-  }
-  else if (active_type_ == "Fixed") {
-    next_active_end_ = manager()->context()->time() + active_mean_;
-  }
-  else if (active_type_ == "UniformInt") {
-    next_active_end_ = manager()->context()->time() + manager()->context()->random_uniform_int(active_min_, active_max_);
-  }
-  else if (active_type_ == "NormalInt") {
-    next_active_end_ = manager()->context()->time() + manager()->context()->random_normal_int(active_mean_, active_stddev_, active_min_, active_max_);
-  }
-  // if (dormant_mean_ > 0 && manager()->context()->time() % (active_mean_ + dormant_mean_) < active_mean_) {
-  //   amt = TotalQty();
-  // }
-  // else if (dormant_mean_ == 0)
-  //   amt = TotalQty();
+  next_active_end_ = active_dist_->sample() + manager()->context()->time();
   return;
 };
 
 void MatlBuyPolicy::SetNextDormantTime() {
-  if (dormant_type_ == "Fixed") {
-    next_dormant_end_ = manager()->context()->time() + dormant_mean_;
-  }
-  else if (dormant_type_ == "UniformInt") {
-    next_dormant_end_ = manager()->context()->time() + manager()->context()->random_uniform_int(dormant_min_, dormant_max_);
-  }
-  else if (dormant_type_ == "NormalInt") {
-    next_dormant_end_ = manager()->context()->time() + manager()->context()->random_normal_int(dormant_mean_, dormant_stddev_, dormant_min_, dormant_max_);
+  if (next_dormant_end_ < 0) {}
+  else {
+    next_dormant_end_ = dormant_dist_->sample() + manager()->context()->time();
   }
   return;
 }

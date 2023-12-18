@@ -19,6 +19,14 @@ class RandomNumberGenerator {
     friend class ::SimInitTest;
     friend class ::RandomTest;
 
+    // all distributions are fiends
+    friend class FixedDoubleDist;
+    friend class UniformDoubleDist;
+    friend class NormalDoubleDist;
+    friend class FixedIntDist;
+    friend class UniformIntDist;
+    friend class NormalIntDist;
+
   private:
     /// Returns a random number for use in a distribution
     static Generator gen_;
@@ -73,6 +81,69 @@ class RandomNumberGenerator {
     /// uses rounding to convert double to int
     int random_normal_int(double mean, double std_dev, int low=0,
                           int high=std::numeric_limits<int>::max());
+
+};
+
+class DoubleDistribution {
+  public:
+    virtual double sample() = 0;
+};
+
+class FixedDoubleDist : public DoubleDistribution {
+  private:
+    double value;
+  public:
+    FixedDoubleDist(double value_) : value(value_) {};
+    virtual double sample() { return value; };
+};
+
+class UniformDoubleDist : public DoubleDistribution {
+  private:
+    boost::random::uniform_real_distribution<> dist;
+  public:
+    UniformDoubleDist(double min = 0, double max=1);
+    virtual double sample();
+};
+
+class NormalDoubleDist : public DoubleDistribution {
+  private:
+    boost::random::normal_distribution<> dist;
+    double min;
+    double max;
+  public:
+    NormalDoubleDist(double mean, double std_dev, double min=0, double max=std::numeric_limits<double>::max());
+    virtual double sample();
+};
+
+class IntDistribution {
+  public:
+    virtual int sample() = 0;
+};
+
+class FixedIntDist : public IntDistribution {
+  private:
+    int value;
+  public:
+    FixedIntDist(int value_) : value(value_) {};
+    virtual int sample() { return value; };
+};
+
+class UniformIntDist : public IntDistribution {
+  private:
+    boost::random::uniform_int_distribution<> dist;
+  public:
+    UniformIntDist(int min = 0, int max=1);
+    virtual int sample();
+};
+
+class NormalIntDist : public IntDistribution {
+  private:
+    boost::random::normal_distribution<> dist;
+    int min;
+    int max;
+  public:
+    NormalIntDist(double mean, double std_dev, int min=0, int max=std::numeric_limits<int>::max());
+    virtual int sample();
 
 };
 

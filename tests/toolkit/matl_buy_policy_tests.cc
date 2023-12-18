@@ -8,6 +8,7 @@
 #include "request.h"
 #include "error.h"
 #include "toolkit/resource_buff.h"
+#include "random_number_generator.h"
 
 #include "test_context.h"
 #include "test_agents/test_facility.h"
@@ -181,42 +182,14 @@ TEST_F(MatlBuyPolicyTests, MultiReqQuantize) {
   ASSERT_FLOAT_EQ(req->target()->quantity(), quantize);
 }
 
-// Tests that agent cycles between active and dormant cycles during a mock
-// sim, only buying when active.
-TEST_F(MatlBuyPolicyTests, ActiveDormant) {
-  std::string active_type = "Fixed";
-  int active = 2;
-  std::string dormant_type = "Fixed";
-  int dormant = 3;
-  int dur = 4;
-  double throughput = 1;
-
-  cyclus::MockSim sim(dur);
-  cyclus::Agent* a = new TestFacility(sim.context());
-  sim.context()->AddPrototype(a->prototype(), a);
-  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
-  sim.AddSource("commod1").Finalize();
-
-  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
-
-  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
-  cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", throughput, active_type, dormant_type, active, dormant)
-        .Set("commod1").Start();
-
-  EXPECT_NO_THROW(sim.Run());
-  EXPECT_DOUBLE_EQ(2, inbuf.quantity());
-
-  delete a;
-}
-
-TEST_F(MatlBuyPolicyTests, ActiveDormantMultipleCycles) {
+TEST_F(MatlBuyPolicyTests, DefaultFixedActiveDormant) {
   using cyclus::QueryResult;
-  std::string active_type = "Fixed";
-  int active = 2;
-  std::string dormant_type = "Fixed";
-  int dormant = 3;
-  int dur = 16;
+  
+  FixedIntDist a_dist = FixedIntDist(1);
+  FixedIntDist d_dist = FixedIntDist(-1);
+  FixedDoubleDist size_dist = FixedDoubleDist(1.0);
+  
+  int dur = 2;
   double throughput = 1;
 
   cyclus::MockSim sim(dur);
@@ -229,7 +202,7 @@ TEST_F(MatlBuyPolicyTests, ActiveDormantMultipleCycles) {
 
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
   cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", throughput, active_type, dormant_type, active, dormant)
+  policy.Init(fac, &inbuf, "inbuf", throughput, &a_dist, &d_dist, &size_dist)
         .Set("commod1").Start();
 
   EXPECT_NO_THROW(sim.Run());
@@ -238,13 +211,196 @@ TEST_F(MatlBuyPolicyTests, ActiveDormantMultipleCycles) {
   // confirm that transactions are only occurring during active periods
   int first_cycle = qr.GetVal<int>("Time", 0);
   EXPECT_EQ(0, first_cycle);
-  int second_cycle = qr.GetVal<int>("Time", 2);
-  EXPECT_EQ(5, second_cycle);
-  int third_cycle = qr.GetVal<int>("Time", 5);
-  EXPECT_EQ(11, third_cycle);
+  int second_cycle = qr.GetVal<int>("Time", 1);
+  EXPECT_EQ(1, second_cycle);
 
-  // confirm total inbuf recieved material
-  EXPECT_DOUBLE_EQ(7, inbuf.quantity());
+  delete a;
+}
+
+TEST_F(MatlBuyPolicyTests, FixedActiveDormant) {
+  using cyclus::QueryResult;
+  
+  FixedIntDist a_dist = FixedIntDist(1);
+  FixedIntDist d_dist = FixedIntDist(1);
+  FixedDoubleDist size_dist = FixedDoubleDist(1.0);
+  
+  int dur = 3;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", throughput, &a_dist, &d_dist, &size_dist)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  // confirm that transactions are only occurring during active periods
+  int first_cycle = qr.GetVal<int>("Time", 0);
+  EXPECT_EQ(0, first_cycle);
+  int second_cycle = qr.GetVal<int>("Time", 1);
+  EXPECT_EQ(2, second_cycle);
+
+  delete a;
+}
+
+TEST_F(MatlBuyPolicyTests, FixedActiveDormantMultipleCycles) {
+  using cyclus::QueryResult;
+  
+  FixedIntDist a_dist = FixedIntDist(2);
+  FixedIntDist d_dist = FixedIntDist(1);
+  FixedDoubleDist size_dist = FixedDoubleDist(1.0);
+  
+  int dur = 8;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", throughput, &a_dist, &d_dist, &size_dist)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  // confirm that transactions are only occurring during active periods
+  int first_cycle = qr.GetVal<int>("Time", 0);
+  EXPECT_EQ(0, first_cycle);
+  // second cycle should occur on times 3-4
+  int second_cycle = qr.GetVal<int>("Time", 2);
+  EXPECT_EQ(3, second_cycle);
+  // third cycle should occur on times 6-7
+  int third_cycle = qr.GetVal<int>("Time", 5);
+  EXPECT_EQ(7, third_cycle);
+
+  delete a;
+}
+
+TEST_F(MatlBuyPolicyTests, UniformActiveDormant) {
+  using cyclus::QueryResult;
+  
+  UniformIntDist a_dist = UniformIntDist(2, 4);
+  UniformIntDist d_dist = UniformIntDist(1, 2);
+  FixedDoubleDist size_dist = FixedDoubleDist(1.0);
+  
+  int dur = 10;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", throughput, &a_dist, &d_dist, &size_dist)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  // confirm that transactions are only occurring during active periods
+  int first_cycle = qr.GetVal<int>("Time", 0);
+  EXPECT_EQ(0, first_cycle);
+  // second cycle should include time 4
+  int second_cycle = qr.GetVal<int>("Time", 2);
+  EXPECT_EQ(4, second_cycle);
+  // third cycle should include 8
+  int third_cycle = qr.GetVal<int>("Time", 5);
+  EXPECT_EQ(8, third_cycle);
+
+  delete a;
+}
+
+TEST_F(MatlBuyPolicyTests, NormalActiveDormant) {
+  using cyclus::QueryResult;
+  
+  NormalIntDist a_dist = NormalIntDist(5, 1, 2, 10);
+  NormalIntDist d_dist = NormalIntDist(3, 0.5, 1, 5);
+  FixedDoubleDist size_dist = FixedDoubleDist(1.0);
+  
+  int dur = 25;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", throughput, &a_dist, &d_dist, &size_dist)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  // confirm that transactions are only occurring during active periods
+  int first_cycle = qr.GetVal<int>("Time", 0);
+  EXPECT_EQ(0, first_cycle);
+  // second cycle should star on time 8
+  int second_cycle = qr.GetVal<int>("Time", 6);
+  EXPECT_EQ(8, second_cycle);
+  // third cycle should include time 19
+  int third_cycle = qr.GetVal<int>("Time", 15);
+  EXPECT_EQ(19, third_cycle);
+
+  delete a;
+}
+
+TEST_F(MatlBuyPolicyTests, MixedActiveDormant) {
+  using cyclus::QueryResult;
+  
+  NormalIntDist a_dist = NormalIntDist(5, 1);
+  UniformIntDist d_dist = UniformIntDist(1, 3);
+  FixedDoubleDist size_dist = FixedDoubleDist(1.0);
+  
+  int dur = 12;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", throughput, &a_dist, &d_dist, &size_dist)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  // confirm that transactions are only occurring during active periods
+  int first_cycle = qr.GetVal<int>("Time", 5);
+  EXPECT_EQ(5, first_cycle);
+  // second cycle should start on time 7
+  int second_cycle = qr.GetVal<int>("Time", 6);
+  EXPECT_EQ(7, second_cycle);
 
   delete a;
 }
