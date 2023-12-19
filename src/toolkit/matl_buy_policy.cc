@@ -169,6 +169,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
 
   if (current_time_ < next_active_end_ || next_dormant_end_ < 0) {
     // currently in the middle of active buying period
+    SetRequestSize();
     amt = TotalQty();
   }
   else if (current_time_ < next_dormant_end_) {
@@ -180,12 +181,12 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     // finished active. starting dormancy and sample/set length of dormant period
     amt = 0;
     SetNextDormantTime();
-
   }
   // the following is an if rather than if-else statement because if dormant
   // length is zero, buy policy should return to active immediately
   if (current_time_ == next_dormant_end_) {
     // finished dormant. starting buying and sample/set length of active period
+    SetRequestSize();
     amt = TotalQty();
     SetNextActiveTime();
   }
@@ -194,8 +195,8 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     return ports;
 
   bool excl = Excl();
-  double req_amt = ReqQty();
-  int n_req = NReq();
+  double req_amt = Excl() ? quantize_ : amt;
+  int n_req = Excl() ? static_cast<int>(amt / quantize_) : 1;
   LGH(INFO3) << "requesting " << amt << " kg via " << n_req << " request(s)"  << std::endl;
 
   // one portfolio for each request
@@ -242,6 +243,15 @@ void MatlBuyPolicy::SetNextDormantTime() {
   }
   return;
 }
+
+void MatlBuyPolicy::SetRequestSize() {
+  sample_fraction_ = size_dist_->sample();
+  if (sample_fraction_ > 1) {
+    sample_fraction_ = sample_fraction_ / size_dist_->max();
+  }
+  return;
+}
+
 
 }  // namespace toolkit
 }  // namespace cyclus

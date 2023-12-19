@@ -87,6 +87,7 @@ class RandomNumberGenerator {
 class DoubleDistribution {
   public:
     virtual double sample() = 0;
+    virtual double max() = 0;
 };
 
 class FixedDoubleDist : public DoubleDistribution {
@@ -95,6 +96,7 @@ class FixedDoubleDist : public DoubleDistribution {
   public:
     FixedDoubleDist(double value_) : value(value_) {};
     virtual double sample() { return value; };
+    virtual double max() { return value; };
 };
 
 class UniformDoubleDist : public DoubleDistribution {
@@ -103,16 +105,18 @@ class UniformDoubleDist : public DoubleDistribution {
   public:
     UniformDoubleDist(double min = 0, double max=1);
     virtual double sample();
+    virtual double max();
 };
 
 class NormalDoubleDist : public DoubleDistribution {
   private:
     boost::random::normal_distribution<> dist;
-    double min;
-    double max;
+    double min_;
+    double max_;
   public:
     NormalDoubleDist(double mean, double std_dev, double min=0, double max=std::numeric_limits<double>::max());
     virtual double sample();
+    virtual double max();
 };
 
 class IntDistribution {
@@ -139,8 +143,8 @@ class UniformIntDist : public IntDistribution {
 class NormalIntDist : public IntDistribution {
   private:
     boost::random::normal_distribution<> dist;
-    int min;
-    int max;
+    int min_;
+    int max_;
   public:
     NormalIntDist(double mean, double std_dev, int min=0, int max=std::numeric_limits<int>::max());
     virtual int sample();

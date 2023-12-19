@@ -141,14 +141,17 @@ class MatlBuyPolicy : public Trader {
   /// is idempotent.
   void Stop();
 
+  double sample_fraction_ = 1.0;
+
   /// the total amount requested
   inline double TotalQty() const {
-    return std::min(throughput_,
-                    fill_to_ * buf_->capacity() - buf_->quantity());
+    return std::min((throughput_* sample_fraction_),
+                    ((fill_to_ * buf_->capacity()) - buf_->quantity()) * sample_fraction_);
   }
 
   /// whether trades will be denoted as exclusive or not
   inline bool Excl() const { return quantize_ > 0; }
+
 
   /// the amount requested per each request
   inline double ReqQty() const {
@@ -172,10 +175,11 @@ class MatlBuyPolicy : public Trader {
   virtual std::set<RequestPortfolio<Material>::Ptr> GetMatlRequests();
   virtual void AcceptMatlTrades(
       const std::vector<std::pair<Trade<Material>, Material::Ptr> >& resps);
+  /// }@
 
   void SetNextActiveTime();
   void SetNextDormantTime();
-  /// }@
+  void SetRequestSize();
 
  private:
   struct CommodDetail {

@@ -405,5 +405,105 @@ TEST_F(MatlBuyPolicyTests, MixedActiveDormant) {
   delete a;
 }
 
+TEST_F(MatlBuyPolicyTests, RandomSizeUniform) {
+  using cyclus::QueryResult;
+  
+  FixedIntDist a_dist = FixedIntDist(1);
+  FixedIntDist d_dist = FixedIntDist(-1);
+  UniformDoubleDist size_dist = UniformDoubleDist(0.5, 1.0);
+  
+  int dur = 2;
+  double throughput = 10;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", throughput, &a_dist, &d_dist, &size_dist)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Resources", NULL);
+  EXPECT_NEAR(6.59845, qr.GetVal<double>("Quantity", 0), 0.00001);
+  EXPECT_NEAR(9.70636, qr.GetVal<double>("Quantity", 1), 0.00001);
+
+  delete a;
+}
+
+TEST_F(MatlBuyPolicyTests, RandomSizeNormal) {
+  using cyclus::QueryResult;
+  
+  FixedIntDist a_dist = FixedIntDist(1);
+  FixedIntDist d_dist = FixedIntDist(-1);
+  NormalDoubleDist size_dist = NormalDoubleDist(0.5, 0.1);
+  
+  int dur = 2;
+  double throughput = 10;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", throughput, &a_dist, &d_dist, &size_dist)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Resources", NULL);
+  EXPECT_NEAR(6.40838, qr.GetVal<double>("Quantity", 0), 0.00001);
+  EXPECT_NEAR(3.26489, qr.GetVal<double>("Quantity", 1), 0.00001);
+
+  delete a;
+}
+
+TEST_F(MatlBuyPolicyTests, RandomSizeAndFrequency) {
+  using cyclus::QueryResult;
+  
+  UniformIntDist a_dist = UniformIntDist(1, 2);
+  UniformIntDist d_dist = UniformIntDist(1, 2);
+  NormalDoubleDist size_dist = NormalDoubleDist(0.5, 0.25);
+  
+  int dur = 8;
+  double throughput = 10;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", throughput, &a_dist, &d_dist, &size_dist)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Resources", NULL);
+  EXPECT_NEAR(0.66224, qr.GetVal<double>("Quantity", 0), 0.00001);
+  EXPECT_NEAR(4.02323, qr.GetVal<double>("Quantity", 1), 0.00001);
+
+  QueryResult qr2 = sim.db().Query("Transactions", NULL);
+  EXPECT_EQ(0, qr2.GetVal<int>("Time", 0));
+  EXPECT_EQ(4, qr2.GetVal<int>("Time", 2));
+
+  delete a;
+}
+
 }
 }
