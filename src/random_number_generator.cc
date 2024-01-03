@@ -69,41 +69,41 @@ namespace cyclus{
     }
 
     double UniformDoubleDist::max() { 
-        return UniformDoubleDist::dist.max(); 
+        return dist.max(); 
     }
 
     NormalDoubleDist::NormalDoubleDist(double mean, double std_dev, double min, double max) : dist(mean, std_dev) {
-        NormalDoubleDist::min_ = min;
-        NormalDoubleDist::max_ = max;
+        min_ = min;
+        max_ = max;
     }
 
     double NormalDoubleDist::sample() {
-        double val = NormalDoubleDist::dist(RandomNumberGenerator::gen_);
-        while (val < NormalDoubleDist::min_ || val > NormalDoubleDist::max_){
-            val = NormalDoubleDist::dist(RandomNumberGenerator::gen_);
+        double val = dist(RandomNumberGenerator::gen_);
+        while (val < min_ || val > max_){
+            val = dist(RandomNumberGenerator::gen_);
         }
         return val;
     }
 
     double NormalDoubleDist::max() { 
-        return NormalDoubleDist::dist.max();
+        return dist.max();
     }
 
     UniformIntDist::UniformIntDist(int min, int max) : dist(min, max) { }
 
     int UniformIntDist::sample() {
-        return UniformIntDist::dist(RandomNumberGenerator::gen_);
+        return dist(RandomNumberGenerator::gen_);
     }
 
     NormalIntDist::NormalIntDist(double mean, double std_dev, int min, int max) : dist(mean, std_dev) {
-        NormalIntDist::min_ = std::min(min, 0);
-        NormalIntDist::max_ = max;
+        min_ = std::min(min, 0);
+        max_ = max;
     }
 
     int NormalIntDist::sample() {
-        double val = NormalIntDist::dist(RandomNumberGenerator::gen_);
-        while (val < NormalIntDist::min_ || val > NormalIntDist::max_){
-            val = NormalIntDist::dist(RandomNumberGenerator::gen_);
+        double val = dist(RandomNumberGenerator::gen_);
+        while (val < min_ || val > max_){
+            val = dist(RandomNumberGenerator::gen_);
         }
         return std::lrint(val);
     }
