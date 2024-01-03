@@ -65,7 +65,7 @@ namespace cyclus{
     UniformDoubleDist::UniformDoubleDist(double min, double max) : dist(min, max) {}
 
     double UniformDoubleDist::sample() { 
-        return UniformDoubleDist::dist(RandomNumberGenerator::gen_); 
+        return dist(RandomNumberGenerator::gen_); 
     }
 
     double UniformDoubleDist::max() { 
