@@ -103,7 +103,7 @@ class UniformDoubleDist : public DoubleDistribution {
   private:
     boost::random::uniform_real_distribution<> dist;
   public:
-    UniformDoubleDist(double min = 0, double max=1);
+    UniformDoubleDist(double min = 0, double max=1) : dist(min, max) {};
     virtual double sample();
     virtual double max();
 };

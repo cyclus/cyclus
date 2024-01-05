@@ -239,7 +239,7 @@ void MatlBuyPolicy::SetNextActiveTime() {
 void MatlBuyPolicy::SetNextDormantTime() {
   if (next_dormant_end_ < 0) {}
   else {
-    next_dormant_end_ = dormant_dist_->sample() + manager()->context()->time();
+    next_dormant_end_ = dormant_dist_->sample() + next_active_end_;
   }
   return;
 }
