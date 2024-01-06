@@ -104,8 +104,8 @@ class UniformDoubleDist : public DoubleDistribution {
     boost::random::uniform_real_distribution<> dist;
   public:
     UniformDoubleDist(double min = 0, double max=1) : dist(min, max) {};
-    virtual double sample();
-    virtual double max();
+    virtual double sample() { return dist(RandomNumberGenerator::gen_); }
+    virtual double max() { return dist.max(); }
 };
 
 class NormalDoubleDist : public DoubleDistribution {
@@ -136,8 +136,9 @@ class UniformIntDist : public IntDistribution {
   private:
     boost::random::uniform_int_distribution<> dist;
   public:
-    UniformIntDist(int min = 0, int max=1);
-    virtual int sample();
+    UniformIntDist(int min = 0, int max=1) : dist(min, max) {};
+    virtual int sample() { return dist(RandomNumberGenerator::gen_); }
+    virtual int max() { return dist.max(); }
 };
 
 class NormalIntDist : public IntDistribution {

@@ -62,16 +62,6 @@ namespace cyclus{
 
     //
     // Distributions
-    UniformDoubleDist::UniformDoubleDist(double min, double max) : dist(min, max) {}
-
-    double UniformDoubleDist::sample() { 
-        return dist(RandomNumberGenerator::gen_); 
-    }
-
-    double UniformDoubleDist::max() { 
-        return dist.max(); 
-    }
-
     NormalDoubleDist::NormalDoubleDist(double mean, double std_dev, double min, double max) : dist(mean, std_dev) {
         min_ = min;
         max_ = max;
@@ -87,12 +77,6 @@ namespace cyclus{
 
     double NormalDoubleDist::max() { 
         return dist.max();
-    }
-
-    UniformIntDist::UniformIntDist(int min, int max) : dist(min, max) { }
-
-    int UniformIntDist::sample() {
-        return dist(RandomNumberGenerator::gen_);
     }
 
     NormalIntDist::NormalIntDist(double mean, double std_dev, int min, int max) : dist(mean, std_dev) {
