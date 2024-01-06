@@ -57,11 +57,11 @@ void MatlBuyPolicy::set_default_distributions() {
   active_dist_ = new FixedIntDist(1);
   dormant_dist_ = new FixedIntDist(-1);
   size_dist_ = new FixedDoubleDist(1.0);
-  init_active_dormant();
 }
 
 void MatlBuyPolicy::init_active_dormant() {
   next_active_end_ = active_dist_->sample();
+ 
   int dormant_len = dormant_dist_->sample();
   if (dormant_len < 0) {
     next_dormant_end_ = -1;
@@ -77,6 +77,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   buf_ = buf;
   name_ = name;
   set_default_distributions();
+  init_active_dormant();
   return *this;
 }
 
@@ -104,6 +105,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   set_fill_to(fill_to);
   set_req_when_under(req_when_under);
   set_default_distributions();
+  init_active_dormant();
   return *this;
 }
 
@@ -119,6 +121,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   set_quantize(quantize);
   set_throughput(throughput);
   set_default_distributions();
+  init_active_dormant();
   return *this;
 }
 
@@ -167,7 +170,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
 
   int current_time_ = manager()->context()->time();
 
-  if (current_time_ < next_active_end_ || next_dormant_end_ < 0) {
+  if (current_time_ < next_active_end_ || never_dormant()) {
     // currently in the middle of active buying period
     SetRequestSize();
     amt = TotalQty();

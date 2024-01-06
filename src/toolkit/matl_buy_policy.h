@@ -170,6 +170,10 @@ class MatlBuyPolicy : public Trader {
       return rsrc_commods_;
   };
 
+  inline bool never_dormant() {
+    return (next_dormant_end_ < 0 || next_active_end_ < 0);
+  };
+
   /// Trader Methods
   /// @{
   virtual std::set<RequestPortfolio<Material>::Ptr> GetMatlRequests();
@@ -199,8 +203,6 @@ class MatlBuyPolicy : public Trader {
   ResBuf<Material>* buf_;
   std::string name_;
   double fill_to_, req_when_under_, quantize_, throughput_;
-  
-  double cumulative_capacity_;
 
   int next_active_end_= 0;
   int next_dormant_end_= 0;
