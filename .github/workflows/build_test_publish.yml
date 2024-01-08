@@ -112,7 +112,6 @@ jobs:
 
       - name: Push Dependency Image
         run: |
-          docker image ls -a
           docker push -a ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps
 
 
