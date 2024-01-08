@@ -63,7 +63,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
     CyclusAgentShim(cpp_cyclus.Context* ctx):  # C++BASES cyclus::Agent(ctx)
         pass
 
-    std_string version() except +:
+    std_string version() except *:
         rtn = (<object> this.self).version
         return str_py_to_cpp(rtn)
 
