@@ -22,6 +22,11 @@ ELSE()
     MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler.")
 ENDIF()
 
+IF(CODE_COVERAGE)
+    MESSAGE(STATUS "Compiling with --coverage flag for code coverage analysis")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+ENDIF()
+
 # enable assembly
 enable_language(ASM)
 
@@ -232,12 +237,10 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("--    Boost Serialization location: ${Boost_SERIALIZATION_LIBRARY}")
 
     # find coin and link to it
-    FIND_PACKAGE(COIN)
-    MESSAGE("-- COIN Version: ${COIN_VERSION}")
-    set(LIBS ${LIBS} ${COIN_LIBRARIES})
-    if(NOT COIN_FOUND)
-      # no COIN, so no MILPs
-      set(DEFAULT_ALLOW_MILPS false)
+    if(DEFAULT_ALLOW_MILPS)
+        FIND_PACKAGE(COIN REQUIRED)
+        MESSAGE("-- COIN Version: ${COIN_VERSION}")
+        set(LIBS ${LIBS} ${COIN_LIBRARIES})
     endif()
 
     #
@@ -305,11 +308,10 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Use new Python library finder
     find_package (Python3 COMPONENTS Interpreter Development NumPy)
 
-    execute_process(COMMAND "${PYTHON_EXECUTABLE}" -c
-                            "import site; print(site.getsitepackages(['${CMAKE_INSTALL_PREFIX}'])[0])"
+    execute_process(COMMAND "${Python3_EXECUTABLE}" -m site --user-site
                     OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
                     OUTPUT_STRIP_TRAILING_WHITESPACE)
-    message("-- PYTHON_EXECUTABLE: ${PYTHON_EXECUTABLE}")
+    message("-- PYTHON_EXECUTABLE: ${Python3_EXECUTABLE}")
     message("-- PYTHON_SITE_PACKAGES: ${PYTHON_SITE_PACKAGES}")
 
     # Include the CMake script UseCython.cmake.  This defines add_cython_module().
@@ -340,7 +342,7 @@ IF(NOT CYCLUS_DOC_ONLY)
         # make sure we know about having python
         add_definitions(-DCYCLUS_WITH_PYTHON)
         IF (NOT APPLE)
-            set(LIBS ${LIBS} ${PYTHON_LIBRARIES})
+            set(LIBS ${LIBS} ${Python3_LIBRARIES})
         ENDIF (NOT APPLE)
         INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/cyclus")
     else(Cython_FOUND)
@@ -378,7 +380,7 @@ IF(NOT CYCLUS_DOC_ONLY)
 
 
     if(Cython_FOUND)
-        INCLUDE_DIRECTORIES(AFTER "${PYTHON_INCLUDE_DIRS}" "${_Python3_NumPy_INCLUDE_DIR}")
+        INCLUDE_DIRECTORIES(AFTER "${Python3_INCLUDE_DIRS}" "${_Python3_NumPy_INCLUDE_DIR}")
     endif(Cython_FOUND)
     # set core version, one way or the other
     IF(NOT "${CORE_VERSION}" STREQUAL "")

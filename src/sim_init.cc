@@ -153,6 +153,9 @@ void SimInit::LoadInfo() {
   std::string d = dq.GetVal<std::string>("Decay");
   si_ = SimInfo(dur, y0, m0, h, d);
 
+  si_.seed = qr.GetVal<int>("Seed");
+  si_.stride = qr.GetVal<int>("Stride");
+  
   si_.parent_sim = qr.GetVal<boost::uuids::uuid>("ParentSimId");
 
   qr = b_->Query("TimeStepDur", NULL);

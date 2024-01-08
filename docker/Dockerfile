@@ -37,6 +37,7 @@ RUN apt install -y \
         python3-tables \
         python3-pandas \
         python3-jinja2 \
+        python3-pip \
         cython3 \
         libwebsockets-dev 
 
@@ -81,7 +82,7 @@ RUN conda update -y --all && \
                python-json-logger \
                glib \
                libxml2 \
-               libxmlpp \
+               libxmlpp-4.0 \
                libblas \
                libcblas \
                liblapack \
@@ -102,6 +103,7 @@ RUN conda update -y --all && \
                "cython<3" \
                websockets \
                pprintpp \
+               pip \
                && \
     mamba install -y --force-reinstall libsqlite && \
     conda clean -y --all
@@ -122,7 +124,7 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
-RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999 
+RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999 --allow-milps
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 

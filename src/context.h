@@ -21,6 +21,10 @@
 
 const uint64_t kDefaultTimeStepDur = 2629846;
 
+const uint64_t kDefaultSeed = 20160212;
+
+const uint64_t kDefaultStride = 10000;
+
 class SimInitTest;
 
 namespace cyclus {
@@ -33,6 +37,7 @@ class Timer;
 class TimeListener;
 class SimInit;
 class DynamicModule;
+class RandomNumberGenerator;
 
 /// Container for a static simulation-global parameters that both describe
 /// the simulation and affect its behavior.
@@ -114,6 +119,15 @@ class SimInfo {
   /// every time step in a table (i.e. agent ID, Time, Quantity,
   /// Composition-object and/or reference).
   bool explicit_inventory_compact;
+
+  /// Seed for random number generator
+  uint64_t seed;
+
+  /// Stride length. Currently unused, but available for future development 
+  /// that may wish to initiate multiple random number generators from the
+  /// same seed, skipping forward in the sequence by the stride length times
+  /// some parameter, such as the agent_id. 
+  uint64_t stride;
 };
 
 /// A simulation context provides access to necessary simulation-global
@@ -234,8 +248,33 @@ class Context {
   /// Returns the current simulation timestep.
   virtual int time();
 
+  int random();
+
+  /// Generates a random number on the range [0,1)]
+  double random_01();
+
+  /// Returns a random number from a uniform integer distribution.
+  int random_uniform_int(int low, int high);
+
+  /// Returns a random number from a uniform real distribution.
+  double random_uniform_real(double low, double high);
+
+  /// Returns a random number from a normal distribution.
+  double random_normal_real(double mean, double std_dev, double low=0,
+                            double high=std::numeric_limits<double>::max());
+
+  /// Returns a random number from a lognormal distribution.
+  int random_normal_int(double mean, double std_dev, int low=0,
+                        int high=std::numeric_limits<int>::max());
+
   /// Returns the duration of a single time step in seconds.
   inline uint64_t dt() {return si_.dt;};
+
+  /// Returns the seed for the random number generator.
+  inline uint64_t seed() {return si_.seed;};
+
+  /// Returns the stride for the random number generator.
+  inline uint64_t stride() {return si_.stride;};
 
   /// Return static simulation info.
   inline SimInfo sim_info() const {
@@ -312,6 +351,7 @@ class Context {
   ExchangeSolver* solver_;
   Recorder* rec_;
   int trans_id_;
+  RandomNumberGenerator* rng_;
 };
 
 }  // namespace cyclus

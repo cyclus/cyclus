@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cyclus"
+authors = [
+    {name = "Cyclus Development Team", email = "cyclus-dev@googlegroups.com"},
+]
+maintainers = [
+    {name = "Cyclus Development Team", email = "cyclus-dev@googlegroups.com"},
+]
+description = "Agent-based fuel cycle simulator."
+readme = "README.rst"
+requires-python = ">=3.8"
+license = {text = "BSD-3-Clause"}
+classifiers = [
+    'Operating System :: POSIX',
+    'Programming Language :: Python :: 3',
+]
+dependencies = [
+    'pandas',
+    'numpy',
+    'Jinja2',
+]
+
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = ['pytest']
+
+[project.urls]
+homepage = "https://fuelcycle.org"
+
+[tool.setuptools]
+package-dir = { cyclus = "cyclus" }
+
+[tool.setuptools.packages.find]
+where = [""]
+include = ["cyclus"]
+namespaces = false
+
+[tool.setuptools.package-data]
+cyclus = ['*.pxd', '*.so', '*.dylib']
