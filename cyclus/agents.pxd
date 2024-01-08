@@ -18,21 +18,21 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):  # C++CONSTR
     # Agent interface
     CyclusAgentShim(cpp_cyclus.Context*)
     std_string version() except *
-    cpp_cyclus.Agent* Clone() except +
-    void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit) except +
-    void InitFromAgent "InitFrom" (CyclusAgentShim*) except +
-    void InitFrom(cpp_cyclus.QueryableBackend*) except +
-    void Snapshot(cpp_cyclus.DbInit) except +
-    void InitInv(cpp_cyclus.Inventories&) except +
-    cpp_cyclus.Inventories SnapshotInv() except +
-    std_string schema() except +
-    cpp_jsoncpp.Value annotations() except +
-    void Build(cpp_cyclus.Agent*) except +
-    void EnterNotify() except +
-    void BuildNotify() except +
-    void DecomNotify() except +
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&) except +
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except +
+    cpp_cyclus.Agent* Clone() except *
+    void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit) except *
+    void InitFromAgent "InitFrom" (CyclusAgentShim*) except *
+    void InitFrom(cpp_cyclus.QueryableBackend*) except *
+    void Snapshot(cpp_cyclus.DbInit) except *
+    void InitInv(cpp_cyclus.Inventories&) except *
+    cpp_cyclus.Inventories SnapshotInv() except *
+    std_string schema() except *
+    cpp_jsoncpp.Value annotations() except *
+    void Build(cpp_cyclus.Agent*) except *
+    void EnterNotify() except *
+    void BuildNotify() except *
+    void DecomNotify() except *
+    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&) except *
+    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except *
     # Extra interface
     PyObject* self  # the Python object we are shimming
 
@@ -43,25 +43,25 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):  # C++CONSTR
 cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):  # C++CONSTRUCTORS CyclusRegionShim(cyclus::Context*)
     # Agent interface
     CyclusRegionShim(cpp_cyclus.Context*)
-    std_string version() except +
-    cpp_cyclus.Agent* Clone() except +
-    void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit) except +
-    void InitFromAgent "InitFrom" (CyclusRegionShim*) except +
-    void InitFrom(cpp_cyclus.QueryableBackend*) except +
-    void Snapshot(cpp_cyclus.DbInit) except +
-    void InitInv(cpp_cyclus.Inventories&) except +
-    cpp_cyclus.Inventories SnapshotInv() except +
-    std_string schema() except +
-    cpp_jsoncpp.Value annotations() except +
-    void Build(cpp_cyclus.Agent*) except +
-    void EnterNotify() except +
-    void BuildNotify() except +
-    void DecomNotify() except +
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&) except +
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except +
-    void Tick() except +
-    void Tock() except +
-    void Decision() except +
+    std_string version() except *
+    cpp_cyclus.Agent* Clone() except *
+    void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit) except *
+    void InitFromAgent "InitFrom" (CyclusRegionShim*) except *
+    void InitFrom(cpp_cyclus.QueryableBackend*) except *
+    void Snapshot(cpp_cyclus.DbInit) except *
+    void InitInv(cpp_cyclus.Inventories&) except *
+    cpp_cyclus.Inventories SnapshotInv() except *
+    std_string schema() except *
+    cpp_jsoncpp.Value annotations() except *
+    void Build(cpp_cyclus.Agent*) except *
+    void EnterNotify() except *
+    void BuildNotify() except *
+    void DecomNotify() except *
+    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&) except *
+    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except *
+    void Tick() except *
+    void Tock() except *
+    void Decision() except *
     # Extra interface
     PyObject* self  # the Python object we are shimming
 
@@ -72,25 +72,25 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):  # C++CON
 cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institution):  # C++CONSTRUCTORS CyclusInstitutionShim(cyclus::Context*)
     # Agent interface
     CyclusInstitutionShim(cpp_cyclus.Context*)
-    std_string version() except +
-    cpp_cyclus.Agent* Clone() except +
-    void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit) except +
-    void InitFromAgent "InitFrom" (CyclusInstitutionShim*) except +
-    void InitFrom(cpp_cyclus.QueryableBackend*) except +
-    void Snapshot(cpp_cyclus.DbInit) except +
-    void InitInv(cpp_cyclus.Inventories&) except +
-    cpp_cyclus.Inventories SnapshotInv() except +
-    std_string schema() except +
-    cpp_jsoncpp.Value annotations() except +
-    void Build(cpp_cyclus.Agent*) except +
-    void EnterNotify() except +
-    void BuildNotify() except +
-    void DecomNotify() except +
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&) except +
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except +
-    void Tick() except +
-    void Tock() except +
-    void Decision() except +
+    std_string version() except *
+    cpp_cyclus.Agent* Clone() except *
+    void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit) except *
+    void InitFromAgent "InitFrom" (CyclusInstitutionShim*) except *
+    void InitFrom(cpp_cyclus.QueryableBackend*) except *
+    void Snapshot(cpp_cyclus.DbInit) except *
+    void InitInv(cpp_cyclus.Inventories&) except *
+    cpp_cyclus.Inventories SnapshotInv() except *
+    std_string schema() except *
+    cpp_jsoncpp.Value annotations() except *
+    void Build(cpp_cyclus.Agent*) except *
+    void EnterNotify() except *
+    void BuildNotify() except *
+    void DecomNotify() except *
+    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&) except *
+    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except *
+    void Tick() except *
+    void Tock() except *
+    void Decision() except *
     # Extra interface
     PyObject* self  # the Python object we are shimming
 
@@ -101,34 +101,34 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
 cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):  # C++CONSTRUCTORS CyclusFacilityShim(cyclus::Context*)
     # Agent interface
     CyclusFacilityShim(cpp_cyclus.Context*)
-    std_string version() except +
-    cpp_cyclus.Agent* Clone() except +
-    void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit) except +
-    void InitFromAgent "InitFrom" (CyclusFacilityShim*) except +
-    void InitFrom(cpp_cyclus.QueryableBackend*) except +
-    void Snapshot(cpp_cyclus.DbInit) except +
-    void InitInv(cpp_cyclus.Inventories&) except +
-    cpp_cyclus.Inventories SnapshotInv() except +
-    std_string schema() except +
-    cpp_jsoncpp.Value annotations() except +
-    void Build(cpp_cyclus.Agent*) except +
-    void EnterNotify() except +
-    void BuildNotify() except +
-    void DecomNotify() except +
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&) except +
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except +
-    void Tick() except +
-    void Tock() except +
-    void Decision() except +
-    cpp_bool CheckDecommissionCondition() except +
-    std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]] GetMatlRequests() except +
-    std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Product]]] GetProductRequests() except +
-    std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]] GetMatlBids(cpp_cyclus.CommodMap[cpp_cyclus.Material].type&) except +
-    std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]] GetProductBids(cpp_cyclus.CommodMap[cpp_cyclus.Product].type&) except +
-    void GetMatlTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]&, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]&) except +
-    void GetProductTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Product]]&, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]&) except +
-    void AcceptMatlTrades(const std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]&) except +
-    void AcceptProductTrades(const std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]&) except +
+    std_string version() except *
+    cpp_cyclus.Agent* Clone() except *
+    void InfileToDb(cpp_cyclus.InfileTree*, cpp_cyclus.DbInit) except *
+    void InitFromAgent "InitFrom" (CyclusFacilityShim*) except *
+    void InitFrom(cpp_cyclus.QueryableBackend*) except *
+    void Snapshot(cpp_cyclus.DbInit) except *
+    void InitInv(cpp_cyclus.Inventories&) except *
+    cpp_cyclus.Inventories SnapshotInv() except *
+    std_string schema() except *
+    cpp_jsoncpp.Value annotations() except *
+    void Build(cpp_cyclus.Agent*) except *
+    void EnterNotify() except *
+    void BuildNotify() except *
+    void DecomNotify() except *
+    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&) except *
+    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except *
+    void Tick() except *
+    void Tock() except *
+    void Decision() except *
+    cpp_bool CheckDecommissionCondition() except *
+    std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]] GetMatlRequests() except *
+    std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Product]]] GetProductRequests() except *
+    std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]] GetMatlBids(cpp_cyclus.CommodMap[cpp_cyclus.Material].type&) except *
+    std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]] GetProductBids(cpp_cyclus.CommodMap[cpp_cyclus.Product].type&) except *
+    void GetMatlTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]&, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]&) except *
+    void GetProductTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Product]]&, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]&) except *
+    void AcceptMatlTrades(const std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]&) except *
+    void AcceptProductTrades(const std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]&) except *
     # Extra interface
     PyObject* self  # the Python object we are shimming
 
@@ -171,4 +171,4 @@ cdef class _Facility(_Agent):
 #
 
 cdef tuple index_and_sort_vars(dict)
-cdef cpp_cyclus.Agent* dynamic_agent_ptr(object) except +
+cdef cpp_cyclus.Agent* dynamic_agent_ptr(object) except *
