@@ -145,8 +145,8 @@ class MatlBuyPolicy : public Trader {
 
   /// the total amount requested
   inline double TotalQty() const {
-    return std::min((throughput_* sample_fraction_),
-                    ((fill_to_ * buf_->capacity()) - buf_->quantity()) * sample_fraction_);
+    return sample_fraction_ * std::min(throughput_,
+           (fill_to_ * buf_->capacity()) - buf_->quantity());
   }
 
   /// whether trades will be denoted as exclusive or not
