@@ -43,8 +43,9 @@ jobs:
         with:
           repository: cyclus/cyclus
           artifact-out-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          artifact-out-tag: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
-          dockerfile-path: docker/cyclus.dockerfile
+          artifact-out-tags: |
+            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
+          dockerfile-path: docker/Dockerfile
           docker-build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -76,7 +77,8 @@ jobs:
           repository-ref: main
           artifact-in-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
           artifact-out-name: cycamore-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          artifact-out-tag: ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
+          artifact-out-tags: |
+            ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
           dockerfile-path: docker/Dockerfile
           docker-build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
@@ -115,7 +117,8 @@ jobs:
           repository-ref: main
           artifact-in-name: cycamore-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
           artifact-out-name: cymetric-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          artifact-out-tag: ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
+          artifact-out-tags: |
+            ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
           dockerfile-path: docker/Dockerfile
           docker-build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}

@@ -37,13 +37,16 @@ jobs:
         run: |
           echo "tag=latest" >> "$GITHUB_ENV"
 
-      - name: Build deps.dockerfile Image
+      - name: Build Dependency Image
         uses: bennibbelink/cyclus-ci-action@main
         with:
           repository: cyclus/cyclus
+          docker-build-target: ${{ matrix.pkg_mgr }}-deps
           artifact-out-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps
-          artifact-out-tag: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps:${{ env.tag }}
-          dockerfile-path: docker/deps.dockerfile
+          artifact-out-tags: |
+            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps:${{ env.tag }}
+            ${{ matrix.pkg_mgr }}-deps
+          dockerfile-path: docker/Dockerfile
           docker-build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -65,13 +68,25 @@ jobs:
 
     name: Building Cyclus
     steps:
-      - name: Build cyclus.dockerfile Image
+      - name: default environment
+        run: |
+          echo "tag=${{ github.run_id }}" >> "$GITHUB_ENV"
+
+      - name: condition on trigger parameters
+        if: ${{ github.repository_owner == 'cyclus' && github.ref == 'refs/heads/main' }}
+        run: |
+          echo "tag=latest" >> "$GITHUB_ENV"
+
+      - name: Build Cyclus Image
         uses: bennibbelink/cyclus-ci-action@main
         with:
           repository: cyclus/cyclus
-          push-image: ${{ github.event_name == 'push'}} # push new cyclus image only on merge
+          docker-build-target: cyclus-pytest
+          push-image: ${{ github.event_name == 'push'}} # push new cyclus image only on push to main
           artifact-in-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps
-          dockerfile-path: docker/cyclus.dockerfile
+          artifact-out-tags: |
+            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}:${{ env.tag }}
+          dockerfile-path: docker/Dockerfile
           docker-build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -109,6 +124,7 @@ jobs:
       - name: Load Dependency Image
         run: |
           docker load --input /tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps.tar
+          docker image ls -a
 
       - name: Push Dependency Image
         run: |
