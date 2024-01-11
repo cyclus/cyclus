@@ -220,8 +220,7 @@ TEST_F(MatlBuyPolicyTests, DefaultFixedActiveDormant) {
 TEST_F(MatlBuyPolicyTests, FixedActiveDormant) {
   using cyclus::QueryResult;
   
-  FixedIntDist a_dist = FixedIntDist(1);
-  FixedIntDist d_dist = FixedIntDist(1);
+  FixedIntDist a_d_dist = FixedIntDist(1);
   FixedDoubleDist size_dist = FixedDoubleDist(1.0);
   
   int dur = 3;
@@ -425,7 +424,7 @@ TEST_F(MatlBuyPolicyTests, RandomSizeUniform) {
 
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
   cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", throughput, &a_dist, &d_dist, &size_dist)
+  policy.Init(fac, &inbuf, "inbuf", throughput, NULL, NULL, &size_dist)
         .Set("commod1").Start();
 
   EXPECT_NO_THROW(sim.Run());
