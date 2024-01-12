@@ -35,11 +35,10 @@ jobs:
         ]
 
     steps:
-      - name: Pull and Tag Dependency Image
+      - name: Pull Dependency Image
         run: |
           docker pull ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps
-          docker tag ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps ${{ matrix.pkg_mgr }}-deps
-          
+
       - name: Build Cyclus
         uses: bennibbelink/cyclus-ci-action@main
         with:
