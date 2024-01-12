@@ -2,6 +2,7 @@
 #define CYCLUS_SRC_TOOLKIT_MATL_BUY_POLICY_H_
 
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 #include "composition.h"
 #include "material.h"
@@ -104,9 +105,9 @@ class MatlBuyPolicy : public Trader {
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       double throughput, 
-                      IntDistribution* active_dist = new FixedIntDist(1),
-                      IntDistribution* dormant_dist = new FixedIntDist(0),
-                      DoubleDistribution* size_dist = new FixedDoubleDist(1.0));
+                      boost::shared_ptr<IntDistribution> active_dist = NULL,
+                      boost::shared_ptr<IntDistribution> dormant_dist = NULL,
+                      boost::shared_ptr<DoubleDistribution> size_dist = NULL);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       double fill_to, double req_when_under);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
@@ -141,11 +142,11 @@ class MatlBuyPolicy : public Trader {
   /// is idempotent.
   void Stop();
 
-  double sample_fraction_ = 1.0;
+  double random_request_size_ = 1.0;
 
-  /// the total amount requested
-  inline double TotalQty() const {
-    return sample_fraction_ * std::min(throughput_,
+  /// the total amount available to request
+  inline double TotalAvailable() const {
+    return std::min(throughput_,
            (fill_to_ * buf_->capacity()) - buf_->quantity());
   }
 
@@ -154,13 +155,13 @@ class MatlBuyPolicy : public Trader {
 
 
   /// the amount requested per each request
-  inline double ReqQty() const {
-    return Excl() ? quantize_ : TotalQty();
+  inline double ReqQty(double amt) const {
+    return Excl() ? quantize_ : amt;
   }
 
   /// the number of requests made per each commodity
-  inline int NReq() const {
-    return Excl() ? static_cast<int>(TotalQty() / quantize_) : 1;
+  inline int NReq(double amt) const {
+    return Excl() ? static_cast<int>(amt / quantize_) : 1;
   }
 
   /// Returns corresponding commodities from which each material object
@@ -197,7 +198,6 @@ class MatlBuyPolicy : public Trader {
   void set_req_when_under(double x);
   void set_quantize(double x);
   void set_throughput(double x);
-  void set_default_distributions();
   void init_active_dormant();
 
   ResBuf<Material>* buf_;
@@ -207,10 +207,10 @@ class MatlBuyPolicy : public Trader {
   int next_active_end_= 0;
   int next_dormant_end_= 0;
 
-  IntDistribution* active_dist_;
-  IntDistribution* dormant_dist_;
-  DoubleDistribution* size_dist_;
-  
+  boost::shared_ptr<IntDistribution> active_dist_;
+  boost::shared_ptr<IntDistribution> dormant_dist_;
+  boost::shared_ptr<DoubleDistribution> size_dist_;
+
   std::map<Material::Ptr, std::string> rsrc_commods_;
   std::map<std::string, CommodDetail> commod_details_;
 };

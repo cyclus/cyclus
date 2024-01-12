@@ -19,7 +19,10 @@ MatlBuyPolicy::MatlBuyPolicy() :
     throughput_(std::numeric_limits<double>::max()),
     quantize_(-1),
     fill_to_(1),
-    req_when_under_(1){
+    req_when_under_(1),
+    active_dist_(NULL),
+    dormant_dist_(NULL),
+    size_dist_(NULL){
   Warn<EXPERIMENTAL_WARNING>(
       "MatlBuyPolicy is experimental and its API may be subject to change");
 }
@@ -53,21 +56,24 @@ void MatlBuyPolicy::set_throughput(double x) {
   throughput_ = x;
 }
 
-void MatlBuyPolicy::set_default_distributions() {
-  active_dist_ = new FixedIntDist(1);
-  dormant_dist_ = new FixedIntDist(-1);
-  size_dist_ = new FixedDoubleDist(1.0);
-}
-
 void MatlBuyPolicy::init_active_dormant() {
+  if (active_dist_ == NULL) {
+    active_dist_ = boost::shared_ptr<FixedIntDist>(new FixedIntDist(1));
+  }
+  if (dormant_dist_ == NULL) {
+    dormant_dist_ = boost::shared_ptr<FixedIntDist>(new FixedIntDist(-1));
+  }
+  if (size_dist_ == NULL) {
+    size_dist_ = boost::shared_ptr<FixedDoubleDist>(new FixedDoubleDist(1.0));
+  }
+
   next_active_end_ = active_dist_->sample();
  
-  int dormant_len = dormant_dist_->sample();
-  if (dormant_len < 0) {
+  if (dormant_dist_->sample() < 0) {
     next_dormant_end_ = -1;
   }
   else {
-    next_dormant_end_ = dormant_len + next_active_end_;
+    next_dormant_end_ = dormant_dist_->sample() + next_active_end_;
   }
 }
 
@@ -76,15 +82,14 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
-  set_default_distributions();
   init_active_dormant();
   return *this;
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name, double throughput, IntDistribution* active_dist,
-                                   IntDistribution* dormant_dist,
-                                   DoubleDistribution* size_dist) {
+                                   std::string name, double throughput, boost::shared_ptr<IntDistribution> active_dist,
+                                   boost::shared_ptr<IntDistribution> dormant_dist,
+                                   boost::shared_ptr<DoubleDistribution> size_dist) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
@@ -104,7 +109,6 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   name_ = name;
   set_fill_to(fill_to);
   set_req_when_under(req_when_under);
-  set_default_distributions();
   init_active_dormant();
   return *this;
 }
@@ -120,7 +124,6 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   set_req_when_under(req_when_under);
   set_quantize(quantize);
   set_throughput(throughput);
-  set_default_distributions();
   init_active_dormant();
   return *this;
 }
@@ -170,36 +173,36 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
 
   int current_time_ = manager()->context()->time();
 
-  if (current_time_ < next_active_end_ || never_dormant()) {
+  if (never_dormant() || current_time_ < next_active_end_) {
     // currently in the middle of active buying period
     SetRequestSize();
-    amt = TotalQty();
+    amt = TotalAvailable() * random_request_size_;
+  }
+  else if (current_time_ == next_active_end_) {
+    // finished active. starting dormancy and sample/set length of dormant period
+    amt = 0;
   }
   else if (current_time_ < next_dormant_end_) {
     // currently in the middle of dormant period
     amt = 0;
     LGH(INFO3) << "in dormant period, no request" << std::endl;
   }
-  else if (current_time_ == next_active_end_) {
-    // finished active. starting dormancy and sample/set length of dormant period
-    amt = 0;
-    SetNextDormantTime();
-  }
   // the following is an if rather than if-else statement because if dormant
   // length is zero, buy policy should return to active immediately
   if (current_time_ == next_dormant_end_) {
     // finished dormant. starting buying and sample/set length of active period
     SetRequestSize();
-    amt = TotalQty();
+    amt = TotalAvailable() * random_request_size_;
     SetNextActiveTime();
+    SetNextDormantTime();
   }
 
   if (!make_req || amt < eps())
     return ports;
 
   bool excl = Excl();
-  double req_amt = Excl() ? quantize_ : amt;
-  int n_req = Excl() ? static_cast<int>(amt / quantize_) : 1;
+  double req_amt = ReqQty(amt);
+  int n_req = NReq(amt);
   LGH(INFO3) << "requesting " << amt << " kg via " << n_req << " request(s)"  << std::endl;
 
   // one portfolio for each request
@@ -248,9 +251,9 @@ void MatlBuyPolicy::SetNextDormantTime() {
 }
 
 void MatlBuyPolicy::SetRequestSize() {
-  sample_fraction_ = size_dist_->sample();
-  if (sample_fraction_ > 1) {
-    sample_fraction_ = sample_fraction_ / size_dist_->max();
+  random_request_size_ = size_dist_->sample();
+  if (random_request_size_ > 1) {
+    random_request_size_ = random_request_size_ / size_dist_->max();
   }
   return;
 }

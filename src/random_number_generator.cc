@@ -62,26 +62,12 @@ namespace cyclus{
 
     //
     // Distributions
-    NormalDoubleDist::NormalDoubleDist(double mean, double std_dev, double min, double max) : dist(mean, std_dev) {
-        min_ = min;
-        max_ = max;
-    }
-
     double NormalDoubleDist::sample() {
         double val = dist(RandomNumberGenerator::gen_);
         while (val < min_ || val > max_){
             val = dist(RandomNumberGenerator::gen_);
         }
         return val;
-    }
-
-    double NormalDoubleDist::max() { 
-        return dist.max();
-    }
-
-    NormalIntDist::NormalIntDist(double mean, double std_dev, int min, int max) : dist(mean, std_dev) {
-        min_ = std::min(min, 0);
-        max_ = max;
     }
 
     int NormalIntDist::sample() {
