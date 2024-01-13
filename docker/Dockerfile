@@ -82,7 +82,7 @@ RUN conda update -y --all && \
                python-json-logger \
                glib \
                libxml2 \
-               libxmlpp \
+               libxmlpp-4.0 \
                libblas \
                libcblas \
                liblapack \
