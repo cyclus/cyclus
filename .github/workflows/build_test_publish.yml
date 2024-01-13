@@ -45,7 +45,6 @@ jobs:
           artifact-out-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps
           artifact-out-tags: |
             ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps:${{ env.tag }}
-            ${{ matrix.pkg_mgr }}-deps
           dockerfile-path: docker/Dockerfile
           docker-build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
