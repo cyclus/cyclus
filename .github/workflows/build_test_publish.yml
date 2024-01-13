@@ -123,7 +123,6 @@ jobs:
       - name: Load Dependency Image
         run: |
           docker load --input /tmp/cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}-deps.tar
-          docker image ls -a
 
       - name: Push Dependency Image
         run: |
