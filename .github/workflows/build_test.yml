@@ -35,14 +35,11 @@ jobs:
         ]
 
     steps:
-      - name: Pull Dependency Image
-        run: |
-          docker pull ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps
-
       - name: Build Cyclus
         uses: bennibbelink/cyclus-ci-action@main
         with:
           repository: cyclus/cyclus
+          pull-image-name: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps
           artifact-out-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
           artifact-out-tags: |
             ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
