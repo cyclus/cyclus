@@ -2,7 +2,7 @@ name: Publish Cyclus Release
 
 on:
   release:
-    types: [published, created, edited]
+    types: [published]
 
 jobs:
   build-and-test-for-release:
@@ -29,14 +29,16 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build cyclus.dockerfile Image
+      - name: Build Cyclus Image
         uses: bennibbelink/cyclus-ci-action@main
         with:
           repository: cyclus/cyclus
           push-image: true
           artifact-out-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          artifact-out-tag: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ github.ref_name }}
-          dockerfile-path: docker/cyclus.dockerfile
+          artifact-out-tags: |
+            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ github.ref_name }}
+          dockerfile-path: docker/Dockerfile
+          docker-build-target: cyclus
           docker-build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
