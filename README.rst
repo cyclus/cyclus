@@ -86,6 +86,7 @@ Package                Minimum Version
 ``sqlite3``              3.7.10
 ``HDF5``                 1.8.4
 ``Coin-Cbc``             2.5
+``zlib``                 1.1.4
 ====================   ==================
 
 For detailed instructions on installing dependencies, see `Installing Dependencies <DEPENDENCIES.rst>`_.
@@ -115,7 +116,7 @@ To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18
 
 - ``conda activate cyclus``
 
-- ``conda install -y openssh gxx_linux-64 gcc_linux-64 cmake make docker-pycreds git xo python-json-logger glib glibmm libxml2 libxmlpp libxmlpp-4.0 libblas libcblas liblapack pkg-config coincbc boost-cpp hdf5 sqlite pcre gettext bzip2 xz setuptools pytest pytables pandas jinja2 "cython<3" websockets pprintpp``
+- ``conda install -y openssh gxx_linux-64 gcc_linux-64 cmake make docker-pycreds git xo python-json-logger glib glibmm zlib libxml2 libxmlpp libxmlpp-4.0 libblas libcblas liblapack pkg-config coincbc boost-cpp hdf5 sqlite pcre gettext bzip2 xz setuptools pytest pytables pandas jinja2 "cython<3" websockets pprintpp``
 
 - ``conda install -y --force-reinstall libsqlite``
 
