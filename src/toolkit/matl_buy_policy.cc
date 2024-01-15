@@ -175,8 +175,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
 
   if (never_dormant() || current_time_ < next_active_end_) {
     // currently in the middle of active buying period
-    SetRequestSize();
-    amt = TotalAvailable() * random_request_size_;
+    amt = TotalAvailable() * SampleRequestSize();
   }
   else if (current_time_ == next_active_end_) {
     // finished active. starting dormancy and sample/set length of dormant period
