@@ -24,13 +24,14 @@ Since last release
 * Adds active and dormant buying cycles in buy policy (#1596)
 * Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599, #1639)
 * Allow randomness in request frequency and size through buy policy (#1634)
+* Adds support for Cython3 (#1636)
 
 **Changed:**
 
 * Moved to unified CHANGELOG Entry and check them with GithubAction (#1571)
 * Major update and modernization of build (#1587, #1632, #1640)
 * Changed Json formatting for compatibility with current python standards (#1587)
-* Changed README.rst installation instructions, tested on fresh Ubuntu-22.04 system with Python 3.11 (#1617)
+* Changed README.rst installation instructions, tested on fresh Ubuntu-22.04 system with Python 3.11 (#1617, #1644)
 
 **Removed:**
 

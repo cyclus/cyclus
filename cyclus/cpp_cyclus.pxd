@@ -719,42 +719,42 @@ cdef extern from "region.h" namespace "cyclus":
 
     cdef cppclass Region(Agent, TimeListener):
         Region(Context*)
-        void InitFromAgent "InitFrom" (Region*)
-        void InitFrom(QueryableBackend*)
-        void InfileToDb(InfileTree*, DbInit)
-        void Build(Agent*)
-        void EnterNotify()
-        void Tick()
-        void Tock()
-        void Decision()
+        void Region_InitFromAgent "InitFrom" (Region*)
+        void Region_InitFrom "InitFrom" (QueryableBackend*)
+        void Region_InfileToDb "InfileToDb" (InfileTree*, DbInit)
+        void Region_Build "Build" (Agent*)
+        void Region_EnterNotify "EnterNotify" ()
+        void Region_Tick "Tick" ()
+        void Region_Tock "Tock" ()
+        void Region_Decision "Decision" ()
 
 
 cdef extern from "institution.h" namespace "cyclus":
 
     cdef cppclass Institution(Agent, TimeListener):
         Institution(Context*)
-        void InitFromAgent "InitFrom" (Institution*)
-        void InitFrom(QueryableBackend*)
-        void InfileToDb(InfileTree*, DbInit)
-        void Build(Agent*)
-        void EnterNotify()
-        void Tick()
-        void Tock()
-        void Decision()
+        void Institution_InitFromAgent "InitFrom" (Institution*)
+        void Institution_InitFrom "InitFrom" (QueryableBackend*)
+        void Institution_InfileToDb "InfileToDb" (InfileTree*, DbInit)
+        void Institution_Build "Build" (Agent*)
+        void Institution_EnterNotify "EnterNotify" ()
+        void Institution_Tick "Tick" ()
+        void Institution_Tock "Tock" ()
+        void Institution_Decision "Decision" ()
 
 
 cdef extern from "facility.h" namespace "cyclus":
 
     cdef cppclass Facility(TimeListener, Agent, Trader):
         Facility(Context*)
-        void InitFromAgent "InitFrom" (Facility*)
-        void InitFrom(QueryableBackend*)
-        void InfileToDb(InfileTree*, DbInit)
-        void Build(Agent*)
-        void EnterNotify()
-        void Tick()
-        void Tock()
-        void Decision()
+        void Facility_InitFromAgent "InitFrom" (Facility*)
+        void Facility_InitFrom "InitFrom" (QueryableBackend*)
+        void Facility_InfileToDb "InfileToDb" (InfileTree*, DbInit)
+        void Facility_Build "Build" (Agent*)
+        void Facility_EnterNotify "EnterNotify" ()
+        void Facility_Tick "Tick" ()
+        void Facility_Tock "Tock" ()
+        void Facility_Decision "Decision" ()
         cpp_bool CheckDecommissionCondition() except +
         set[RequestPortfolio[Material].Ptr] GetMatlRequests()
         set[RequestPortfolio[Product].Ptr] GetProductRequests()
@@ -762,7 +762,7 @@ cdef extern from "facility.h" namespace "cyclus":
         set[BidPortfolio[Product].Ptr] GetProductBids(CommodMap[Product].type&)
         void AdjustMatlPrefs(PrefMap[Material].type&)
         void AdjustProductPrefs(PrefMap[Product].type&)
-        void GetMatlTrades(const const vector[Trade[Material]]&,
+        void GetMatlTrades(const vector[Trade[Material]]&,
                            vector[pair[Trade[Material], Material.Ptr]]&)
         void GetProductTrades(const vector[Trade[Product]]&,
                               vector[pair[Trade[Product], Product.Ptr]]&)

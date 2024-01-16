@@ -63,11 +63,11 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
     CyclusAgentShim(cpp_cyclus.Context* ctx):  # C++BASES cyclus::Agent(ctx)
         pass
 
-    std_string version() except +:
+    std_string version() except *:
         rtn = (<object> this.self).version
         return str_py_to_cpp(rtn)
 
-    cpp_cyclus.Agent* Clone() except +:
+    cpp_cyclus.Agent* Clone() except *:
         cdef lib._Context ctx = lib.Context(init=False)
         (<lib._Context> ctx).ptx = this.context()
         cdef _Agent a = type(<object> this.self)(ctx)
@@ -76,11 +76,11 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         lib._AGENT_REFS[a.id] = a
         return dynamic_cast[agent_ptr]((<_Agent> a).shim)
 
-    void InitFromAgent "InitFrom" (CyclusAgentShim* a) except +:
+    void InitFromAgent "InitFrom" (CyclusAgentShim* a) except *:
         cpp_cyclus.Agent.InitFromAgent(a)
         (<object> this.self).init_from_agent(<object> a.self)
 
-    void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di) except +:
+    void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di) except *:
         cpp_cyclus.Agent.InfileToDb(tree, di)
         # wrap interface
         cdef lib._InfileTree py_tree = lib.InfileTree(free=False)
@@ -90,7 +90,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         # call generic python
         (<object> this.self).infile_to_db(py_tree, py_di)
 
-    void InitFrom(cpp_cyclus.QueryableBackend* b) except +:
+    void InitFrom(cpp_cyclus.QueryableBackend* b) except *:
         cpp_cyclus.Agent.InitFrom(b)
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
@@ -99,43 +99,43 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         self.init_from_dict(res)
         lib._AGENT_REFS[self.id] = self
 
-    void Snapshot(cpp_cyclus.DbInit di) except +:
+    void Snapshot(cpp_cyclus.DbInit di) except *:
         cdef lib._DbInit py_di = lib.DbInit(free=False)
         py_di.ptx = &di
         (<object> this.self).snapshot(py_di)
 
-    void InitInv(cpp_cyclus.Inventories& invs) except +:
+    void InitInv(cpp_cyclus.Inventories& invs) except *:
         pyinvs = lib.inventories_to_py(invs)
         (<object> this.self).init_inv(pyinvs)
 
-    cpp_cyclus.Inventories SnapshotInv() except +:
+    cpp_cyclus.Inventories SnapshotInv() except *:
         pyinvs = (<object> this.self).snapshot_inv()
         return lib.inventories_to_cpp(pyinvs)
 
-    std_string schema() except +:
+    std_string schema() except *:
         pyschema = (<object> this.self).schema
         return str_py_to_cpp(pyschema)
 
-    cpp_jsoncpp.Value annotations() except +:
+    cpp_jsoncpp.Value annotations() except *:
         pyanno = (<object> this.self).annotations_json
         return lib.str_to_json_value(pyanno)
 
-    void Build(cpp_cyclus.Agent* parent) except +:
+    void Build(cpp_cyclus.Agent* parent) except *:
         cpp_cyclus.Agent.Build(parent)
         pyrent = lib.agent_to_py(parent, None)
         (<object> this.self).build(pyrent)
 
-    void EnterNotify() except +:
+    void EnterNotify() except *:
         cpp_cyclus.Agent.EnterNotify()
         (<object> this.self).enter_notify()
 
-    void BuildNotify() except +:
+    void BuildNotify() except *:
         (<object> this.self).build_notify()
 
-    void DecomNotify() except +:
+    void DecomNotify() except *:
         (<object> this.self).decom_notify()
 
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except +:
+    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_MAT_PREFS_TIME, _GET_MAT_PREFS_PTR, _GET_MAT_PREFS
         cdef int curr_time = this.context().time()
@@ -156,7 +156,7 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         for (req, bid), pref in updates.items():
             prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
 
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except +:
+    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_PROD_PREFS_TIME, _GET_PROD_PREFS_PTR, _GET_PROD_PREFS
         cdef int curr_time = this.context().time()
@@ -186,11 +186,11 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
     CyclusRegionShim(cpp_cyclus.Context* ctx):  # C++BASES cyclus::Region(ctx)
         pass
 
-    std_string version() except +:
+    std_string version() except *:
         rtn = (<object> this.self).version
         return str_py_to_cpp(rtn)
 
-    cpp_cyclus.Agent* Clone() except +:
+    cpp_cyclus.Agent* Clone() except *:
         cdef lib._Context ctx = lib.Context(init=False)
         (<lib._Context> ctx).ptx = this.context()
         cdef _Region a = type(<object> this.self)(ctx)
@@ -200,12 +200,12 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         return dynamic_cast[agent_ptr](
                 reinterpret_cast[region_shim_ptr]((<_Agent> a).shim))
 
-    void InitFromAgent "InitFrom" (CyclusRegionShim* a) except +:
-        cpp_cyclus.Region.InitFromAgent(a)
+    void InitFromAgent "InitFrom" (CyclusRegionShim* a) except *:
+        cpp_cyclus.Region.Region_InitFromAgent(a)
         (<object> this.self).init_from_agent(<object> a.self)
 
-    void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di) except +:
-        cpp_cyclus.Region.InfileToDb(tree, di)
+    void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di) except *:
+        cpp_cyclus.Region.Region_InfileToDb(tree, di)
         # wrap interface
         cdef lib._InfileTree py_tree = lib.InfileTree(free=False)
         py_tree.ptx = tree
@@ -214,8 +214,8 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         # call generic python
         (<object> this.self).infile_to_db(py_tree, py_di)
 
-    void InitFrom(cpp_cyclus.QueryableBackend* b) except +:
-        cpp_cyclus.Region.InitFrom(b)
+    void InitFrom(cpp_cyclus.QueryableBackend* b) except *:
+        cpp_cyclus.Region.Region_InitFrom(b)
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         # call generic python
@@ -223,43 +223,43 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         self.init_from_dict(res)
         lib._AGENT_REFS[self.id] = self
 
-    void Snapshot(cpp_cyclus.DbInit di) except +:
+    void Snapshot(cpp_cyclus.DbInit di) except *:
         cdef lib._DbInit py_di = lib.DbInit(free=False)
         py_di.ptx = &di
         (<object> this.self).snapshot(py_di)
 
-    void InitInv(cpp_cyclus.Inventories& invs) except +:
+    void InitInv(cpp_cyclus.Inventories& invs) except *:
         pyinvs = lib.inventories_to_py(invs)
         (<object> this.self).init_inv(pyinvs)
 
-    cpp_cyclus.Inventories SnapshotInv() except +:
+    cpp_cyclus.Inventories SnapshotInv() except *:
         pyinvs = (<object> this.self).snapshot_inv()
         return lib.inventories_to_cpp(pyinvs)
 
-    std_string schema() except +:
+    std_string schema() except *:
         pyschema = (<object> this.self).schema
         return str_py_to_cpp(pyschema)
 
-    cpp_jsoncpp.Value annotations() except +:
+    cpp_jsoncpp.Value annotations() except *:
         pyanno = (<object> this.self).annotations_json
         return lib.str_to_json_value(pyanno)
 
-    void Build(cpp_cyclus.Agent* parent) except +:
-        cpp_cyclus.Region.Build(parent)
+    void Build(cpp_cyclus.Agent* parent) except *:
+        cpp_cyclus.Region.Region_Build(parent)
         pyrent = lib.agent_to_py(parent, None)
         (<object> this.self).build(pyrent)
 
-    void EnterNotify() except +:
-        cpp_cyclus.Region.EnterNotify()
+    void EnterNotify() except *:
+        cpp_cyclus.Region.Region_EnterNotify()
         (<object> this.self).enter_notify()
 
-    void BuildNotify() except +:
+    void BuildNotify() except *:
         (<object> this.self).build_notify()
 
-    void DecomNotify() except +:
+    void DecomNotify() except *:
         (<object> this.self).decom_notify()
 
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except +:
+    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_MAT_PREFS_TIME, _GET_MAT_PREFS_PTR, _GET_MAT_PREFS
         cdef int curr_time = this.context().time()
@@ -280,7 +280,7 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         for (req, bid), pref in updates.items():
             prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
 
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except +:
+    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_PROD_PREFS_TIME, _GET_PROD_PREFS_PTR, _GET_PROD_PREFS
         cdef int curr_time = this.context().time()
@@ -301,13 +301,13 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         for (req, bid), pref in updates.items():
             prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = pref
 
-    void Tick() except +:
+    void Tick() except *:
         (<object> this.self).tick()
 
-    void Tock() except +:
+    void Tock() except *:
         (<object> this.self).tock()
 
-    void Decision() except +:
+    void Decision() except *:
         (<object> this.self).decision()
 
 
@@ -319,11 +319,11 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
     CyclusInstitutionShim(cpp_cyclus.Context* ctx):  # C++BASES cyclus::Institution(ctx)
         pass
 
-    std_string version() except +:
+    std_string version() except *:
         rtn = (<object> this.self).version
         return str_py_to_cpp(rtn)
 
-    cpp_cyclus.Agent* Clone() except +:
+    cpp_cyclus.Agent* Clone() except *:
         cdef lib._Context ctx = lib.Context(init=False)
         (<lib._Context> ctx).ptx = this.context()
         cdef _Institution a = type(<object> this.self)(ctx)
@@ -333,12 +333,12 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         return dynamic_cast[agent_ptr](
                 reinterpret_cast[institution_shim_ptr]((<_Agent> a).shim))
 
-    void InitFromAgent "InitFrom" (CyclusInstitutionShim* a) except +:
-        cpp_cyclus.Institution.InitFromAgent(a)
+    void InitFromAgent "InitFrom" (CyclusInstitutionShim* a) except *:
+        cpp_cyclus.Institution.Institution_InitFromAgent(a)
         (<object> this.self).init_from_agent(<object> a.self)
 
-    void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di) except +:
-        cpp_cyclus.Institution.InfileToDb(tree, di)
+    void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di) except *:
+        cpp_cyclus.Institution.Institution_InfileToDb(tree, di)
         # wrap interface
         cdef lib._InfileTree py_tree = lib.InfileTree(free=False)
         py_tree.ptx = tree
@@ -347,8 +347,8 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         # call generic python
         (<object> this.self).infile_to_db(py_tree, py_di)
 
-    void InitFrom(cpp_cyclus.QueryableBackend* b) except +:
-        cpp_cyclus.Institution.InitFrom(b)
+    void InitFrom(cpp_cyclus.QueryableBackend* b) except *:
+        cpp_cyclus.Institution.Institution_InitFrom(b)
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         # call generic python
@@ -356,43 +356,43 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         self.init_from_dict(res)
         lib._AGENT_REFS[self.id] = self
 
-    void Snapshot(cpp_cyclus.DbInit di) except +:
+    void Snapshot(cpp_cyclus.DbInit di) except *:
         cdef lib._DbInit py_di = lib.DbInit(free=False)
         py_di.ptx = &di
         (<object> this.self).snapshot(py_di)
 
-    void InitInv(cpp_cyclus.Inventories& invs) except +:
+    void InitInv(cpp_cyclus.Inventories& invs) except *:
         pyinvs = lib.inventories_to_py(invs)
         (<object> this.self).init_inv(pyinvs)
 
-    cpp_cyclus.Inventories SnapshotInv() except +:
+    cpp_cyclus.Inventories SnapshotInv() except *:
         pyinvs = (<object> this.self).snapshot_inv()
         return lib.inventories_to_cpp(pyinvs)
 
-    std_string schema() except +:
+    std_string schema() except *:
         pyschema = (<object> this.self).schema
         return str_py_to_cpp(pyschema)
 
-    cpp_jsoncpp.Value annotations() except +:
+    cpp_jsoncpp.Value annotations() except *:
         pyanno = (<object> this.self).annotations_json
         return lib.str_to_json_value(pyanno)
 
-    void Build(cpp_cyclus.Agent* parent) except +:
-        cpp_cyclus.Institution.Build(parent)
+    void Build(cpp_cyclus.Agent* parent) except *:
+        cpp_cyclus.Institution.Institution_Build(parent)
         pyrent = lib.agent_to_py(parent, None)
         (<object> this.self).build(pyrent)
 
-    void EnterNotify() except +:
-        cpp_cyclus.Institution.EnterNotify()
+    void EnterNotify() except *:
+        cpp_cyclus.Institution.Institution_EnterNotify()
         (<object> this.self).enter_notify()
 
-    void BuildNotify() except +:
+    void BuildNotify() except *:
         (<object> this.self).build_notify()
 
-    void DecomNotify() except +:
+    void DecomNotify() except *:
         (<object> this.self).decom_notify()
 
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except +:
+    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_MAT_PREFS_TIME, _GET_MAT_PREFS_PTR, _GET_MAT_PREFS
         cdef int curr_time = this.context().time()
@@ -413,7 +413,7 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         for (req, bid), pref in updates.items():
             prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
 
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except +:
+    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_PROD_PREFS_TIME, _GET_PROD_PREFS_PTR, _GET_PROD_PREFS
         cdef int curr_time = this.context().time()
@@ -434,14 +434,14 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         for (req, bid), pref in updates.items():
             prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = pref
 
-    void Tick() except +:
+    void Tick() except *:
         (<object> this.self).tick()
 
-    void Tock() except +:
-        cpp_cyclus.Institution.Tock()
+    void Tock() except *:
+        cpp_cyclus.Institution.Institution_Tock()
         (<object> this.self).tock()
 
-    void Decision() except +:
+    void Decision() except *:
         (<object> this.self).decision()
 
 
@@ -461,11 +461,11 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
     CyclusFacilityShim(cpp_cyclus.Context* ctx):  # C++BASES cyclus::Facility(ctx)
         pass
 
-    std_string version() except +:
+    std_string version() except *:
         rtn = (<object> this.self).version
         return str_py_to_cpp(rtn)
 
-    cpp_cyclus.Agent* Clone() except +:
+    cpp_cyclus.Agent* Clone() except *:
         cdef lib._Context ctx = lib.Context(init=False)
         (<lib._Context> ctx).ptx = this.context()
         cdef _Facility a = type(<object> this.self)(ctx)
@@ -475,12 +475,12 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         return dynamic_cast[agent_ptr](
                 reinterpret_cast[facility_shim_ptr]((<_Agent> a).shim))
 
-    void InitFromAgent "InitFrom" (CyclusFacilityShim* a) except +:
-        cpp_cyclus.Facility.InitFromAgent(a)
+    void InitFromAgent "InitFrom" (CyclusFacilityShim* a) except *:
+        cpp_cyclus.Facility.Facility_InitFromAgent(a)
         (<object> this.self).init_from_agent(<object> a.self)
 
-    void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di) except +:
-        cpp_cyclus.Facility.InfileToDb(tree, di)
+    void InfileToDb(cpp_cyclus.InfileTree* tree, cpp_cyclus.DbInit di) except *:
+        cpp_cyclus.Facility.Facility_InfileToDb(tree, di)
         # wrap interface
         cdef lib._InfileTree py_tree = lib.InfileTree(free=False)
         py_tree.ptx = tree
@@ -489,8 +489,8 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         # call generic python
         (<object> this.self).infile_to_db(py_tree, py_di)
 
-    void InitFrom(cpp_cyclus.QueryableBackend* b) except +:
-        cpp_cyclus.Facility.InitFrom(b)
+    void InitFrom(cpp_cyclus.QueryableBackend* b) except *:
+        cpp_cyclus.Facility.Facility_InitFrom(b)
         cdef cpp_cyclus.QueryResult qr = b.Query(std_string(<char*> "Info"), NULL)
         res, _ = lib.single_query_result_to_py(qr, 0)
         # call generic python
@@ -498,43 +498,43 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         self.init_from_dict(res)
         lib._AGENT_REFS[self.id] = self
 
-    void Snapshot(cpp_cyclus.DbInit di) except +:
+    void Snapshot(cpp_cyclus.DbInit di) except *:
         cdef lib._DbInit py_di = lib.DbInit(free=False)
         py_di.ptx = &di
         (<object> this.self).snapshot(py_di)
 
-    void InitInv(cpp_cyclus.Inventories& invs) except +:
+    void InitInv(cpp_cyclus.Inventories& invs) except *:
         pyinvs = lib.inventories_to_py(invs)
         (<object> this.self).init_inv(pyinvs)
 
-    cpp_cyclus.Inventories SnapshotInv() except +:
+    cpp_cyclus.Inventories SnapshotInv() except *:
         pyinvs = (<object> this.self).snapshot_inv()
         return lib.inventories_to_cpp(pyinvs)
 
-    std_string schema() except +:
+    std_string schema() except *:
         pyschema = (<object> this.self).schema
         return str_py_to_cpp(pyschema)
 
-    cpp_jsoncpp.Value annotations() except +:
+    cpp_jsoncpp.Value annotations() except *:
         pyanno = (<object> this.self).annotations_json
         return lib.str_to_json_value(pyanno)
 
-    void Build(cpp_cyclus.Agent* parent) except +:
-        cpp_cyclus.Facility.Build(parent)
+    void Build(cpp_cyclus.Agent* parent) except *:
+        cpp_cyclus.Facility.Facility_Build(parent)
         pyrent = lib.agent_to_py(parent, None)
         (<object> this.self).build(pyrent)
 
-    void EnterNotify() except +:
-        cpp_cyclus.Facility.EnterNotify()
+    void EnterNotify() except *:
+        cpp_cyclus.Facility.Facility_EnterNotify()
         (<object> this.self).enter_notify()
 
-    void BuildNotify() except +:
+    void BuildNotify() except *:
         (<object> this.self).build_notify()
 
-    void DecomNotify() except +:
+    void DecomNotify() except *:
         (<object> this.self).decom_notify()
 
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except +:
+    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_MAT_PREFS_TIME, _GET_MAT_PREFS_PTR, _GET_MAT_PREFS
         cdef int curr_time = this.context().time()
@@ -555,7 +555,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         for (req, bid), pref in updates.items():
             prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
 
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except +:
+    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_PROD_PREFS_TIME, _GET_PROD_PREFS_PTR, _GET_PROD_PREFS
         cdef int curr_time = this.context().time()
@@ -576,20 +576,20 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         for (req, bid), pref in updates.items():
             prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = pref
 
-    void Tick() except +:
+    void Tick() except *:
         (<object> this.self).tick()
 
-    void Tock() except +:
+    void Tock() except *:
         (<object> this.self).tock()
 
-    void Decision() except +:
+    void Decision() except *:
         (<object> this.self).decision()
 
-    cpp_bool CheckDecommissionCondition() except +:
+    cpp_bool CheckDecommissionCondition() except *:
         rtn = (<object> this.self).check_decommission_condition()
         return bool_to_cpp(rtn)
 
-    std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]] GetMatlRequests() except +:
+    std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]] GetMatlRequests() except *:
         pyportfolios = (<object> this.self).get_material_requests()
         cdef std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]] ports = \
             std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Material]]]()
@@ -603,7 +603,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
                 ))
         return ports
 
-    std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Product]]] GetProductRequests() except +:
+    std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Product]]] GetProductRequests() except *:
         pyportfolios = (<object> this.self).get_product_requests()
         cdef std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Product]]] ports = \
             std_set[shared_ptr[cpp_cyclus.RequestPortfolio[cpp_cyclus.Product]]]()
@@ -614,7 +614,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
             ports.insert(ts.product_request_portfolio_to_cpp(normport, this))
         return ports
 
-    std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]] GetMatlBids(cpp_cyclus.CommodMap[cpp_cyclus.Material].type& commod_requests) except +:
+    std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Material]]] GetMatlBids(cpp_cyclus.CommodMap[cpp_cyclus.Material].type& commod_requests) except *:
         # cache the commod_reqs wrappers globally
         global _GET_MAT_BIDS_TIME, _GET_MAT_BIDS_PTR, _GET_MAT_BIDS
         cdef int curr_time = this.context().time()
@@ -644,7 +644,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
                 ))
         return ports
 
-    std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]] GetProductBids(cpp_cyclus.CommodMap[cpp_cyclus.Product].type& commod_requests) except +:
+    std_set[shared_ptr[cpp_cyclus.BidPortfolio[cpp_cyclus.Product]]] GetProductBids(cpp_cyclus.CommodMap[cpp_cyclus.Product].type& commod_requests) except *:
         # cache the commod_reqs wrappers globally
         global _GET_PROD_BIDS_TIME, _GET_PROD_BIDS_PTR, _GET_PROD_BIDS
         cdef int curr_time = this.context().time()
@@ -670,7 +670,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
             ports.insert(ts.product_bid_portfolio_to_cpp(normport, this))
         return ports
 
-    void GetMatlTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses) except +:
+    void GetMatlTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Material]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses) except *:
         pytrades = ts.material_trade_vector_to_py(trades)
         pyresp = (<object> this.self).get_material_trades(pytrades)
         if pyresp is None or len(pyresp) == 0:
@@ -685,7 +685,7 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
                     (<ts._Material> resp).ptx)
                 ))
 
-    void GetProductTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Product]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses) except +:
+    void GetProductTrades(const std_vector[cpp_cyclus.Trade[cpp_cyclus.Product]]& trades, std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses) except *:
         pytrades = ts.product_trade_vector_to_py(trades)
         pyresp = (<object> this.self).get_product_trades(pytrades)
         if pyresp is None or len(pyresp) == 0:
@@ -700,11 +700,11 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
                     (<ts._Product> resp).ptx)
                 ))
 
-    void AcceptMatlTrades(const std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses) except +:
+    void AcceptMatlTrades(const std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Material], shared_ptr[cpp_cyclus.Material]]]& responses) except *:
         pyresp = ts.material_responses_to_py(responses)
         (<object> this.self).accept_material_trades(pyresp)
 
-    void AcceptProductTrades(const std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses) except +:
+    void AcceptProductTrades(const std_vector[std_pair[cpp_cyclus.Trade[cpp_cyclus.Product], shared_ptr[cpp_cyclus.Product]]]& responses) except *:
         pyresp = ts.product_responses_to_py(responses)
         (<object> this.self).accept_product_trades(pyresp)
 
@@ -1716,7 +1716,7 @@ cdef tuple index_and_sort_vars(dict vars):
     return rtn
 
 
-cdef cpp_cyclus.Agent* dynamic_agent_ptr(object a) except +:
+cdef cpp_cyclus.Agent* dynamic_agent_ptr(object a) except *:
     """Dynamically casts an agent instance to the correct agent pointer"""
     if a is None:
         return NULL
