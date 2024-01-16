@@ -190,6 +190,7 @@ class MatlBuyPolicy : public Trader {
     double pref;
   };
 
+  void set_manager(Agent* m);
   /// requires buf_ already set
   void set_fill_to(double x);
   /// requires buf_ already set

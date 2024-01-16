@@ -95,9 +95,7 @@ TEST_F(MatlBuyPolicyTests, StartStop) {
   ResBuf<Material> buff;
   buff.capacity(cap);
   MatlBuyPolicy p;
-  p.Init(NULL, &buff, "");
-  ASSERT_THROW(p.Start(), ValueError);
-  ASSERT_THROW(p.Stop(), ValueError);
+  ASSERT_THROW(p.Init(NULL, &buff, ""), ValueError);
 }
 
 // Tests that matlbuypolicy sends out a request properly

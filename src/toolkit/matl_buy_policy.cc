@@ -32,6 +32,17 @@ MatlBuyPolicy::~MatlBuyPolicy() {
     manager()->context()->UnregisterTrader(this);
 }
 
+void MatlBuyPolicy::set_manager(Agent* m) {
+  if (m != NULL) {
+    Trader::manager_ = m;
+  }
+  else {
+    std::stringstream ss;
+    ss << "No manager set on Buy Policy " << name_;
+    throw ValueError(ss.str());
+  }
+}
+
 void MatlBuyPolicy::set_fill_to(double x) {
   if (x > 1)
     x /= buf_->capacity();
@@ -66,20 +77,20 @@ void MatlBuyPolicy::init_active_dormant() {
   if (size_dist_ == NULL) {
     size_dist_ = boost::shared_ptr<FixedDoubleDist>(new FixedDoubleDist(1.0));
   }
-
-  next_active_end_ = active_dist_->sample();
+  
+  SetNextActiveTime();
  
   if (dormant_dist_->sample() < 0) {
     next_dormant_end_ = -1;
   }
   else {
-    next_dormant_end_ = dormant_dist_->sample() + next_active_end_;
+    SetNextDormantTime();
   }
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name) {
-  Trader::manager_ = manager;
+  set_manager(manager);
   buf_ = buf;
   name_ = name;
   init_active_dormant();
@@ -90,7 +101,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name, double throughput, boost::shared_ptr<IntDistribution> active_dist,
                                    boost::shared_ptr<IntDistribution> dormant_dist,
                                    boost::shared_ptr<DoubleDistribution> size_dist) {
-  Trader::manager_ = manager;
+  set_manager(manager);
   buf_ = buf;
   name_ = name;
   set_throughput(throughput);
@@ -104,7 +115,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name,
                                    double fill_to, double req_when_under) {
-  Trader::manager_ = manager;
+  set_manager(manager);
   buf_ = buf;
   name_ = name;
   set_fill_to(fill_to);
@@ -117,7 +128,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name, double throughput,
                                    double fill_to, double req_when_under,
                                    double quantize) {
-  Trader::manager_ = manager;
+  set_manager(manager);
   buf_ = buf;
   name_ = name;
   set_fill_to(fill_to);
