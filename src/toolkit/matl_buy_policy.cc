@@ -177,12 +177,8 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     // currently in the middle of active buying period
     amt = TotalAvailable() * SampleRequestSize();
   }
-  else if (current_time_ == next_active_end_) {
+  else if (current_time_ == next_active_end_ || current_time_ < next_dormant_end_) {
     // finished active. starting dormancy and sample/set length of dormant period
-    amt = 0;
-  }
-  else if (current_time_ < next_dormant_end_) {
-    // currently in the middle of dormant period
     amt = 0;
     LGH(INFO3) << "in dormant period, no request" << std::endl;
   }
@@ -190,8 +186,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   // length is zero, buy policy should return to active immediately
   if (current_time_ == next_dormant_end_) {
     // finished dormant. starting buying and sample/set length of active period
-    SetRequestSize();
-    amt = TotalAvailable() * random_request_size_;
+    amt = TotalAvailable() * SampleRequestSize();
     SetNextActiveTime();
     SetNextDormantTime();
   }
@@ -249,12 +244,12 @@ void MatlBuyPolicy::SetNextDormantTime() {
   return;
 }
 
-void MatlBuyPolicy::SetRequestSize() {
-  random_request_size_ = size_dist_->sample();
+double MatlBuyPolicy::SampleRequestSize() {
+  double random_request_size_ = size_dist_->sample();
   if (random_request_size_ > 1) {
     random_request_size_ = random_request_size_ / size_dist_->max();
   }
-  return;
+  return random_request_size_;
 }
 
 

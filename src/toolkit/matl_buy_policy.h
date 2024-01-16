@@ -142,12 +142,10 @@ class MatlBuyPolicy : public Trader {
   /// is idempotent.
   void Stop();
 
-  double random_request_size_ = 1.0;
-
   /// the total amount available to request
   inline double TotalAvailable() const {
     return std::min(throughput_,
-           (fill_to_ * buf_->capacity()) - buf_->quantity());
+                   (fill_to_ * buf_->capacity()) - buf_->quantity());
   }
 
   /// whether trades will be denoted as exclusive or not
@@ -184,7 +182,7 @@ class MatlBuyPolicy : public Trader {
 
   void SetNextActiveTime();
   void SetNextDormantTime();
-  void SetRequestSize();
+  double SampleRequestSize();
 
  private:
   struct CommodDetail {
