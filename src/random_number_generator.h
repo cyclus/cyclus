@@ -116,7 +116,7 @@ class NormalDoubleDist : public DoubleDistribution {
   public:
     NormalDoubleDist(double mean, double std_dev, double min=0, double max=std::numeric_limits<double>::max()) : dist(mean, std_dev), min_(min), max_(max) {};
     virtual double sample();
-    virtual double max() { return dist.max(); }
+    virtual double max() { return max_; }
 };
 
 class IntDistribution {
@@ -149,7 +149,7 @@ class NormalIntDist : public IntDistribution {
   public:
     NormalIntDist(double mean, double std_dev, int min=0, int max=std::numeric_limits<int>::max()) : dist(mean, std_dev), min_(min), max_(max) {};
     virtual int sample();
-    virtual int max() { return dist.max(); }
+    virtual int max() { return max_; }
 };
 
 }
