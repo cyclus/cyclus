@@ -191,7 +191,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     // currently in the middle of active buying period
     amt = TotalAvailable() * SampleRequestSize();
   }
-  else if (current_time_ == next_active_end_ || current_time_ < next_dormant_end_) {
+  else if (current_time_ < next_dormant_end_) {
     // finished active. starting dormancy and sample/set length of dormant period
     amt = 0;
     LGH(INFO3) << "in dormant period, no request" << std::endl;
