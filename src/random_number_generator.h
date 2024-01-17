@@ -4,6 +4,8 @@
 #include <boost/random.hpp>
 #include <cstdint>
 
+#include "error.h"
+
 class SimInitTest;
 class RandomTest;
 
@@ -114,7 +116,11 @@ class NormalDoubleDist : public DoubleDistribution {
     double min_;
     double max_;
   public:
-    NormalDoubleDist(double mean, double std_dev, double min=0, double max=std::numeric_limits<double>::max()) : dist(mean, std_dev), min_(min), max_(max) {};
+    NormalDoubleDist(double mean, double std_dev, double min=0, double max=std::numeric_limits<double>::max()) : dist(mean, std_dev), min_(min), max_(max) {
+      if (min_ == max_) {
+        throw ValueError("Min and max cannot be equal for a normal distribution. Either use FixedDoubleDist or change the min/max.");
+      }
+    };
     virtual double sample();
     virtual double max() { return max_; }
 };
@@ -147,7 +153,11 @@ class NormalIntDist : public IntDistribution {
     int min_;
     int max_;
   public:
-    NormalIntDist(double mean, double std_dev, int min=0, int max=std::numeric_limits<int>::max()) : dist(mean, std_dev), min_(min), max_(max) {};
+    NormalIntDist(double mean, double std_dev, int min=0, int max=std::numeric_limits<int>::max()) : dist(mean, std_dev), min_(min), max_(max) {
+      if (min_ == max_) {
+        throw ValueError("Min and max cannot be equal for a normal distribution. Either use FixedIntDist or change the min/max.");
+      }
+    };
     virtual int sample();
     virtual int max() { return max_; }
 };

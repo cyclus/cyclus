@@ -79,12 +79,15 @@ void MatlBuyPolicy::init_active_dormant() {
   }
   
   SetNextActiveTime();
+  LGH(INFO4) << "first active time end: " << next_active_end_ << std::endl;
  
   if (dormant_dist_->sample() < 0) {
     next_dormant_end_ = -1;
+    LGH(INFO4) << "dormant length -1, always active" << std::endl;
   }
   else {
     SetNextDormantTime();
+    LGH(INFO4) << "first dormant time end: " << next_dormant_end_ << std::endl;
   }
 }
 
@@ -200,6 +203,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     amt = TotalAvailable() * SampleRequestSize();
     SetNextActiveTime();
     SetNextDormantTime();
+    LGH(INFO4) << "end of dormant period, next active time end: " << next_active_end_ << ", and next dormant time end: " << next_dormant_end_ << std::endl;
   }
 
   if (!make_req || amt < eps())
@@ -248,8 +252,9 @@ void MatlBuyPolicy::SetNextActiveTime() {
 };
 
 void MatlBuyPolicy::SetNextDormantTime() {
-  if (next_dormant_end_ < 0) {}
+  if (next_dormant_end_ < 0) {std::cerr << "dormant length -1, always active" << std::endl;}
   else {
+    std::cerr << "setting next dormant time" << std::endl;
     next_dormant_end_ = dormant_dist_->sample() + next_active_end_;
   }
   return;
