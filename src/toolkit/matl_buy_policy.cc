@@ -77,6 +77,10 @@ void MatlBuyPolicy::init_active_dormant() {
   if (size_dist_ == NULL) {
     size_dist_ = boost::shared_ptr<FixedDoubleDist>(new FixedDoubleDist(1.0));
   }
+
+  if (size_dist_->max() > 1) {
+    throw ValueError("Size distribution cannot have a max greater than 1.");
+  }
   
   SetNextActiveTime();
   LGH(INFO4) << "first active time end: " << next_active_end_ << std::endl;
@@ -260,11 +264,7 @@ void MatlBuyPolicy::SetNextDormantTime() {
 }
 
 double MatlBuyPolicy::SampleRequestSize() {
-  double random_request_size_ = size_dist_->sample();
-  if (random_request_size_ > 1) {
-    random_request_size_ = random_request_size_ / size_dist_->max();
-  }
-  return random_request_size_;
+  return size_dist_->sample();
 }
 
 

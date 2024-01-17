@@ -337,8 +337,7 @@ TEST_F(MatlBuyPolicyTests, UniformActiveDormant) {
 TEST_F(MatlBuyPolicyTests, NormalActiveDormant) {
   using cyclus::QueryResult;
 
-  boost::shared_ptr<NormalIntDist> a_dist = 
-  boost::shared_ptr<NormalIntDist>(new NormalIntDist(5, 1, 2, 10));
+  boost::shared_ptr<NormalIntDist> a_dist = boost::shared_ptr<NormalIntDist>(new NormalIntDist(5, 1, 2, 10));
   boost::shared_ptr<NormalIntDist> d_dist = boost::shared_ptr<NormalIntDist>(new NormalIntDist(3, 0.5, 1, 5));
   
   int dur = 25;
@@ -376,7 +375,7 @@ TEST_F(MatlBuyPolicyTests, NormalActiveDormant) {
 TEST_F(MatlBuyPolicyTests, MixedActiveDormant) {
   using cyclus::QueryResult;
   
-  boost::shared_ptr<NormalIntDist> a_dist = boost::shared_ptr<NormalIntDist>(new NormalIntDist(5, 1));
+  boost::shared_ptr<NormalIntDist> a_dist = boost::shared_ptr<NormalIntDist>(new NormalIntDist(5, 1, 0, 1e299));
   boost::shared_ptr<UniformIntDist> d_dist = boost::shared_ptr<UniformIntDist>(new UniformIntDist(1, 3));
   
   int dur = 12;
@@ -499,7 +498,7 @@ TEST_F(MatlBuyPolicyTests, RandomSizeAndFrequency) {
 
   QueryResult qr2 = sim.db().Query("Transactions", NULL);
   EXPECT_EQ(0, qr2.GetVal<int>("Time", 0));
-  EXPECT_EQ(5, qr2.GetVal<int>("Time", 2));
+  EXPECT_EQ(4, qr2.GetVal<int>("Time", 2));
 
   delete a;
 }
