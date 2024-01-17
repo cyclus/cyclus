@@ -252,9 +252,8 @@ void MatlBuyPolicy::SetNextActiveTime() {
 };
 
 void MatlBuyPolicy::SetNextDormantTime() {
-  if (next_dormant_end_ < 0) {std::cerr << "dormant length -1, always active" << std::endl;}
+  if (next_dormant_end_ < 0) {}
   else {
-    std::cerr << "setting next dormant time" << std::endl;
     next_dormant_end_ = dormant_dist_->sample() + next_active_end_;
   }
   return;
