@@ -116,9 +116,12 @@ class NormalDoubleDist : public DoubleDistribution {
     double min_;
     double max_;
   public:
-    NormalDoubleDist(double mean, double std_dev, double min=0, double max=std::numeric_limits<double>::max()) : dist(mean, std_dev), min_(min), max_(max) {
+    NormalDoubleDist(double mean, double std_dev, double min=0, double max=1) : dist(mean, std_dev), min_(min), max_(max) {
       if (min_ == max_) {
         throw ValueError("Min and max cannot be equal for a normal distribution. Either use FixedDoubleDist or change the min/max.");
+      }
+      if (max_ < (mean - 3*std_dev) || min_ > (mean + 3*std_dev)) {
+        Warn<VALUE_WARNING>("Dist is sampling from a truncated normal more than 3 standard deviations from the mean. Drawing sampling may be inefficient");
       }
     };
     virtual double sample();
@@ -153,9 +156,12 @@ class NormalIntDist : public IntDistribution {
     int min_;
     int max_;
   public:
-    NormalIntDist(double mean, double std_dev, int min=0, int max=std::numeric_limits<int>::max()) : dist(mean, std_dev), min_(min), max_(max) {
+    NormalIntDist(double mean, double std_dev, int min=0, int max=1) : dist(mean, std_dev), min_(min), max_(max) {
       if (min_ == max_) {
         throw ValueError("Min and max cannot be equal for a normal distribution. Either use FixedIntDist or change the min/max.");
+      }
+      if (max_ < (mean - 3*std_dev) || min_ > (mean + 3*std_dev)) {
+        Warn<VALUE_WARNING>("Dist is sampling from a truncated normal more than 3 standard deviations from the mean. Drawing sampling may be inefficient");
       }
     };
     virtual int sample();
