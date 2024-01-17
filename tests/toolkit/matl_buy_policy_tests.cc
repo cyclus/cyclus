@@ -193,7 +193,7 @@ TEST_F(MatlBuyPolicyTests, DefaultFixedActiveDormant) {
   int dur = 2;
   double throughput = 1;
 
-  boost::shared_ptr<FixedIntDist> a_d_dist = boost::shared_ptr<FixedIntDist>(NULL);
+  boost::shared_ptr<FixedIntDist> a_d_dist = NULL;
 
   cyclus::MockSim sim(dur);
   cyclus::Agent* a = new TestFacility(sim.context());
