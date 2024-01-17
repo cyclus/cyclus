@@ -20,8 +20,9 @@ MatlBuyPolicy::MatlBuyPolicy() :
     quantize_(-1),
     fill_to_(1),
     req_when_under_(1),
-    active_(1),
-    dormant_(0){
+    active_dist_(NULL),
+    dormant_dist_(NULL),
+    size_dist_(NULL){
   Warn<EXPERIMENTAL_WARNING>(
       "MatlBuyPolicy is experimental and its API may be subject to change");
 }
@@ -29,6 +30,17 @@ MatlBuyPolicy::MatlBuyPolicy() :
 MatlBuyPolicy::~MatlBuyPolicy() {
   if (manager() != NULL)
     manager()->context()->UnregisterTrader(this);
+}
+
+void MatlBuyPolicy::set_manager(Agent* m) {
+  if (m != NULL) {
+    Trader::manager_ = m;
+  }
+  else {
+    std::stringstream ss;
+    ss << "No manager set on Buy Policy " << name_;
+    throw ValueError(ss.str());
+  }
 }
 
 void MatlBuyPolicy::set_fill_to(double x) {
@@ -55,45 +67,67 @@ void MatlBuyPolicy::set_throughput(double x) {
   throughput_ = x;
 }
 
-void MatlBuyPolicy::set_active(int x) {
-  assert(x > 0);
-  active_ = x;
-}
+void MatlBuyPolicy::init_active_dormant() {
+  if (active_dist_ == NULL) {
+    active_dist_ = boost::shared_ptr<FixedIntDist>(new FixedIntDist(1));
+  }
+  if (dormant_dist_ == NULL) {
+    dormant_dist_ = boost::shared_ptr<FixedIntDist>(new FixedIntDist(-1));
+  }
+  if (size_dist_ == NULL) {
+    size_dist_ = boost::shared_ptr<FixedDoubleDist>(new FixedDoubleDist(1.0));
+  }
 
-void MatlBuyPolicy::set_dormant(int x) {
-  assert(x >= 0);
-  dormant_ = x;
+  if (size_dist_->max() > 1) {
+    throw ValueError("Size distribution cannot have a max greater than 1.");
+  }
+  
+  SetNextActiveTime();
+  LGH(INFO4) << "first active time end: " << next_active_end_ << std::endl;
+ 
+  if (dormant_dist_->sample() < 0) {
+    next_dormant_end_ = -1;
+    LGH(INFO4) << "dormant length -1, always active" << std::endl;
+  }
+  else {
+    SetNextDormantTime();
+    LGH(INFO4) << "first dormant time end: " << next_dormant_end_ << std::endl;
+  }
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name) {
-  Trader::manager_ = manager;
+  set_manager(manager);
   buf_ = buf;
   name_ = name;
+  init_active_dormant();
   return *this;
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name, double throughput, int active, int dormant) {
-  Trader::manager_ = manager;
+                                   std::string name, double throughput, boost::shared_ptr<IntDistribution> active_dist,
+                                   boost::shared_ptr<IntDistribution> dormant_dist,
+                                   boost::shared_ptr<DoubleDistribution> size_dist) {
+  set_manager(manager);
   buf_ = buf;
   name_ = name;
   set_throughput(throughput);
-  set_active(active);
-  set_dormant(dormant);
-  LGH(INFO3) << "has buy policy with active = " << active_ \
-             << "time steps and dormant = " << dormant_ << " time steps." ;
+  active_dist_ = active_dist;
+  dormant_dist_ = dormant_dist;
+  size_dist_ = size_dist;
+  init_active_dormant();
   return *this;
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name,
                                    double fill_to, double req_when_under) {
-  Trader::manager_ = manager;
+  set_manager(manager);
   buf_ = buf;
   name_ = name;
   set_fill_to(fill_to);
   set_req_when_under(req_when_under);
+  init_active_dormant();
   return *this;
 }
 
@@ -101,13 +135,14 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name, double throughput,
                                    double fill_to, double req_when_under,
                                    double quantize) {
-  Trader::manager_ = manager;
+  set_manager(manager);
   buf_ = buf;
   name_ = name;
   set_fill_to(fill_to);
   set_req_when_under(req_when_under);
   set_quantize(quantize);
   set_throughput(throughput);
+  init_active_dormant();
   return *this;
 }
 
@@ -153,24 +188,35 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   std::set<RequestPortfolio<Material>::Ptr> ports;
   bool make_req = buf_->quantity() < req_when_under_ * buf_->capacity();
   double amt;
-  
-  if (dormant_ > 0 && manager()->context()->time() % (active_ + dormant_) < active_) {
-    amt = TotalQty();
+
+  int current_time_ = manager()->context()->time();
+
+  if (never_dormant() || current_time_ < next_active_end_) {
+    // currently in the middle of active buying period
+    amt = TotalAvailable() * SampleRequestSize();
   }
-  else if (dormant_ == 0)
-    amt = TotalQty();
-  else {
-    // in dormant part of cycle, return empty portfolio
+  else if (current_time_ < next_dormant_end_) {
+    // finished active. starting dormancy and sample/set length of dormant period
     amt = 0;
-    LGH(INFO3) << "in dormant period, no request";
+    LGH(INFO3) << "in dormant period, no request" << std::endl;
   }
+  // the following is an if rather than if-else statement because if dormant
+  // length is zero, buy policy should return to active immediately
+  if (current_time_ == next_dormant_end_) {
+    // finished dormant. starting buying and sample/set length of active period
+    amt = TotalAvailable() * SampleRequestSize();
+    SetNextActiveTime();
+    SetNextDormantTime();
+    LGH(INFO4) << "end of dormant period, next active time end: " << next_active_end_ << ", and next dormant time end: " << next_dormant_end_ << std::endl;
+  }
+
   if (!make_req || amt < eps())
     return ports;
 
   bool excl = Excl();
-  double req_amt = ReqQty();
-  int n_req = NReq();
-  LGH(INFO3) << "requesting " << amt << " kg via " << n_req << " request(s)";
+  double req_amt = ReqQty(amt);
+  int n_req = NReq(amt);
+  LGH(INFO3) << "requesting " << amt << " kg via " << n_req << " request(s)"  << std::endl;
 
   // one portfolio for each request
   for (int i = 0; i != n_req; i++) {
@@ -199,10 +245,28 @@ void MatlBuyPolicy::AcceptMatlTrades(
   for (it = resps.begin(); it != resps.end(); ++it) {
     rsrc_commods_[it->second] = it->first.request->commodity();
     LGH(INFO3) << "got " << it->second->quantity() << " kg of "
-               << it->first.request->commodity();
+               << it->first.request->commodity()  << std::endl;
     buf_->Push(it->second);
   }
 }
+
+void MatlBuyPolicy::SetNextActiveTime() {
+  next_active_end_ = active_dist_->sample() + manager()->context()->time();
+  return;
+};
+
+void MatlBuyPolicy::SetNextDormantTime() {
+  if (next_dormant_end_ < 0) {}
+  else {
+    next_dormant_end_ = dormant_dist_->sample() + next_active_end_;
+  }
+  return;
+}
+
+double MatlBuyPolicy::SampleRequestSize() {
+  return size_dist_->sample();
+}
+
 
 }  // namespace toolkit
 }  // namespace cyclus

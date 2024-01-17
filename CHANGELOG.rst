@@ -23,6 +23,7 @@ Since last release
 * Added code coverage reporting to GitHub workflows (#1616)
 * Adds active and dormant buying cycles in buy policy (#1596)
 * Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599, #1639)
+* Allow randomness in request frequency and size through buy policy (#1634)
 * Adds support for Cython3 (#1636)
 
 **Changed:**

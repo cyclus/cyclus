@@ -57,7 +57,24 @@ namespace cyclus{
             val = rn();
         }
         int rounded_val = std::lrint(val);
+        return rounded_val;
+    }
+
+    //
+    // Distributions
+    double NormalDoubleDist::sample() {
+        double val = dist(RandomNumberGenerator::gen_);
+        while (val < min_ || val > max_){
+            val = dist(RandomNumberGenerator::gen_);
+        }
         return val;
     }
 
+    int NormalIntDist::sample() {
+        double val = dist(RandomNumberGenerator::gen_);
+        while (val < min_ || val > max_){
+            val = dist(RandomNumberGenerator::gen_);
+        }
+        return std::lrint(val);
+    }
 }
