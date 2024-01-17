@@ -121,7 +121,7 @@ class NormalDoubleDist : public DoubleDistribution {
         throw ValueError("Min and max cannot be equal for a normal distribution. Either use FixedDoubleDist or change the min/max.");
       }
       if (max_ < (mean - 3*std_dev) || min_ > (mean + 3*std_dev)) {
-        Warn<VALUE_WARNING>("Dist is sampling from a truncated normal more than 3 standard deviations from the mean. Drawing sampling may be inefficient");
+        Warn<VALUE_WARNING>("Dist is sampling from a tail of a truncated normal more than 3 standard deviations from the mean. Drawing sampling may be inefficient");
       }
     };
     virtual double sample();
@@ -161,7 +161,7 @@ class NormalIntDist : public IntDistribution {
         throw ValueError("Min and max cannot be equal for a normal distribution. Either use FixedIntDist or change the min/max.");
       }
       if (max_ < (mean - 3*std_dev) || min_ > (mean + 3*std_dev)) {
-        Warn<VALUE_WARNING>("Dist is sampling from a truncated normal more than 3 standard deviations from the mean. Drawing sampling may be inefficient");
+        Warn<VALUE_WARNING>("Dist is sampling from a tail of a truncated normal more than 3 standard deviations from the mean. Drawing sampling may be inefficient");
       }
     };
     virtual int sample();
