@@ -37,6 +37,9 @@ jobs:
         run: |
           echo "tag=latest" >> "$GITHUB_ENV"
 
+      - name: Checkout Cyclus
+        uses: actions/checkout@v4
+
       - name: Build Dependency and Test Image
         uses: docker/build-push-action@v5
         with:
