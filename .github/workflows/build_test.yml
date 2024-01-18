@@ -93,7 +93,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: ${{ github.workspace }}/cycamore
-          file: docker/Dockerfile
+          file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -147,7 +147,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: ${{ github.workspace }}/cymetric
-          file: docker/Dockerfile
+          file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
