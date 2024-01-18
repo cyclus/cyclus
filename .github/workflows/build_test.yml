@@ -84,6 +84,7 @@ jobs:
         run: |
           pwd
           ls
+          ls cycamore
 
       - name: Build Cycamore
         id: build-cycamore
@@ -91,7 +92,7 @@ jobs:
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          context: ${{ github.workspace }}/cycamore
+          context: ./cycamore
           file: docker/Dockerfile
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
@@ -134,9 +135,9 @@ jobs:
 
       - name: Debugging
         run: |
-          cat docker/Dockerfile
           pwd
           ls
+          ls cymetric
 
 
       - name: Build Cymetric
