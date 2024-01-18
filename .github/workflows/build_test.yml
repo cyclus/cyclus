@@ -35,16 +35,19 @@ jobs:
         ]
 
     steps:
-      - name: Build Cyclus
-        uses: bennibbelink/cyclus-ci-action@main
+      - name: Checkout Cyclus
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Test Cyclus
+        uses: docker/build-push-action@v5
         with:
-          repository: cyclus/cyclus
-          pull-image-name: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps
-          artifact-out-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          artifact-out-tags: |
-            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
-          dockerfile-path: docker/Dockerfile
-          docker-build-args: |
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          file: docker/Dockerfile
+          build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
@@ -67,18 +70,23 @@ jobs:
         ]
 
     steps:
-      - name: Build Cycamore
-        id: build-cycamore
-        uses: bennibbelink/cyclus-ci-action@main
+      - name: Checkout Cycamore
+        uses: actions/checkout@v4
         with:
           repository: cyclus/cycamore
-          repository-ref: main
-          artifact-in-name: cyclus-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          artifact-out-name: cycamore-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          artifact-out-tags: |
-            ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
-          dockerfile-path: docker/Dockerfile
-          docker-build-args: |
+          ref: main
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Cycamore
+        id: build-cycamore
+        uses: docker/build-push-action@v5
+        with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          file: docker/Dockerfile
+          build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
       
@@ -107,18 +115,23 @@ jobs:
         ]
 
     steps:
-      - name: Build Cymetric
-        id: build-cymetric
-        uses: bennibbelink/cyclus-ci-action@main
+      - name: Checkout Cymetric
+        uses: actions/checkout@v4
         with:
           repository: cyclus/cymetric
-          repository-ref: main
-          artifact-in-name: cycamore-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          artifact-out-name: cymetric-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          artifact-out-tags: |
-            ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}
-          dockerfile-path: docker/Dockerfile
-          docker-build-args: |
+          ref: main
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Cymetric
+        id: build-cymetric
+        uses: docker/build-push-action@v5
+        with:
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          file: docker/Dockerfile
+          build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
