@@ -131,6 +131,8 @@ jobs:
         run: |
           cat docker/Dockerfile
           pwd
+          ls
+          
 
       - name: Build Cymetric
         id: build-cymetric
