@@ -23,7 +23,7 @@ cdef std_string str_py_to_cpp(object x):
     return s
 
 
-cdef public std_string py_find_module "CyclusPyFindModule" (std_string cpp_lib) except +:
+cdef public std_string py_find_module "CyclusPyFindModule" (std_string cpp_lib) except *:
     """Finds a Python module and returns a string of the form '<py>:modulepath'"""
     lib = std_string_to_py(cpp_lib)
     try:
@@ -37,7 +37,7 @@ cdef public std_string py_find_module "CyclusPyFindModule" (std_string cpp_lib) 
 
 cdef public Agent* make_py_agent "CyclusMakePyAgent" (std_string cpp_lib,
                                                      std_string cpp_agent,
-                                                     void* cpp_ctx) except +:
+                                                     void* cpp_ctx) except *:
     """Makes a new Python agent instance."""
     libname = std_string_to_py(cpp_lib)
     agentname = std_string_to_py(cpp_agent)
@@ -59,7 +59,7 @@ cdef public Agent* make_py_agent "CyclusMakePyAgent" (std_string cpp_lib,
 
 cdef public void init_from_py_agent "CyclusInitFromPyAgent" (Agent* cpp_src,
                                                              Agent* cpp_dst,
-                                                             void* cpp_ctx) except +:
+                                                             void* cpp_ctx) except *:
     """Initializes the dst agent with the settings from the src. Users will not
     normally need to call this. Useful for cloning prototypes.
     """
@@ -72,20 +72,20 @@ cdef public void init_from_py_agent "CyclusInitFromPyAgent" (Agent* cpp_src,
     PyErr_CheckSignals()
 
 
-cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" () except +:
+cdef public void clear_pyagent_refs "CyclusClearPyAgentRefs" () except *:
     """Clears the cache of agent referencess"""
     cyclib._clear_agent_refs()
     PyErr_CheckSignals()
 
 
-cdef public void py_del_agent "CyclusPyDelAgent" (int i) except +:
+cdef public void py_del_agent "CyclusPyDelAgent" (int i) except *:
     """Clears the cache of a single agent ref"""
     cyclib._del_agent(i)
     PyErr_CheckSignals()
 
 
 cdef public void py_call_listeners "CyclusPyCallListeners" (std_string cpp_tsname,
-                            Agent* cpp_agent, void* cpp_ctx, int time, hold_any cpp_value) except +:
+                            Agent* cpp_agent, void* cpp_ctx, int time, hold_any cpp_value) except *:
     """Calls the python time series listeners
     """
     ctx = PyCapsule_New(cpp_ctx, <char*> b"ctx", NULL)

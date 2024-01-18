@@ -2,11 +2,13 @@
 #define CYCLUS_SRC_TOOLKIT_MATL_BUY_POLICY_H_
 
 #include <string>
+#include <boost/shared_ptr.hpp>
 
 #include "composition.h"
 #include "material.h"
 #include "res_buf.h"
 #include "trader.h"
+#include "random_number_generator.h"
 
 namespace cyclus {
 namespace toolkit {
@@ -85,15 +87,27 @@ class MatlBuyPolicy : public Trader {
   /// nearest integer number of time steps from a truncated normal
   /// distribution from a mean, standard deviation, min, and max value.
   /// Note that the (s, S) policy is not currently compatible with active and
-  /// dormant buying perionds 
-  /// @param active the length of the on, actively buying period
-  /// @param dormant the length of the dormant period
+  /// Active and dormant buying perionds 
+  /// Active parameters:
+  /// @param active_dist an IntDistribution object that will be used to sample
+  /// the number of time steps in the "on" phase.  If not set, a fixed
+  /// distribution with a value of 1 will be used.
+  /// @param dormant_dist an IntDistribution object that will be used to sample
+  /// the number of time steps in the "off" phase.  If not set, a fixed
+  /// distribution with a value of 0 will be used (no dormant, always on)
+  /// @param size_dist a DoubleDistribution object that will be used to sample
+  /// the size of the request as a fraction of the available capacity at the 
+  /// current time step.  If not set, a fixed distribution with a value of 
+  /// 1.0 will be used.
   /// Note that active and dormant periods are note currently compatible with
   /// (s, S) inventory management
   /// @{
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      double throughput, int active = 1, int dormant = 0);
+                      double throughput, 
+                      boost::shared_ptr<IntDistribution> active_dist = NULL,
+                      boost::shared_ptr<IntDistribution> dormant_dist = NULL,
+                      boost::shared_ptr<DoubleDistribution> size_dist = NULL);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       double fill_to, double req_when_under);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
@@ -128,23 +142,24 @@ class MatlBuyPolicy : public Trader {
   /// is idempotent.
   void Stop();
 
-  /// the total amount requested
-  inline double TotalQty() const {
+  /// the total amount available to request
+  inline double TotalAvailable() const {
     return std::min(throughput_,
-                    fill_to_ * buf_->capacity() - buf_->quantity());
+                   (fill_to_ * buf_->capacity()) - buf_->quantity());
   }
 
   /// whether trades will be denoted as exclusive or not
   inline bool Excl() const { return quantize_ > 0; }
 
+
   /// the amount requested per each request
-  inline double ReqQty() const {
-    return Excl() ? quantize_ : TotalQty();
+  inline double ReqQty(double amt) const {
+    return Excl() ? quantize_ : amt;
   }
 
   /// the number of requests made per each commodity
-  inline int NReq() const {
-    return Excl() ? static_cast<int>(TotalQty() / quantize_) : 1;
+  inline int NReq(double amt) const {
+    return Excl() ? static_cast<int>(amt / quantize_) : 1;
   }
 
   /// Returns corresponding commodities from which each material object
@@ -154,6 +169,10 @@ class MatlBuyPolicy : public Trader {
       return rsrc_commods_;
   };
 
+  inline bool never_dormant() {
+    return (next_dormant_end_ < 0 || next_active_end_ < 0);
+  };
+
   /// Trader Methods
   /// @{
   virtual std::set<RequestPortfolio<Material>::Ptr> GetMatlRequests();
@@ -161,25 +180,36 @@ class MatlBuyPolicy : public Trader {
       const std::vector<std::pair<Trade<Material>, Material::Ptr> >& resps);
   /// }@
 
+  void SetNextActiveTime();
+  void SetNextDormantTime();
+  double SampleRequestSize();
+
  private:
   struct CommodDetail {
     Composition::Ptr comp;
     double pref;
   };
 
+  void set_manager(Agent* m);
   /// requires buf_ already set
   void set_fill_to(double x);
   /// requires buf_ already set
   void set_req_when_under(double x);
   void set_quantize(double x);
   void set_throughput(double x);
-  void set_active(int x);
-  void set_dormant(int x);
+  void init_active_dormant();
 
   ResBuf<Material>* buf_;
   std::string name_;
   double fill_to_, req_when_under_, quantize_, throughput_;
-  int active_, dormant_;
+
+  int next_active_end_= 0;
+  int next_dormant_end_= 0;
+
+  boost::shared_ptr<IntDistribution> active_dist_;
+  boost::shared_ptr<IntDistribution> dormant_dist_;
+  boost::shared_ptr<DoubleDistribution> size_dist_;
+
   std::map<Material::Ptr, std::string> rsrc_commods_;
   std::map<std::string, CommodDetail> commod_details_;
 };
