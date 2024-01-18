@@ -1832,7 +1832,7 @@ cpdef dict normalize_request_portfolio(object inp):
             for name, reqs in commodity.items():
                 if name == 'preference' or name == 'exclusive':
                     continue
-                
+
                 commods.append({name:reqs})
         constrs = inp.get('constraints', [])
     else:
@@ -1850,7 +1850,6 @@ cpdef dict normalize_request_portfolio(object inp):
         commods = list(commods)
     cdef dict default_req = {'target': None, 'preference': 1.0,
                              'exclusive': False, 'cost': None}
-
     for index, commodity in enumerate(commods):
         for key, val in commodity.items():
             if isinstance(val, ts.Resource):
@@ -1858,7 +1857,7 @@ cpdef dict normalize_request_portfolio(object inp):
                 req['target'] = val
                 if 'preference' in inp['commodities'][index]:
                     req['preference'] = inp['commodities'][index]['preference']
-                if 'exclusive' in inp['commoditites'][index]:
+                if 'exclusive' in inp['commodities'][index]:
                     req['exclusive'] = inp['commodities'][index]['exclusive']
                 commods[index][key] = [req]
 
