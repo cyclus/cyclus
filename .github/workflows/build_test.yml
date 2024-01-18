@@ -75,14 +75,10 @@ jobs:
         with:
           repository: cyclus/cycamore
           ref: main
+          path: cycamore
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
-      - name: Debugging
-        run: |
-          cat docker/Dockerfile
-          pwd
 
       - name: Build Cycamore
         id: build-cycamore
@@ -90,6 +86,7 @@ jobs:
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          context: cycamore
           file: docker/Dockerfile
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
@@ -125,6 +122,7 @@ jobs:
         with:
           repository: cyclus/cymetric
           ref: main
+          path: cymetric
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -140,6 +138,7 @@ jobs:
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          context: cymetric
           file: docker/Dockerfile
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
