@@ -82,17 +82,16 @@ jobs:
 
       - name: Debugging
         run: |
-          cat docker/Dockerfile
           pwd
           ls
-          
+
       - name: Build Cycamore
         id: build-cycamore
         uses: docker/build-push-action@v5
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          context: cycamore
+          context: ${{ github.workspace }}/cycamore
           file: docker/Dockerfile
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
@@ -146,7 +145,7 @@ jobs:
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          context: cymetric
+          context: ${{ github.workspace }}/cymetric
           file: docker/Dockerfile
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
