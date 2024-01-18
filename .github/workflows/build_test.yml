@@ -75,7 +75,7 @@ jobs:
         with:
           repository: cyclus/cycamore
           ref: main
-          path: cycamore
+          path: ${{ github.workspace }}/cycamore
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -84,7 +84,7 @@ jobs:
         run: |
           pwd
           ls
-          ls cycamore
+          ls ${{ github.workspace }}
 
       - name: Build Cycamore
         id: build-cycamore
@@ -92,7 +92,7 @@ jobs:
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          context: ./cycamore
+          context: ${{ github.workspace }}/cycamore
           file: docker/Dockerfile
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
@@ -128,7 +128,7 @@ jobs:
         with:
           repository: cyclus/cymetric
           ref: main
-          path: cymetric
+          path: ${{ github.workspace }}/cymetric
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
