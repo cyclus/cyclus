@@ -46,7 +46,10 @@ jobs:
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          push: false
           file: docker/Dockerfile
+          tags: |
+            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -92,8 +95,11 @@ jobs:
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          push: false
           context: ${{ github.workspace }}/cycamore
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
+          tags: |
+            ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -146,6 +152,7 @@ jobs:
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          push: false
           context: ${{ github.workspace }}/cymetric
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           build-args: |
