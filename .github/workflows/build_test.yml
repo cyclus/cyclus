@@ -91,6 +91,7 @@ jobs:
 
       - name: Build Cycamore
         id: build-cycamore
+        continue-on-error: true
         uses: docker/build-push-action@v5
         with:
           cache-from: type=gha
@@ -148,6 +149,7 @@ jobs:
 
       - name: Build Cymetric
         id: build-cymetric
+        continue-on-error: true
         uses: docker/build-push-action@v5
         with:
           cache-from: type=gha
