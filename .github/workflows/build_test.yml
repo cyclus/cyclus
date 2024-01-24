@@ -100,13 +100,6 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-      
-      - name: Add to warning message
-        if: steps.build-cycamore.outcome != 'success'
-        run: |
-          message="Cycamore failed downstream when using Cyclus ${{ github.ref }}"
-          echo "CYCAMORE_WARNING=$message" >> "$GITHUB_ENV"
-
 
   downstream-cymetric:
     runs-on: ubuntu-latest
@@ -152,25 +145,19 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-
-      - name: Add to warning message
-        if: steps.build-cymetric.outcome != 'success'
-        run: |
-          message="Cymetric failed downstream when using Cyclus ${{ github.ref }}"
-          echo "CYMETRIC_WARNING=$message" >> "$GITHUB_ENV"
   
-  comment-warning:
+  comment-downstream-statuses:
     runs-on: ubuntu-latest
     needs: [build-test-cyclus, downstream-cycamore, downstream-cymetric]
-    if: ${{ needs.downstream-cymetric.outputs.build-failure }} || ${{ needs.downstream-cycamore.outputs.build-failure }}
     permissions:
       pull-requests: write
 
     steps:
-      - name: Failure Warning
-        uses: mshick/add-pr-comment@v2
+      - name: PR Comment
+        uses: thollander/actions-comment-pull-request@v2
         with:
+          comment_tag: downstream_statuses
           message: |
-            ## Downstream Build Failures
-            ${{ env.CYCAMORE_WARNING }}
-            ${{ env.CYMETRIC_WARNING }}
+            ## Downstream Build Statuses using Cyclus ${{ github.ref }}
+            - Cycamore: ${{needs.downstream-cycamore.outputs.build-failure && '**Failure**' || '*Success*'}}
+            - Cymetric: ${{needs.downstream-cymetric.outputs.build-failure && '**Failure**' || '*Success*'}}
