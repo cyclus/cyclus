@@ -1,0 +1,115 @@
+#ifndef CYCLUS_SRC_TOOLKIT_RES_BUF_TRACKER_H_
+#define CYCLUS_SRC_TOOLKIT_RES_BUF_TRACKER_H_
+
+#include "error.h"
+
+namespace cyclus {
+namespace toolkit {
+
+/// ResBufTracker is a helper class that tracks the quantity of multiple
+/// ResBufs. This can be useful when a single agent has multiple buffers that
+/// but a limit should be placed on their combined inventory, such as a 
+/// facility-wide maximum inventory. Like ResBufs, ResBufTracker has an
+/// infinite capacity unless explicitly changed.
+///
+/// ResBufTracker does not hold any inventory itself, it only tracks the
+/// quantities of other ResBufs. ResBufTracker currently tracks quantities 
+/// alone, not compositions.
+///
+/// @code
+/// class MyAgent : public cyclus:: Facility {
+///   public:
+///     EnterNotify() {
+///       cyclus::Facility::EnterNotify();
+///       tracker_.Init({&inventory_, &outventory_}, facility_max_inv_size_);
+///
+///       cyclus::MatlBuyPolicy p;
+///       p.Init(this, &inventory_, "inventory", &tracker_);
+/// }
+///   protected:
+///     cyclus::toolkit::ResBuf<cyclus::Material> inventory_;
+///     cyclus::toolkit::ResBuf<cyclus::Material> outventory_;
+///
+///     double facility_max_inv_size_ = 1000;
+///     cyclus::toolkit::ResBufTracker tracker_;
+/// }
+
+class ResBufTracker {
+    public:
+    /// Creates an uninitialized tracker. The Init function MUST be called before
+    /// the tracker is used.
+    ResBufTracker() : max_inv_size_(std::numeric_limits<double>::max()), qty_(0)  {};
+
+    ResBufTracker(std::vector<ResBuf<Material>*> bufs, 
+                  double max_inv_size = std::numeric_limits<double>::max()) {
+                    Init(bufs, max_inv_size);
+    }
+
+    ~ResBufTracker() {};
+    
+    /// Initializes the tracker with the given ResBufs. The tracker will have
+    /// infinite capacity unless explicitly changed.
+    void Init(std::vector<ResBuf<Material>*> bufs, 
+              double max_inv_size = std::numeric_limits<double>::max()) {
+                bufs_ = bufs;
+                max_inv_size_ = max_inv_size;
+    }
+    
+    /// Returns the total quantity of all tracked ResBufs.
+    /// @throws ValueError if the tracker has not been initialized (zero)
+    inline double quantity() {
+        int num = num_bufs();
+        if (num == 0) {
+            throw ValueError("ResBufTracker has not been initialized, no buffers to track");
+        }
+        for (int i = 0; i < num; i++) {
+            qty_ += bufs_[i]->quantity();
+        }
+        return qty_;
+    }
+    
+    /// Returns the total capacity of all tracked ResBufs.
+    inline double capacity() {return max_inv_size_;};
+    
+    /// Returns the remaining facility-wide space across all tracked ResBufs.
+    inline double space() {return std::max(0.0, max_inv_size_ - qty_);};
+
+    /// Returns the remaining space in the given ResBuf, considering the 
+    /// facility-wide limitations.
+    inline double buf_space(ResBuf<Material>* buf) {return std::min(buf->space(), space());};
+
+    /// Returns true if there are no resources in any buffer
+    inline bool empty() {return quantity() == 0;};
+
+    /// Returns number of buffers being tracked
+    /// @throws ValueError if the tracker has not been initialized (zero)
+    inline int num_bufs() {
+        int num = bufs_.size();
+        if (num == 0) {
+            throw ValueError("ResBufTracker has not been initialized, no buffers to track");
+        }
+        return num;};
+
+    /// Change the total capacity across all ResBufs. The new capacity must be
+    /// greater than the current quantity.
+    /// @throws ValueError if the new capacity is less than the current quantity
+    void set_capacity(double cap) {
+        if (quantity() - cap > eps_rsrc()) {
+            std::stringstream ss;
+            ss << std::setprecision(17) << "new capacity " << cap << 
+            " lower than existing quantity " << quantity();
+            throw ValueError(ss.str());
+        }
+        max_inv_size_ = cap;
+    }
+
+    private:
+    double max_inv_size_;
+    double qty_;
+    std::vector<ResBuf<Material>*> bufs_;
+};
+
+} // namespace toolkit
+} // namespace cyclus
+
+#endif // CYCLUS_SRC_TOOLKIT_RES_BUF_TRACKER_H_

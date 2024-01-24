@@ -45,10 +45,14 @@ TEST_F(MatlBuyPolicyTests, Init) {
   double cap = 5;
   ResBuf<Material> buff;
   buff.capacity(cap);
+  ResBufTracker buff_tracker({&buff});
+  std::cerr << "buf cap: " << buff.capacity() << std::endl;
   MatlBuyPolicy p;
+  std::cerr << "policy created" << std::endl;
 
   // defaults
-  p.Init(fac1, &buff, "");
+  p.Init(fac1, &buff, "", &buff_tracker);
+  std::cerr << "policy initialized" << std::endl;
   double amt = p.TotalAvailable();
   ASSERT_FLOAT_EQ(amt, cap);
   ASSERT_FLOAT_EQ(p.ReqQty(amt), cap);
@@ -56,7 +60,7 @@ TEST_F(MatlBuyPolicyTests, Init) {
 
   // throughput
   double throughput = cap - 1;
-  p.Init(fac1, &buff, "", throughput, 1, 1, -1);
+  p.Init(fac1, &buff, "", &buff_tracker, throughput, 1, 1, -1);
   amt = p.TotalAvailable();
   ASSERT_FLOAT_EQ(amt, throughput);
   ASSERT_FLOAT_EQ(p.ReqQty(amt), throughput);
@@ -64,7 +68,7 @@ TEST_F(MatlBuyPolicyTests, Init) {
 
   // exclusive orders
   double quantize = 2.5;
-  p.Init(fac1, &buff, "", std::numeric_limits<double>::max(), 1, 1, quantize);
+  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max(), 1, 1, quantize);
   amt = p.TotalAvailable();
   ASSERT_FLOAT_EQ(amt, cap);
   ASSERT_FLOAT_EQ(p.ReqQty(amt), quantize);
@@ -73,9 +77,9 @@ TEST_F(MatlBuyPolicyTests, Init) {
   // S,s with nothing in buffer 
   double S = 4, s = 2;
   // reset
-  p.Init(fac1, &buff, "", std::numeric_limits<double>::max(), 1, 1, -1); 
+  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max(), 1, 1, -1); 
   // use Ss constructor
-  p.Init(fac1, &buff, "", S, s);
+  p.Init(fac1, &buff, "", &buff_tracker, S, s);
   amt = p.TotalAvailable();
   ASSERT_FLOAT_EQ(amt, S);
   ASSERT_FLOAT_EQ(p.ReqQty(amt), S);
@@ -94,8 +98,9 @@ TEST_F(MatlBuyPolicyTests, StartStop) {
   double cap = 5;
   ResBuf<Material> buff;
   buff.capacity(cap);
+  ResBufTracker buff_tracker({&buff});
   MatlBuyPolicy p;
-  ASSERT_THROW(p.Init(NULL, &buff, ""), ValueError);
+  ASSERT_THROW(p.Init(NULL, &buff, "", &buff_tracker), ValueError);
 }
 
 // Tests that matlbuypolicy sends out a request properly
@@ -103,10 +108,11 @@ TEST_F(MatlBuyPolicyTests, OneReq) {
   double cap = 5;
   ResBuf<Material> buff;
   buff.capacity(cap);
+  ResBufTracker buff_tracker({&buff});
   cyclus::Composition::Ptr c1 = cyclus::Composition::Ptr(new TestComp()); 
   MatlBuyPolicy p;
 
-  p.Init(fac1, &buff, "").Set("commod1", c1);
+  p.Init(fac1, &buff, "", &buff_tracker).Set("commod1", c1);
   std::set<RequestPortfolio<Material>::Ptr> obs = p.GetMatlRequests();
   ASSERT_EQ(obs.size(), 1);
   ASSERT_EQ((*obs.begin())->requests().size(), 1);
@@ -120,6 +126,7 @@ TEST_F(MatlBuyPolicyTests, MultipleReqs) {
   double cap = 5;
   ResBuf<Material> buff;
   buff.capacity(cap);
+  ResBufTracker buff_tracker({&buff});
   std::string commod1("foo"), commod2("bar");
   double p2 = 2.5;
   cyclus::Composition::Ptr c1 = cyclus::Composition::Ptr(new TestComp()); 
@@ -127,7 +134,7 @@ TEST_F(MatlBuyPolicyTests, MultipleReqs) {
   MatlBuyPolicy p;
   
   // two requests
-  p.Init(fac1, &buff, "").Set(commod1, c1).Set(commod2, c2, p2);
+  p.Init(fac1, &buff, "", &buff_tracker).Set(commod1, c1).Set(commod2, c2, p2);
   std::set<RequestPortfolio<Material>::Ptr> obs = p.GetMatlRequests();
   ASSERT_EQ(obs.size(), 1);
   ASSERT_EQ((*obs.begin())->requests().size(), 2);
@@ -148,12 +155,13 @@ TEST_F(MatlBuyPolicyTests, Quantize) {
   double cap = 5;
   ResBuf<Material> buff;
   buff.capacity(cap);
+  ResBufTracker buff_tracker({&buff});
   double p2 = 2.5;
   cyclus::Composition::Ptr c1 = cyclus::Composition::Ptr(new TestComp()); 
   MatlBuyPolicy p;
 
   double quantize = 2.5;
-  p.Init(fac1, &buff, "", std::numeric_limits<double>::max(), 1, 1, quantize).Set("commod1", c1);
+  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max(), 1, 1, quantize).Set("commod1", c1);
   std::set<RequestPortfolio<Material>::Ptr> obs = p.GetMatlRequests();
   ASSERT_EQ(obs.size(), 2);
   ASSERT_EQ((*obs.begin())->requests().size(), 1);
@@ -167,13 +175,14 @@ TEST_F(MatlBuyPolicyTests, MultiReqQuantize) {
     double cap = 5;
   ResBuf<Material> buff;
   buff.capacity(cap);
+  ResBufTracker buff_tracker({&buff});
   cyclus::Composition::Ptr c1 = cyclus::Composition::Ptr(new TestComp()); 
   cyclus::Composition::Ptr c2 = cyclus::Composition::Ptr(new TestComp()); 
   MatlBuyPolicy p;
   
   // two portfolios with quantize
   double quantize = 2.5;
-  p.Init(fac1, &buff, "", std::numeric_limits<double>::max(), 1, 1, quantize).Set("commod1", c1).Set("commod2", c2);
+  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max(), 1, 1, quantize).Set("commod1", c1).Set("commod2", c2);
   std::set<RequestPortfolio<Material>::Ptr> obs = p.GetMatlRequests();
   ASSERT_EQ(obs.size(), 2);
   ASSERT_EQ((*obs.begin())->requests().size(), 2);
@@ -204,8 +213,9 @@ TEST_F(MatlBuyPolicyTests, DefaultFixedActiveDormant) {
   TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
 
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  ResBufTracker buf_tracker({&inbuf});
   cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", throughput, a_d_dist, a_d_dist, NULL)
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput, a_d_dist, a_d_dist, NULL)
         .Set("commod1").Start();
 
   EXPECT_NO_THROW(sim.Run());
@@ -240,8 +250,9 @@ TEST_F(MatlBuyPolicyTests, FixedActiveDormant) {
   TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
 
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  ResBufTracker buf_tracker({&inbuf});
   cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", throughput, a_d_dist, a_d_dist, size_dist)
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput, a_d_dist, a_d_dist, size_dist)
         .Set("commod1").Start();
 
   EXPECT_NO_THROW(sim.Run());
@@ -274,8 +285,9 @@ TEST_F(MatlBuyPolicyTests, FixedActiveDormantMultipleCycles) {
   TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
 
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  ResBufTracker buf_tracker({&inbuf});
   cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", throughput, a_dist, d_dist, NULL)
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput, a_dist, d_dist, NULL)
         .Set("commod1").Start();
 
   EXPECT_NO_THROW(sim.Run());
@@ -314,8 +326,9 @@ TEST_F(MatlBuyPolicyTests, UniformActiveDormant) {
   TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
 
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  ResBufTracker buf_tracker({&inbuf});
   cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", throughput, a_dist, d_dist, NULL)
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput, a_dist, d_dist, NULL)
         .Set("commod1").Start();
 
   EXPECT_NO_THROW(sim.Run());
@@ -352,8 +365,9 @@ TEST_F(MatlBuyPolicyTests, NormalActiveDormant) {
   TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
 
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  ResBufTracker buf_tracker({&inbuf});
   cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", throughput, a_dist, d_dist, NULL)
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput, a_dist, d_dist, NULL)
         .Set("commod1").Start();
 
   EXPECT_NO_THROW(sim.Run());
@@ -390,8 +404,9 @@ TEST_F(MatlBuyPolicyTests, MixedActiveDormant) {
   TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
 
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  ResBufTracker buf_tracker({&inbuf});
   cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", throughput, a_dist, d_dist, NULL)
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput, a_dist, d_dist, NULL)
         .Set("commod1").Start();
 
   EXPECT_NO_THROW(sim.Run());
@@ -424,8 +439,9 @@ TEST_F(MatlBuyPolicyTests, RandomSizeUniform) {
   TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
 
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  ResBufTracker buf_tracker({&inbuf});
   cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", throughput, NULL, NULL, size_dist)
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput, NULL, NULL, size_dist)
         .Set("commod1").Start();
 
   EXPECT_NO_THROW(sim.Run());
@@ -454,8 +470,9 @@ TEST_F(MatlBuyPolicyTests, RandomSizeNormal) {
   TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
 
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  ResBufTracker buf_tracker({&inbuf});
   cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", throughput, NULL, NULL, size_dist)
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput, NULL, NULL, size_dist)
         .Set("commod1").Start();
 
   EXPECT_NO_THROW(sim.Run());
@@ -486,8 +503,9 @@ TEST_F(MatlBuyPolicyTests, RandomSizeAndFrequency) {
   TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
 
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  ResBufTracker buf_tracker({&inbuf});
   cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", throughput, a_dist, d_dist, size_dist)
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput, a_dist, d_dist, size_dist)
         .Set("commod1").Start();
 
   EXPECT_NO_THROW(sim.Run());

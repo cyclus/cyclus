@@ -43,6 +43,23 @@ void MatlBuyPolicy::set_manager(Agent* m) {
   }
 }
 
+void MatlBuyPolicy::create_buf_tracker() {
+  std::vector<ResBuf<Material>*> bufs = {buf_};
+  buf_tracker_ = new ResBufTracker();
+  buf_tracker_->Init(bufs, buf_->capacity());
+}
+
+void MatlBuyPolicy::set_buf_tracker(ResBufTracker* t) {
+  std::cerr << "set_buf_trackers" << std::endl;
+  if (t == NULL){
+    std::vector<ResBuf<Material>*> bufs = {buf_};
+    buf_tracker_->Init(bufs, buf_->capacity());
+  }
+  else {
+    buf_tracker_ = t;
+  }
+}
+
 void MatlBuyPolicy::set_fill_to(double x) {
   if (x > 1)
     x /= buf_->capacity();
@@ -53,7 +70,7 @@ void MatlBuyPolicy::set_fill_to(double x) {
 void MatlBuyPolicy::set_req_when_under(double x) {
   if (x > 1)
     x /= buf_->capacity();
-  assert(x > 0 && x <= 1.);
+  assert(x >= 0 && x <= 1.);
   req_when_under_ = x;
 }
 
@@ -96,21 +113,27 @@ void MatlBuyPolicy::init_active_dormant() {
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name) {
+                                   std::string name, ResBufTracker* buf_tracker) {
   set_manager(manager);
+  std::cerr << "manager is " << manager << std::endl;
   buf_ = buf;
   name_ = name;
+  std::cerr << "beginning buf_tracker_ init" << std::endl;
+  set_buf_tracker(buf_tracker);
   init_active_dormant();
   return *this;
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name, double throughput, boost::shared_ptr<IntDistribution> active_dist,
+                                   std::string name, ResBufTracker* buf_tracker,
+                                   double throughput, boost::shared_ptr<IntDistribution> active_dist,
                                    boost::shared_ptr<IntDistribution> dormant_dist,
                                    boost::shared_ptr<DoubleDistribution> size_dist) {
   set_manager(manager);
   buf_ = buf;
   name_ = name;
+  std::cerr << "beginning buf_tracker_ init" << std::endl;
+  set_buf_tracker(buf_tracker);
   set_throughput(throughput);
   active_dist_ = active_dist;
   dormant_dist_ = dormant_dist;
@@ -120,11 +143,13 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name,
+                                   std::string name, 
+                                   ResBufTracker* buf_tracker,
                                    double fill_to, double req_when_under) {
   set_manager(manager);
   buf_ = buf;
   name_ = name;
+  create_buf_tracker();
   set_fill_to(fill_to);
   set_req_when_under(req_when_under);
   init_active_dormant();
@@ -132,12 +157,15 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name, double throughput,
+                                   std::string name, 
+                                   ResBufTracker* buf_tracker,
+                                   double throughput,
                                    double fill_to, double req_when_under,
                                    double quantize) {
   set_manager(manager);
   buf_ = buf;
   name_ = name;
+  create_buf_tracker();
   set_fill_to(fill_to);
   set_req_when_under(req_when_under);
   set_quantize(quantize);

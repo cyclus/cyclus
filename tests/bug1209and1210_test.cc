@@ -22,8 +22,9 @@ class MultiTraderSink: public cyclus::Facility {
 
   void EnterNotify() {
     cyclus::Facility::EnterNotify();
-    policy1.Init(this, &inbuf1, "inbuf1").Set("commod1").Start();
-    policy2.Init(this, &inbuf2, "inbuf2").Set("commod2").Start();
+    buff_tracker.Init({&inbuf1, &inbuf2});
+    policy1.Init(this, &inbuf1, "inbuf1", &buff_tracker).Set("commod1").Start();
+    policy2.Init(this, &inbuf2, "inbuf2", &buff_tracker).Set("commod2").Start();
   }
 
   void Tick() {}
@@ -33,6 +34,7 @@ class MultiTraderSink: public cyclus::Facility {
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf1;
   cyclus::toolkit::MatlBuyPolicy policy2;
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf2;
+  cyclus::toolkit::ResBufTracker buff_tracker;
 };
 
 // issue 1210 was preventing the 1209 test from passing (causing segfaults),
