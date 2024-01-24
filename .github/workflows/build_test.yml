@@ -58,6 +58,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-test-cyclus
     if: ${{ github.event_name == 'pull_request' }}
+    permissions:
+      pull-requests: write
     continue-on-error: true
 
     strategy:
@@ -107,14 +109,19 @@ jobs:
       
       - name: Failure Warning
         if: steps.build-cycamore.outcome != 'success'
-        run: |
-          echo "::warning title=Downstream Failure::Cycamore Build/Test Failed"
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            **Warning**
+            Cycamore Downstream Failure
 
 
   downstream-cymetric:
     runs-on: ubuntu-latest
     needs: [build-test-cyclus, downstream-cycamore]
     if: ${{ github.event_name == 'pull_request' }}
+    permissions:
+      pull-requests: write
     continue-on-error: true
 
     strategy:
@@ -163,5 +170,8 @@ jobs:
 
       - name: Failure Warning
         if: steps.build-cymetric.outcome != 'success'
-        run: |
-          echo "::warning title=Downstream Failure::Cymetric Build/Test Failed"
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            **Warning**
+            Cymetric Downstream Failure
