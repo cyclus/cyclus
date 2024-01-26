@@ -65,6 +65,11 @@ jobs:
           ref: main
           path: ${{ github.workspace }}/cycamore
 
+      - name: Debugging
+        run: |
+          docker ps -a
+          docker image ls -a
+
       - name: Build Cycamore
         id: build-cycamore
         if: ${{ github.event_name == 'pull_request' }}
