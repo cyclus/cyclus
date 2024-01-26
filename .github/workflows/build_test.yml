@@ -18,8 +18,7 @@ on:
       - 'doc/**'
       - 'CHANGELOG.rst'
 
-env:
-  TEST_DOWNSTREAM: ${{ github.event_name == 'pull_request' }}
+
 
 jobs:
   build-test-cyclus:
@@ -40,6 +39,9 @@ jobs:
     outputs:
       cycamore-build-failure: ${{ steps.build-cycamore.outcome }} != 'success'
       cymetric-build-failure: ${{ steps.build-cymetric.outcome }} != 'success'
+
+    env:
+      TEST_DOWNSTREAM: ${{ github.event_name == 'pull_request' }}
 
     steps:
       - name: Checkout Cyclus
