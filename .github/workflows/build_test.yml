@@ -48,8 +48,7 @@ jobs:
       - name: Build and Test Cyclus
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=local
-          cache-to: type=local,mode=max
+          cache-to: type=local,mode=max,dest=${HOME}/docker_cache
           push: false
           file: docker/Dockerfile
           tags: |
@@ -72,8 +71,8 @@ jobs:
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=local
-          cache-to: type=local,mode=max
+          cache-from: type=local,src=${HOME}/docker_cache
+          cache-to: type=local,mode=max,dest=${HOME}/docker_cache
           push: false
           context: ${{ github.workspace }}/cycamore
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
@@ -97,8 +96,8 @@ jobs:
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=local
-          cache-to: type=local,mode=max
+          cache-from: type=local,src=${HOME}/docker_cache
+          cache-to: type=local,mode=max,dest=${HOME}/docker_cache
           push: false
           context: ${{ github.workspace }}/cymetric
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
