@@ -10,7 +10,8 @@ RUN apt update --fix-missing
 
 FROM common-base as apt-deps
 
-RUN apt install -y --fix-missing \
+RUN apt update --fix-missing && \
+    apt install -y --fix-missing \
         libssh-dev \
         g++ \
         gcc \
