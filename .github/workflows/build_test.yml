@@ -18,8 +18,6 @@ on:
       - 'doc/**'
       - 'CHANGELOG.rst'
 
-
-
 jobs:
   build-test-cyclus:
     runs-on: ubuntu-latest
@@ -39,9 +37,6 @@ jobs:
     outputs:
       cycamore-build-failure: ${{ steps.build-cycamore.outcome }} != 'success'
       cymetric-build-failure: ${{ steps.build-cymetric.outcome }} != 'success'
-
-    env:
-      TEST_DOWNSTREAM: ${{ github.event_name == 'pull_request' }}
 
     steps:
       - name: Checkout Cyclus
@@ -64,7 +59,7 @@ jobs:
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
       - name: Checkout Cycamore
-        if: ${{ env.TEST_DOWNSTREAM }}
+        if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@v4
         with:
           repository: cyclus/cycamore
@@ -73,7 +68,7 @@ jobs:
 
       - name: Build Cycamore
         id: build-cycamore
-        if: ${{ env.TEST_DOWNSTREAM }}
+        if: ${{ github.event_name == 'pull_request' }}
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
@@ -89,7 +84,7 @@ jobs:
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
       - name: Checkout Cymetric
-        if: ${{ env.TEST_DOWNSTREAM }}
+        if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@v4
         with:
           repository: cyclus/cymetric
@@ -97,7 +92,7 @@ jobs:
           path: ${{ github.workspace }}/cymetric
 
       - name: Build Cymetric
-        if: ${{ env.TEST_DOWNSTREAM }}
+        if: ${{ github.event_name == 'pull_request' }}
         id: build-cymetric
         continue-on-error: true
         uses: docker/build-push-action@v5
@@ -113,7 +108,7 @@ jobs:
 
   comment-downstream-statuses:
     runs-on: ubuntu-latest
-    if: ${{ env.TEST_DOWNSTREAM }}
+    if: ${{ github.event_name == 'pull_request' }}
     needs: [ build-test-cyclus ]
     permissions:
       pull-requests: write
