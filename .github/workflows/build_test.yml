@@ -82,7 +82,7 @@ jobs:
           load: true
           push: false
           build-contexts: |
-            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus=cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
+            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus=docker-image://cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
           context: ${{ github.workspace }}/cycamore
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           tags: |
@@ -110,7 +110,7 @@ jobs:
           load: true
           push: false
           build-contexts: |
-            ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore=cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
+            ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore=docker-image://cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
           context: ${{ github.workspace }}/cymetric
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           build-args: |
@@ -131,5 +131,5 @@ jobs:
           comment_tag: downstream_statuses
           message: |
             ## Downstream Build Statuses using Cyclus ${{ github.ref }}
-            - Cycamore: ${{needs.build-test-cyclus.outputs.cycamore-build-failure && '**Failure**' || '*Success*'}}
-            - Cymetric: ${{needs.built-test-cyclus.outputs.cymetric-build-failure && '**Failure**' || '*Success*'}}
+            - Cycamore: ${{needs.build-test-cyclus.outputs.cycamore-build-failure && '**Failure** :warning:' || '*Success* :white_check_mark:'}}
+            - Cymetric: ${{needs.built-test-cyclus.outputs.cymetric-build-failure && '**Failure** :warning:' || '*Success* :white_check_mark:'}}
