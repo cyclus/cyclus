@@ -53,7 +53,7 @@ jobs:
           push: false
           file: docker/Dockerfile
           tags: |
-            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus
+            cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -81,10 +81,12 @@ jobs:
           cache-to: type=local,mode=max,dest=${HOME}/docker_cache
           load: true
           push: false
+          build-contexts: |
+            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus=cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
           context: ${{ github.workspace }}/cycamore
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           tags: |
-            ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore
+            cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -107,6 +109,8 @@ jobs:
           cache-to: type=local,mode=max,dest=${HOME}/docker_cache
           load: true
           push: false
+          build-contexts: |
+            ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore=cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
           context: ${{ github.workspace }}/cymetric
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           build-args: |
