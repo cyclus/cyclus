@@ -7,7 +7,7 @@
 #include "composition.h"
 #include "material.h"
 #include "res_buf.h"
-#include "res_buf_tracker.h"
+#include "total_inv_tracker.h"
 #include "trader.h"
 #include "random_number_generator.h"
 
@@ -104,17 +104,17 @@ class MatlBuyPolicy : public Trader {
   /// (s, S) inventory management
   /// @{
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      ResBufTracker* buf_tracker);
+                      TotalInvTracker* buf_tracker);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      ResBufTracker* buf_tracker, double throughput,
+                      TotalInvTracker* buf_tracker, double throughput,
                       boost::shared_ptr<IntDistribution> active_dist = NULL,
                       boost::shared_ptr<IntDistribution> dormant_dist = NULL,
                       boost::shared_ptr<DoubleDistribution> size_dist = NULL);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      ResBufTracker* buf_tracker,
+                      TotalInvTracker* buf_tracker,
                       double fill_to, double req_when_under);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      ResBufTracker* buf_tracker,
+                      TotalInvTracker* buf_tracker,
                       double throughput, double fill_to,
                       double req_when_under, double quantize);
   /// @}
@@ -197,7 +197,7 @@ class MatlBuyPolicy : public Trader {
 
   void set_manager(Agent* m);
   void create_buf_tracker();
-  void set_buf_tracker(ResBufTracker* t);
+  void set_buf_tracker(TotalInvTracker* t);
   /// requires buf_ already set
   void set_fill_to(double x);
   /// requires buf_ already set
@@ -207,7 +207,7 @@ class MatlBuyPolicy : public Trader {
   void init_active_dormant();
 
   ResBuf<Material>* buf_;
-  ResBufTracker* buf_tracker_;
+  TotalInvTracker* buf_tracker_;
   std::string name_;
   double fill_to_, req_when_under_, quantize_, throughput_;
 
