@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: Log in to the Container registry
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -55,12 +55,11 @@ jobs:
       - name: Build and Test Cyclus
         uses: docker/build-push-action@v5
         with:
-          cache-to: type=local,mode=max,dest=${HOME}/docker_cache
+          cache-from: type=registry,ref=ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus
+          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus,mode=max
           load: true
-          push: false
           file: docker/Dockerfile
-          tags: |
-            cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
+          tags: cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -84,12 +83,10 @@ jobs:
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=local,src=${HOME}/docker_cache
-          cache-to: type=local,mode=max,dest=${HOME}/docker_cache
+          cache-from: type=registry,ref=ghcr.io/cyclus/cache/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore
+          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore,mode=max
           load: true
-          push: false
-          build-contexts: |
-            cycamore=docker-image://cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
+          build-contexts: cycamore=docker-image://ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus
           context: ${{ github.workspace }}/cycamore
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           tags: |
@@ -112,12 +109,9 @@ jobs:
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=local,src=${HOME}/docker_cache
-          cache-to: type=local,mode=max,dest=${HOME}/docker_cache
-          load: true
-          push: false
-          build-contexts: |
-            cymetric=docker-image://cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
+          cache-from: type=registry,ref=ghcr.io/cyclus/cache/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric
+          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric,mode=max
+          build-contexts: cymetric=docker-image://ghcr.io/cyclus/cache/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore
           context: ${{ github.workspace }}/cymetric
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           build-args: |
