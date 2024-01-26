@@ -51,7 +51,7 @@ jobs:
 
       - name: Checkout Cyclus
         uses: actions/checkout@v4
-        
+
       - name: Build and Test Cyclus
         uses: docker/build-push-action@v5
         with:
@@ -89,7 +89,7 @@ jobs:
           load: true
           push: false
           build-contexts: |
-            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus=docker-image://cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
+            cycamore=docker-image://cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
           context: ${{ github.workspace }}/cycamore
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           tags: |
@@ -117,7 +117,7 @@ jobs:
           load: true
           push: false
           build-contexts: |
-            ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore=docker-image://cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
+            cymetric=docker-image://cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
           context: ${{ github.workspace }}/cymetric
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           build-args: |
