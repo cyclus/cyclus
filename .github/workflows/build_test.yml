@@ -49,6 +49,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           cache-to: type=local,mode=max,dest=${HOME}/docker_cache
+          load: true
           push: false
           file: docker/Dockerfile
           tags: |
@@ -78,6 +79,7 @@ jobs:
         with:
           cache-from: type=local,src=${HOME}/docker_cache
           cache-to: type=local,mode=max,dest=${HOME}/docker_cache
+          load: true
           push: false
           context: ${{ github.workspace }}/cycamore
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
@@ -103,6 +105,7 @@ jobs:
         with:
           cache-from: type=local,src=${HOME}/docker_cache
           cache-to: type=local,mode=max,dest=${HOME}/docker_cache
+          load: true
           push: false
           context: ${{ github.workspace }}/cymetric
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
