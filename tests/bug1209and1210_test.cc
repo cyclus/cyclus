@@ -34,7 +34,7 @@ class MultiTraderSink: public cyclus::Facility {
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf1;
   cyclus::toolkit::MatlBuyPolicy policy2;
   cyclus::toolkit::ResBuf<cyclus::Material> inbuf2;
-  cyclus::toolkit::ResBufTracker buff_tracker;
+  cyclus::toolkit::TotalInvTracker buff_tracker;
 };
 
 // issue 1210 was preventing the 1209 test from passing (causing segfaults),
