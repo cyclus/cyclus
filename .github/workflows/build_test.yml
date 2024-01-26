@@ -18,6 +18,9 @@ on:
       - 'doc/**'
       - 'CHANGELOG.rst'
 
+env:
+  TEST_DOWNSTREAM: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build-test-cyclus:
     runs-on: ubuntu-latest
@@ -34,6 +37,10 @@ jobs:
           conda,
         ]
 
+    outputs:
+      cycamore-build-failure: ${{ steps.build-cycamore.outcome }} != 'success'
+      cymetric-build-failure: ${{ steps.build-cymetric.outcome }} != 'success'
+
     steps:
       - name: Checkout Cyclus
         uses: actions/checkout@v4
@@ -44,8 +51,8 @@ jobs:
       - name: Build and Test Cyclus
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=local
+          cache-to: type=local,mode=max
           push: false
           file: docker/Dockerfile
           tags: |
@@ -54,44 +61,22 @@ jobs:
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
-  downstream-cycamore:
-    runs-on: ubuntu-latest
-    needs: build-test-cyclus
-    if: ${{ github.event_name == 'pull_request' }}
-    outputs:
-      build-failure: ${{ steps.build-cycamore.outcome }} != 'success'
-    continue-on-error: true
-
-    strategy:
-      fail-fast: false
-      matrix:
-        ubuntu_versions : [
-          20.04,
-          22.04,
-        ]
-        pkg_mgr : [
-          apt,
-          conda,
-        ]
-
-    steps:
       - name: Checkout Cycamore
+        if: ${{ env.TEST_DOWNSTREAM }}
         uses: actions/checkout@v4
         with:
           repository: cyclus/cycamore
           ref: main
           path: ${{ github.workspace }}/cycamore
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Build Cycamore
         id: build-cycamore
+        if: ${{ env.TEST_DOWNSTREAM }}
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=local
+          cache-to: type=local,mode=max
           push: false
           context: ${{ github.workspace }}/cycamore
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
@@ -101,54 +86,33 @@ jobs:
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
-  downstream-cymetric:
-    runs-on: ubuntu-latest
-    needs: [build-test-cyclus, downstream-cycamore]
-    if: ${{ github.event_name == 'pull_request' }}
-    outputs:
-      build-failure: ${{ steps.build-cymetric.outcome }} != 'success'
-    continue-on-error: true
-
-    strategy:
-      fail-fast: false
-      matrix:
-        ubuntu_versions : [
-          20.04,
-          22.04,
-        ]
-        pkg_mgr : [
-          apt,
-          conda,
-        ]
-
-    steps:
       - name: Checkout Cymetric
+        if: ${{ env.TEST_DOWNSTREAM }}
         uses: actions/checkout@v4
         with:
           repository: cyclus/cymetric
           ref: main
           path: ${{ github.workspace }}/cymetric
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: Build Cymetric
+        if: ${{ env.TEST_DOWNSTREAM }}
         id: build-cymetric
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=local
+          cache-to: type=local,mode=max
           push: false
           context: ${{ github.workspace }}/cymetric
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-  
+
   comment-downstream-statuses:
     runs-on: ubuntu-latest
-    needs: [build-test-cyclus, downstream-cycamore, downstream-cymetric]
+    if: ${{ env.TEST_DOWNSTREAM }}
+    needs: [ build-test-cyclus ]
     permissions:
       pull-requests: write
 
@@ -159,5 +123,5 @@ jobs:
           comment_tag: downstream_statuses
           message: |
             ## Downstream Build Statuses using Cyclus ${{ github.ref }}
-            - Cycamore: ${{needs.downstream-cycamore.outputs.build-failure && '**Failure**' || '*Success*'}}
-            - Cymetric: ${{needs.downstream-cymetric.outputs.build-failure && '**Failure**' || '*Success*'}}
+            - Cycamore: ${{needs.build-test-cyclus.outputs.cycamore-build-failure && '**Failure**' || '*Success*'}}
+            - Cymetric: ${{needs.built-test-cyclus.outputs.cymetric-build-failure && '**Failure**' || '*Success*'}}
