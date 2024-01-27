@@ -53,11 +53,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build and Test Cyclus
+        id: build-cyclus
         uses: docker/build-push-action@v5
         with:
           cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-cache
           cache-to: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-cache,mode=max
           file: docker/Dockerfile
+          push: true
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -70,11 +72,6 @@ jobs:
           ref: ci-test
           path: ${{ github.workspace }}/cycamore
 
-      - name: Debugging
-        run: |
-          docker ps -a
-          docker image ls -a
-
       - name: Build Cycamore
         id: build-cycamore
         if: ${{ github.event_name == 'pull_request' }}
@@ -84,10 +81,11 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-cache
           cache-to: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-cache,mode=max
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
+          push: true
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            cyclus_tag=ci-cache
+            cyclus_tag=ci-cache@${{ steps.build-cyclus.outputs.digest }}
 
       - name: Checkout Cymetric
         if: ${{ github.event_name == 'pull_request' }}
@@ -106,12 +104,12 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-cache
           cache-to: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-cache,mode=max
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
+          push: true
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            cycamore_tag=ci-cache
+            cycamore_tag=ci-cache@${{ steps.build-cycamore.outputs.digest }}
             
-
   comment-downstream-statuses:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
