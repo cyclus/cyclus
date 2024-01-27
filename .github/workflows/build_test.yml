@@ -68,7 +68,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@v4
         with:
-          repository: cyclus/cycamore
+          repository: bennibbelink/cycamore
           ref: ci-test
           path: ${{ github.workspace }}/cycamore
 
