@@ -59,7 +59,7 @@ jobs:
           cache-to: type=local,mode=max
           load: true
           file: docker/Dockerfile
-          tags: cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
+          tags: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -87,8 +87,7 @@ jobs:
           cache-to: type=local,mode=max
           load: true
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
-          tags: |
-            cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
+          tags: ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
