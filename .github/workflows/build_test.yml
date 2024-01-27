@@ -55,8 +55,8 @@ jobs:
       - name: Build and Test Cyclus
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=local
-          cache-to: type=local,mode=max
+          cache-from: type=local,src=${HOME}/docker_cache
+          cache-to: type=local,mode=max,dest=${HOME}/docker_cache
           load: true
           file: docker/Dockerfile
           tags: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus
@@ -83,8 +83,8 @@ jobs:
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=local
-          cache-to: type=local,mode=max
+          cache-from: type=local,src=${HOME}/docker_cache
+          cache-to: type=local,mode=max,dest=${HOME}/docker_cache
           load: true
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           tags: ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore
@@ -107,8 +107,8 @@ jobs:
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=local
-          cache-to: type=local,mode=max
+          cache-from: type=local,src=${HOME}/docker_cache
+          cache-to: type=local,mode=max,src=${HOME}/docker_cache
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
