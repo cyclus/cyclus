@@ -55,11 +55,9 @@ jobs:
       - name: Build and Test Cyclus
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=local,src=${HOME}/docker_cache
-          cache-to: type=local,mode=max,dest=${HOME}/docker_cache
-          load: true
+          cache-from: type=registry,ref=ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:cached
+          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:cached,mode=max
           file: docker/Dockerfile
-          tags: cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -83,23 +81,20 @@ jobs:
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=local,src=${HOME}/docker_cache
-          cache-to: type=local,mode=max,dest=${HOME}/docker_cache
-          load: true
-          pull: false
+          cache-from: type=registry,ref=ghcr.io/cyclus/cache/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:cached
+          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:cached,mode=max
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
-          tags: ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            cyclus_tag=ci
+            cyclus_tag=cached
 
       - name: Checkout Cymetric
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@v4
         with:
-          repository: cyclus/cymetric
-          ref: main
+          repository: bennibbelink/cymetric
+          ref: ci-test
           path: ${{ github.workspace }}/cymetric
 
       - name: Build Cymetric
@@ -108,14 +103,14 @@ jobs:
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=local,src=${HOME}/docker_cache
-          cache-to: type=local,mode=max,dest=${HOME}/docker_cache
-          pull: false
+          cache-from: type=registry,ref=ghcr.io/cyclus/cache/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:cached
+          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:cached,mode=max
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            BUILDKIT_INLINE_CACHE=1
+            cycamore_tag=cached
+            
 
   comment-downstream-statuses:
     runs-on: ubuntu-latest
