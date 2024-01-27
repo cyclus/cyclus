@@ -56,7 +56,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           cache-from: type=registry,ref=ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus
-          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus,mode=max
+          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus,mode=max,image-manifest=true
           load: true
           file: docker/Dockerfile
           tags: cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
@@ -84,7 +84,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           cache-from: type=registry,ref=ghcr.io/cyclus/cache/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore
-          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore,mode=max
+          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore,mode=max,image-manifest=true
           load: true
           build-contexts: cycamore=docker-image://ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus
           context: ${{ github.workspace }}/cycamore
@@ -110,7 +110,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           cache-from: type=registry,ref=ghcr.io/cyclus/cache/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric
-          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric,mode=max
+          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric,mode=max,image-manifest=true
           build-contexts: cymetric=docker-image://ghcr.io/cyclus/cache/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore
           context: ${{ github.workspace }}/cymetric
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
