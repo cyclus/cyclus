@@ -86,6 +86,7 @@ jobs:
           cache-from: type=local,src=${HOME}/docker_cache
           cache-to: type=local,mode=max,dest=${HOME}/docker_cache
           load: true
+          pull: false
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           tags: ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore
           build-args: |
@@ -108,7 +109,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           cache-from: type=local,src=${HOME}/docker_cache
-          cache-to: type=local,mode=max,src=${HOME}/docker_cache
+          cache-to: type=local,mode=max,dest=${HOME}/docker_cache
+          pull: false
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
