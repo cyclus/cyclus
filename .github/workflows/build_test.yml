@@ -59,7 +59,7 @@ jobs:
           cache-to: type=local,mode=max,dest=${HOME}/docker_cache
           load: true
           file: docker/Dockerfile
-          tags: cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus
+          tags: cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -88,11 +88,11 @@ jobs:
           load: true
           pull: false
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
-          tags: ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore
+          tags: ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            BUILDKIT_INLINE_CACHE=1
+            cyclus_tag=ci
 
       - name: Checkout Cymetric
         if: ${{ github.event_name == 'pull_request' }}
