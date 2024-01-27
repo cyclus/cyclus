@@ -55,8 +55,8 @@ jobs:
       - name: Build and Test Cyclus
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=registry,ref=ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus
-          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus,mode=max,image-manifest=true
+          cache-from: type=local
+          cache-to: type=local,mode=max
           load: true
           file: docker/Dockerfile
           tags: cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
@@ -83,11 +83,9 @@ jobs:
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=registry,ref=ghcr.io/cyclus/cache/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore
-          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore,mode=max,image-manifest=true
+          cache-from: type=local
+          cache-to: type=local,mode=max
           load: true
-          build-contexts: cycamore=docker-image://ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus
-          context: ${{ github.workspace }}/cycamore
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           tags: |
             cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
@@ -110,10 +108,8 @@ jobs:
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=registry,ref=ghcr.io/cyclus/cache/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric
-          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric,mode=max,image-manifest=true
-          build-contexts: cymetric=docker-image://ghcr.io/cyclus/cache/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore
-          context: ${{ github.workspace }}/cymetric
+          cache-from: type=local
+          cache-to: type=local,mode=max
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
