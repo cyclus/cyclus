@@ -1,4 +1,4 @@
-name: Build and Test Dependency Images
+name: Build/Test Dependency Images
 
 on:
   # allows us to run workflows manually
