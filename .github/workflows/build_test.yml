@@ -34,7 +34,7 @@ jobs:
         ]
 
     outputs:
-      cyclus-digest: ${{ steps.build-cyclus.outputs.digest }}
+      cyclus-${{matrix.ubuntu_versions}}-${{matrix.pkg_mgr}}-digest: ${{ steps.build-cyclus.outputs.digest }}
 
     steps:
       - name: Log in to the Container registry
@@ -83,7 +83,7 @@ jobs:
 
     outputs:
       cycamore-build-failure: ${{ steps.build-cycamore.outcome }} != 'success'
-      cycamore-digest: ${{ steps.build-cycamore.outputs.digest }}
+      cycamore-${{}}-digest: ${{ steps.build-cycamore.outputs.digest }}
 
     steps:
       - name: Log in to the Container registry
@@ -104,6 +104,8 @@ jobs:
           ref: ci-test
 
       - name: Build Cycamore
+        env:
+          cyclus-digest: ${{needs.cyclus-job.outputs.digest}}
         id: build-cycamore
         uses: docker/build-push-action@v5
         with:
@@ -115,7 +117,7 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            cyclus_tag=ci-image-cache@${{ needs.cyclus-job.outputs.digest }}
+            cyclus_tag=ci-image-cache@${{needs.cyclus-job.outputs.cyclus-${{matrix.ubuntu_versions}}-${{matrix.pkg_mgr}}-digest}}
 
 
   cymetric-job:
