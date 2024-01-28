@@ -19,9 +19,8 @@ on:
       - 'CHANGELOG.rst'
 
 jobs:
-  build-test-cyclus:
+  cyclus-job:
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
@@ -35,8 +34,7 @@ jobs:
         ]
 
     outputs:
-      cycamore-build-failure: ${{ steps.build-cycamore.outcome }} != 'success'
-      cymetric-build-failure: ${{ steps.build-cymetric.outcome }} != 'success'
+      cyclus-digest: ${{ steps.build-cyclus.outputs.digest }}
 
     steps:
       - name: Log in to the Container registry
@@ -65,6 +63,39 @@ jobs:
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
+
+  cycamore-job:
+    runs-on: ubuntu-latest
+    needs: [cyclus-job]
+    if: ${{ github.event_name == 'pull_request' }}
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_versions : [
+          20.04,
+          22.04,
+        ]
+        pkg_mgr : [
+          apt,
+          conda,
+        ]
+
+    outputs:
+      cycamore-build-failure: ${{ steps.build-cycamore.outcome }} != 'success'
+      cycamore-digest: ${{ steps.build-cycamore.outputs.digest }}
+
+    steps:
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Checkout Cycamore
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@v4
@@ -75,7 +106,6 @@ jobs:
 
       - name: Build Cycamore
         id: build-cycamore
-        if: ${{ github.event_name == 'pull_request' }}
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
@@ -87,10 +117,41 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            cyclus_tag=ci-image-cache@${{ steps.build-cyclus.outputs.digest }}
+            cyclus_tag=ci-image-cache@${{ needs.cyclus-job.outputs.digest }}
 
+
+  cymetric-job:
+    runs-on: ubuntu-latest
+    needs: [build-test-cyclus, build-test-cycamore]
+    if: ${{ github.event_name == 'pull_request' }}
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_versions : [
+          20.04,
+          22.04,
+        ]
+        pkg_mgr : [
+          apt,
+          conda,
+        ]
+
+    outputs:
+      cymetric-build-failure: ${{ steps.build-cymetric.outcome }} != 'success'
+
+    steps:
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
       - name: Checkout Cymetric
-        if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@v4
         with:
           repository: bennibbelink/cymetric
@@ -98,7 +159,6 @@ jobs:
           path: ${{ github.workspace }}/cymetric
 
       - name: Build Cymetric
-        if: ${{ github.event_name == 'pull_request' }}
         id: build-cymetric
         continue-on-error: true
         uses: docker/build-push-action@v5
@@ -111,12 +171,12 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            cycamore_tag=ci-image-cache@${{ steps.build-cycamore.outputs.digest }}
+            cycamore_tag=ci-image-cache@${{ steps.cycamore-job.outputs.digest }}
             
   comment-downstream-statuses:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' }}
-    needs: [ build-test-cyclus ]
+    needs: [ cyclus-job, cycamore-job, cymetric-job ]
     permissions:
       pull-requests: write
 
@@ -127,5 +187,5 @@ jobs:
           comment_tag: downstream_statuses
           message: |
             ## Downstream Build Statuses using Cyclus ${{ github.ref }}
-            - Cycamore: ${{needs.build-test-cyclus.outputs.cycamore-build-failure && '**Failure** :warning:' || '*Success* :white_check_mark:'}}
-            - Cymetric: ${{needs.built-test-cyclus.outputs.cymetric-build-failure && '**Failure** :warning:' || '*Success* :white_check_mark:'}}
+            - Cycamore: ${{needs.cycamore-job.outputs.cycamore-build-failure && '**Failure** :warning:' || '*Success* :white_check_mark:'}}
+            - Cymetric: ${{needs.cymetric-job.outputs.cymetric-build-failure && '**Failure** :warning:' || '*Success* :white_check_mark:'}}
