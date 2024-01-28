@@ -72,7 +72,7 @@ jobs:
           ref: ci-test
           path: $HOME/cycamore
 
-      - name: Build Cycamore
+      - name: Build and Test Cycamore
         id: build-cycamore
         if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
         continue-on-error: true
@@ -97,7 +97,7 @@ jobs:
           ref: ci-test
           path: $HOME/cymetric
 
-      - name: Build Cymetric
+      - name: Build and Test Cymetric
         if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
         id: build-cymetric
         continue-on-error: true
