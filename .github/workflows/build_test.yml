@@ -21,6 +21,8 @@ on:
 jobs:
   build-test-cyclus:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
@@ -32,10 +34,6 @@ jobs:
           apt,
           conda,
         ]
-
-    outputs:
-      cycamore-build-failure: ${{ steps.build-cycamore.outcome }} != 'success'
-      cymetric-build-failure: ${{ steps.build-cymetric.outcome }} != 'success'
 
     steps:
       - name: Log in to the Container registry
@@ -65,7 +63,7 @@ jobs:
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
       - name: Checkout Cycamore
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
           repository: bennibbelink/cycamore
@@ -74,7 +72,7 @@ jobs:
 
       - name: Build Cycamore
         id: build-cycamore
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
@@ -89,7 +87,7 @@ jobs:
             cyclus_tag=ci-image-cache@${{ steps.build-cyclus.outputs.digest }}
 
       - name: Checkout Cymetric
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
           repository: bennibbelink/cymetric
@@ -97,7 +95,7 @@ jobs:
           path: ${{ github.workspace }}/cymetric
 
       - name: Build Cymetric
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
         id: build-cymetric
         continue-on-error: true
         uses: docker/build-push-action@v5
@@ -111,20 +109,17 @@ jobs:
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
             cycamore_tag=ci-image-cache@${{ steps.build-cycamore.outputs.digest }}
-            
-  comment-downstream-statuses:
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
-    needs: [ build-test-cyclus ]
-    permissions:
-      pull-requests: write
-
-    steps:
+  
       - name: PR Comment
+        if: ${{ github.event_name == 'pull_request' }}
         uses: thollander/actions-comment-pull-request@v2
         with:
           comment_tag: downstream_statuses
           message: |
             ## Downstream Build Statuses using Cyclus ${{ github.ref }}
-            - Cycamore: ${{needs.build-test-cyclus.outputs.cycamore-build-failure && '**Failure** :warning:' || '*Success* :white_check_mark:'}}
-            - Cymetric: ${{needs.built-test-cyclus.outputs.cymetric-build-failure && '**Failure** :warning:' || '*Success* :white_check_mark:'}}
+            - Cycamore: ${{steps.build-cycamore.outcome == 'success' && '*Success* :white_check_mark:' || 
+                steps.build-cycamore.outcome == 'failure' && '**Failure** :x:' || 
+                '**Skipped due to upstream failure** :warning:'}}
+            - Cymetric: ${{needs.build-cymetric.outcome == 'success' && '*Success* :white_check_mark:' || 
+                steps.build-cymetric.outcome == 'failure' && '**Failure** :x:' || 
+                '**Skipped due to upstream failure** :warning:'}}
