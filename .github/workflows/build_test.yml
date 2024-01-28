@@ -74,11 +74,11 @@ jobs:
 
       - name: Build Cycamore
         id: build-cycamore
-        working-directory: ${{ github.workspace }}/cycamore
         if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
+          context: ${{ github.workspace }}/cycamore
           file: docker/Dockerfile
           cache-from: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache
           cache-to: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache,mode=max
@@ -100,10 +100,10 @@ jobs:
       - name: Build Cymetric
         if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
         id: build-cymetric
-        working-directory: ${{ github.workspace }}/cymetric
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
+          context: ${{ github.workspace }}/cymetric
           file: docker/Dockerfile
           cache-from: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache
           cache-to: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache,mode=max
