@@ -31,7 +31,7 @@ jobs:
 
     name: Building Dependency Image
     steps:
-      - name: Tag as github.ci-image-cache
+      - name: Tag as ci-image-cache
         run: |
           echo "tag=ci-image-cache" >> "$GITHUB_ENV"
 
