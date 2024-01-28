@@ -53,8 +53,8 @@ jobs:
       - name: Build Test Image
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=registry,ref=ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps
-          cache-to: type=registry,ref=ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps,mode=max
+          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps:ci-layer-cache
+          cache-to: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps:ci-layer-cache,mode=max
           file: docker/Dockerfile
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
@@ -63,12 +63,11 @@ jobs:
       - name: Push Dependency Image
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=registry,ref=ghcr.io/cyclus/cache/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps
+          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps:ci-layer-cache
+          file: docker/Dockerfile
           target: ${{ matrix.pkg_mgr }}-deps
           push: true
-          tags: |
-            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps:${{ env.tag }}
-          file: docker/Dockerfile
+          tags: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps:${{ env.tag }}
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
