@@ -22,6 +22,8 @@ jobs:
   build-test-cyclus:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
+      packages: write
       pull-requests: write
     strategy:
       fail-fast: false

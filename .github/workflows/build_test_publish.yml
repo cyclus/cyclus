@@ -14,6 +14,9 @@ on:
 jobs:
   build-dependency-img:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     strategy:
       matrix:
@@ -28,11 +31,11 @@ jobs:
 
     name: Building Dependency Image
     steps:
-      - name: default environment
+      - name: Tag as github.ci-image-cache
         run: |
-          echo "tag=${{ github.run_id }}" >> "$GITHUB_ENV"
+          echo "tag=ci-image-cache" >> "$GITHUB_ENV"
 
-      - name: condition on trigger parameters
+      - name: Tag as latest
         if: ${{ github.repository_owner == 'cyclus' && github.ref == 'refs/heads/main' }}
         run: |
           echo "tag=latest" >> "$GITHUB_ENV"
