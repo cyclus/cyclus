@@ -79,7 +79,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: $HOME/cycamore
-          file: docker/Dockerfile
+          file: $HOME/cycamore/docker/Dockerfile
           cache-from: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache
           cache-to: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache,mode=max
           tags: ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-image-cache
@@ -104,7 +104,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: $HOME/cymetric
-          file: docker/Dockerfile
+          file: $HOME/cymetric/docker/Dockerfile
           cache-from: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache
           cache-to: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache,mode=max
           tags: ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-image-cache
