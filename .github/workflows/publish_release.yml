@@ -26,7 +26,7 @@ jobs:
           conda
         ]
 
-    name: Installing Dependencies, Building cyclus and running tests
+    name: Build, Test, Publish
     steps:
       - name: Tag as ci-image-cache
         run: |
