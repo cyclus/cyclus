@@ -52,22 +52,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and Test Cyclus
+      - name: Build, Test, and Push Cyclus
         uses: docker/build-push-action@v5
         with:
           cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
           cache-to: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache,mode=max
           file: docker/Dockerfile
-          build-args: |
-            pkg_mgr=${{ matrix.pkg_mgr }}
-            ubuntu_version=${{ matrix.ubuntu_versions }}
-
-      - name: Push Cyclus
-        uses: docker/build-push-action@v5
-        with:
-          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
-          file: docker/Dockerfile
-          target: cyclus
           push: true
           tags: |
             ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.version_tag }}
