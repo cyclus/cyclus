@@ -1,4 +1,4 @@
-name: Publish Cyclus Release
+name: Publish Stable Cyclus
 
 on:
   push:
