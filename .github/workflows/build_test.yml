@@ -68,8 +68,8 @@ jobs:
         if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
-          repository: bennibbelink/cycamore
-          ref: ci-test
+          repository: cyclus/cycamore
+          ref: tag-build-arg
           path: $HOME/cycamore
 
       - name: Build and Test Cycamore
@@ -93,8 +93,8 @@ jobs:
         if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
-          repository: bennibbelink/cymetric
-          ref: ci-test
+          repository: cyclus/cymetric
+          ref: tag-build-arg
           path: $HOME/cymetric
 
       - name: Build and Test Cymetric
