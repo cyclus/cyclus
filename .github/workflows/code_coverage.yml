@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - name: Checkout and Build Cyclus
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Building Cyclus
         run: |
