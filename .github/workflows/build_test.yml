@@ -120,7 +120,7 @@ jobs:
         with:
           comment_tag: ${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
           message: |
-            ## Downstream Build Statuses using Cyclus ${{ github.ref }} on Ubuntu ${{ matrix.ubuntu_versions }} with ${{ matrix.pkg_mgr }}
+            ## Downstream build statuses using cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
             - Cycamore: ${{steps.build-cycamore.outcome == 'success' && '*Success* :white_check_mark:' || 
                 steps.build-cycamore.outcome == 'failure' && '**Failure** :x:' || 
                 '**Skipped due to upstream failure** :warning:'}}
