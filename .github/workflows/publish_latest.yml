@@ -29,7 +29,7 @@ jobs:
           conda,
         ]
 
-    name: Building Dependency Image
+    name: Build, Test, Publish
     steps:
       - name: Tag as ci-image-cache
         run: |
