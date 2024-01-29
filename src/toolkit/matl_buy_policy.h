@@ -196,8 +196,7 @@ class MatlBuyPolicy : public Trader {
   };
 
   void set_manager(Agent* m);
-  void create_buf_tracker();
-  void set_buf_tracker(TotalInvTracker* t);
+  void set_total_inv_tracker(TotalInvTracker* t);
   /// requires buf_ already set
   void set_fill_to(double x);
   /// requires buf_ already set
