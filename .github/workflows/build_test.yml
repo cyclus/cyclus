@@ -124,6 +124,6 @@ jobs:
             - Cycamore: ${{steps.build-cycamore.outcome == 'success' && '*Success* :white_check_mark:' || 
                 steps.build-cycamore.outcome == 'failure' && '**Failure** :x:' || 
                 '**Skipped due to upstream failure** :warning:'}}
-            - Cymetric: ${{needs.build-cymetric.outcome == 'success' && '*Success* :white_check_mark:' || 
+            - Cymetric: ${{steps.build-cymetric.outcome == 'success' && '*Success* :white_check_mark:' || 
                 steps.build-cymetric.outcome == 'failure' && '**Failure** :x:' || 
                 '**Skipped due to upstream failure** :warning:'}}
