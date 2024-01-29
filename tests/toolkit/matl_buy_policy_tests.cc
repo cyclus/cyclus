@@ -196,6 +196,52 @@ TEST_F(MatlBuyPolicyTests, MultiReqQuantize) {
   ASSERT_FLOAT_EQ(req->target()->quantity(), quantize);
 }
 
+TEST_F(MatlBuyPolicyTests, TotalInvTracker) {
+  using cyclus::QueryResult;
+
+  int dur = 5;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur); 
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+  sim.AddSource("commod1").Finalize();
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  inbuf.capacity(10);
+  cyclus::toolkit::ResBuf<cyclus::Material> otherbuf;
+  otherbuf.capacity(10);
+
+  cyclus::CompMap cm;
+  cm[1001] = 1;
+  cyclus::Material::Ptr mat = cyclus::Material::Create(fac, 2, cyclus::Composition::CreateFromAtom(cm));
+  otherbuf.Push(mat);
+
+  double total_capacity = 5;
+  TotalInvTracker buf_tracker({&inbuf, &otherbuf}, total_capacity);
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput)
+        .Set("commod1").Start();
+
+  EXPECT_FALSE(buf_tracker.empty());
+  EXPECT_EQ(buf_tracker.quantity(), 2);
+  EXPECT_EQ(buf_tracker.capacity(), total_capacity);
+  EXPECT_EQ(buf_tracker.space(), total_capacity - 2);
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  int n_trans = qr.rows.size();
+  EXPECT_EQ(n_trans, 3);
+
+  EXPECT_EQ(buf_tracker.quantity(), 5);
+  EXPECT_EQ(buf_tracker.space(), 0);
+  EXPECT_EQ(inbuf.space(), inbuf.capacity() - inbuf.quantity());
+  EXPECT_EQ(buf_tracker.buf_space(&inbuf), 0);
+}
+
 TEST_F(MatlBuyPolicyTests, DefaultFixedActiveDormant) {
   using cyclus::QueryResult;
   
