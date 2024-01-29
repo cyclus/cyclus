@@ -20,6 +20,8 @@ MatlBuyPolicy::MatlBuyPolicy() :
     quantize_(-1),
     fill_to_(1),
     req_when_under_(1),
+    reorder_amt_(0),
+    RQ_exclusive_(false),
     active_dist_(NULL),
     dormant_dist_(NULL),
     size_dist_(NULL){
@@ -105,6 +107,14 @@ void MatlBuyPolicy::init_active_dormant() {
   }
 }
 
+void MatlBuyPolicy::set_reorder_amt(double x) {
+  reorder_amt_ = x;
+}
+
+void MatlBuyPolicy::set_RQ_exclusive(bool x) {
+  RQ_exclusive_ = x;
+}
+
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name, TotalInvTracker* buf_tracker) {
   set_manager(manager);
@@ -164,6 +174,22 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   return *this;
 }
 
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
+                                   std::string name, double req_when_under,
+                                   double reorder_amt, bool RQ_exclusive) {
+  set_manager(manager);
+  buf_ = buf;
+  name_ = name;
+  set_req_when_under(req_when_under);
+  set_reorder_amt(reorder_amt);
+  set_RQ_exclusive(RQ_exclusive);
+  if (RQ_exclusive) {
+    set_quantize(reorder_amt);
+  }
+  init_active_dormant();
+  return *this;
+}
+
 MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod) {
   CompMap c;
   c[10010000] = 1e-100;
@@ -208,6 +234,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   double amt;
 
   int current_time_ = manager()->context()->time();
+  std::cerr << "for time " << current_time_ << ", make_req is " << make_req << std::endl;
 
   if (never_dormant() || current_time_ < next_active_end_) {
     // currently in the middle of active buying period
@@ -228,13 +255,20 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     LGH(INFO4) << "end of dormant period, next active time end: " << next_active_end_ << ", and next dormant time end: " << next_dormant_end_ << std::endl;
   }
 
+  std::cerr << "amt is " << amt << std::endl;
+
   if (!make_req || amt < eps())
     return ports;
 
   bool excl = Excl();
+  if ((reorder_amt_ > 0) && (amt > reorder_amt_)) {
+    std::cerr << "reorder_amt_ is " << reorder_amt_ << std::endl;
+    amt = reorder_amt_;
+  }
   double req_amt = ReqQty(amt);
   int n_req = NReq(amt);
   LGH(INFO3) << "requesting " << amt << " kg via " << n_req << " request(s)"  << std::endl;
+  std::cerr << "requesting " << amt << " kg via " << n_req << " request(s)"  << std::endl;
 
   // one portfolio for each request
   for (int i = 0; i != n_req; i++) {

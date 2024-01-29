@@ -73,6 +73,11 @@ class MatlBuyPolicy : public Trader {
   /// a single time step
   /// @param fill_to the amount or fraction of inventory to order when placing
   /// an order. This is equivalent to the S in an (s, S) inventory policy.
+  /// @param reorder_quantity is the size of request to place when the buf has
+  /// reached reorder point. This is equivalent to the Q in an (R, Q) inventory
+  /// policy.
+  /// @param RQ_exclusive If true, the policy will make a quantized request
+  /// for reorder_quantity
   /// @param req_when_under place an request when the buf's quantity is less
   /// than its capacity * fill_to (as a fraction). This is equivalent to the s
   /// in an (s, S) inventory policy.
@@ -117,6 +122,9 @@ class MatlBuyPolicy : public Trader {
                       TotalInvTracker* buf_tracker,
                       double throughput, double fill_to,
                       double req_when_under, double quantize);
+  MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
+                      double req_when_under, double reorder_amt,
+                      bool RQ_exclusive);
   /// @}
 
   /// Instructs the policy to fill its buffer with requests on the given
@@ -204,11 +212,15 @@ class MatlBuyPolicy : public Trader {
   void set_quantize(double x);
   void set_throughput(double x);
   void init_active_dormant();
+  void set_reorder_amt(double x);
+  void set_RQ_exclusive(bool x);
 
   ResBuf<Material>* buf_;
   TotalInvTracker* buf_tracker_;
   std::string name_;
   double fill_to_, req_when_under_, quantize_, throughput_;
+  double reorder_amt_;
+  bool RQ_exclusive_;
 
   int next_active_end_= 0;
   int next_dormant_end_= 0;

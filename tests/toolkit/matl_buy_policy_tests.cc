@@ -567,5 +567,38 @@ TEST_F(MatlBuyPolicyTests, RandomSizeAndFrequency) {
   delete a;
 }
 
+TEST_F(MatlBuyPolicyTests, RQInventory) {
+  using cyclus::QueryResult;
+  
+  int dur = 5;
+  double req_when_under = 1;
+  double reorder_amt = 1;
+  bool RQ_exclusive = false;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  inbuf.capacity(3);
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", req_when_under, reorder_amt, RQ_exclusive)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  EXPECT_EQ(0, qr.GetVal<int>("Time", 0));
+  
+  qr = sim.db().Query("Resources", NULL);
+  EXPECT_NEAR(1, qr.GetVal<double>("Quantity", 0), 0.00001);
+  EXPECT_NEAR(1, qr.GetVal<double>("Quantity", 1), 0.00001);
+
+  delete a;
+}
+
 }
 }
