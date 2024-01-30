@@ -71,16 +71,12 @@ class MatlBuyPolicy : public Trader {
   /// @param name a unique name identifying this policy
   /// @param throughput a constraining value for total transaction quantities in
   /// a single time step
-  /// @param fill_to the amount or fraction of inventory to order when placing
+  /// @param inv_policy the inventory policy to use. Options are "sS" and "RQ"
+  /// @param fill_behav the amount or fraction of inventory to order when placing
   /// an order. This is equivalent to the S in an (s, S) inventory policy.
-  /// @param reorder_quantity is the size of request to place when the buf has
-  /// reached reorder point. This is equivalent to the Q in an (R, Q) inventory
-  /// policy.
-  /// @param RQ_exclusive If true, the policy will make a quantized request
-  /// for reorder_quantity
-  /// @param req_when_under place an request when the buf's quantity is less
-  /// than its capacity * fill_to (as a fraction). This is equivalent to the s
-  /// in an (s, S) inventory policy.
+
+  /// @param req_at the inventory minimum. If the buffer is below
+  /// this value, new material will be requested up to
   /// @param quantize If quantize is greater than zero, the policy will make
   /// exclusive, integral quantize kg requests.  Otherwise, single requests will
   /// be sent to fill the buffer's empty space.
@@ -116,15 +112,15 @@ class MatlBuyPolicy : public Trader {
                       boost::shared_ptr<IntDistribution> dormant_dist = NULL,
                       boost::shared_ptr<DoubleDistribution> size_dist = NULL);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      TotalInvTracker* buf_tracker,
-                      double fill_to, double req_when_under);
+                      TotalInvTracker* buf_tracker, double throughput,
+                      double quantize);                    
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       TotalInvTracker* buf_tracker,
-                      double throughput, double fill_to,
-                      double req_when_under, double quantize);
+                      double throughput, std::string inv_policy,
+                      double fill_behav, double req_at);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      double req_when_under, double reorder_amt,
-                      bool RQ_exclusive);
+                      TotalInvTracker* buf_tracker, std::string inv_policy,
+                      double fill_behav, double req_at);
   /// @}
 
   /// Instructs the policy to fill its buffer with requests on the given
@@ -157,12 +153,17 @@ class MatlBuyPolicy : public Trader {
   /// the total amount available to request
   inline double TotalAvailable() const {
     return std::min({throughput_,
-                   (fill_to_ * buf_->capacity()) - buf_->quantity(),
+                    fill_to_ - buf_->quantity(),
+                    buf_->space(),
                     buf_tracker_->space()});
   }
 
+  /// whether a request can be made
+  inline bool MakeReq() const { return buf_->quantity() <= req_at_; }
+
   /// whether trades will be denoted as exclusive or not
-  inline bool Excl() const { return quantize_ > 0; }
+  inline bool Excl() const { 
+    return quantize_ > 0; }
 
 
   /// the amount requested per each request
@@ -205,22 +206,20 @@ class MatlBuyPolicy : public Trader {
 
   void set_manager(Agent* m);
   void set_total_inv_tracker(TotalInvTracker* t);
+  void set_inv_policy(std::string p, double x, 
+                      double y = std::numeric_limits<double>::max());
   /// requires buf_ already set
   void set_fill_to(double x);
   /// requires buf_ already set
-  void set_req_when_under(double x);
+  void set_req_at(double x);
   void set_quantize(double x);
   void set_throughput(double x);
   void init_active_dormant();
-  void set_reorder_amt(double x);
-  void set_RQ_exclusive(bool x);
 
   ResBuf<Material>* buf_;
   TotalInvTracker* buf_tracker_;
-  std::string name_;
-  double fill_to_, req_when_under_, quantize_, throughput_;
-  double reorder_amt_;
-  bool RQ_exclusive_;
+  std::string name_, inv_policy;
+  double fill_to_, req_at_, quantize_, throughput_;
 
   int next_active_end_= 0;
   int next_dormant_end_= 0;

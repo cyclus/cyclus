@@ -18,10 +18,8 @@ MatlBuyPolicy::MatlBuyPolicy() :
     name_(""),
     throughput_(std::numeric_limits<double>::max()),
     quantize_(-1),
-    fill_to_(1),
-    req_when_under_(1),
-    reorder_amt_(0),
-    RQ_exclusive_(false),
+    fill_to_(std::numeric_limits<double>::max()),
+    req_at_(std::numeric_limits<double>::max()),
     active_dist_(NULL),
     dormant_dist_(NULL),
     size_dist_(NULL){
@@ -55,18 +53,29 @@ void MatlBuyPolicy::set_total_inv_tracker(TotalInvTracker* t) {
   }
 }
 
+void MatlBuyPolicy::set_inv_policy(std::string inv_policy, double fill, double req_at) {
+  set_req_at(req_at);
+  if ((inv_policy == "sS") || (inv_policy == "Ss")) {
+    set_fill_to(fill);
+  }
+  else if ((inv_policy == "RQ") || (inv_policy == "QR")) {
+    set_quantize(fill);
+    // maximum amount that an RQ policy could achieve is req_at + fill
+    set_fill_to(req_at + fill);
+  }
+  else {
+    throw ValueError("Invalid inventory policy");
+  }
+}
+
 void MatlBuyPolicy::set_fill_to(double x) {
-  if (x > 1)
-    x /= buf_->capacity();
-  assert(x > 0 && x <= 1.);
+  assert(x > 0);
   fill_to_ = x;
 }
 
-void MatlBuyPolicy::set_req_when_under(double x) {
-  if (x > 1)
-    x /= buf_->capacity();
-  assert(x >= 0 && x <= 1.);
-  req_when_under_ = x;
+void MatlBuyPolicy::set_req_at(double x) {
+  assert(x >= 0);
+  req_at_ = x;
 }
 
 void MatlBuyPolicy::set_quantize(double x) {
@@ -107,14 +116,6 @@ void MatlBuyPolicy::init_active_dormant() {
   }
 }
 
-void MatlBuyPolicy::set_reorder_amt(double x) {
-  reorder_amt_ = x;
-}
-
-void MatlBuyPolicy::set_RQ_exclusive(bool x) {
-  RQ_exclusive_ = x;
-}
-
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name, TotalInvTracker* buf_tracker) {
   set_manager(manager);
@@ -143,15 +144,14 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name, 
-                                   TotalInvTracker* buf_tracker,
-                                   double fill_to, double req_when_under) {
+                                   std::string name, TotalInvTracker* buf_tracker,
+                                   double throughput, double quantize) {
   set_manager(manager);
   buf_ = buf;
   name_ = name;
   set_total_inv_tracker(buf_tracker);
-  set_fill_to(fill_to);
-  set_req_when_under(req_when_under);
+  set_throughput(throughput);
+  set_quantize(quantize);
   init_active_dormant();
   return *this;
 }
@@ -160,32 +160,28 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                    std::string name, 
                                    TotalInvTracker* buf_tracker,
                                    double throughput,
-                                   double fill_to, double req_when_under,
-                                   double quantize) {
+                                   std::string inv_policy,
+                                   double fill_behav, double req_at) {
   set_manager(manager);
   buf_ = buf;
   name_ = name;
   set_total_inv_tracker(buf_tracker);
-  set_fill_to(fill_to);
-  set_req_when_under(req_when_under);
-  set_quantize(quantize);
+  set_inv_policy(inv_policy, fill_behav, req_at);
   set_throughput(throughput);
   init_active_dormant();
   return *this;
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name, double req_when_under,
-                                   double reorder_amt, bool RQ_exclusive) {
+                                   std::string name, 
+                                   TotalInvTracker* buf_tracker,
+                                   std::string inv_policy,
+                                   double fill_behav, double req_at) {
   set_manager(manager);
   buf_ = buf;
   name_ = name;
-  set_req_when_under(req_when_under);
-  set_reorder_amt(reorder_amt);
-  set_RQ_exclusive(RQ_exclusive);
-  if (RQ_exclusive) {
-    set_quantize(reorder_amt);
-  }
+  set_total_inv_tracker(buf_tracker);
+  set_inv_policy(inv_policy, fill_behav, req_at);
   init_active_dormant();
   return *this;
 }
@@ -230,11 +226,13 @@ void MatlBuyPolicy::Stop() {
 std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   rsrc_commods_.clear();
   std::set<RequestPortfolio<Material>::Ptr> ports;
-  bool make_req = buf_->quantity() < req_when_under_ * buf_->capacity();
+  if (!MakeReq()) {
+    return ports;
+  }
+
   double amt;
 
   int current_time_ = manager()->context()->time();
-  std::cerr << "for time " << current_time_ << ", make_req is " << make_req << std::endl;
 
   if (never_dormant() || current_time_ < next_active_end_) {
     // currently in the middle of active buying period
@@ -255,20 +253,13 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     LGH(INFO4) << "end of dormant period, next active time end: " << next_active_end_ << ", and next dormant time end: " << next_dormant_end_ << std::endl;
   }
 
-  std::cerr << "amt is " << amt << std::endl;
-
-  if (!make_req || amt < eps())
+  if (amt < eps())
     return ports;
 
   bool excl = Excl();
-  if ((reorder_amt_ > 0) && (amt > reorder_amt_)) {
-    std::cerr << "reorder_amt_ is " << reorder_amt_ << std::endl;
-    amt = reorder_amt_;
-  }
   double req_amt = ReqQty(amt);
   int n_req = NReq(amt);
   LGH(INFO3) << "requesting " << amt << " kg via " << n_req << " request(s)"  << std::endl;
-  std::cerr << "requesting " << amt << " kg via " << n_req << " request(s)"  << std::endl;
 
   // one portfolio for each request
   for (int i = 0; i != n_req; i++) {
