@@ -42,17 +42,14 @@ class MatlBuyPolicyTests: public ::testing::Test {
 };
 
 TEST_F(MatlBuyPolicyTests, Init) {
-  double cap = 5;
+  double cap = 10;
   ResBuf<Material> buff;
   buff.capacity(cap);
   TotalInvTracker buff_tracker({&buff});
-  std::cerr << "buf cap: " << buff.capacity() << std::endl;
   MatlBuyPolicy p;
-  std::cerr << "policy created" << std::endl;
 
   // defaults
   p.Init(fac1, &buff, "", &buff_tracker);
-  std::cerr << "policy initialized" << std::endl;
   double amt = p.TotalAvailable();
   ASSERT_FLOAT_EQ(amt, cap);
   ASSERT_FLOAT_EQ(p.ReqQty(amt), cap);
@@ -60,7 +57,7 @@ TEST_F(MatlBuyPolicyTests, Init) {
 
   // throughput
   double throughput = cap - 1;
-  p.Init(fac1, &buff, "", &buff_tracker, throughput, 1, 1, -1);
+  p.Init(fac1, &buff, "", &buff_tracker, throughput);
   amt = p.TotalAvailable();
   ASSERT_FLOAT_EQ(amt, throughput);
   ASSERT_FLOAT_EQ(p.ReqQty(amt), throughput);
@@ -68,19 +65,28 @@ TEST_F(MatlBuyPolicyTests, Init) {
 
   // exclusive orders
   double quantize = 2.5;
-  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max(), 1, 1, quantize);
+  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max(), 
+         quantize);
   amt = p.TotalAvailable();
   ASSERT_FLOAT_EQ(amt, cap);
   ASSERT_FLOAT_EQ(p.ReqQty(amt), quantize);
   ASSERT_EQ(p.NReq(amt), static_cast<int>(cap / quantize));
+}
 
-  // S,s with nothing in buffer 
+TEST_F(MatlBuyPolicyTests, Init_sS) {
+  double cap = 10;
+  ResBuf<Material> buff;
+  buff.capacity(cap);
+  TotalInvTracker buff_tracker({&buff});
+  MatlBuyPolicy p;
+
+// S,s with nothing in buffer 
   double S = 4, s = 2;
-  // reset
-  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max(), 1, 1, -1); 
+  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max()); 
   // use Ss constructor
-  p.Init(fac1, &buff, "", &buff_tracker, S, s);
-  amt = p.TotalAvailable();
+  p.Init(fac1, &buff, "", &buff_tracker, "sS", S, s);
+  ASSERT_TRUE(p.MakeReq());
+  double amt = p.TotalAvailable();
   ASSERT_FLOAT_EQ(amt, S);
   ASSERT_FLOAT_EQ(p.ReqQty(amt), S);
   ASSERT_EQ(p.NReq(amt), 1);
@@ -88,10 +94,52 @@ TEST_F(MatlBuyPolicyTests, Init) {
   // S,s with something in buffer
   Composition::Ptr c;
   buff.Push(Material::CreateUntracked(s, c));
+  p.Init(fac1, &buff, "", &buff_tracker, "sS", S, s);
+  ASSERT_TRUE(p.MakeReq());
   amt = p.TotalAvailable();
   ASSERT_FLOAT_EQ(amt, S - s);
   ASSERT_FLOAT_EQ(p.ReqQty(amt), S - s);
   ASSERT_EQ(p.NReq(amt), 1);
+
+  // S,s with too much in the buffer
+  buff.Push(Material::CreateUntracked(s, c));
+  p.Init(fac1, &buff, "", &buff_tracker, "sS", S, s);
+  ASSERT_FALSE(p.MakeReq());
+}
+
+TEST_F(MatlBuyPolicyTests, Init_RQ) {
+  double cap = 10;
+  ResBuf<Material> buff;
+  buff.capacity(cap);
+  TotalInvTracker buff_tracker({&buff});
+  MatlBuyPolicy p;
+
+// R,Q with nothing in buffer
+  double R = 2, Q = 4;
+  // reset
+  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max()); 
+  // use RQ constructor
+  p.Init(fac1, &buff, "", &buff_tracker, "RQ", Q, R);
+  ASSERT_TRUE(p.MakeReq());
+  double amt = p.TotalAvailable();
+  ASSERT_FLOAT_EQ(amt, 6);
+  ASSERT_FLOAT_EQ(p.ReqQty(amt), Q);
+  ASSERT_EQ(p.NReq(amt), 1);
+
+  // R,Q with something in the buffer
+  Composition::Ptr c;
+  buff.Push(Material::CreateUntracked(R, c));
+  p.Init(fac1, &buff, "", &buff_tracker, "RQ", Q, R);
+  ASSERT_TRUE(p.MakeReq());
+  amt = p.TotalAvailable();
+  ASSERT_FLOAT_EQ(amt, 4);
+  ASSERT_FLOAT_EQ(p.ReqQty(amt), Q);
+  ASSERT_EQ(p.NReq(amt), 1);
+
+  // R,Q with too much in the buffer
+  buff.Push(Material::CreateUntracked(R, c));
+  p.Init(fac1, &buff, "", &buff_tracker, "RQ", Q, R);  
+  ASSERT_FALSE(p.MakeReq());
 }
 
 TEST_F(MatlBuyPolicyTests, StartStop) {
@@ -161,7 +209,8 @@ TEST_F(MatlBuyPolicyTests, Quantize) {
   MatlBuyPolicy p;
 
   double quantize = 2.5;
-  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max(), 1, 1, quantize).Set("commod1", c1);
+  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max(),
+         quantize).Set("commod1", c1);
   std::set<RequestPortfolio<Material>::Ptr> obs = p.GetMatlRequests();
   ASSERT_EQ(obs.size(), 2);
   ASSERT_EQ((*obs.begin())->requests().size(), 1);
@@ -182,7 +231,8 @@ TEST_F(MatlBuyPolicyTests, MultiReqQuantize) {
   
   // two portfolios with quantize
   double quantize = 2.5;
-  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max(), 1, 1, quantize).Set("commod1", c1).Set("commod2", c2);
+  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max(),
+         quantize).Set("commod1", c1).Set("commod2", c2);
   std::set<RequestPortfolio<Material>::Ptr> obs = p.GetMatlRequests();
   ASSERT_EQ(obs.size(), 2);
   ASSERT_EQ((*obs.begin())->requests().size(), 2);
@@ -563,39 +613,6 @@ TEST_F(MatlBuyPolicyTests, RandomSizeAndFrequency) {
   QueryResult qr2 = sim.db().Query("Transactions", NULL);
   EXPECT_EQ(0, qr2.GetVal<int>("Time", 0));
   EXPECT_EQ(4, qr2.GetVal<int>("Time", 2));
-
-  delete a;
-}
-
-TEST_F(MatlBuyPolicyTests, RQInventory) {
-  using cyclus::QueryResult;
-  
-  int dur = 5;
-  double req_when_under = 1;
-  double reorder_amt = 1;
-  bool RQ_exclusive = false;
-
-  cyclus::MockSim sim(dur);
-  cyclus::Agent* a = new TestFacility(sim.context());
-  sim.context()->AddPrototype(a->prototype(), a);
-  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());sim.AddSource("commod1").Finalize();
-
-  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
-
-  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
-  inbuf.capacity(3);
-  cyclus::toolkit::MatlBuyPolicy policy;
-  policy.Init(fac, &inbuf, "inbuf", req_when_under, reorder_amt, RQ_exclusive)
-        .Set("commod1").Start();
-
-  EXPECT_NO_THROW(sim.Run());
-
-  QueryResult qr = sim.db().Query("Transactions", NULL);
-  EXPECT_EQ(0, qr.GetVal<int>("Time", 0));
-  
-  qr = sim.db().Query("Resources", NULL);
-  EXPECT_NEAR(1, qr.GetVal<double>("Quantity", 0), 0.00001);
-  EXPECT_NEAR(1, qr.GetVal<double>("Quantity", 1), 0.00001);
 
   delete a;
 }
