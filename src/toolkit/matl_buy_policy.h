@@ -71,12 +71,10 @@ class MatlBuyPolicy : public Trader {
   /// @param name a unique name identifying this policy
   /// @param throughput a constraining value for total transaction quantities in
   /// a single time step
-  /// @param inv_policy the inventory policy to use. Options are "sS" and "RQ"
-  /// @param fill_behav the amount or fraction of inventory to order when placing
-  /// an order. This is equivalent to the S in an (s, S) inventory policy.
-
-  /// @param req_at the inventory minimum. If the buffer is below
-  /// this value, new material will be requested up to
+  /// @param inv_policy the inventory policy to use. Options are "sS", "RQ". Each inventory policy options has two additional required parameters. An (s,S) inventory policy orders material only when the buffer is below the minimum value, s, and orders only enough to bring the buffer to the maximum value, S. An (s,S) policy allows partial orders. Set s as req_at and S as fill. An (R,Q) inventory policy requests material when the buffer is below the minimum value, R, and places an exclusive request for size Q. Set R as req_at and Q as fill. 
+  /// @param req_at, the inventory minimum (s, and R) for (s,S) and (R,Q),. If the buffer has less than or equal to value, new material will be requested based on the policy in place. 
+  /// @param fill_behav, the quantity govering the fill strategy for inventory policies. For (s,S), this is the maximum value, and material will be ordered up to this amount. For (R,Q), this is the quantity of material that will be ordered (exclusive).
+  /// @param ccap the cumulative capacity of material to be received in one active cycle. A ccap inventory policy allows for a cumulative capacity of material to be received in one active cycle. Once the cumulative capacity is recieved, the agent enters a dormant period. Also requires dormant distributions using dormant_dist.
   /// @param quantize If quantize is greater than zero, the policy will make
   /// exclusive, integral quantize kg requests.  Otherwise, single requests will
   /// be sent to fill the buffer's empty space.
@@ -121,6 +119,10 @@ class MatlBuyPolicy : public Trader {
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       TotalInvTracker* buf_tracker, std::string inv_policy,
                       double fill_behav, double req_at);
+  MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
+                      TotalInvTracker* buf_tracker, double throughput,
+                      double ccap,
+                      boost::shared_ptr<IntDistribution> dormant_dist);
   /// @}
 
   /// Instructs the policy to fill its buffer with requests on the given
@@ -212,6 +214,7 @@ class MatlBuyPolicy : public Trader {
   void set_fill_to(double x);
   /// requires buf_ already set
   void set_req_at(double x);
+  void set_ccap(double x);
   void set_quantize(double x);
   void set_throughput(double x);
   void init_active_dormant();
@@ -219,7 +222,7 @@ class MatlBuyPolicy : public Trader {
   ResBuf<Material>* buf_;
   TotalInvTracker* buf_tracker_;
   std::string name_, inv_policy;
-  double fill_to_, req_at_, quantize_, throughput_;
+  double fill_to_, req_at_, quantize_, throughput_, ccap_, cycle_total_inv_;
 
   int next_active_end_= 0;
   int next_dormant_end_= 0;

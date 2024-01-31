@@ -617,5 +617,40 @@ TEST_F(MatlBuyPolicyTests, RandomSizeAndFrequency) {
   delete a;
 }
 
+TEST_F(MatlBuyPolicyTests, CCap_Inventory) {
+  using cyclus::QueryResult;
+
+  double ccap = 2;
+  boost::shared_ptr<FixedIntDist> d_dist = boost::shared_ptr<FixedIntDist>(new FixedIntDist(2));
+
+  int dur = 8;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  TotalInvTracker buf_tracker({&inbuf});
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput, ccap, d_dist)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  // check that transactions happen as expected (at time steps 0 and 1, then 4 and 5)
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  EXPECT_EQ(0, qr.GetVal<int>("Time", 0));
+  EXPECT_EQ(1, qr.GetVal<int>("Time", 1));
+  EXPECT_EQ(4, qr.GetVal<int>("Time", 2));
+  EXPECT_EQ(5, qr.GetVal<int>("Time", 3));
+
+  delete a;
+}
+
 }
 }
