@@ -81,13 +81,19 @@ class TotalInvTracker {
     /// capacity of the TotalInvTracker, or the sum of each ResBuf's capacity,
     /// whichever is lower.
     inline double capacity() {
+        return std::min(total_capacity_bufs(), max_inv_size_);
+    };
+
+    // Returns the sum of the capacities of all buffers. Does not include the 
+    // capacity of the tracker
+    inline double total_capacity_bufs() {
         int num = num_bufs();
         double cap = 0;
         for (int i = 0; i < num; i++) {
             cap += bufs_[i]->capacity();
         }
-        return std::min(cap, max_inv_size_);
-    };
+        return cap;
+    }
 
     /// Returns the total capacity of the traker. Does not include ResBufs
     inline double tracker_capacity() { return max_inv_size_;}

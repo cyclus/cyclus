@@ -161,7 +161,7 @@ class MatlBuyPolicy : public Trader {
   }
 
   /// whether a request can be made
-  inline bool MakeReq() const { return buf_->quantity() <= req_at_; }
+  inline bool MakeReq() const { return buf_tracker_->quantity() <= req_at_; }
 
   /// whether trades will be denoted as exclusive or not
   inline bool Excl() const { 
