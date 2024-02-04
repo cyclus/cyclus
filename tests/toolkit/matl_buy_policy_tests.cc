@@ -42,7 +42,7 @@ class MatlBuyPolicyTests: public ::testing::Test {
 };
 
 TEST_F(MatlBuyPolicyTests, Init) {
-  double cap = 10;
+  double cap = 5;
   ResBuf<Material> buff;
   buff.capacity(cap);
   TotalInvTracker buff_tracker({&buff});
@@ -289,7 +289,7 @@ TEST_F(MatlBuyPolicyTests, TotalInvTracker) {
   EXPECT_EQ(buf_tracker.quantity(), 5);
   EXPECT_EQ(buf_tracker.space(), 0);
   EXPECT_EQ(inbuf.space(), inbuf.capacity() - inbuf.quantity());
-  EXPECT_EQ(buf_tracker.buf_space(&inbuf), 0);
+  EXPECT_EQ(buf_tracker.constrained_buf_space(&inbuf), 0);
 }
 
 TEST_F(MatlBuyPolicyTests, DefaultFixedActiveDormant) {

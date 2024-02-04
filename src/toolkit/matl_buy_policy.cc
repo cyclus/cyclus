@@ -20,11 +20,11 @@ MatlBuyPolicy::MatlBuyPolicy() :
     quantize_(-1),
     fill_to_(std::numeric_limits<double>::max()),
     req_at_(std::numeric_limits<double>::max()),
+    ccap_(-1),
+    cycle_total_inv_(0),
     active_dist_(NULL),
     dormant_dist_(NULL),
-    size_dist_(NULL),
-    ccap_(-1),
-    cycle_total_inv_(0){
+    size_dist_(NULL){
   Warn<EXPERIMENTAL_WARNING>(
       "MatlBuyPolicy is experimental and its API may be subject to change");
 }
@@ -118,7 +118,7 @@ void MatlBuyPolicy::init_active_dormant() {
     next_dormant_end_ = -1;
     LGH(INFO4) << "dormant length -1, always active" << std::endl;
     }
-  else if (ccap_ > 0) {
+  else if (use_cumulative_capacity()) {
     next_dormant_end_ = -1;
     LGH(INFO4) << "dormant length set at -1 for first active period of ccap cycle" << std::endl;
     }
@@ -280,14 +280,14 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     // finished dormant. starting buying and sample/set length of active period
     amt = TotalAvailable() * SampleRequestSize();
     SetNextActiveTime();
-    if (ccap_ < 0) {
+    if (!use_cumulative_capacity()) {
       SetNextDormantTime();
       LGH(INFO4) << "end of dormant period, next active time end: " << next_active_end_ << ", and next dormant time end: " << next_dormant_end_ << std::endl;
     }
     else {next_dormant_end_ = -1;}
   }
 
-  if ( ccap_ != -1 ) {
+  if (use_cumulative_capacity()) {
     amt = std::min(amt, ccap_ - cycle_total_inv_);
   }
 
@@ -329,13 +329,13 @@ void MatlBuyPolicy::AcceptMatlTrades(
                << it->first.request->commodity()  << std::endl;
     buf_->Push(it->second);
     // ccap handling
-    if (ccap_ > 0) {
+    if (use_cumulative_capacity()) {
       cycle_total_inv_ += it->second->quantity();
     }
   }
   // check if cumulative cap has been reached. If yes, then sample for dormant
   // length and reset cycle_total_inv
-  if ((ccap_ > 0) && ((ccap_ - cycle_total_inv_) < eps())) {
+  if (use_cumulative_capacity() && ((ccap_ - cycle_total_inv_) < eps())) {
     SetNextDormantTime();
     LGH(INFO3) << "cycle cumulative inventory has been reached. Dormant period will end at " << next_dormant_end_ << std::endl;
     cycle_total_inv_ = 0;
@@ -348,7 +348,7 @@ void MatlBuyPolicy::SetNextActiveTime() {
 };
 
 void MatlBuyPolicy::SetNextDormantTime() {
-  if (ccap_ > 0) {
+  if (use_cumulative_capacity()) {
     // need the +1 when not using next_active_end_ 
     next_dormant_end_ = (
       dormant_dist_->sample() + manager()->context()->time() + 1);

@@ -31,9 +31,10 @@ TEST_F(TotalInvTrackerTest, space) {
   EXPECT_EQ(multi_tracker_.space(), max_inv_size_ - qty1_ - qty2_);
 }
 
-TEST_F(TotalInvTrackerTest, buf_space) {
-  EXPECT_EQ(multi_tracker_.buf_space(&buf1_), buf1_.space());
-  EXPECT_EQ(multi_tracker_.buf_space(&buf2_), max_inv_size_ - qty1_ - qty2_);
+TEST_F(TotalInvTrackerTest, constrained_buf_space) {
+  EXPECT_EQ(multi_tracker_.constrained_buf_space(&buf1_), buf1_.space());
+  EXPECT_EQ(multi_tracker_.constrained_buf_space(&buf2_),
+            max_inv_size_ - qty1_ - qty2_);
 }
 
 TEST_F(TotalInvTrackerTest, empty) {

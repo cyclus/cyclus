@@ -67,9 +67,6 @@ class TotalInvTracker {
     /// @throws ValueError if the tracker has not been initialized (zero)
     inline double quantity() {
         int num = num_bufs();
-        if (num == 0) {
-            throw ValueError("TotalInvTracker has not been initialized, no buffers to track");
-        }
         qty_ = 0;
         for (int i = 0; i < num; i++) {
             qty_ += bufs_[i]->quantity();
@@ -82,7 +79,7 @@ class TotalInvTracker {
     /// whichever is lower.
     inline double capacity() {
         return std::min(total_capacity_bufs(), max_inv_size_);
-    };
+    }
 
     // Returns the sum of the capacities of all buffers. Does not include the 
     // capacity of the tracker
@@ -96,17 +93,19 @@ class TotalInvTracker {
     }
 
     /// Returns the total capacity of the traker. Does not include ResBufs
-    inline double tracker_capacity() { return max_inv_size_;}
+    inline double tracker_capacity() { return max_inv_size_; }
     
     /// Returns the remaining facility-wide space across all tracked ResBufs.
-    inline double space() {return std::max(0.0, capacity() - quantity());};
+    inline double space() { return std::max(0.0, capacity() - quantity()); }
 
     /// Returns the remaining space in the given ResBuf, considering the 
     /// facility-wide limitations.
-    inline double buf_space(ResBuf<Material>* buf) {return std::min(buf->space(), space());};
+    inline double constrained_buf_space(ResBuf<Material>* buf) {
+        return std::min(buf->space(), space());
+    }
 
     /// Returns true if there are no resources in any buffer
-    inline bool empty() {return quantity() == 0;};
+    inline bool empty() { return quantity() == 0; }
 
     /// Returns number of buffers being tracked
     /// @throws ValueError if the tracker has not been initialized (zero)

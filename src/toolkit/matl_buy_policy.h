@@ -164,8 +164,7 @@ class MatlBuyPolicy : public Trader {
   inline bool MakeReq() const { return buf_tracker_->quantity() <= req_at_; }
 
   /// whether trades will be denoted as exclusive or not
-  inline bool Excl() const { 
-    return quantize_ > 0; }
+  inline bool Excl() const { return quantize_ > 0; }
 
 
   /// the amount requested per each request
@@ -189,6 +188,8 @@ class MatlBuyPolicy : public Trader {
     return (next_dormant_end_ < 0 || next_active_end_ < 0);
   };
 
+  inline bool use_cumulative_capacity() {return ccap_ > 0;};
+
   /// Trader Methods
   /// @{
   virtual std::set<RequestPortfolio<Material>::Ptr> GetMatlRequests();
@@ -207,7 +208,7 @@ class MatlBuyPolicy : public Trader {
   };
 
   void set_manager(Agent* m);
-  void set_total_inv_tracker(TotalInvTracker* t);
+  void set_total_inv_tracker(TotalInvTracker* t = NULL);
   void set_inv_policy(std::string p, double x, 
                       double y = std::numeric_limits<double>::max());
   /// requires buf_ already set
