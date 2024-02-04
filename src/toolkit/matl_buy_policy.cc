@@ -57,10 +57,11 @@ void MatlBuyPolicy::set_total_inv_tracker(TotalInvTracker* t) {
 
 void MatlBuyPolicy::set_inv_policy(std::string inv_policy, double fill, double req_at) {
   set_req_at(req_at);
-  if ((inv_policy == "sS") || (inv_policy == "Ss")) {
+  std::transform(inv_policy.begin(), inv_policy.end(), inv_policy.begin(), ::tolower);
+  if ((inv_policy == "ss")) {
     set_fill_to(fill);
   }
-  else if ((inv_policy == "RQ") || (inv_policy == "QR")) {
+  else if ((inv_policy == "rq") || (inv_policy == "qr")) {
     set_quantize(fill);
     // maximum amount that an RQ policy could achieve is req_at + fill
     set_fill_to(req_at + fill);
@@ -286,8 +287,8 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
     else {next_dormant_end_ = -1;}
   }
 
-  if ((ccap_ != -1) && ((cycle_total_inv_ + amt) > ccap_)) {
-    amt = ccap_ - cycle_total_inv_;
+  if ( ccap_ != -1 ) {
+    amt = std::min(amt, ccap_ - cycle_total_inv_);
   }
 
   if (amt < eps())

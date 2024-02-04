@@ -1898,7 +1898,7 @@ class SnapshotFilter(CodeGeneratorFilter):
         CYCNS + '::toolkit::ResourceBuff': None,
         CYCNS + '::toolkit::ResBuf': None,
         CYCNS + '::toolkit::ResMap': '{var}.obj_ids()',
-        CYCNS + '::Toolkit::TotalInvTracker': None,
+        CYCNS + '::toolkit::TotalInvTracker': None,
         }
 
 

@@ -115,7 +115,8 @@ class TotalInvTracker {
         if (num == 0) {
             throw ValueError("TotalInvTracker has not been initialized, no buffers to track");
         }
-        return num;};
+        return num;
+    }
 
     /// Change the total capacity across all ResBufs. The new capacity must be
     /// greater than the current quantity.
