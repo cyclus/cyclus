@@ -617,7 +617,7 @@ TEST_F(MatlBuyPolicyTests, RandomSizeAndFrequency) {
   delete a;
 }
 
-TEST_F(MatlBuyPolicyTests, CCap_Inventory) {
+TEST_F(MatlBuyPolicyTests, Cumulative_Cap_Inventory) {
   using cyclus::QueryResult;
 
   double ccap = 2;

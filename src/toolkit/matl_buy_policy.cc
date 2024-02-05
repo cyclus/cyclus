@@ -20,7 +20,7 @@ MatlBuyPolicy::MatlBuyPolicy() :
     quantize_(-1),
     fill_to_(std::numeric_limits<double>::max()),
     req_at_(std::numeric_limits<double>::max()),
-    ccap_(-1),
+    cumulative_cap_(-1),
     cycle_total_inv_(0),
     active_dist_(NULL),
     dormant_dist_(NULL),
@@ -81,9 +81,9 @@ void MatlBuyPolicy::set_req_at(double x) {
   req_at_ = x;
 }
 
-void MatlBuyPolicy::set_ccap(double x) {
+void MatlBuyPolicy::set_cumulative_cap(double x) {
   assert(x > 0);
-  ccap_ = x;
+  cumulative_cap_ = x;
 }
 
 void MatlBuyPolicy::set_quantize(double x) {
@@ -120,7 +120,7 @@ void MatlBuyPolicy::init_active_dormant() {
     }
   else if (use_cumulative_capacity()) {
     next_dormant_end_ = -1;
-    LGH(INFO4) << "dormant length set at -1 for first active period of ccap cycle" << std::endl;
+    LGH(INFO4) << "dormant length set at -1 for first active period of cumulative capacity cycle" << std::endl;
     }
   else {
     SetNextDormantTime();
@@ -201,14 +201,14 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf, 
                                    std::string name,
                                    TotalInvTracker* buf_tracker,
-                                   double throughput, double ccap,
+                                   double throughput, double cumulative_cap,
                                    boost::shared_ptr<IntDistribution> dormant_dist) {
   set_manager(manager);
   buf_ = buf;
   name_ = name;
   set_total_inv_tracker(buf_tracker);
   set_throughput(throughput);
-  set_ccap(ccap);
+  set_cumulative_cap(cumulative_cap);
   dormant_dist_ = dormant_dist;
   init_active_dormant();
   return *this;
@@ -255,40 +255,55 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   rsrc_commods_.clear();
   std::set<RequestPortfolio<Material>::Ptr> ports;
 
-  // (s,S)/(R,Q) inventory policy handling
-  if (!MakeReq()) {
-    return ports;
-  }
-
   double amt;
 
   int current_time_ = manager()->context()->time();
 
-  // period inventory handling
-  if (never_dormant() || current_time_ < next_active_end_) {
-    // currently in the middle of active buying period
+  // Three step process to determine size of amount and reset any necessary
+  // cycle times
+
+  // Step 1: determine if inventory policy allows for a request to be made
+  // Handing for (s,S)/(R,Q) inventory policies
+  if (!MakeReq()) {
+    return ports;
+  }
+  // Handling for cumulative capacity inventory policy
+  // buy while not in dormant, don't buy while dormant. Make sure the request
+  // is less than or equal to the space remaining in the cycle capacity
+  // (cumulative cap minus current cycle inventory)
+  if (use_cumulative_capacity()) {
+    if (no_cycle_end_time() || current_time_ == next_dormant_end_){
+      amt = std::min((TotalAvailable() * SampleRequestSize()),
+                     (cumulative_cap_ - cycle_total_inv_));
+    }
+    else if (current_time_ < next_dormant_end_) {
+      amt = 0;
+      LGH(INFO3) << "in dormant period, no request" << std::endl;
+      }
+  }
+  // Step 2: determine if active/dormant cycle times allow for a request
+  // if no cycles, or if in the middle of active period, or if dormant period
+  // just ended, then request
+  else if (no_cycle_end_time() || (current_time_ < next_active_end_) || 
+           (current_time_ == next_dormant_end_)) {
     amt = TotalAvailable() * SampleRequestSize();
   }
+  // if in the middle of dormant period, then don't request
   else if (current_time_ < next_dormant_end_) {
-    // finished active. starting dormancy and sample/set length of dormant period
     amt = 0;
     LGH(INFO3) << "in dormant period, no request" << std::endl;
   }
-  // the following is an if rather than if-else statement because if dormant
-  // length is zero, buy policy should return to active immediately
+
+  // Step 3: Finally, determine if active/dormant cycle times need to be reset. 
+  // If reaching the end of a cumulative cap cycle, set next_dormant_end_ = -1,
+  // otherwise sample for next dormant.
   if (current_time_ == next_dormant_end_) {
-    // finished dormant. starting buying and sample/set length of active period
-    amt = TotalAvailable() * SampleRequestSize();
     SetNextActiveTime();
-    if (!use_cumulative_capacity()) {
+    if (use_cumulative_capacity()) { next_dormant_end_ = -1; }
+    else { 
       SetNextDormantTime();
       LGH(INFO4) << "end of dormant period, next active time end: " << next_active_end_ << ", and next dormant time end: " << next_dormant_end_ << std::endl;
-    }
-    else {next_dormant_end_ = -1;}
-  }
-
-  if (use_cumulative_capacity()) {
-    amt = std::min(amt, ccap_ - cycle_total_inv_);
+      }
   }
 
   if (amt < eps())
@@ -328,17 +343,18 @@ void MatlBuyPolicy::AcceptMatlTrades(
     LGH(INFO3) << "got " << it->second->quantity() << " kg of "
                << it->first.request->commodity()  << std::endl;
     buf_->Push(it->second);
-    // ccap handling
+    // cumulative capacity handling
     if (use_cumulative_capacity()) {
       cycle_total_inv_ += it->second->quantity();
     }
   }
   // check if cumulative cap has been reached. If yes, then sample for dormant
   // length and reset cycle_total_inv
-  if (use_cumulative_capacity() && ((ccap_ - cycle_total_inv_) < eps())) {
-    SetNextDormantTime();
-    LGH(INFO3) << "cycle cumulative inventory has been reached. Dormant period will end at " << next_dormant_end_ << std::endl;
-    cycle_total_inv_ = 0;
+  if (use_cumulative_capacity() && (
+    (cumulative_cap_ - cycle_total_inv_) < eps())) {
+      SetNextDormantTime();
+      LGH(INFO3) << "cycle cumulative inventory has been reached. Dormant period will end at " << next_dormant_end_ << std::endl;
+      cycle_total_inv_ = 0;
   }
 }
 
