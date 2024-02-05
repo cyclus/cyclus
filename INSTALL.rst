@@ -34,7 +34,7 @@ Installation
 
 Before going further with the installation procedure be sure you have installed
 all the required dependencies listed above. We have provided detailed
-instructions for :doc:`installing dependencies <DEPENDENCIES.rst>`_ for the major supported
+instructions for :doc:`here <DEPENDENCIES>`.for the major supported
 systems.
 
 
