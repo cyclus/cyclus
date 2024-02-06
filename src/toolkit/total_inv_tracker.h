@@ -53,14 +53,14 @@ class TotalInvTracker {
     /// infinite capacity unless explicitly changed.
     void Init(std::vector<ResBuf<Material>*> bufs, 
               double max_inv_size = std::numeric_limits<double>::max()) {
-                if (bufs.size() == 0) {
-                    throw ValueError("TotalInvTracker must be initialized with at least one ResBuf");
-                }
-                bufs_ = bufs;
-                if (max_inv_size <= 0) {
-                    throw ValueError("TotalInvTracker must be initialized with a positive capacity");
-                }
-                max_inv_size_ = max_inv_size;
+        if (bufs.size() == 0) {
+            throw ValueError("TotalInvTracker must be initialized with at least one ResBuf");
+        }
+        bufs_ = bufs;
+        if (max_inv_size <= 0) {
+            throw ValueError("TotalInvTracker must be initialized with a positive capacity");
+        }
+        max_inv_size_ = max_inv_size;
     }
     
     /// Returns the total quantity of all tracked ResBufs.
