@@ -202,9 +202,13 @@ class MatlBuyPolicy : public Trader {
 
   inline bool no_cycle_end_time() {
     return (next_dormant_end_ < 0 || next_active_end_ < 0);
-  };
+  }
 
-  inline bool use_cumulative_capacity() {return cumulative_cap_ > 0;};
+  inline bool dormant(int time) { 
+    return (time >= next_active_end_ && time < next_dormant_end_); 
+  }
+
+  inline bool use_cumulative_capacity() { return cumulative_cap_ > 0; }
 
   /// Trader Methods
   /// @{
@@ -216,6 +220,7 @@ class MatlBuyPolicy : public Trader {
   void SetNextActiveTime();
   void SetNextDormantTime();
   double SampleRequestSize();
+  void CheckActiveDormantCumulativeTimes();
 
  private:
   struct CommodDetail {

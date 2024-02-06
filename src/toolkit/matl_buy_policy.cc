@@ -73,6 +73,7 @@ void MatlBuyPolicy::set_inv_policy(std::string inv_policy, double fill, double r
 
 void MatlBuyPolicy::set_fill_to(double x) {
   assert(x > 0);
+  assert(x <= buf_->capacity());
   fill_to_ = x;
 }
 
@@ -255,56 +256,18 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   rsrc_commods_.clear();
   std::set<RequestPortfolio<Material>::Ptr> ports;
 
-  double amt;
+  double amt = 0;
 
   int current_time_ = manager()->context()->time();
 
-  // Three step process to determine size of amount and reset any necessary
-  // cycle times
+  double max_request_amt = use_cumulative_capacity() ? cumulative_cap_ - cycle_total_inv_ : std::numeric_limits<double>::max();
 
-  // Step 1: determine if inventory policy allows for a request to be made
-  // Handing for (s,S)/(R,Q) inventory policies
-  if (!MakeReq()) {
-    return ports;
+  if (MakeReq() && !dormant(current_time_)) {
+    amt = std::min(TotalAvailable() * SampleRequestSize(), max_request_amt);
   }
-  // Handling for cumulative capacity inventory policy
-  // buy while not in dormant, don't buy while dormant. Make sure the request
-  // is less than or equal to the space remaining in the cycle capacity
-  // (cumulative cap minus current cycle inventory)
-  if (use_cumulative_capacity()) {
-    if (no_cycle_end_time() || current_time_ == next_dormant_end_){
-      amt = std::min((TotalAvailable() * SampleRequestSize()),
-                     (cumulative_cap_ - cycle_total_inv_));
-    }
-    else if (current_time_ < next_dormant_end_) {
-      amt = 0;
-      LGH(INFO3) << "in dormant period, no request" << std::endl;
-      }
-  }
-  // Step 2: determine if active/dormant cycle times allow for a request
-  // if no cycles, or if in the middle of active period, or if dormant period
-  // just ended, then request
-  else if (no_cycle_end_time() || (current_time_ < next_active_end_) || 
-           (current_time_ == next_dormant_end_)) {
-    amt = TotalAvailable() * SampleRequestSize();
-  }
-  // if in the middle of dormant period, then don't request
-  else if (current_time_ < next_dormant_end_) {
-    amt = 0;
-    LGH(INFO3) << "in dormant period, no request" << std::endl;
-  }
+  else { LGH(INFO3) << "in dormant period, no request" << std::endl; }
 
-  // Step 3: Finally, determine if active/dormant cycle times need to be reset. 
-  // If reaching the end of a cumulative cap cycle, set next_dormant_end_ = -1,
-  // otherwise sample for next dormant.
-  if (current_time_ == next_dormant_end_) {
-    SetNextActiveTime();
-    if (use_cumulative_capacity()) { next_dormant_end_ = -1; }
-    else { 
-      SetNextDormantTime();
-      LGH(INFO4) << "end of dormant period, next active time end: " << next_active_end_ << ", and next dormant time end: " << next_dormant_end_ << std::endl;
-      }
-  }
+  CheckActiveDormantCumulativeTimes();
 
   if (amt < eps())
     return ports;
@@ -381,6 +344,17 @@ double MatlBuyPolicy::SampleRequestSize() {
   return size_dist_->sample();
 }
 
+void MatlBuyPolicy::CheckActiveDormantCumulativeTimes() {
+  if (manager()->context()->time() == next_dormant_end_) {
+    SetNextActiveTime();
+    if (use_cumulative_capacity()) { next_dormant_end_ = -1; }
+    else { 
+      SetNextDormantTime();
+      LGH(INFO4) << "end of dormant period, next active time end: " << next_active_end_ << ", and next dormant time end: " << next_dormant_end_ << std::endl;
+      }
+  }
+  return;
+}
 
 }  // namespace toolkit
 }  // namespace cyclus

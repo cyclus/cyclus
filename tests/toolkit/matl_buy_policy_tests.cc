@@ -266,7 +266,8 @@ TEST_F(MatlBuyPolicyTests, TotalInvTracker) {
 
   cyclus::CompMap cm;
   cm[1001] = 1;
-  cyclus::Material::Ptr mat = cyclus::Material::Create(fac, 2, cyclus::Composition::CreateFromAtom(cm));
+  double mat_size = 2;
+  cyclus::Material::Ptr mat = cyclus::Material::Create(fac, mat_size, cyclus::Composition::CreateFromAtom(cm));
   otherbuf.Push(mat);
 
   double total_capacity = 5;
@@ -276,9 +277,9 @@ TEST_F(MatlBuyPolicyTests, TotalInvTracker) {
         .Set("commod1").Start();
 
   EXPECT_FALSE(buf_tracker.empty());
-  EXPECT_EQ(buf_tracker.quantity(), 2);
+  EXPECT_EQ(buf_tracker.quantity(), mat_size);
   EXPECT_EQ(buf_tracker.capacity(), total_capacity);
-  EXPECT_EQ(buf_tracker.space(), total_capacity - 2);
+  EXPECT_EQ(buf_tracker.space(), total_capacity - mat_size);
 
   EXPECT_NO_THROW(sim.Run());
 
@@ -286,7 +287,7 @@ TEST_F(MatlBuyPolicyTests, TotalInvTracker) {
   int n_trans = qr.rows.size();
   EXPECT_EQ(n_trans, 3);
 
-  EXPECT_EQ(buf_tracker.quantity(), 5);
+  EXPECT_EQ(buf_tracker.quantity(), total_capacity);
   EXPECT_EQ(buf_tracker.space(), 0);
   EXPECT_EQ(inbuf.space(), inbuf.capacity() - inbuf.quantity());
   EXPECT_EQ(buf_tracker.constrained_buf_space(&inbuf), 0);
