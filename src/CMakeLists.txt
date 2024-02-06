@@ -98,6 +98,8 @@ copy_when_diff(
 ###########################################################
 ############# cython configuration ########################
 ###########################################################
+
+SET(PreCythonLibs ${LIBS})
 if(Cython_FOUND)
     # some setup
     set(cython_include_directories "")
@@ -132,7 +134,7 @@ if(Cython_FOUND)
         set(_generated_h "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc.h")
         set(_generated_cc "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc.gen")
         set(_h_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.h")
-        set(_cc_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc")
+        set(_cc_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cpp")
         set_source_files_properties(${_cc_file} PROPERTIES GENERATED TRUE)
 
         EXECUTE_PROCESS(COMMAND ${CYTHON_EXECUTABLE} --cplus
@@ -143,6 +145,23 @@ if(Cython_FOUND)
         IF(NOT "${res_var_c}" STREQUAL "0")
             message(FATAL_ERROR "Cython compilation of ${file} failed!")
         ENDIF()
+
+        ADD_LIBRARY(${name} ${_cc_file})
+        SET_TARGET_PROPERTIES(${name} PROPERTIES 
+          OUTPUT_NAME "${name}"
+          PREFIX ""
+          INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+          INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+          )
+        SET(LIBS ${LIBS} ${name})
+
+        TARGET_LINK_LIBRARIES(${name} dl ${PreCythonLibs})
+
+        INSTALL(
+          TARGETS ${name}
+          LIBRARY DESTINATION lib
+          )
+
         copy_when_diff(${_generated_h} ${_h_file})
         copy_when_diff(${_generated_cc} ${_cc_file})
     endforeach()
