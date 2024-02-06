@@ -137,7 +137,7 @@ RUN lcov -c --rc lcov_branch_coverage=1 -d build/src -o initial_coverage.info --
     lcov --remove total_coverage.info -o src_coverage.info --rc lcov_branch_coverage=1 "/usr/**" "/opt/**" && \
     mkdir -p coverage/html && \
     genhtml  src_coverage.info --output-directory coverage/html --branch-coverage
-RUN curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin && \
+RUN curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin
     # coveralls
 
 FROM ${pkg_mgr}-deps as cyclus
