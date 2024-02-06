@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - '.github/workflows/build_test_publish.yml'
+      - '.github/workflows/publish_latest.yml'
       - 'docker/**'
   push:
     branches:
@@ -14,9 +14,6 @@ on:
 jobs:
   build-dependency-img:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     strategy:
       matrix:
