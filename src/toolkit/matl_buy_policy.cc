@@ -79,7 +79,7 @@ void MatlBuyPolicy::set_fill_to(double x) {
 
 void MatlBuyPolicy::set_req_at(double x) {
   assert(x >= 0);
-  req_at_ = x;
+  req_at_ = std::min(x, buf_->capacity());
 }
 
 void MatlBuyPolicy::set_cumulative_cap(double x) {
@@ -332,8 +332,7 @@ void MatlBuyPolicy::SetNextDormantTime() {
     next_dormant_end_ = (
       dormant_dist_->sample() + manager()->context()->time() + 1);
   }
-  else if (next_dormant_end_ < 0) {}
-  else {
+  else if (next_dormant_end_ >= 0) {
     next_dormant_end_ = dormant_dist_->sample() + 
                         std::max(next_active_end_, 1);
   }
@@ -346,9 +345,10 @@ double MatlBuyPolicy::SampleRequestSize() {
 
 void MatlBuyPolicy::CheckActiveDormantCumulativeTimes() {
   if (manager()->context()->time() == next_dormant_end_) {
-    SetNextActiveTime();
     if (use_cumulative_capacity()) { next_dormant_end_ = -1; }
     else { 
+        SetNextActiveTime();
+
       SetNextDormantTime();
       LGH(INFO4) << "end of dormant period, next active time end: " << next_active_end_ << ", and next dormant time end: " << next_dormant_end_ << std::endl;
       }
