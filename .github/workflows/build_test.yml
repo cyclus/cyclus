@@ -6,14 +6,18 @@ on:
   pull_request:
     paths-ignore:
       - '.github/workflows/publish_latest.yml'
+      - '.github/workflows/publish_release.yml'
       - '.github/workflows/changelog_test.yml'
+      - '.github/workflows/code_coverage.yml'
       - 'docker/**'
       - 'doc/**'
       - 'CHANGELOG.rst'
   push:
     paths-ignore:
       - '.github/workflows/publish_latest.yml'
+      - '.github/workflows/publish_release.yml'
       - '.github/workflows/changelog_test.yml'
+      - '.github/workflows/code_coverage.yml'
       - 'docker/**'
       - 'doc/**'
       - 'CHANGELOG.rst'

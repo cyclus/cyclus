@@ -113,21 +113,21 @@ ENV CPP /opt/conda/bin/x86_64-conda_cos6-linux-gnu-cpp
 
 FROM apt-deps as apt-coverage-deps
 RUN apt install -y lcov curl
+ENV GCOV /usr/bin/gcov
 
 FROM conda-deps as conda-coverage-deps
 RUN mamba install -y lcov curl
+ENV GCOV /opt/conda/bin/x86_64-conda-linux-gnu-gcov
 
 FROM ${pkg_mgr}-coverage-deps as cyclus-coverage
-ARG GITHUB_TOKEN
 ARG make_cores=2
-# ENV COVERALLS_REPO_TOKEN ${GITHUB_TOKEN}
 
 COPY . /cyclus
 WORKDIR /cyclus
 RUN python install.py -j 2 --build-type=Release --core-version 999999.999999 --allow-milps --code_coverage
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
-RUN lcov -c --rc lcov_branch_coverage=1 -d build/src -o initial_coverage.info --initial && \
+RUN lcov -c --rc lcov_branch_coverage=1 -d build/src -o initial_coverage.info --gcov-tool ${GCOV} --initial && \
     cyclus_unit_tests && \
     cd tests && \
     python -m pytest --ignore test_main.py && \
@@ -137,8 +137,9 @@ RUN lcov -c --rc lcov_branch_coverage=1 -d build/src -o initial_coverage.info --
     lcov --remove total_coverage.info -o src_coverage.info --rc lcov_branch_coverage=1 "/usr/**" "/opt/**" && \
     mkdir -p coverage/html && \
     genhtml  src_coverage.info --output-directory coverage/html --branch-coverage
-RUN curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin
-    # coveralls
+RUN --mount=type=secret,id=GITHUB_TOKEN \
+    curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin && \
+    coveralls report src_coverage.info --repo-token ${GITHUB_TOKEN} --format=lcov --compare-ref=main -p --job-flag ${ubuntu-version}-${pkg_mgr}
 
 FROM ${pkg_mgr}-deps as cyclus
 ARG make_cores=2

@@ -5,7 +5,10 @@ on:
   workflow_dispatch:
   pull_request:
     paths-ignore:
-      # - '.github/workflows/**'
+      - '.github/workflows/build_test.yml'
+      - '.github/workflows/publish_latest.yml'
+      - '.github/workflows/publish_release.yml'
+      - '.github/workflows/changelog_test.yml'
       - 'docker/**'
       - 'doc/**'
       - 'CHANGELOG.rst'
@@ -53,9 +56,14 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
+          secret-envs: |
+            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
         
-      - name: debug
-        run: |
-          pwd
-          ls
-          ls cyclus
+  finish-coveralls:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@v2
+      with:
+        parallel-finished: true
