@@ -130,6 +130,13 @@ class TotalInvTracker {
         max_inv_size_ = cap;
     }
 
+    bool buf_in_tracker(ResBuf<Material>* buf) {
+        for (int i = 0; i < num_bufs(); i++) {
+            if (bufs_[i] == buf) { return true; }
+        }
+        return false;
+    }
+
     private:
     double max_inv_size_;
     double qty_;

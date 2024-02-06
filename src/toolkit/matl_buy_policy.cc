@@ -50,6 +50,11 @@ void MatlBuyPolicy::set_total_inv_tracker(TotalInvTracker* t) {
     std::vector<ResBuf<Material>*> bufs = {buf_};
     buf_tracker_->Init(bufs, buf_->capacity());
   }
+  else if (!t->buf_in_tracker(buf_)) {
+    std::stringstream ss;
+    ss << "TotalInvTracker does not contain ResBuf used in buy policy";
+    throw ValueError(ss.str());
+  }
   else {
     buf_tracker_ = t;
   }
@@ -73,8 +78,7 @@ void MatlBuyPolicy::set_inv_policy(std::string inv_policy, double fill, double r
 
 void MatlBuyPolicy::set_fill_to(double x) {
   assert(x > 0);
-  assert(x <= buf_->capacity());
-  fill_to_ = x;
+  fill_to_ = std::min(x, buf_->capacity());
 }
 
 void MatlBuyPolicy::set_req_at(double x) {
@@ -84,7 +88,7 @@ void MatlBuyPolicy::set_req_at(double x) {
 
 void MatlBuyPolicy::set_cumulative_cap(double x) {
   assert(x > 0);
-  cumulative_cap_ = x;
+  cumulative_cap_ = std::min(x, buf_->capacity());
 }
 
 void MatlBuyPolicy::set_quantize(double x) {
