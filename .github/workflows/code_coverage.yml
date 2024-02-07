@@ -56,9 +56,10 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            coveralls_build_number=${{ github.run_id }}
           secrets: |
-            repo_token=${{ secrets.GITHUB_TOKEN }}
+            "coveralls_flags=--compare-ref ${{ github.base_ref }} --service github \
+            --parallel --job-flag ${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }} \
+            --build-number ${{ github.run_id }} -r ${{ secrets.GITHUB_TOKEN }}"
         
   finish-coveralls:
     needs: build-and-test

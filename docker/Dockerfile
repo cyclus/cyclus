@@ -121,7 +121,6 @@ ENV GCOV /opt/conda/bin/x86_64-conda-linux-gnu-gcov
 
 FROM ${pkg_mgr}-coverage-deps as cyclus-coverage
 ARG make_cores=2
-ARG coveralls_build_number=1
 
 COPY . /cyclus
 WORKDIR /cyclus
@@ -135,11 +134,9 @@ RUN lcov -c --rc lcov_branch_coverage=1 -d build/src -o initial_coverage.info --
     lcov -c --rc lcov_branch_coverage=1 -d build/src -o test_coverage.info --gcov-tool ${GCOV} && \
     lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info --rc lcov_branch_coverage=1 -o total_coverage.info && \
     lcov --remove total_coverage.info -o src_coverage.info --rc lcov_branch_coverage=1 "/usr/**" "/opt/**"
-RUN --mount=type=secret,id=repo_token \
+RUN --mount=type=secret,id=coveralls_flags \
     curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin && \
-    coveralls report src_coverage.info --format lcov --compare-ref main \
-        -p --job-flag ${ubuntu-version}-${pkg_mgr} --build-number ${coveralls_build_number} \
-        -r $(cat /run/secrets/repo_token)
+    coveralls report src_coverage.info --format lcov $(cat /run/secrets/coveralls_flags)
 
 FROM ${pkg_mgr}-deps as cyclus
 ARG make_cores=2
