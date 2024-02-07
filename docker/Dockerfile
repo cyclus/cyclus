@@ -127,16 +127,15 @@ WORKDIR /cyclus
 RUN python install.py -j 2 --build-type=Release --core-version 999999.999999 --allow-milps --code_coverage
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
-RUN --mount=type=bind,target=. \
-    --mount=type=secret,id=GITHUB_TOKEN \
+RUN --mount=type=secret,id=GITHUB_TOKEN \
     lcov -c --rc lcov_branch_coverage=1 -d build/src -o initial_coverage.info --gcov-tool ${GCOV} --initial && \
     cyclus_unit_tests && \
     cd tests && python -m pytest --ignore test_main.py && cd .. && \
     lcov -c --rc lcov_branch_coverage=1 -d build/src -o test_coverage.info --gcov-tool ${GCOV} && \
     lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info --rc lcov_branch_coverage=1 -o total_coverage.info && \
-    lcov --remove total_coverage.info -o /cyclus/src_coverage.info --rc lcov_branch_coverage=1 "/usr/**" "/opt/**" && \
+    lcov --remove total_coverage.info -o src_coverage.info --rc lcov_branch_coverage=1 "/usr/**" "/opt/**" && \
     curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin && \
-    COVERALLS_REPO_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) coveralls report /cyclus/src_coverage.info --format=lcov --compare-ref=main -p --job-flag ${ubuntu-version}-${pkg_mgr}
+    COVERALLS_REPO_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) coveralls report src_coverage.info --format=lcov --compare-ref=main -p --job-flag ${ubuntu-version}-${pkg_mgr}
 
 FROM ${pkg_mgr}-deps as cyclus
 ARG make_cores=2
