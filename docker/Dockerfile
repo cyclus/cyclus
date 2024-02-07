@@ -129,17 +129,13 @@ ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 RUN lcov -c --rc lcov_branch_coverage=1 -d build/src -o initial_coverage.info --gcov-tool ${GCOV} --initial && \
     cyclus_unit_tests && \
-    cd tests && \
-    python -m pytest --ignore test_main.py && \
-    cd .. && \
+    cd tests && python -m pytest --ignore test_main.py && cd .. && \
     lcov -c --rc lcov_branch_coverage=1 -d build/src -o test_coverage.info --gcov-tool ${GCOV} && \
     lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info --rc lcov_branch_coverage=1 -o total_coverage.info && \
-    lcov --remove total_coverage.info -o src_coverage.info --rc lcov_branch_coverage=1 "/usr/**" "/opt/**" && \
-    mkdir -p coverage/html && \
-    genhtml src_coverage.info --output-directory coverage/html --branch-coverage
+    lcov --remove total_coverage.info -o /cyclus/src_coverage.info --rc lcov_branch_coverage=1 "/usr/**" "/opt/**"
 RUN --mount=type=bind,target=. \
     --mount=type=secret,id=GITHUB_TOKEN \
-    ls /run/secrets && ls /cyclus
+    ls /run/secrets && ls /cyclus && pwd
 RUN --mount=type=bind,target=. \
     --mount=type=secret,id=GITHUB_TOKEN \
     curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin && \
