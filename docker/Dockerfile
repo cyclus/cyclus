@@ -121,10 +121,10 @@ ENV GCOV /opt/conda/bin/x86_64-conda-linux-gnu-gcov
 
 FROM ${pkg_mgr}-coverage-deps as cyclus-coverage
 ARG make_cores=2
+ARG ci_run_id=1
 
 COPY . /cyclus
 WORKDIR /cyclus
-RUN 
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 RUN python install.py -j 2 --build-type=Release --core-version 999999.999999 --allow-milps --code_coverage
@@ -135,10 +135,10 @@ RUN lcov -c --rc lcov_branch_coverage=1 -d build/src -o initial_coverage.info --
     lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info --rc lcov_branch_coverage=1 -o total_coverage.info && \
     lcov --remove total_coverage.info -o src_coverage.info --rc lcov_branch_coverage=1 "/usr/**" "/opt/**"
 RUN --mount=type=secret,id=GITHUB_TOKEN \
-    --mount=type=secret,id=RUN_ID \
+    cat /run/secrets/GITHUB_TOKEN && \
     curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin && \
     coveralls report src_coverage.info --format=lcov --compare-ref=main \
-        -p --job-flag ${ubuntu-version}-${pkg_mgr} --build-number $(cat /run/secrets/RUN_ID) \
+        -p --job-flag ${ubuntu-version}-${pkg_mgr} --build-number ${ci_run_id} \
         -r $(cat /run/secrets/GITHUB_TOKEN)
 
 FROM ${pkg_mgr}-deps as cyclus
