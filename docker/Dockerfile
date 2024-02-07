@@ -137,7 +137,11 @@ RUN lcov -c --rc lcov_branch_coverage=1 -d build/src -o initial_coverage.info --
     lcov --remove total_coverage.info -o src_coverage.info --rc lcov_branch_coverage=1 "/usr/**" "/opt/**" && \
     mkdir -p coverage/html && \
     genhtml src_coverage.info --output-directory coverage/html --branch-coverage
-RUN --mount=type=secret,id=GITHUB_TOKEN \
+RUN --mount=type=bind,target=. \
+    --mount=type=secret,id=GITHUB_TOKEN \
+    ls /run/secrets
+RUN --mount=type=bind,target=. \
+    --mount=type=secret,id=GITHUB_TOKEN \
     curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin && \
     COVERALLS_REPO_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) coveralls report src_coverage.info --format=lcov --compare-ref=main -p --job-flag ${ubuntu-version}-${pkg_mgr}
 
