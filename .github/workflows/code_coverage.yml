@@ -58,6 +58,7 @@ jobs:
             ubuntu_version=${{ matrix.ubuntu_versions }}
           secret-envs: |
             GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            RUN_ID=${{ github.run_id }}
         
   finish-coveralls:
     needs: build-and-test
@@ -67,3 +68,4 @@ jobs:
       uses: coverallsapp/github-action@v2
       with:
         parallel-finished: true
+        
