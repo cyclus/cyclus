@@ -52,20 +52,29 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache
           cache-to: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache,mode=max
           file: docker/Dockerfile
-          target: cyclus-coverage
+          target: coverage-report
+          outputs: type=local,dest=${HOME}
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-          secrets: |
-            "coveralls_flags=--parallel --job-flag ${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }} 
-            --build-number ${{ github.run_id }} -r ${{ secrets.GITHUB_TOKEN }}"
+
+      - name: debug
+        run: ls ${HOME}
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          flag-name: ${{ join(matrix.*, '-') }}
+          parallel: true
+          file: ${HOME}/src_coverage.info
+          format: lcov
+          compare-ref: main
         
   finish-coveralls:
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
-    - name: Coveralls Done
-      run: |
-        curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz
-        ./coveralls done --build-number ${{ github.run_id }} -r ${{ secrets.GITHUB_TOKEN }}
-        
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@v2
+      with:
+        parallel-finished: true
