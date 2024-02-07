@@ -130,22 +130,23 @@ if(Cython_FOUND)
     foreach(file ${CYCLUS_CORE_CYTHON_FILES})
         message(STATUS "Cython Compiling ${file}")
         get_filename_component(name ${file} NAME_WE)
-        set(_generated_h "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cpp.h")
-        set(_generated_cpp "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cpp.gen")
+        set(_generated_h "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc.h")
+        set(_generated_cc "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc.gen")
         set(_h_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.h")
-        set(_cpp_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cpp")
+        set(_cc_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc")
         set_source_files_properties(${_cc_file} PROPERTIES GENERATED TRUE)
 
         EXECUTE_PROCESS(COMMAND ${CYTHON_EXECUTABLE} --cplus
             ${include_directory_arg} ${version_arg}
             ${cython_debug_arg} ${CYTHON_FLAGS}
-            --output-file  ${_generated_cpp} ${file}
+            --output-file  ${_generated_cc} ${file}
             RESULT_VARIABLE res_var_c)
         IF(NOT "${res_var_c}" STREQUAL "0")
             message(FATAL_ERROR "Cython compilation of ${file} failed!")
         ENDIF()
 
-        ADD_LIBRARY(${name} ${_cpp_file})
+        ADD_LIBRARY(${name} ${_cc_file})
+        SET(CythonModuleSrc ${CythonModuleSrc} ${_cc_file})
         SET_TARGET_PROPERTIES(${name} PROPERTIES 
           OUTPUT_NAME "${name}"
           PREFIX ""
@@ -166,7 +167,7 @@ if(Cython_FOUND)
           )
 
         copy_when_diff(${_generated_h} ${_h_file})
-        copy_when_diff(${_generated_cpp} ${_cpp_file})
+        copy_when_diff(${_generated_cc} ${_cc_file})
     endforeach()
 endif(Cython_FOUND)
 ###########################################################
@@ -197,6 +198,7 @@ foreach(ccfile ${CYCLUS_COIN_SRC})
 endforeach()
 list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc)
 list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc)
+list(REMOVE_ITEM cc_files ${CythonModuleSrc})
 
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${cc_files})
 

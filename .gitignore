@@ -62,14 +62,12 @@ Debug/
 # generated cython ignores
 *.cc.gen
 *.cc.h
-*.cpp.gen
-*.cpp.h
 *.h.gen
-src/eventhooks.cpp
+src/eventhooks.cc
 src/eventhooks.h
-src/pyinfile.cpp
+src/pyinfile.cc
 src/pyinfile.h
-src/pymodule.cpp
+src/pymodule.cc
 src/pymodule.h
 
 # this is copied over by the installer
