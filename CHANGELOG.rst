@@ -46,6 +46,7 @@ Since last release
   quantize, bids that one was not able to fullfill and caused cyclus to crash. (#1552)
 * Resolve deprecation warnings involving <boost/detail/sp_typeinfo.hpp> (#1611)
 * Resolve segmentation faults when calling Cbc (#1614)
+* Resolve segmentation faults when using cyclus via Python (#1666)
 
 
 

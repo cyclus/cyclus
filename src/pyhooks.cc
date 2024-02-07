@@ -1,9 +1,8 @@
+#include "Python.h"
 #include "pyhooks.h"
 
 #ifdef CYCLUS_WITH_PYTHON
 #include <stdlib.h>
-
-#include "Python.h"
 
 extern "C" {
 #include "eventhooks.h"
@@ -17,39 +16,58 @@ bool PY_INTERP_INIT = false;
 
 
 void PyAppendInitTab(void) {
-#if PY_MAJOR_VERSION < 3
-  // Not used before Python 3
-#else
-  PyImport_AppendInittab("_cyclus_eventhooks", PyInit_eventhooks);
-  PyImport_AppendInittab("_cyclus_pyinfile", PyInit_pyinfile);
-  PyImport_AppendInittab("_cyclus_pymodule", PyInit_pymodule);
-#endif
+  if (PyImport_AppendInittab("eventhooks", PyInit_eventhooks) == -1) {
+    fprintf(stderr, "Error appending 'eventhooks' to the initialization table\n");
+  }
+
+  if (PyImport_AppendInittab("pyinfile", PyInit_pyinfile) == -1) {
+    fprintf(stderr, "Error appending 'pyinfile' to the initialization table\n");
+  }
+
+  if (PyImport_AppendInittab("pymodule", PyInit_pymodule) == -1) {
+    fprintf(stderr, "Error appending 'pymodule' to the initialization table\n");
+  }
 }
 
 void PyImportInit(void) {
-#if PY_MAJOR_VERSION < 3
-  initeventhooks();
-  initpyinfile();
-  initpymodule();
-#else
-  PyImport_ImportModule("_cyclus_eventhooks");
-  PyImport_ImportModule("_cyclus_pyinfile");
-  PyImport_ImportModule("_cyclus_pymodule");
-#endif
-};
+  PyObject* module_eventhooks = PyImport_ImportModule("eventhooks");
+  if (module_eventhooks == NULL) {
+    PyErr_Print(); // Print Python error information
+    fprintf(stderr, "Error importing 'eventhooks' module\n");
+  }
 
+  PyObject* module_pyinfile = PyImport_ImportModule("pyinfile");
+  if (module_pyinfile == NULL) {
+    PyErr_Print();
+    fprintf(stderr, "Error importing 'pyinfile' module\n");
+  }
+
+  PyObject* module_pymodule = PyImport_ImportModule("pymodule");
+  if (module_pymodule == NULL) {
+    PyErr_Print();
+    fprintf(stderr, "Error importing 'pymodule' module\n");
+  }
+}
 
 void PyImportCallInit(void) {
-#if PY_MAJOR_VERSION < 3
-  initeventhooks();
-  initpyinfile();
-  initpymodule();
-#else
-  PyInit_eventhooks();
-  PyInit_pyinfile();
-  PyInit_pymodule();
-#endif
-};
+  PyObject* init_eventhooks = PyInit_eventhooks();
+  if (init_eventhooks == NULL) {
+    PyErr_Print();
+    fprintf(stderr, "Error calling PyInit_eventhooks()\n");
+  }
+
+  PyObject* init_pyinfile = PyInit_pyinfile();
+  if (init_pyinfile == NULL) {
+    PyErr_Print();
+    fprintf(stderr, "Error calling PyInit_pyinfile()\n");
+  }
+
+  PyObject* init_pymodule = PyInit_pymodule();
+  if (init_pymodule == NULL) {
+    PyErr_Print();
+    fprintf(stderr, "Error calling PyInit_pymodule()\n");
+  }
+}
 
 
 void PyStart(void) {
