@@ -138,8 +138,10 @@ RUN lcov -c --rc lcov_branch_coverage=1 -d build/src -o initial_coverage.info --
     mkdir -p coverage/html && \
     genhtml src_coverage.info --output-directory coverage/html --branch-coverage
 RUN --mount=type=secret,id=GITHUB_TOKEN \
+    echo "ben" && echo ${GITHUB_TOKEN}
+RUN --mount=type=secret,id=GITHUB_TOKEN \
     curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin && \
-    coveralls report src_coverage.info --repo-token ${GITHUB_TOKEN} --format=lcov --compare-ref=main -p --job-flag ${ubuntu-version}-${pkg_mgr}
+    coveralls report src_coverage.info -r ${GITHUB_TOKEN} --format=lcov --compare-ref=main -p --job-flag ${ubuntu-version}-${pkg_mgr}
 
 FROM ${pkg_mgr}-deps as cyclus
 ARG make_cores=2
