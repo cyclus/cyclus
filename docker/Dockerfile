@@ -135,11 +135,10 @@ RUN lcov -c --rc lcov_branch_coverage=1 -d build/src -o initial_coverage.info --
     lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info --rc lcov_branch_coverage=1 -o total_coverage.info && \
     lcov --remove total_coverage.info -o src_coverage.info --rc lcov_branch_coverage=1 "/usr/**" "/opt/**"
 RUN --mount=type=secret,id=GITHUB_TOKEN \
-    cat /run/secrets/GITHUB_TOKEN && \
+    ls -l /run/secrets && \
     curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin && \
-    coveralls report src_coverage.info --format=lcov --compare-ref=main \
-        -p --job-flag ${ubuntu-version}-${pkg_mgr} --build-number ${ci_run_id} \
-        -r $(cat /run/secrets/GITHUB_TOKEN)
+    COVERALLS_REPO_TOKEN=$(cat /run/secrets/GITHUB_TOKEN) coveralls report src_coverage.info --format=lcov --compare-ref=main \
+        -p --job-flag ${ubuntu-version}-${pkg_mgr} --build-number ${ci_run_id}
 
 FROM ${pkg_mgr}-deps as cyclus
 ARG make_cores=2
