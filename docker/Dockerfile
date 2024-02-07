@@ -134,7 +134,7 @@ RUN --mount=type=secret,id=coveralls_flags \
     cd tests && python -m pytest --ignore test_main.py && cd .. && \
     lcov -c --rc lcov_branch_coverage=1 -d build/src -o test_coverage.info --gcov-tool ${GCOV} && \
     lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info --rc lcov_branch_coverage=1 -o total_coverage.info && \
-    lcov --remove total_coverage.info -o src_coverage.info --rc lcov_branch_coverage=1 "/usr/**" "/opt/**" \
+    lcov --remove total_coverage.info -o src_coverage.info --rc lcov_branch_coverage=1 "/usr/**" "/opt/**" && \
     curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin && \
     coveralls report src_coverage.info --format lcov $(cat /run/secrets/coveralls_flags)
 
