@@ -57,8 +57,7 @@ jobs:
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
           secrets: |
-            "coveralls_flags=--compare-ref ${{ github.base_ref }} --service github \
-            --parallel --job-flag ${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }} \
+            "coveralls_flags=--parallel --job-flag ${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }} \
             --build-number ${{ github.run_id }} -r ${{ secrets.GITHUB_TOKEN }}"
         
   finish-coveralls:
@@ -68,5 +67,5 @@ jobs:
     - name: Coveralls Done
       run: |
         curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz
-        ./coveralls done --build-number ${{ github.run_id }}
+        ./coveralls done --build-number ${{ github.run_id }} -r ${{ secrets.GITHUB_TOKEN }}
         
