@@ -56,7 +56,7 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            ci_run_id=${{ github.run_id }}
+            coveralls_build_number=${{ github.run_id }}
           secrets: |
             repo_token=${{ secrets.GITHUB_TOKEN }}
         
@@ -64,8 +64,8 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
-    - name: Coveralls Finished
-      uses: coverallsapp/github-action@v2
-      with:
-        parallel-finished: true
+    - name: Coveralls Done
+      run: |
+        curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz
+        ./coveralls done --build-number ${{ github.run_id }}
         
