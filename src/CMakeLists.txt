@@ -131,22 +131,22 @@ if(Cython_FOUND)
     foreach(file ${CYCLUS_CORE_CYTHON_FILES})
         message(STATUS "Cython Compiling ${file}")
         get_filename_component(name ${file} NAME_WE)
-        set(_generated_h "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc.h")
-        set(_generated_cc "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc.gen")
+        set(_generated_h "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cpp.h")
+        set(_generated_cpp "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cpp.gen")
         set(_h_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.h")
-        set(_cc_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cpp")
+        set(_cpp_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cpp")
         set_source_files_properties(${_cc_file} PROPERTIES GENERATED TRUE)
 
         EXECUTE_PROCESS(COMMAND ${CYTHON_EXECUTABLE} --cplus
             ${include_directory_arg} ${version_arg}
             ${cython_debug_arg} ${CYTHON_FLAGS}
-            --output-file  ${_generated_cc} ${file}
+            --output-file  ${_generated_cpp} ${file}
             RESULT_VARIABLE res_var_c)
         IF(NOT "${res_var_c}" STREQUAL "0")
             message(FATAL_ERROR "Cython compilation of ${file} failed!")
         ENDIF()
 
-        ADD_LIBRARY(${name} ${_cc_file})
+        ADD_LIBRARY(${name} ${_cpp_file})
         SET_TARGET_PROPERTIES(${name} PROPERTIES 
           OUTPUT_NAME "${name}"
           PREFIX ""
@@ -161,9 +161,13 @@ if(Cython_FOUND)
           TARGETS ${name}
           LIBRARY DESTINATION lib
           )
+        INSTALL(
+          TARGETS ${name}
+          LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES}
+          )
 
         copy_when_diff(${_generated_h} ${_h_file})
-        copy_when_diff(${_generated_cc} ${_cc_file})
+        copy_when_diff(${_generated_cpp} ${_cpp_file})
     endforeach()
 endif(Cython_FOUND)
 ###########################################################
