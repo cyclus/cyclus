@@ -98,8 +98,7 @@ copy_when_diff(
 ###########################################################
 ############# cython configuration ########################
 ###########################################################
-
-SET(PreCythonLibs ${LIBS})
+SET(NoCythonLibs ${LIBS})
 if(Cython_FOUND)
     # some setup
     set(cython_include_directories "")
@@ -155,7 +154,7 @@ if(Cython_FOUND)
           )
         SET(LIBS ${LIBS} ${name})
 
-        TARGET_LINK_LIBRARIES(${name} dl ${PreCythonLibs})
+        TARGET_LINK_LIBRARIES(${name} dl ${NoCythonLibs})
 
         INSTALL(
           TARGETS ${name}
