@@ -23,12 +23,12 @@ jobs:
       fail-fast: false
       matrix:
         ubuntu_versions : [
-          # 20.04,
+          20.04,
           22.04,
         ]
         pkg_mgr : [
           apt,
-          # conda,
+          conda,
         ]
     
     name: Build, Test, Report Coverage
@@ -58,7 +58,7 @@ jobs:
             ubuntu_version=${{ matrix.ubuntu_versions }}
             ci_run_id=${{ github.run_id }}
           secret-envs: |
-            GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+            "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
         
   finish-coveralls:
     needs: build-and-test

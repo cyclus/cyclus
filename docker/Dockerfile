@@ -127,6 +127,7 @@ COPY . /cyclus
 WORKDIR /cyclus
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
+RUN whoami
 RUN python install.py -j 2 --build-type=Release --core-version 999999.999999 --allow-milps --code_coverage
 RUN lcov -c --rc lcov_branch_coverage=1 -d build/src -o initial_coverage.info --gcov-tool ${GCOV} --initial && \
     cyclus_unit_tests && \
