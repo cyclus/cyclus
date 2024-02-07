@@ -57,7 +57,7 @@ jobs:
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
           secrets: |
-            "coveralls_flags=--parallel --job-flag ${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }} \
+            "coveralls_flags=--parallel --job-flag ${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }} 
             --build-number ${{ github.run_id }} -r ${{ secrets.GITHUB_TOKEN }}"
         
   finish-coveralls:
