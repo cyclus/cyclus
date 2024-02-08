@@ -136,7 +136,7 @@ RUN lcov -c --rc lcov_branch_coverage=1 -d build/src -o initial_coverage.info --
     lcov --remove total_coverage.info -o src_coverage.info --rc lcov_branch_coverage=1 "/usr/**" "/opt/**"
 
 FROM scratch as coverage-report
-COPY --from=cyclus-coverage /cyclus/src_coverage.info /src_coverage.info
+COPY --from=cyclus-coverage /cyclus /coverage_report
 
 
 FROM ${pkg_mgr}-deps as cyclus
