@@ -255,7 +255,7 @@ void XMLFileLoader::LoadSolver() {
   if (!exclusive) {
     std::stringstream ss;
     ss << "You have set allow_exclusive_orders to False."
-       << " Many archetypes (e.g., :cycamore:Reactor will not work"
+       << " Many archetypes (e.g., :cycamore:Reactor) will not work"
        << " as intended with this feature turned off.";
     Warn<VALUE_WARNING>(ss.str());
   }

@@ -26,6 +26,7 @@ Since last release
 * Allow randomness in request frequency and size through buy policy (#1634)
 * Adds support for Cython3 (#1636)
 * Adds TotalInvTracker, which allows an inventory cap to be set for multiple resource buffers, and is now required for material buy policy (#1646)
+* AddMutalReqs and AddReciepe functions and exclusive bids in python API of DRE (#1584)
 
 **Changed:**
 
