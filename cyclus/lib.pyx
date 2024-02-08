@@ -1827,7 +1827,6 @@ cpdef dict normalize_request_portfolio(object inp):
         inp = dict(inp)
     if 'commodities' in inp:
         commods = []
-        prefs = []
         for commodity in inp['commodities']:
             for name, reqs in commodity.items():
                 if name == 'preference' or name == 'exclusive':
