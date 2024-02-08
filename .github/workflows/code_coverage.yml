@@ -9,7 +9,6 @@ on:
       - '.github/workflows/publish_latest.yml'
       - '.github/workflows/publish_release.yml'
       - '.github/workflows/changelog_test.yml'
-      - 'docker/**'
       - 'doc/**'
       - 'CHANGELOG.rst'
 

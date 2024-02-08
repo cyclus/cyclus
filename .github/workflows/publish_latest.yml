@@ -6,7 +6,6 @@ on:
   pull_request:
     paths:
       - '.github/workflows/publish_latest.yml'
-      - 'docker/**'
   push:
     branches:
       - main
@@ -64,3 +63,48 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
+
+      - name: Checkout Cycamore
+        uses: actions/checkout@v4
+        with:
+          repository: cyclus/cycamore
+          ref: tag-build-arg
+          path: $HOME/cycamore
+    
+      - name: Build, Test, and Push Cycamore
+        id: build-cycamore
+        continue-on-error: true
+        uses: docker/build-push-action@v5
+        with:
+          context: $HOME/cycamore
+          file: $HOME/cycamore/docker/Dockerfile
+          cache-from: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache
+          cache-to: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache,mode=max
+          tags: ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:${{ env.tag }}
+          push: true
+          build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
+            cyclus_tag=${{ env.tag }}@${{ steps.build-cyclus.outputs.digest }}
+
+      - name: Checkout Cymetric
+        uses: actions/checkout@v4
+        with:
+          repository: cyclus/cymetric
+          ref: tag-build-arg
+          path: $HOME/cymetric
+
+      - name: Build, Test, and Push Cymetric
+        continue-on-error: true
+        uses: docker/build-push-action@v5
+        with:
+          context: $HOME/cymetric
+          file: $HOME/cymetric/docker/Dockerfile
+          cache-from: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache
+          cache-to: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache,mode=max
+          tags: ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:${{ env.tag }}
+          push: true
+          build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
+            cycamore_tag=${{ env.tag }}@${{ steps.build-cycamore.outputs.digest }}

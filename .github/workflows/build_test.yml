@@ -9,7 +9,6 @@ on:
       - '.github/workflows/publish_release.yml'
       - '.github/workflows/changelog_test.yml'
       - '.github/workflows/code_coverage.yml'
-      - 'docker/**'
       - 'doc/**'
       - 'CHANGELOG.rst'
   push:
@@ -18,7 +17,6 @@ on:
       - '.github/workflows/publish_release.yml'
       - '.github/workflows/changelog_test.yml'
       - '.github/workflows/code_coverage.yml'
-      - 'docker/**'
       - 'doc/**'
       - 'CHANGELOG.rst'
 
