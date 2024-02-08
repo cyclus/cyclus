@@ -68,7 +68,6 @@ jobs:
           flag-name: ${{ join(matrix.*, '-') }}
           parallel: true
           file: ${{ github.workspace }}/cyclus_built/total_coverage.info
-          base-path: ${{ github.workspace }}/cyclus_built
           format: lcov
           compare-ref: main
 
