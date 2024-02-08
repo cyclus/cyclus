@@ -52,20 +52,20 @@ jobs:
           cache-to: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache,mode=max
           file: docker/Dockerfile
           target: coverage-report
-          outputs: type=local,dest=.
+          outputs: type=local,dest=${HOME}
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
       - name: debug
-        run: ls -l && ls -l coverage_report
+        run: ls -l ${HOME} && cat ${HOME}/src_coverage.info
 
       - name: Coveralls
         uses: coverallsapp/github-action@v2
         with:
           flag-name: ${{ join(matrix.*, '-') }}
           parallel: true
-          file: coverage_report/src_coverage.info
+          file: ${HOME}/src_coverage.info
           format: lcov
           compare-ref: main
         
