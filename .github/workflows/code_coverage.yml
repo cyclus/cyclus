@@ -75,7 +75,7 @@ jobs:
         uses: actions/upload-pages-artifact@v2
         with:
           name: cyclus-coverage-report-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          path: ${{ github.workspace }}/html
+          path: ${{ github.workspace }}/cyclus_built/html
         
   finish-coveralls:
     needs: build-and-test
