@@ -66,7 +66,7 @@ jobs:
         with:
           flag-name: ${{ join(matrix.*, '-') }}
           parallel: true
-          # file: src_coverage.info
+          file: src_coverage.info
           format: lcov
           compare-ref: main
         
