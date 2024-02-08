@@ -138,8 +138,7 @@ RUN lcov -c --rc lcov_branch_coverage=1 -d build/src -o initial_coverage.info --
     genhtml src_coverage.info --output-directory html --branch-coverage
 
 FROM scratch as coverage-report
-COPY --from=cyclus-coverage /cyclus/src_coverage.info /src_coverage.info
-COPY --from=cyclus-coverage /cyclus/html /html
+COPY --from=cyclus-coverage /cyclus/** /cyclus_built/
 
 
 FROM ${pkg_mgr}-deps as cyclus
