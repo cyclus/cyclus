@@ -2279,21 +2279,29 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
         shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]](
             new cpp_cyclus.RequestPortfolio[{{cyr}}]()
             )
+
+    cdef std_vector[cpp_cyclus.RequestPortfolio[{{cyr}}].request_ptr] mreqs
+    cdef cpp_cyclus.Request[{{cyr}}]* single_request
     cdef std_string commod
     cdef _{{rclsname}} targ
     cdef shared_ptr[{{cyr}}] targ_ptr
+
     # add requests
-    for name, reqs in pyport['commodities'].items():
-        commod = str_py_to_cpp(name)
-        for req in reqs:
-            targ = <_{{rclsname}}> req['target']
-            targ_ptr = reinterpret_pointer_cast[{{ts.cython_type(r)}},
-                                                cpp_cyclus.Resource](targ.ptx)
-            if req['cost'] is not None:
-                raise ValueError('setting cost functions from Python is not yet '
-                                 'supported.')
-            port.get().AddRequest(targ_ptr, requester, commod, req['preference'],
-                                  req['exclusive'])
+    for commodity in pyport['commodities']:
+        for name, reqs in commodity.items():
+            commod = str_py_to_cpp(name)
+            for req in reqs:
+                targ = <_{{rclsname}}> req['target']
+                targ_ptr = reinterpret_pointer_cast[{{ts.cython_type(r)}},
+                                                    cpp_cyclus.Resource](targ.ptx)
+                if req['cost'] is not None:
+                    raise ValueError('setting cost functions from Python is not yet '
+                                    'supported.')
+                single_request = port.get().AddRequest(targ_ptr, requester, commod, req['preference'],
+                                req['exclusive'])
+                mreqs.push_back(single_request)
+    port.get().AddMutualReqs(mreqs)
+    
     # add constraints
     for constr in pyport['constraints']:
         port.get().AddConstraint(

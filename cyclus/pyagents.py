@@ -50,13 +50,13 @@ class Sink(Facility):
         else:
             comp = self.context.get_recipe(self.recipe)
         mat = ts.Material.create_untracked(self.capacity, comp)
-        port = {"commodities": {c: mat for c in self.in_commods},
+        port = {"commodities": [{c: mat} for c in self.in_commods],
                 "constraints": self.capacity}
         return port
 
     def get_product_requests(self):
         prod = ts.Product.create_untracked(self.capacity, "")
-        port = {"commodities": {c: prod for c in self.in_commods},
+        port = {"commodities": [{c: prod} for c in self.in_commods],
                 "constraints": self.capacity}
         return port
 
