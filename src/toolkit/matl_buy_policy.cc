@@ -18,8 +18,10 @@ MatlBuyPolicy::MatlBuyPolicy() :
     name_(""),
     throughput_(std::numeric_limits<double>::max()),
     quantize_(-1),
-    fill_to_(1),
-    req_when_under_(1),
+    fill_to_(std::numeric_limits<double>::max()),
+    req_at_(std::numeric_limits<double>::max()),
+    cumulative_cap_(-1),
+    cycle_total_inv_(0),
     active_dist_(NULL),
     dormant_dist_(NULL),
     size_dist_(NULL){
@@ -43,18 +45,50 @@ void MatlBuyPolicy::set_manager(Agent* m) {
   }
 }
 
-void MatlBuyPolicy::set_fill_to(double x) {
-  if (x > 1)
-    x /= buf_->capacity();
-  assert(x > 0 && x <= 1.);
-  fill_to_ = x;
+void MatlBuyPolicy::set_total_inv_tracker(TotalInvTracker* t) {
+  if (t == NULL){
+    std::vector<ResBuf<Material>*> bufs = {buf_};
+    buf_tracker_->Init(bufs, buf_->capacity());
+  }
+  else if (!t->buf_in_tracker(buf_)) {
+    std::stringstream ss;
+    ss << "TotalInvTracker does not contain ResBuf used in buy policy";
+    throw ValueError(ss.str());
+  }
+  else {
+    buf_tracker_ = t;
+  }
 }
 
-void MatlBuyPolicy::set_req_when_under(double x) {
-  if (x > 1)
-    x /= buf_->capacity();
-  assert(x > 0 && x <= 1.);
-  req_when_under_ = x;
+void MatlBuyPolicy::set_inv_policy(std::string inv_policy, double fill, double req_at) {
+  set_req_at(req_at);
+  std::transform(inv_policy.begin(), inv_policy.end(), inv_policy.begin(), ::tolower);
+  if ((inv_policy == "ss")) {
+    set_fill_to(fill);
+  }
+  else if ((inv_policy == "rq") || (inv_policy == "qr")) {
+    set_quantize(fill);
+    // maximum amount that an RQ policy could achieve is req_at + fill
+    set_fill_to(req_at + fill);
+  }
+  else {
+    throw ValueError("Invalid inventory policy");
+  }
+}
+
+void MatlBuyPolicy::set_fill_to(double x) {
+  assert(x > 0);
+  fill_to_ = std::min(x, buf_->capacity());
+}
+
+void MatlBuyPolicy::set_req_at(double x) {
+  assert(x >= 0);
+  req_at_ = std::min(x, buf_->capacity());
+}
+
+void MatlBuyPolicy::set_cumulative_cap(double x) {
+  assert(x > 0);
+  cumulative_cap_ = std::min(x, buf_->capacity());
 }
 
 void MatlBuyPolicy::set_quantize(double x) {
@@ -88,7 +122,11 @@ void MatlBuyPolicy::init_active_dormant() {
   if (dormant_dist_->sample() < 0) {
     next_dormant_end_ = -1;
     LGH(INFO4) << "dormant length -1, always active" << std::endl;
-  }
+    }
+  else if (use_cumulative_capacity()) {
+    next_dormant_end_ = -1;
+    LGH(INFO4) << "dormant length set at -1 for first active period of cumulative capacity cycle" << std::endl;
+    }
   else {
     SetNextDormantTime();
     LGH(INFO4) << "first dormant time end: " << next_dormant_end_ << std::endl;
@@ -96,21 +134,24 @@ void MatlBuyPolicy::init_active_dormant() {
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name) {
+                                   std::string name, TotalInvTracker* buf_tracker) {
   set_manager(manager);
   buf_ = buf;
   name_ = name;
+  set_total_inv_tracker(buf_tracker);
   init_active_dormant();
   return *this;
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name, double throughput, boost::shared_ptr<IntDistribution> active_dist,
+                                   std::string name, TotalInvTracker* buf_tracker,
+                                   double throughput, boost::shared_ptr<IntDistribution> active_dist,
                                    boost::shared_ptr<IntDistribution> dormant_dist,
                                    boost::shared_ptr<DoubleDistribution> size_dist) {
   set_manager(manager);
   buf_ = buf;
   name_ = name;
+  set_total_inv_tracker(buf_tracker);
   set_throughput(throughput);
   active_dist_ = active_dist;
   dormant_dist_ = dormant_dist;
@@ -120,28 +161,60 @@ MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name,
-                                   double fill_to, double req_when_under) {
+                                   std::string name, TotalInvTracker* buf_tracker,
+                                   double throughput, double quantize) {
   set_manager(manager);
   buf_ = buf;
   name_ = name;
-  set_fill_to(fill_to);
-  set_req_when_under(req_when_under);
+  set_total_inv_tracker(buf_tracker);
+  set_throughput(throughput);
+  set_quantize(quantize);
   init_active_dormant();
   return *this;
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                   std::string name, double throughput,
-                                   double fill_to, double req_when_under,
-                                   double quantize) {
+                                   std::string name, 
+                                   TotalInvTracker* buf_tracker,
+                                   double throughput,
+                                   std::string inv_policy,
+                                   double fill_behav, double req_at) {
   set_manager(manager);
   buf_ = buf;
   name_ = name;
-  set_fill_to(fill_to);
-  set_req_when_under(req_when_under);
-  set_quantize(quantize);
+  set_total_inv_tracker(buf_tracker);
+  set_inv_policy(inv_policy, fill_behav, req_at);
   set_throughput(throughput);
+  init_active_dormant();
+  return *this;
+}
+
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf,
+                                   std::string name, 
+                                   TotalInvTracker* buf_tracker,
+                                   std::string inv_policy,
+                                   double fill_behav, double req_at) {
+  set_manager(manager);
+  buf_ = buf;
+  name_ = name;
+  set_total_inv_tracker(buf_tracker);
+  set_inv_policy(inv_policy, fill_behav, req_at);
+  init_active_dormant();
+  return *this;
+}
+
+MatlBuyPolicy& MatlBuyPolicy::Init(Agent* manager, ResBuf<Material>* buf, 
+                                   std::string name,
+                                   TotalInvTracker* buf_tracker,
+                                   double throughput, double cumulative_cap,
+                                   boost::shared_ptr<IntDistribution> dormant_dist) {
+  set_manager(manager);
+  buf_ = buf;
+  name_ = name;
+  set_total_inv_tracker(buf_tracker);
+  set_throughput(throughput);
+  set_cumulative_cap(cumulative_cap);
+  dormant_dist_ = dormant_dist;
   init_active_dormant();
   return *this;
 }
@@ -186,31 +259,21 @@ void MatlBuyPolicy::Stop() {
 std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
   rsrc_commods_.clear();
   std::set<RequestPortfolio<Material>::Ptr> ports;
-  bool make_req = buf_->quantity() < req_when_under_ * buf_->capacity();
-  double amt;
+
+  double amt = 0;
 
   int current_time_ = manager()->context()->time();
 
-  if (never_dormant() || current_time_ < next_active_end_) {
-    // currently in the middle of active buying period
-    amt = TotalAvailable() * SampleRequestSize();
-  }
-  else if (current_time_ < next_dormant_end_) {
-    // finished active. starting dormancy and sample/set length of dormant period
-    amt = 0;
-    LGH(INFO3) << "in dormant period, no request" << std::endl;
-  }
-  // the following is an if rather than if-else statement because if dormant
-  // length is zero, buy policy should return to active immediately
-  if (current_time_ == next_dormant_end_) {
-    // finished dormant. starting buying and sample/set length of active period
-    amt = TotalAvailable() * SampleRequestSize();
-    SetNextActiveTime();
-    SetNextDormantTime();
-    LGH(INFO4) << "end of dormant period, next active time end: " << next_active_end_ << ", and next dormant time end: " << next_dormant_end_ << std::endl;
-  }
+  double max_request_amt = use_cumulative_capacity() ? cumulative_cap_ - cycle_total_inv_ : std::numeric_limits<double>::max();
 
-  if (!make_req || amt < eps())
+  if (MakeReq() && !dormant(current_time_)) {
+    amt = std::min(TotalAvailable() * SampleRequestSize(), max_request_amt);
+  }
+  else { LGH(INFO3) << "in dormant period, no request" << std::endl; }
+
+  CheckActiveDormantCumulativeTimes();
+
+  if (amt < eps())
     return ports;
 
   bool excl = Excl();
@@ -247,6 +310,18 @@ void MatlBuyPolicy::AcceptMatlTrades(
     LGH(INFO3) << "got " << it->second->quantity() << " kg of "
                << it->first.request->commodity()  << std::endl;
     buf_->Push(it->second);
+    // cumulative capacity handling
+    if (use_cumulative_capacity()) {
+      cycle_total_inv_ += it->second->quantity();
+    }
+  }
+  // check if cumulative cap has been reached. If yes, then sample for dormant
+  // length and reset cycle_total_inv
+  if (use_cumulative_capacity() && (
+    (cumulative_cap_ - cycle_total_inv_) < eps())) {
+      SetNextDormantTime();
+      LGH(INFO3) << "cycle cumulative inventory has been reached. Dormant period will end at " << next_dormant_end_ << std::endl;
+      cycle_total_inv_ = 0;
   }
 }
 
@@ -256,9 +331,14 @@ void MatlBuyPolicy::SetNextActiveTime() {
 };
 
 void MatlBuyPolicy::SetNextDormantTime() {
-  if (next_dormant_end_ < 0) {}
-  else {
-    next_dormant_end_ = dormant_dist_->sample() + next_active_end_;
+  if (use_cumulative_capacity()) {
+    // need the +1 when not using next_active_end_ 
+    next_dormant_end_ = (
+      dormant_dist_->sample() + manager()->context()->time() + 1);
+  }
+  else if (next_dormant_end_ >= 0) {
+    next_dormant_end_ = dormant_dist_->sample() + 
+                        std::max(next_active_end_, 1);
   }
   return;
 }
@@ -267,6 +347,18 @@ double MatlBuyPolicy::SampleRequestSize() {
   return size_dist_->sample();
 }
 
+void MatlBuyPolicy::CheckActiveDormantCumulativeTimes() {
+  if (manager()->context()->time() == next_dormant_end_) {
+    if (use_cumulative_capacity()) { next_dormant_end_ = -1; }
+    else { 
+        SetNextActiveTime();
+
+      SetNextDormantTime();
+      LGH(INFO4) << "end of dormant period, next active time end: " << next_active_end_ << ", and next dormant time end: " << next_dormant_end_ << std::endl;
+      }
+  }
+  return;
+}
 
 }  // namespace toolkit
 }  // namespace cyclus

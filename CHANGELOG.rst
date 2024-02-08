@@ -25,6 +25,7 @@ Since last release
 * Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599, #1639)
 * Allow randomness in request frequency and size through buy policy (#1634)
 * Adds support for Cython3 (#1636)
+* Adds TotalInvTracker, which allows an inventory cap to be set for multiple resource buffers, and is now required for material buy policy (#1646)
 * AddMutalReqs and AddReciepe functions and exclusive bids in python API of DRE (#1584)
 
 **Changed:**
@@ -46,6 +47,7 @@ Since last release
   quantize, bids that one was not able to fullfill and caused cyclus to crash. (#1552)
 * Resolve deprecation warnings involving <boost/detail/sp_typeinfo.hpp> (#1611)
 * Resolve segmentation faults when calling Cbc (#1614)
+* Resolve segmentation faults when using cyclus via Python (#1666)
 
 
 

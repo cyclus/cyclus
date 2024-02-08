@@ -102,11 +102,14 @@ BUFFERS = {'{0}::toolkit::ResourceBuff'.format(CYCNS),
            ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Product'),
            ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Material'),
            '{0}::toolkit::ResMap'.format(CYCNS),
+           '{0}::toolkit::TotalInvTracker'.format(CYCNS),
+           ('{0}::toolkit::TotalInvTracker'.format(CYCNS), '{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Material'),
            }
 
 TEMPLATES = {'std::vector', 'std::set', 'std::list', 'std::pair',
              'std::map', '{0}::toolkit::ResBuf'.format(CYCNS),
-             CYCNS + '::toolkit::ResMap',}
+             CYCNS + '::toolkit::ResMap',
+             CYCNS + '::toolkit::TotalInvTracker',}
 
 WRANGLERS = {
     '{0}::Agent'.format(CYCNS),
@@ -1079,6 +1082,7 @@ class InitFromCopyFilter(CodeGeneratorFilter):
                                             "m->{var}.capacity());\n"),
         CYCNS + '::toolkit::ResBuf': "{var}.capacity(m->{var}.capacity());\n",
         CYCNS + '::toolkit::ResMap': '{var}.obj_ids(m->obj_ids());\n',
+        CYCNS + '::toolkit::TotalInvTracker': "{var}.capacity();\n",
         }
 
 class InitFromDbFilter(CodeGeneratorFilter):
@@ -1145,6 +1149,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
         CYCNS + '::toolkit::ResBuf': '{var}.capacity({capacity});\n',
         CYCNS + '::toolkit::ResMap': (
             '{var}.obj_ids(qr.GetVal<{tstr}>("{var}"))\n;'),
+        CYCNS + '::toolkit::TotalInvTracker': '{var}.capacity();\n',
         }
 
 
@@ -1893,6 +1898,7 @@ class SnapshotFilter(CodeGeneratorFilter):
         CYCNS + '::toolkit::ResourceBuff': None,
         CYCNS + '::toolkit::ResBuf': None,
         CYCNS + '::toolkit::ResMap': '{var}.obj_ids()',
+        CYCNS + '::toolkit::TotalInvTracker': None,
         }
 
 
@@ -1947,6 +1953,7 @@ class SnapshotInvFilter(CodeGeneratorFilter):
             'invs[\"{var}\"] = {var}.PopNRes({var}.count());\n'
             '{var}.Push(invs["{var}"]);\n'),
         CYCNS + '::toolkit::ResMap': "invs[\"{var}\"] = {var}.ResValues();\n",
+        CYCNS + '::toolkit::TotalInvTracker': ';\n',
         }
 
 
@@ -1995,6 +2002,7 @@ class InitInvFilter(CodeGeneratorFilter):
         CYCNS + '::toolkit::ResourceBuff': "{var}.PushAll(inv[\"{var}\"]);\n",
         CYCNS + '::toolkit::ResBuf': "{var}.Push(inv[\"{var}\"]);\n",
         CYCNS + '::toolkit::ResMap': "{var}.ResValues(inv[\"{var}\"]);\n",
+        CYCNS + '::toolkit::TotalInvTracker': ";\n",
         }
 
 

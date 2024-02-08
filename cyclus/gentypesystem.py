@@ -377,6 +377,7 @@ CYTHON_TYPES = {
     'std::list': 'std_list',
     'std::vector': 'std_vector',
     'cyclus::toolkit::ResBuf': 'cpp_cyclus.ResBuf',
+    'cyclus::toolkit::TotalInvTracker': 'cpp_cyclus.TotalInvTracker',
     'cyclus::toolkit::ResMap': 'cpp_cyclus.ResMap',
     }
 
@@ -384,7 +385,7 @@ CYTHON_TYPES = {
 RESOURCES = ['MATERIAL', 'PRODUCT']
 
 INVENTORIES = ['cyclus::toolkit::ResourceBuff', 'cyclus::toolkit::ResBuf',
-               'cyclus::toolkit::ResMap']
+               'cyclus::toolkit::TotalInvTracker', 'cyclus::toolkit::ResMap']
 
 USE_SHARED_PTR = ('MATERIAL', 'PRODUCT', 'cyclus::Material', 'cyclus::Product')
 
@@ -419,6 +420,7 @@ FUNCNAMES = {
     'std::list': 'std_list',
     'std::vector': 'std_vector',
     'cyclus::toolkit::ResBuf': 'res_buf',
+    'cyclus::toolkit::TotalInvTracker': 'total_inv_tracker',
     'cyclus::toolkit::ResMap': 'res_map',
     }
 
@@ -453,6 +455,7 @@ CLASSNAMES = {
     'std::list': 'List',
     'std::vector': 'Vector',
     'cyclus::toolkit::ResBuf': 'ResBuf',
+    'cyclus::toolkit::TotalInvTracker': 'total_inv_tracker',
     'cyclus::toolkit::ResMap': 'ResMap',
     }
 
@@ -489,6 +492,7 @@ TEMPLATE_ARGS = {
     'std::list': ('val',),
     'std::vector': ('val',),
     'cyclus::toolkit::ResBuf': ('val',),
+    'cyclus::toolkit::TotalInvTracker': ('val',),
     'cyclus::toolkit::ResMap': ('key', 'val'),
     }
 
@@ -509,6 +513,7 @@ NPTYPES = {
     'std::list': 'np.NPY_OBJECT',
     'std::vector': 'np.NPY_OBJECT',
     'cyclus::toolkit::ResBuf': 'np.NPY_OBJECT',
+    'cyclus::toolkit::TotalInvTracker': 'np.NPY_OBJECT',
     'cyclus::toolkit::ResMap': 'np.NPY_OBJECT',
     }
 
@@ -529,6 +534,7 @@ NEW_PY_INSTS = {
     'std::list': '[]',
     'std::vector': '[]',
     'cyclus::toolkit::ResBuf': 'None',
+    'cyclus::toolkit::TotalInvTracker': 'None',
     'cyclus::toolkit::ResMap': 'None',
     }
 
@@ -646,6 +652,7 @@ TO_PY_CONVERTERS = {
         '    py{var}[i] = {var}_i\n',
         'py{var}'),
     'cyclus::toolkit::ResBuf': ('', '', 'None'),
+    'cyclus::toolkit::TotalInvTracker': ('', '', 'None'),
     'cyclus::toolkit::ResMap': ('', '', 'None'),
     }
 
@@ -755,6 +762,12 @@ TO_CPP_CONVERTERS = {
     'cyclus::toolkit::ResBuf': (
         'cdef _{classname} py{var}\n'
         'cdef cpp_cyclus.ResBuf[{valtype}] cpp{var}\n',
+        'py{var} = <_{classname}> {var}\n'
+        'cpp{var} = deref(py{var}.ptx)\n',
+        'cpp{var}'),
+    'cyclus::toolkit::TotalInvTracker': (
+        'cdef _{classname} py{var}\n'
+        'cdef cpp_cyclus.TotalInvTracker[{valtype}] cpp{var}\n',
         'py{var} = <_{classname}> {var}\n'
         'cpp{var} = deref(py{var}.ptx)\n',
         'cpp{var}'),
