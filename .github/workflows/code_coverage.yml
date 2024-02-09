@@ -79,6 +79,7 @@ jobs:
           flag-name: ${{ join(matrix.*, '-') }}
           parallel: true
           file: ${{ runner.temp }}/cyclus_built/total_coverage.info
+          base-path: ${{ runner.temp }}/cyclus_built
           format: lcov
           compare-ref: main
 
