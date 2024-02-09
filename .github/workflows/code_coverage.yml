@@ -58,7 +58,7 @@ jobs:
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
       - name: debug
-        runs: |
+        run: |
           ls ${HOME}
 
       - name: Coveralls
