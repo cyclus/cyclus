@@ -57,11 +57,6 @@ jobs:
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
-      - name: debug
-        run: |
-            ls ${{ github.workspace }}
-            ls ${{ github.workspace }}/cyclus_built
-
       - name: Coveralls
         uses: coverallsapp/github-action@v2
         with:

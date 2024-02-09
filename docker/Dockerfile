@@ -138,7 +138,6 @@ RUN lcov -c --rc lcov_branch_coverage=1 -d /cyclus -o initial_coverage.info --gc
 FROM scratch as coverage-report
 COPY --from=cyclus-coverage /cyclus /cyclus_built
 
-
 FROM ${pkg_mgr}-deps as cyclus
 ARG make_cores=2
 
