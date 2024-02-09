@@ -132,7 +132,8 @@ RUN lcov -c --rc lcov_branch_coverage=1 -d /cyclus -o initial_coverage.info --gc
     cyclus_unit_tests && \
     cd tests && python -m pytest && cd .. && \
     lcov -c --rc lcov_branch_coverage=1 -d /cyclus -o test_coverage.info --gcov-tool ${GCOV} --no-external && \
-    lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info --rc lcov_branch_coverage=1 -o total_coverage.info && \
+    lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info --rc lcov_branch_coverage=1 -o combined_coverage.info && \
+    lcov --remove combined_coverage.info -o total_coverage.info --rc lcov_branch_coverage=1 "build/**" && \
     mkdir -p html && genhtml total_coverage.info --output-directory html --branch-coverage
 
 FROM scratch as coverage-report
