@@ -71,6 +71,7 @@ jobs:
           ls ${HOME}
           echo break 
           ls ${{ runner.temp }}
+          cd ${{ runner.temp }}/cyclus_built
 
       - name: Coveralls
         uses: coverallsapp/github-action@v2
