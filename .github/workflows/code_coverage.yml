@@ -45,9 +45,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Make directory for coverage
-        run: mkdir -p ${{ github.workspace }}/coverage
-
       - name: Build, Test, and Report Coverage
         uses: docker/build-push-action@v5
         with:
