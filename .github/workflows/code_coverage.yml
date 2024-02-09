@@ -55,15 +55,13 @@ jobs:
           cache-to: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache,mode=max
           file: docker/Dockerfile
           target: coverage-report
-          outputs: type=local,dest=${{ runner.temp }}
+          outputs: type=local,dest=.
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
       - name: debug
         run: |
-          cd ${{ runner.temp }}/cyclus_built
-          echo BREAK
           ls -l
           echo BREAK
           pwd
@@ -74,7 +72,7 @@ jobs:
         with:
           flag-name: ${{ join(matrix.*, '-') }}
           parallel: true
-          file: ./total_coverage.info
+          file: ${{ github.workspace }}/total_coverage.info
           format: lcov
           compare-ref: main
 
@@ -82,7 +80,7 @@ jobs:
         uses: actions/upload-pages-artifact@v2
         with:
           name: cyclus-coverage-report-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          path: ${{ runner.temp }}/cyclus_built/html
+          path: ${{ github.workspace }}/html
         
   finish-coveralls:
     needs: build-and-test
