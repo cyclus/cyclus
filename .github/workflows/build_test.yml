@@ -72,7 +72,7 @@ jobs:
         with:
           repository: cyclus/cycamore
           ref: tag-build-arg
-          path: ${{ runner.temp }}/cycamore
+          path: ${{ github.workspace }}/cycamore
 
       - name: Build and Test Cycamore
         id: build-cycamore
@@ -80,8 +80,8 @@ jobs:
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          context: ${{ runner.temp }}/cycamore
-          file: ${{ runner.temp }}/cycamore/docker/Dockerfile
+          context: ${{ github.workspace }}/cycamore
+          file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           cache-from: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache
           cache-to: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache,mode=max
           tags: ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-image-cache
@@ -97,7 +97,7 @@ jobs:
         with:
           repository: cyclus/cymetric
           ref: tag-build-arg
-          path: ${{ runner.temp }}/cymetric
+          path: ${{ github.workspace }}/cymetric
 
       - name: Build and Test Cymetric
         if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
@@ -105,8 +105,8 @@ jobs:
         continue-on-error: true
         uses: docker/build-push-action@v5
         with:
-          context: ${{ runner.temp }}/cymetric
-          file: ${{ runner.temp }}/cymetric/docker/Dockerfile
+          context: ${{ github.workspace }}/cymetric
+          file: ${{ github.workspace }}/cymetric/docker/Dockerfile
           cache-from: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache
           cache-to: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache,mode=max
           tags: ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-image-cache
