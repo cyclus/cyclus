@@ -1,11 +1,8 @@
 name: Publish Stable Cyclus
 
 on:
-  push:
-    branches:
-      - main
-    tags:
-      - '*'
+  release:
+    types: [released]
 
 jobs:
   build-and-test-for-release:
