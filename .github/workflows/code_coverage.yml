@@ -27,7 +27,7 @@ jobs:
         ]
         pkg_mgr : [
           apt,
-          # conda,
+          conda,
         ]
     
     name: Build, Test, Report Coverage
