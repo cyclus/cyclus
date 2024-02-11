@@ -125,7 +125,7 @@ ARG make_cores=2
 COPY . /cyclus
 WORKDIR /cyclus
 
-RUN python install.py -j 2 --build-type=Release --core-version 999999.999999 --allow-milps --code_coverage
+RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999 --allow-milps --code_coverage
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 RUN lcov -c --rc lcov_branch_coverage=1 -d /cyclus -o initial_coverage.info --gcov-tool ${GCOV} --initial --no-external && \
