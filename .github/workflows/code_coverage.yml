@@ -20,16 +20,7 @@ jobs:
       packages: write
     strategy:
       fail-fast: false
-      matrix:
-        ubuntu_versions : [
-          # 20.04,
-          22.04,
-        ]
-        pkg_mgr : [
-          apt,
-          conda,
-        ]
-    
+
     name: Build, Test, Report Coverage
     steps:
       - name: Log in to the Container registry
@@ -53,15 +44,10 @@ jobs:
           file: docker/Dockerfile
           target: coverage-report
           outputs: type=local,dest=.
-          build-args: |
-            pkg_mgr=${{ matrix.pkg_mgr }}
-            ubuntu_version=${{ matrix.ubuntu_versions }}
 
       - name: Coveralls
         uses: coverallsapp/github-action@v2
         with:
-          flag-name: ${{ join(matrix.*, '-') }}
-          parallel: true
           file: ${{ github.workspace }}/total_coverage.info
           format: lcov
           compare-ref: main
@@ -72,11 +58,3 @@ jobs:
           name: cyclus-coverage-report-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
           path: ${{ github.workspace }}/html
         
-  finish-coveralls:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    steps:
-    - name: Coveralls Finished
-      uses: coverallsapp/github-action@v2
-      with:
-        parallel-finished: true
