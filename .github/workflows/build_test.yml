@@ -96,7 +96,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: cyclus/cymetric
-          ref: tag-build-arg
           path: ${{ github.workspace }}/cymetric
 
       - name: Build and Test Cymetric
