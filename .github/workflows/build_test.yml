@@ -71,7 +71,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: cyclus/cycamore
-          ref: tag-build-arg
           path: ${{ github.workspace }}/cycamore
 
       - name: Build and Test Cycamore
