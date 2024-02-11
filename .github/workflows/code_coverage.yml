@@ -19,6 +19,16 @@ jobs:
       contents: read
       packages: write
 
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_versions : [
+          22.04,
+        ]
+        pkg_mgr : [
+          apt,
+        ]
+
     name: Build, Test, Report Coverage
     steps:
       - name: Log in to the Container registry
@@ -42,6 +52,9 @@ jobs:
           file: docker/Dockerfile
           target: coverage-report
           outputs: type=local,dest=.
+          build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
 
       - name: Coveralls
         uses: coverallsapp/github-action@v2
