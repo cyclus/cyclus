@@ -33,7 +33,7 @@ jobs:
       - name: Tag as stable
         if: ${{ github.repository_owner == 'cyclus' }}
         run: |
-          echo "version_tag=${{ github.ref_name }}" >> "$GITHUB_ENV"
+          echo "version_tag=${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
           echo "stable_tag=stable" >> "$GITHUB_ENV"
 
       - name: Log in to the Container registry
