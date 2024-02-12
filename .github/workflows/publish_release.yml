@@ -1,6 +1,9 @@
 name: Publish Stable Cyclus
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/publish_release.yml'
   release:
     types: [released]
 
@@ -31,7 +34,7 @@ jobs:
           echo "stable_tag=ci-image-cache" >> "$GITHUB_ENV"
 
       - name: Tag as stable
-        if: ${{ github.repository_owner == 'cyclus' }}
+        if: ${{ github.repository_owner == 'cyclus' && github.event_name == 'release' }}
         run: |
           echo "version_tag=${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
           echo "stable_tag=stable" >> "$GITHUB_ENV"
