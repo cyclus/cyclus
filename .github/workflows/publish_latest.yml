@@ -55,11 +55,11 @@ jobs:
       - name: Build, Test, and Push Cyclus
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
-          cache-to: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache,mode=max
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache,mode=max
           file: docker/Dockerfile
           push: true
-          tags: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.tag }}
+          tags: ghcr.io/${{ github.repository_owner }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.tag }}
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -77,14 +77,16 @@ jobs:
         with:
           context: ${{ github.workspace }}/cycamore
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
-          cache-from: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache
-          cache-to: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache,mode=max
-          tags: ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:${{ env.tag }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache,mode=max
+          tags: ghcr.io/${{ github.repository_owner }}/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:${{ env.tag }}
           push: true
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            cyclus_tag=${{ env.tag }}@${{ steps.build-cyclus.outputs.digest }}
+            cyclus_tag=${{ env.tag }}
+          build-contexts: |
+            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.tag }}=docker-image://ghcr.io/${{ github.repository_owner }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.tag }}@${{ steps.build-cyclus.outputs.digest }}
 
       - name: Checkout Cymetric
         uses: actions/checkout@v4
@@ -98,11 +100,13 @@ jobs:
         with:
           context: ${{ github.workspace }}/cymetric
           file: ${{ github.workspace }}/cymetric/docker/Dockerfile
-          cache-from: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache
-          cache-to: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache,mode=max
-          tags: ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:${{ env.tag }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache
+          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache,mode=max
+          tags: ghcr.io/${{ github.repository_owner }}/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:${{ env.tag }}
           push: true
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            cycamore_tag=${{ env.tag }}@${{ steps.build-cycamore.outputs.digest }}
+            cycamore_tag=${{ env.tag }}
+          build-contexts: |
+            ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:${{ env.tag }}=docker-image://ghcr.io/${{ github.repository_owner }}/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:${{ env.tag }}@${{ steps.build-cycamore.outputs.digest }}
