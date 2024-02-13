@@ -111,7 +111,7 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            cycamore_tag=local-ci-image
+            cycamore_tag=ci-image-cache
           build-contexts: |
             ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-image-cache=docker-image://ghcr.io/${{ github.repository_owner }}/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-image-cache@${{ steps.build-cycamore.outputs.digest }}
 
