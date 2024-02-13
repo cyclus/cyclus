@@ -1,0 +1,32 @@
+name: Comment on PR
+
+on:
+  workflow_run:
+    workflows: ["Build/Test Cyclus"]
+    types:
+      - completed
+
+jobs:
+  pr-comment:
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          merge-multiple: true
+
+      - name: Merge artifacts and get PR number
+        run: |
+          echo "### Build Status Report" > artifacts_merged.md
+          cat ./*.txt >> artifacts_merged.md
+          echo "PR_NUMBER=$(cat pr_number)" >> "$GITHUB_ENV"
+
+      - name: PR Comment
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          pr_number: ${{ env.PR_NUMBER }}
+          comment_tag: build_status_report
+          filePath: artifacts_merged.md
