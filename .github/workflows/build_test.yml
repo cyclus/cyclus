@@ -42,13 +42,6 @@ jobs:
           - 5000:5000
 
     steps:
-      # - name: Log in to the Container registry
-      #   uses: docker/login-action@v3
-      #   with:
-      #     registry: ghcr.io
-      #     username: ${{ github.actor }}
-      #     password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
@@ -63,7 +56,7 @@ jobs:
         with:
           file: docker/Dockerfile
           cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
-          tags: localhost:5000/cyclus:latest
+          tags: localhost:5000/cyclus:local
           push: true
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
@@ -85,14 +78,14 @@ jobs:
           context: ${{ github.workspace }}/cycamore
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
           cache-from: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache
-          tags: localhost:5000/cycamore:latest
+          tags: localhost:5000/cycamore:local
           push: true
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
             cyclus_tag=fake-ci-tag
           build-contexts: |
-            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:fake-ci-tag=docker-image://localhost:5000/cyclus:latest
+            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:fake-ci-tag=docker-image://localhost:5000/cyclus:local
 
       - name: Checkout Cymetric
         if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
@@ -115,7 +108,7 @@ jobs:
             ubuntu_version=${{ matrix.ubuntu_versions }}
             cycamore_tag=fake-ci-tag
           build-contexts: |
-            ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:fake-ci-tag=docker-image://localhost:5000/cycamore:latest
+            ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:fake-ci-tag=docker-image://localhost:5000/cycamore:local
 
       - name: Export Environment Variables
         if: github.event_name == 'pull_request'
