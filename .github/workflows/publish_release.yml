@@ -34,7 +34,7 @@ jobs:
           echo "stable_tag=ci-image-cache" >> "$GITHUB_ENV"
 
       - name: Tag as stable
-        if: ${{ github.event_name == 'release' }}
+        if: ${{ github.actor == 'cyclus' && github.event_name == 'release' }}
         run: |
           echo "version_tag=${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
           echo "stable_tag=stable" >> "$GITHUB_ENV"
@@ -55,13 +55,12 @@ jobs:
       - name: Build, Test, and Push Cyclus
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.actor }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache,mode=max
+          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
           file: docker/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.actor }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.version_tag }}
-            ghcr.io/${{ github.actor }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.stable_tag }}
+            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.version_tag }}
+            ghcr.io/cyclu/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.stable_tag }}
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
