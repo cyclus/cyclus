@@ -35,7 +35,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout Cyclus
@@ -47,8 +47,8 @@ jobs:
       - name: Build, Test, and Report Coverage
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.repository_owner }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache,mode=max
+          cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache
+          cache-to: type=registry,ref=ghcr.io/${{ github.actor }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache,mode=max
           file: docker/Dockerfile
           target: coverage-report
           outputs: type=local,dest=.
