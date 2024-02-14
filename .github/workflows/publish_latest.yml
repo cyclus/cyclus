@@ -53,6 +53,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build, Test, and Push Cyclus
+        id: build-cyclus
         uses: docker/build-push-action@v5
         with:
           cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
@@ -84,7 +85,7 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            cyclus_tag=${{ env.tag }}
+            cyclus_tag=${{ env.tag }}@${{ steps.build-cyclus.outputs.digest }}
 
       - name: Checkout Cymetric
         uses: actions/checkout@v4
@@ -105,4 +106,4 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            cycamore_tag=${{ env.tag }}
+            cycamore_tag=${{ env.tag }}@${{ steps.build-cycamore.outputs.digest }}

@@ -11,6 +11,9 @@ on:
       - '.github/workflows/changelog_test.yml'
       - 'doc/**'
       - 'CHANGELOG.rst'
+  push:
+    branches:
+      - main
 
 jobs:
   build-and-test:
@@ -47,8 +50,8 @@ jobs:
       - name: Build, Test, and Report Coverage
         uses: docker/build-push-action@v5
         with:
-          cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache
-          cache-to: type=registry,ref=ghcr.io/${{ github.actor }}/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache,mode=max
+          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache
+          cache-to: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache,mode=max,ignore-error=true
           file: docker/Dockerfile
           target: coverage-report
           outputs: type=local,dest=.
