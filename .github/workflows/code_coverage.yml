@@ -11,6 +11,9 @@ on:
       - '.github/workflows/changelog_test.yml'
       - 'doc/**'
       - 'CHANGELOG.rst'
+  push:
+    branches:
+      - main
 
 jobs:
   build-and-test:
@@ -35,7 +38,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout Cyclus
@@ -48,7 +51,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache
-          cache-to: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache,mode=max
+          cache-to: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache,mode=max,ignore-error=true
           file: docker/Dockerfile
           target: coverage-report
           outputs: type=local,dest=.

@@ -23,10 +23,7 @@ on:
 jobs:
   build-test-cyclus:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      pull-requests: write
+
     strategy:
       fail-fast: false
       matrix:
@@ -39,16 +36,17 @@ jobs:
           conda,
         ]
 
-    steps:
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
 
+    steps:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
 
       - name: Checkout Cyclus
         uses: actions/checkout@v4
@@ -59,8 +57,7 @@ jobs:
         with:
           file: docker/Dockerfile
           cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
-          cache-to: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache,mode=max
-          tags: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-image-cache
+          tags: localhost:5000/cyclus:local
           push: true
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
@@ -81,14 +78,14 @@ jobs:
         with:
           context: ${{ github.workspace }}/cycamore
           file: ${{ github.workspace }}/cycamore/docker/Dockerfile
+          build-contexts: |
+            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus=docker-image://localhost:5000/cyclus:local
           cache-from: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache
-          cache-to: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache,mode=max
-          tags: ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-image-cache
+          tags: localhost:5000/cycamore:local
           push: true
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            cyclus_tag=ci-image-cache@${{ steps.build-cyclus.outputs.digest }}
 
       - name: Checkout Cymetric
         if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
@@ -105,25 +102,51 @@ jobs:
         with:
           context: ${{ github.workspace }}/cymetric
           file: ${{ github.workspace }}/cymetric/docker/Dockerfile
+          build-contexts: |
+            ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore=docker-image://localhost:5000/cycamore:local
           cache-from: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache
-          cache-to: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache,mode=max
-          tags: ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-image-cache
-          push: true
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
-            cycamore_tag=ci-image-cache@${{ steps.build-cycamore.outputs.digest }}
   
-      - name: PR Comment
-        if: ${{ github.event_name == 'pull_request' }}
-        uses: thollander/actions-comment-pull-request@v2
+      - name: Export Environment Variables
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "CYCAMORE_BUILD_STATUS=${{steps.build-cycamore.outcome == 'success' && '**Success** :white_check_mark:' || 
+          steps.build-cycamore.outcome == 'failure' && '**Failure** :x:' || 
+          '**Skipped due to upstream failure** :warning:'}}" >> "$GITHUB_ENV"
+
+          echo "CYMETRIC_BUILD_STATUS=${{steps.build-cymetric.outcome == 'success' && '**Success** :white_check_mark:' || 
+          steps.build-cymetric.outcome == 'failure' && '**Failure** :x:' || 
+          '**Skipped due to upstream failure** :warning:'}}" >> "$GITHUB_ENV"
+
+          echo "ARTIFACT_NAME=${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}" >> "$GITHUB_ENV"
+
+      - name: Construct Artifact
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "
+          ##### Build \`FROM cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus\`
+            - Cycamore: ${{ env.CYCAMORE_BUILD_STATUS }}
+            - Cymetric: ${{ env.CYMETRIC_BUILD_STATUS }}" > ${{ env.ARTIFACT_NAME }}.txt
+      
+      - name: Upload Artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
         with:
-          comment_tag: ${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
-          message: |
-            ## Downstream build statuses using cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}
-            - Cycamore: ${{steps.build-cycamore.outcome == 'success' && '*Success* :white_check_mark:' || 
-                steps.build-cycamore.outcome == 'failure' && '**Failure** :x:' || 
-                '**Skipped due to upstream failure** :warning:'}}
-            - Cymetric: ${{steps.build-cymetric.outcome == 'success' && '*Success* :white_check_mark:' || 
-                steps.build-cymetric.outcome == 'failure' && '**Failure** :x:' || 
-                '**Skipped due to upstream failure** :warning:'}}
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_NAME }}.txt
+
+  upload-pr-number:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Save PR number to file
+        run: |
+          echo "${{ github.event.number }}" > pr_number
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number
