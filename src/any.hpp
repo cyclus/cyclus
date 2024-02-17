@@ -198,10 +198,7 @@ namespace boost { namespace spirit
         basic_hold_any(T const& x)
           : table(spirit::detail::get_table<T>::template get<Char>()), object(0)
         {
-            if (spirit::detail::get_table<T>::is_small::value)
-                new (&object) T(x);
-            else
-                object = new T(x);
+            new_object(object, x, typename spirit::detail::get_table<T>::is_small());
         }
 
         basic_hold_any(const char* x)
@@ -228,6 +225,17 @@ namespace boost { namespace spirit
             table->static_delete(&object);
         }
 
+        template <typename T>
+        static void new_object(void*& object, T const& x, mpl::true_)
+        {
+            new (&object) T(x);
+        }
+
+        template <typename T>
+        static void new_object(void*& object, T const& x, mpl::false_)
+        {
+            object = new T(x);
+        }
         // assignment
         basic_hold_any& assign(basic_hold_any const& x)
         {
@@ -255,24 +263,17 @@ namespace boost { namespace spirit
             if (table == x_table) {
             // if so, we can avoid deallocating and re-use memory
                 table->destruct(&object);    // first destruct the old content
-                if (spirit::detail::get_table<T>::is_small::value) {
-                    // create copy on-top of object pointer itself
-                    new (&object) T(x);
-                }
-                else {
-                    // create copy on-top of old version
-                    new (object) T(x);
-                }
+                new_object(object, x, typename spirit::detail::get_table<T>::is_small());
             }
             else {
                 if (spirit::detail::get_table<T>::is_small::value) {
                     // create copy on-top of object pointer itself
                     table->destruct(&object); // first destruct the old content
-                    new (&object) T(x);
+                    new_object(object, x, typename spirit::detail::get_table<T>::is_small());
                 }
                 else {
                     reset();                  // first delete the old content
-                    object = new T(x);
+                    new_object(object, x, typename spirit::detail::get_table<T>::is_small());
                 }
                 table = x_table;      // update table pointer
             }
