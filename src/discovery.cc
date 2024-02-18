@@ -91,7 +91,7 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
   fs::recursive_directory_iterator last;
   for (; it != last; it.increment(errc)) {
     if (errc != no_err) {
-      if (it.level() > 0) {
+      if (it.depth() > 0) {
         it.pop();
       }
       continue;
@@ -100,8 +100,8 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
     string pthstr = pth.string();
     bool irf = fs::is_regular_file(pth, errc);
     if (errc != no_err || !irf) {
-      it.no_push();
-      if (it.level() > 0) {
+      it.disable_recursion_pending();
+      if (it.depth() > 0) {
         it.pop();
       }
       continue;
