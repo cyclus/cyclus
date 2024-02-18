@@ -276,7 +276,6 @@ cdef extern from "pyhooks.h" namespace "cyclus":
 
    cdef void PyAppendInitTab() except +
    cdef void PyImportInit() except +
-   cdef void PyImportCallInit() except +
 
 
 cdef extern from "pyhooks.h" namespace "cyclus::toolkit":

@@ -22,9 +22,6 @@ void PyAppendInitTab(void);
 /// Convience function for import initialization
 void PyImportInit(void);
 
-/// Convience function for imports when Python has already been started
-void PyImportCallInit(void);
-
 /// Initialize Python functionality, this is a no-op if Python was not
 /// installed along with Cyclus. This may be called many times and safely
 /// initializes the Python interpreter only once.
