@@ -56,7 +56,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
-          cache-to: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache,mode=max
           file: docker/Dockerfile
           push: true
           tags: |
