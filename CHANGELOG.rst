@@ -34,6 +34,7 @@ Since last release
 * Major update and modernization of build (#1587, #1632)
 * Changed Json formatting for compatibility with current python standards (#1587)
 * Changed README.rst installation instructions, tested on fresh Ubuntu-22.04 system with Python 3.11 (#1617, #1644)
+* Resolved various compilation warnings due to use of deprecated APIs (#1671)
 
 **Removed:**
 

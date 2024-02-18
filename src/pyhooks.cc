@@ -49,27 +49,6 @@ void PyImportInit(void) {
   }
 }
 
-void PyImportCallInit(void) {
-  PyObject* init_eventhooks = PyInit_eventhooks();
-  if (init_eventhooks == NULL) {
-    PyErr_Print();
-    fprintf(stderr, "Error calling PyInit_eventhooks()\n");
-  }
-
-  PyObject* init_pyinfile = PyInit_pyinfile();
-  if (init_pyinfile == NULL) {
-    PyErr_Print();
-    fprintf(stderr, "Error calling PyInit_pyinfile()\n");
-  }
-
-  PyObject* init_pymodule = PyInit_pymodule();
-  if (init_pymodule == NULL) {
-    PyErr_Print();
-    fprintf(stderr, "Error calling PyInit_pymodule()\n");
-  }
-}
-
-
 void PyStart(void) {
   if (!PY_INTERP_INIT) {
     PyAppendInitTab();
@@ -127,8 +106,6 @@ bool PY_INTERP_INIT = false;
 void PyAppendInitTab(void) {};
 
 void PyImportInit(void) {};
-
-void PyImportCallInit(void) {};
 
 void PyStart(void) {};
 
