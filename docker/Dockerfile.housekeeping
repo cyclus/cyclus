@@ -1,0 +1,7 @@
+ARG UBUNTU_VERSION=22.04
+ARG OWNER=cyclus
+ARG TAG=latest
+FROM ghcr.io/${OWNER}/cyclus-ci-ubuntu-${UBUNTU_VERSION}:$TAG
+
+RUN pip install sphinx; \
+    apt-get -y install clang-format

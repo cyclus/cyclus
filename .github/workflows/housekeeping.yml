@@ -1,0 +1,40 @@
+name: Housekeeping Checks
+
+on:
+  # allows us to run workflows manually
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  Housekeeping:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/cyclus/cyclus-ci-ubuntu-22.04-housekeeping:latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup environment
+        run: |
+          echo "REPO_SLUG=${GITHUB_REPOSITORY}" >> $GITHUB_ENV
+          echo "PULL_REQUEST=$(echo  $GITHUB_REF | cut -d"/" -f3)" >> $GITHUB_ENV
+          mkdir /root/build_dir
+          ln -s $GITHUB_WORKSPACE /root/build_dir/cyclus
+
+      - name: Housekeeping
+        run: |
+          cd $GITHUB_WORKSPACE
+          git config --global --add safe.directory /__w/cyclus/cyclus
+          find src/ \( -name "*.hpp" -o -name "*.cpp" -o -name "*.hh" -o -name "*.cc" -o -name "*.h" \) \
+              -exec clang-format -style=file -i {} \;
+          clang_diffs=`git status --porcelain`
+          if [ -z "${clang_diffs}" ]; then
+            echo -e "\033[32mStyle guide checker passed!\033[0m"
+          else
+            echo -e "\033[1;31mERROR: Style guide checker failed. Please run clang-format.\033[0m"
+            echo -e "\033[33mclang_diffs: ${clang_diffs}\033[0m"
+            git diff
+            exit 1
+          fi
