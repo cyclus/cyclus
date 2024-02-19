@@ -196,6 +196,7 @@ void XMLFileLoader::LoadSim() {
   LoadControlParams();  // must be first
   LoadSolver();
   LoadRecipes();
+  LoadPackages();
   LoadSpecs();
   LoadInitialAgents();  // must be last
   SimInit::Snapshot(ctx_);
@@ -323,6 +324,28 @@ void XMLFileLoader::LoadRecipes() {
     Composition::Ptr comp = ReadRecipe(qe);
     comp->Record(ctx_);
     ctx_->AddRecipe(name, comp);
+  }
+}
+
+void XMLFileLoader::LoadPackages() {
+  InfileTree xqe(*parser_);
+  // create default package
+  ctx_->AddPackage("default", 0, std::numeric_limits<int>::max(), "first");
+
+  std::string query = "/*/package";
+  int num_packages = xqe.NMatches(query);
+  for (int i = 0; i < num_packages; i++) {
+    InfileTree* qe = xqe.SubTree(query, i);
+    std::string name = cyclus::OptionalQuery<std::string>(qe, "name", "default");
+    CLOG(LEV_DEBUG3) << "loading package: " << name;
+    
+    double fill_min = cyclus::OptionalQuery<double>(qe, "fill_min", 0);
+    double fill_max = cyclus::OptionalQuery<double>(qe, "fill_max", std::numeric_limits<double>::max());
+    
+    std::string strategy = cyclus::OptionalQuery<std::string>(qe, "strategy", "first");
+
+    boost::shared_ptr<Package> p = Package::Create(name, fill_min, fill_max, strategy);
+    ctx_->AddPackage(name, fill_min, fill_max, strategy);
   }
 }
 

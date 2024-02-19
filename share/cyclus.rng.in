@@ -179,6 +179,17 @@ datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
     </element>
   </zeroOrMore>
 
+  <zeroOrMore>
+    <element name="package">
+      <interleave>
+        <element name="name"><text/></element>
+        <element name="fill_min"><data type="double"/></element>
+        <element name="fill_max"><data type="double"/></element>
+        <element name="strategy"><text/></element>
+      </interleave>
+    </element>
+  </zeroOrMore>
+
 </interleave> </element>
 
 </start>
