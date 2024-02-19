@@ -16,7 +16,7 @@ jobs:
 
       - name: Set up Dependencies
         run: |
-          apt-get install -y clang-format
+          sudo apt-get install -y clang-format
 
       - name: Setup environment
         run: |
