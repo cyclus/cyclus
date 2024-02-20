@@ -351,8 +351,7 @@ class Context {
 
   std::map<std::string, Agent*> protos_;
   std::map<std::string, Composition::Ptr> recipes_;
-  //std::map<std::string, Package::Ptr> packages_;
-  std::map<std::string, boost::shared_ptr<Package>> packages_;
+  std::map<std::string, Package::Ptr> packages_;
   std::set<Agent*> agent_list_;
   std::set<Trader*> traders_;
   std::map<std::string, int> n_prototypes_;
