@@ -1,6 +1,7 @@
 #ifndef CYCLUS_SRC_PACKAGE_H_
 #define CYCLUS_SRC_PACKAGE_H_
 
+#include <limits>
 #include <string>
 #include <boost/shared_ptr.hpp>
 
