@@ -15,15 +15,17 @@ const ResourceType Material::kType = "Material";
 Material::~Material() {}
 
 Material::Ptr Material::Create(Agent* creator, double quantity,
-                               Composition::Ptr c) {
-  Material::Ptr m(new Material(creator->context(), quantity, c));
+                               Composition::Ptr c, int package_id) {
+  Material::Ptr m(new Material(creator->context(), quantity, c, package_id));
   m->tracker_.Create(creator);
   return m;
 }
 
 Material::Ptr Material::CreateUntracked(double quantity,
                                         Composition::Ptr c) {
-  Material::Ptr m(new Material(NULL, quantity, c));
+  // default package id for untracked
+  int package_id = 1;
+  Material::Ptr m(new Material(NULL, quantity, c, package_id));
   return m;
 }
 
@@ -48,6 +50,7 @@ void Material::Record(Context* ctx) const {
   ctx_->NewDatum("MaterialInfo")
       ->AddVal("ResourceId", state_id())
       ->AddVal("PrevDecayTime", prev_decay_time_)
+      ->AddVal("PackageId", package_id_)
       ->Record();
 
   comp_->Record(ctx);
@@ -87,8 +90,9 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
   }
 
   qty_ -= qty;
-
-  Material::Ptr other(new Material(ctx_, qty, c));
+  // extracted material has default package
+  int package_id = 1;
+  Material::Ptr other(new Material(ctx_, qty, c, package_id));
 
   // Decay called on the extracted material should have the same dt as for
   // this material regardless of composition.
@@ -218,12 +222,13 @@ Composition::Ptr Material::comp() {
   return comp_;
 }
 
-Material::Material(Context* ctx, double quantity, Composition::Ptr c)
+Material::Material(Context* ctx, double quantity, Composition::Ptr c, int package_id)
     : qty_(quantity),
       comp_(c),
       tracker_(ctx, this),
       ctx_(ctx),
-      prev_decay_time_(0) {
+      prev_decay_time_(0),
+      package_id_(package_id) {
   if (ctx != NULL) {
     prev_decay_time_ = ctx->time();
   } else {
@@ -234,6 +239,14 @@ Material::Material(Context* ctx, double quantity, Composition::Ptr c)
 Material::Ptr NewBlankMaterial(double quantity) {
   Composition::Ptr comp = Composition::CreateFromMass(CompMap());
   return Material::CreateUntracked(quantity, comp);
+}
+
+int Material::package_id() {
+  return package_id_;
+}
+
+void Material::ChangePackageId(int new_package_id) {
+  package_id_ = new_package_id;
 }
 
 }  // namespace cyclus

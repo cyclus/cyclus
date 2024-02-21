@@ -12,17 +12,18 @@ int Product::next_qualid_ = 1;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Product::Ptr Product::Create(Agent* creator, double quantity,
-                             std::string quality) {
+                             std::string quality, int package_id) {
   if (qualids_.count(quality) == 0) {
     qualids_[quality] = next_qualid_++;
     creator->context()->NewDatum("Products")
         ->AddVal("QualId", qualids_[quality])
         ->AddVal("Quality", quality)
+        ->AddVal("PackageId", 1)
         ->Record();
   }
 
   // the next lines must come after qual id setting
-  Product::Ptr r(new Product(creator->context(), quantity, quality));
+  Product::Ptr r(new Product(creator->context(), quantity, quality, package_id));
   r->tracker_.Create(creator);
   return r;
 }
@@ -30,7 +31,9 @@ Product::Ptr Product::Create(Agent* creator, double quantity,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Product::Ptr Product::CreateUntracked(double quantity,
                                       std::string quality) {
-  Product::Ptr r(new Product(NULL, quantity, quality));
+  // default package id for untracked
+  int package_id = 1;
+  Product::Ptr r(new Product(NULL, quantity, quality, package_id));
   r->tracker_.DontTrack();
   return r;
 }
@@ -62,7 +65,7 @@ Product::Ptr Product::Extract(double quantity) {
 
   quantity_ -= quantity;
 
-  Product::Ptr other(new Product(ctx_, quantity, quality_));
+  Product::Ptr other(new Product(ctx_, quantity, quality_, package_id_));
   tracker_.Extract(&other->tracker_);
   return other;
 }
@@ -73,10 +76,11 @@ Resource::Ptr Product::ExtractRes(double qty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Product::Product(Context* ctx, double quantity, std::string quality)
+Product::Product(Context* ctx, double quantity, std::string quality, int package_id)
     : quality_(quality),
       quantity_(quantity),
       tracker_(ctx, this),
-      ctx_(ctx) {}
+      ctx_(ctx),
+      package_id_(package_id) {}
 
 }  // namespace cyclus

@@ -5,6 +5,8 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+#include "package.h"
+
 class SimInitTest;
 
 namespace cyclus {
