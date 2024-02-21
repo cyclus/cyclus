@@ -65,3 +65,12 @@ jobs:
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
+      - name: Build Debian package
+        working-directory: ./build
+        run: |
+          make package
+        
+      - name: Upload .deb to release
+        uses: alexellis/upload-assets@0.4.0
+        with:
+          asset_paths: '["cyclus*.deb"]'
