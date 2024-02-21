@@ -12,6 +12,7 @@
 #include "xml_parser.h"
 #include "timer.h"
 #include "recorder.h"
+#include "package.h"
 
 namespace cyclus {
 
@@ -80,6 +81,9 @@ class XMLFileLoader {
 
   /// loads a specific recipe
   void LoadRecipe(InfileTree* qe);
+
+  // loads packages
+  void LoadPackages();
 
   /// Creates all initial agent instances from the input file.
   virtual void LoadInitialAgents();

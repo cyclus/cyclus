@@ -27,6 +27,7 @@ Since last release
 * Adds support for Cython3 (#1636)
 * Adds TotalInvTracker, which allows an inventory cap to be set for multiple resource buffers, and is now required for material buy policy (#1646)
 * AddMutalReqs and AddReciepe functions and exclusive bids in python API of DRE (#1584)
+* Created Package class and optional declaration of packages in input files (#1673)
 
 **Changed:**
 

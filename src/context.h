@@ -18,6 +18,7 @@
 #include "greedy_solver.h"
 #include "pyhooks.h"
 #include "recorder.h"
+#include "package.h"
 
 const uint64_t kDefaultTimeStepDur = 2629846;
 
@@ -248,6 +249,15 @@ class Context {
   /// Returns the current simulation timestep.
   virtual int time();
 
+  /// Adds a package type to a simulation-wide accessible list.
+  /// Agents should NOT add their own packages.
+  void AddPackage(std::string name, double fill_min = 0,
+                  double fill_max = std::numeric_limits<double>::max(),
+                  std::string strategy = "first");
+
+  // Retrieve a registered package. 
+  Package::Ptr GetPackage(std::string name);
+
   int random();
 
   /// Generates a random number on the range [0,1)]
@@ -341,6 +351,7 @@ class Context {
 
   std::map<std::string, Agent*> protos_;
   std::map<std::string, Composition::Ptr> recipes_;
+  std::map<std::string, Package::Ptr> packages_;
   std::set<Agent*> agent_list_;
   std::set<Trader*> traders_;
   std::map<std::string, int> n_prototypes_;

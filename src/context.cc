@@ -192,6 +192,24 @@ Composition::Ptr Context::GetRecipe(std::string name) {
   return recipes_[name];
 }
 
+void Context::AddPackage(std::string name, double fill_min, double fill_max,
+                         std::string strategy) {
+  packages_[name] = Package::Create(name, fill_min, fill_max, strategy);
+  NewDatum("Packages")
+    ->AddVal("Package", name)
+    ->AddVal("FillMin", fill_min)
+    ->AddVal("FillMax", fill_max)
+    ->AddVal("Strategy", strategy)
+    ->Record();
+}
+
+Package::Ptr Context::GetPackage(std::string name) {
+  if (packages_.count(name) == 0) {
+    throw KeyError("Invalid package name " + name);
+  }
+  return packages_[name];
+}
+
 void Context::InitSim(SimInfo si) {
   NewDatum("Info")
       ->AddVal("Handle", si.handle)
