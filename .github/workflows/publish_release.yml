@@ -73,4 +73,4 @@ jobs:
       - name: Upload .deb to release
         uses: alexellis/upload-assets@0.4.0
         with:
-          asset_paths: '["cyclus*.deb"]'
+          asset_paths: '["./build/cyclus*.deb"]'
