@@ -18,7 +18,7 @@ Product::Ptr Product::Create(Agent* creator, double quantity,
     creator->context()->NewDatum("Products")
         ->AddVal("QualId", qualids_[quality])
         ->AddVal("Quality", quality)
-        ->AddVal("PackageId", 1)
+        ->AddVal("PackageId", package_id)
         ->Record();
   }
 
