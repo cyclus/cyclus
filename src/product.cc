@@ -9,7 +9,6 @@ const ResourceType Product::kType = "Product";
 
 std::map<std::string, int> Product::qualids_;
 int Product::next_qualid_ = 1;
-static int default_package_id_ = 1;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Product::Ptr Product::Create(Agent* creator, double quantity,

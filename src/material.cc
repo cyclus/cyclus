@@ -12,8 +12,6 @@ namespace cyclus {
 
 const ResourceType Material::kType = "Material";
 
-static int default_package_id_ = 1;
-
 Material::~Material() {}
 
 Material::Ptr Material::Create(Agent* creator, double quantity,

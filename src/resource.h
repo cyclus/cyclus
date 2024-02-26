@@ -79,6 +79,8 @@ class Resource {
   /// @return a new resource object with same state id and quantity == quantity
   virtual Ptr ExtractRes(double quantity) = 0;
 
+ protected:
+  const static int default_package_id_ = 1;
  private:
   static int nextstate_id_;
   static int nextobj_id_;
