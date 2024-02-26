@@ -12,6 +12,8 @@ namespace cyclus {
 
 const ResourceType Material::kType = "Material";
 
+static int default_package_id_ = 1;
+
 Material::~Material() {}
 
 Material::Ptr Material::Create(Agent* creator, double quantity,
@@ -23,9 +25,7 @@ Material::Ptr Material::Create(Agent* creator, double quantity,
 
 Material::Ptr Material::CreateUntracked(double quantity,
                                         Composition::Ptr c) {
-  // default package id for untracked
-  int package_id = 1;
-  Material::Ptr m(new Material(NULL, quantity, c, package_id));
+  Material::Ptr m(new Material(NULL, quantity, c, default_package_id_));
   return m;
 }
 
@@ -90,9 +90,7 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
   }
 
   qty_ -= qty;
-  // extracted material has default package
-  int package_id = 1;
-  Material::Ptr other(new Material(ctx_, qty, c, package_id));
+  Material::Ptr other(new Material(ctx_, qty, c, default_package_id_));
 
   // Decay called on the extracted material should have the same dt as for
   // this material regardless of composition.

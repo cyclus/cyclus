@@ -75,7 +75,7 @@ class Product : public Resource {
   /// @param ctx the simulation context
   /// @param quantity is a double indicating the quantity
   /// @param quality the resource quality
-  Product(Context* ctx, double quantity, std::string quality, int package_id);
+  Product(Context* ctx, double quantity, std::string quality, int package_id = 1);
 
   // map<quality, quality_id>
   static std::map<std::string, int> qualids_;
