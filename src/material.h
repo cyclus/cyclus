@@ -160,7 +160,7 @@ class Material: public Resource {
   virtual void ChangePackageId(int new_package_id);
 
  protected:
-  Material(Context* ctx, double quantity, Composition::Ptr c, int package_id = 1);
+  Material(Context* ctx, double quantity, Composition::Ptr c, int package_id = default_package_id_);
 
  private:
   Context* ctx_;
