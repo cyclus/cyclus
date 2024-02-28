@@ -138,13 +138,6 @@ RUN lcov -c --rc lcov_branch_coverage=1 -d /cyclus -o initial_coverage.info --gc
 FROM scratch as coverage-report
 COPY --from=cyclus-coverage /cyclus /
 
-FROM cyclus as deb-generation
-WORKDIR /cyclus/build
-RUN make package
-
-FROM scratch as deb-package
-COPY --from=deb-generation /cyclus/build/cyclus*.deb /
-
 FROM ${pkg_mgr}-deps as cyclus
 ARG make_cores=2
 
@@ -160,6 +153,13 @@ WORKDIR /cyclus
 RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999 --allow-milps
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
+
+FROM cyclus as deb-generation
+WORKDIR /cyclus/build
+RUN make package
+
+FROM scratch as deb-package
+COPY --from=deb-generation /cyclus/build/cyclus*.deb /
 
 FROM cyclus as cyclus-test
 
