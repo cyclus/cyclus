@@ -72,7 +72,7 @@ class Product : public Resource {
   void Absorb(Product::Ptr other);
 
   /// Changes the product's package id
-  void ChangePackageId(int package_id);
+  void ChangePackageId(int new_package_id);
 
  private:
   /// @param ctx the simulation context
