@@ -67,6 +67,7 @@ jobs:
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
       - name: Make Debian Package
+        if: matrix.pkg_mgr == 'apt' && matrix.ubuntu_versions == '22.04'
         uses: docker/build-push-action@v5
         with:
           cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
@@ -78,6 +79,7 @@ jobs:
             ubuntu_version=${{ matrix.ubuntu_versions }}
         
       - name: Upload .deb to release
+        if: matrix.pkg_mgr == 'apt' && matrix.ubuntu_versions == '22.04'
         uses: alexellis/upload-assets@0.4.0
         with:
-          asset_paths: '["./build/cyclus*.deb"]'
+          asset_paths: '["cyclus*.deb"]'
