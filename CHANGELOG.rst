@@ -19,7 +19,7 @@ Since last release
 * build and test are now fown on githubAction in place or CircleCI (#1569)
 * Have separate workflows for testing, publishing dependency images, and publishing release images (#1597, #1602, #1606, #1609, #1629, #1633, #1637, #1668, #1672)
 * Add Ubuntu 20.04 to the list of supported platforms (#1605, #1608)
-* Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599)
+* Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599, #1677)
 * Added code coverage reporting to GitHub workflows (#1616, #1679)
 * Adds active and dormant buying cycles in buy policy (#1596)
 * Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599, #1639)

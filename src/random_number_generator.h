@@ -85,9 +85,11 @@ class RandomNumberGenerator {
                           int high=std::numeric_limits<int>::max());
 
 };
-
+  
 class DoubleDistribution {
   public:
+    typedef boost::shared_ptr<DoubleDistribution> Ptr;
+
     virtual double sample() = 0;
     virtual double max() = 0;
 };
@@ -96,6 +98,8 @@ class FixedDoubleDist : public DoubleDistribution {
   private:
     double value;
   public:
+    typedef boost::shared_ptr<FixedDoubleDist> Ptr;
+
     FixedDoubleDist(double value_) : value(value_) {};
     virtual double sample() { return value; };
     virtual double max() { return value; };
@@ -105,6 +109,8 @@ class UniformDoubleDist : public DoubleDistribution {
   private:
     boost::random::uniform_real_distribution<> dist;
   public:
+    typedef boost::shared_ptr<UniformDoubleDist> Ptr;
+
     UniformDoubleDist(double min = 0, double max=1) : dist(min, max) {};
     virtual double sample() { return dist(RandomNumberGenerator::gen_); }
     virtual double max() { return dist.max(); }
@@ -116,6 +122,8 @@ class NormalDoubleDist : public DoubleDistribution {
     double min_;
     double max_;
   public:
+    typedef boost::shared_ptr<NormalDoubleDist> Ptr;
+
     NormalDoubleDist(double mean, double std_dev, double min=0, double max=1) : dist(mean, std_dev), min_(min), max_(max) {
       if (min_ == max_) {
         throw ValueError("Min and max cannot be equal for a normal distribution. Either use FixedDoubleDist or change the min/max.");
@@ -130,6 +138,7 @@ class NormalDoubleDist : public DoubleDistribution {
 
 class IntDistribution {
   public:
+    typedef boost::shared_ptr<IntDistribution> Ptr;
     virtual int sample() = 0;
 };
 
@@ -137,6 +146,8 @@ class FixedIntDist : public IntDistribution {
   private:
     int value;
   public:
+    typedef boost::shared_ptr<FixedIntDist> Ptr;
+
     FixedIntDist(int value_) : value(value_) {};
     virtual int sample() { return value; };
 };
@@ -145,6 +156,8 @@ class UniformIntDist : public IntDistribution {
   private:
     boost::random::uniform_int_distribution<> dist;
   public:
+    typedef boost::shared_ptr<UniformIntDist> Ptr;
+
     UniformIntDist(int min = 0, int max=1) : dist(min, max) {};
     virtual int sample() { return dist(RandomNumberGenerator::gen_); }
     virtual int max() { return dist.max(); }
@@ -156,6 +169,8 @@ class NormalIntDist : public IntDistribution {
     int min_;
     int max_;
   public:
+    typedef boost::shared_ptr<NormalIntDist> Ptr;
+
     NormalIntDist(double mean, double std_dev, int min=0, int max=1) : dist(mean, std_dev), min_(min), max_(max) {
       if (min_ == max_) {
         throw ValueError("Min and max cannot be equal for a normal distribution. Either use FixedIntDist or change the min/max.");
