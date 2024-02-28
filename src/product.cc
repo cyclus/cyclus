@@ -73,6 +73,30 @@ Resource::Ptr Product::ExtractRes(double qty) {
   return boost::static_pointer_cast<Resource>(Extract(qty));
 }
 
+void Product::ChangePackageId(int new_package_id) {
+  if (ctx_ != NULL) {
+    throw ValueError("Package Id cannot be changed with NULL context");
+  }
+  if (new_package_id == package_id_) {
+    // no change needed
+    return;
+  }
+  else if (new_package_id == default_package_id_) {
+    // default has functionally no restrictions
+    package_id_ = new_package_id;
+    return;
+  }
+  
+  Package::Ptr p = ctx_->GetPackageById(package_id_);
+  double min = p->fill_min();
+  double max = p->fill_max();
+  if (quantity_ >= min && quantity_ <= max) {
+    package_id_ = new_package_id;
+  } else {
+    throw ValueError("Material quantity is outside of package fill limits.");
+  }
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Product::Product(Context* ctx, double quantity, std::string quality, int package_id)
     : quality_(quality),

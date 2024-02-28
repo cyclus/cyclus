@@ -141,6 +141,30 @@ void Material::Transmute(Composition::Ptr c) {
   }
 }
 
+void Material::ChangePackageId(int new_package_id) {
+  if (ctx_ != NULL) {
+    throw ValueError("Package Id cannot be changed with NULL context");
+  }
+  if (new_package_id == package_id_) {
+    // no change needed
+    return;
+  }
+  else if (new_package_id == default_package_id_) {
+    // default has functionally no restrictions
+    package_id_ = new_package_id;
+    return;
+  }
+  
+  Package::Ptr p = ctx_->GetPackageById(package_id_);
+  double min = p->fill_min();
+  double max = p->fill_max();
+  if (qty_ >= min && qty_ <= max) {
+    package_id_ = new_package_id;
+  } else {
+    throw ValueError("Material quantity is outside of package fill limits.");
+  }
+}
+
 void Material::Decay(int curr_time) {
   if (ctx_ != NULL && ctx_->sim_info().decay == "never") {
     return;
@@ -239,10 +263,6 @@ Material::Ptr NewBlankMaterial(double quantity) {
 
 int Material::package_id() {
   return package_id_;
-}
-
-void Material::ChangePackageId(int new_package_id) {
-  package_id_ = new_package_id;
 }
 
 }  // namespace cyclus

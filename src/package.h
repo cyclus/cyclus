@@ -19,7 +19,16 @@ class Package {
     // create a new package type
     static Ptr Create(std::string name, double fill_min, double fill_max, std::string strategy);
 
-    int id();
+    // returns package id
+    int id() const { return id_; }
+    // returns package name
+    std::string name() const { return name_; }
+    // returns package fill min
+    double fill_min() const { return fill_min_; }
+    // returns package fill max
+    double fill_max() const { return fill_max_; }
+    // returns package strategy
+    std::string strategy() const { return strategy_; }
 
   protected:
     Package();

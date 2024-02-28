@@ -71,6 +71,9 @@ class Product : public Resource {
   /// @throws ValueError 'other' resource is of different quality
   void Absorb(Product::Ptr other);
 
+  /// Changes the product's package id
+  void ChangePackageId(int package_id);
+
  private:
   /// @param ctx the simulation context
   /// @param quantity is a double indicating the quantity

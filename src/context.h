@@ -256,7 +256,9 @@ class Context {
                   std::string strategy = "first");
 
   // Retrieve a registered package. 
-  Package::Ptr GetPackage(std::string name);
+  Package::Ptr GetPackageByName(std::string name);
+
+  Package::Ptr GetPackageById(int id);
 
   int random();
 
