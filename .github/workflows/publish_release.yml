@@ -34,7 +34,7 @@ jobs:
           echo "stable_tag=ci-image-cache" >> "$GITHUB_ENV"
 
       - name: Tag as stable
-        if: ${{ github.repository_owner == 'cyclus' && github.event_name == 'release' }}
+        if: ${{ github.repository_owner == 'bennibbelink' && github.event_name == 'release' }}
         run: |
           echo "version_tag=${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
           echo "stable_tag=stable" >> "$GITHUB_ENV"
@@ -58,17 +58,24 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
           file: docker/Dockerfile
           push: true
+          target: cyclus
           tags: |
-            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.version_tag }}
-            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.stable_tag }}
+            ghcr.io/bennibbelink/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.version_tag }}
+            ghcr.io/bennibbelink/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.stable_tag }}
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
-      - name: Build Debian package
-        working-directory: ./build
-        run: |
-          make package
+      - name: Make Debian Package
+        uses: docker/build-push-action@v5
+        with:
+          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
+          file: docker/Dockerfile
+          target: deb-package
+          outputs: type=local,dest=.
+          build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
         
       - name: Upload .deb to release
         uses: alexellis/upload-assets@0.4.0
