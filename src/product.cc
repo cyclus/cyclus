@@ -73,6 +73,10 @@ Resource::Ptr Product::ExtractRes(double qty) {
   return boost::static_pointer_cast<Resource>(Extract(qty));
 }
 
+int Product::package_id() {
+  return package_id_;
+}
+
 void Product::ChangePackageId(int new_package_id) {
   if (ctx_ != NULL) {
     throw ValueError("Package Id cannot be changed with NULL context");

@@ -153,12 +153,11 @@ class Material: public Resource {
   /// DEPRECATED - use non-const comp() function.
   Composition::Ptr comp() const;
 
-  /// Returns the package id.
-  virtual int package_id();
+  int package_id();
 
   /// Changes the package id. Checks that the resource fits the package 
   /// type minimum and maximum mass criteria.
-  virtual void ChangePackageId(int new_package_id = default_package_id_);
+  void ChangePackageId(int new_package_id = default_package_id_);
 
  protected:
   Material(Context* ctx, double quantity, Composition::Ptr c, int package_id = default_package_id_);

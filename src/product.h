@@ -71,6 +71,9 @@ class Product : public Resource {
   /// @throws ValueError 'other' resource is of different quality
   void Absorb(Product::Ptr other);
 
+  // Returns the package id.
+  int package_id();
+
   /// Changes the product's package id
   void ChangePackageId(int new_package_id);
 
