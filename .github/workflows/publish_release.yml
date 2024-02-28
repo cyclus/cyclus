@@ -81,5 +81,7 @@ jobs:
       - name: Upload .deb to release
         if: matrix.pkg_mgr == 'apt' && matrix.ubuntu_versions == '22.04'
         uses: alexellis/upload-assets@0.4.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         with:
           asset_paths: '["cyclus*.deb"]'
