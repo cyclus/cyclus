@@ -203,11 +203,21 @@ void Context::AddPackage(std::string name, double fill_min, double fill_max,
     ->Record();
 }
 
-Package::Ptr Context::GetPackage(std::string name) {
+Package::Ptr Context::GetPackageByName(std::string name) {
   if (packages_.count(name) == 0) {
     throw KeyError("Invalid package name " + name);
   }
   return packages_[name];
+}
+
+Package::Ptr Context::GetPackageById(int id) {
+  // iterate through the list of packages to get the one package with the correct id
+  std::map<std::string, Package::Ptr>::iterator it;
+  for (it = packages_.begin(); it != packages_.end(); ++it) {
+    if (it->second->id() == id) {
+      return it->second;
+    }
+  }
 }
 
 void Context::InitSim(SimInfo si) {
