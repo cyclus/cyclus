@@ -3,6 +3,7 @@
 
 #include <limits>
 #include <string>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 
 namespace cyclus {
@@ -18,6 +19,11 @@ class Package {
 
     // create a new package type
     static Ptr Create(std::string name, double fill_min, double fill_max, std::string strategy);
+
+    /// Repackages a single resource into a package. If some quantity of the 
+    /// resource cannot be packaged, the remainder is left in the resource
+    /// object. 
+    std::vector<typename T::Ptr> Repackage(typename T::Ptr r, Package::Ptr pkg);
 
     // returns package id
     int id() const { return id_; }
