@@ -30,6 +30,8 @@ std::vector<Resource::Ptr> ResCast(std::vector<Product::Ptr> rs);
 /// basically a no-op that enables ResBuf to work for plain Resource types.
 std::vector<Resource::Ptr> ResCast(std::vector<Resource::Ptr> rs);
 
+double GetFillMass(Resource::Ptr r, Package::Ptr pkg);
+
 }  // namespace toolkit
 }  // namespace cyclus
 

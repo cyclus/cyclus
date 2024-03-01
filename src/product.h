@@ -75,7 +75,7 @@ class Product : public Resource {
   int package_id();
 
   /// Changes the product's package id
-  void ChangePackageId(int new_package_id);
+  void ChangePackageId(int new_package_id = default_package_id_);
 
  private:
   /// @param ctx the simulation context

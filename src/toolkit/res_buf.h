@@ -163,6 +163,35 @@ class ResBuf {
     return Pop(qty);
   }
 
+  /// Pops the specified amount of material, re-packed into the the 
+  /// package type provided. Returns any remaining material that doesn't
+  /// fit in a package per the packaging strategy and limits as a 
+  /// separate vector with default packaging
+  std::vector<typename T::Ptr> PopPackaged(double qty, Package::Ptr pkg) {
+    typename T::Ptr r = Pop(qty);
+    std::vector<typename T::Ptr> rs_pkgd;
+    typename T::Ptr r_pkgd;
+    
+    double fill_mass = GetFillMass(r, pkg);
+    if (fill_mass ==0) {
+      return rs_pkgd;
+    }
+
+    while (r->quantity() > pkg->fill_min()) {
+      double pkg_fill = std::min(r->quantity(), fill_mass);
+      r_pkgd = boost::dynamic_pointer_cast<T>(r->ExtractRes(pkg_fill));
+      r_pkgd->ChangePackageId(pkg->id());
+      rs_pkgd.push_back(r_pkgd);
+    }
+    // push leftover material back into the buffer
+    double remaining = r->quantity() - r_pkgd->quantity();
+    if (remaining > 0) {
+      rs_.push_front(boost::dynamic_pointer_cast<T>(r->ExtractRes(remaining)));
+    }
+
+    return rs_pkgd;
+  }
+
   /// Pops the specified number of resource objects from the buffer.
   /// Resources are not split and are retrieved in the order they were
   /// pushed (i.e. oldest first).
