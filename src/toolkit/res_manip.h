@@ -30,6 +30,9 @@ std::vector<Resource::Ptr> ResCast(std::vector<Product::Ptr> rs);
 /// basically a no-op that enables ResBuf to work for plain Resource types.
 std::vector<Resource::Ptr> ResCast(std::vector<Resource::Ptr> rs);
 
+/// Given a single resource and a package type, returns optimal fill mass for
+/// the resource to be packaged. Can be used to determine how to respond to 
+/// requests for material, and to actually package add send off trades
 double GetFillMass(Resource::Ptr r, Package::Ptr pkg);
 
 }  // namespace toolkit
