@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include "resource.h"
 
 namespace cyclus {
 
@@ -19,6 +20,12 @@ class Package {
 
     // create a new package type
     static Ptr Create(std::string name, double fill_min, double fill_max, std::string strategy);
+
+    /// Given a single resource and a package type, returns optimal fill mass
+    /// for the resource to be packaged. Can be used to determine how to   
+    /// respond to requests for material, and to actually package and send off
+    /// trades
+    double GetFillMass(Resource::Ptr r, Package::Ptr pkg);
 
     /// Repackages a single resource into a package. If some quantity of the 
     /// resource cannot be packaged, the remainder is left in the resource

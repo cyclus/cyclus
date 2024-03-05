@@ -21,6 +21,31 @@ Package::Ptr Package::Create(std::string name, double fill_min, double fill_max,
   return p;
 }
 
+double GetFillMass(Resource::Ptr r, Package::Ptr pkg) {
+  if (r->quantity() < pkg->fill_min()) {
+    // less than one pkg of material available
+    return 0;
+  }
+
+  std::vector<Resource::Ptr> rs;
+  Resource::Ptr r_pkgd;
+  double fill_mass;
+  if (pkg->strategy() == "first") {
+    fill_mass = pkg->fill_max();
+  } else if (pkg->strategy() == "equal") {
+    int num_min_fill = std::floor(r->quantity() / pkg->fill_min());
+    int num_max_fill = std::ceil(r->quantity() / pkg->fill_max());
+    if (num_min_fill >= num_max_fill) {
+      // all material can fit in a package
+      double fill_mass = r->quantity() / num_max_fill;
+    } else {
+      // some material will remain unpackaged, fill up as many max packages as possible
+      fill_mass = pkg->fill_max();
+    }
+  }
+  return fill_mass;
+}
+
 std::vector<typename T::Ptr> Package::Repackage(typename T::Ptr r,
                                                 Package::Ptr pkg) {
     std::vector<typename T::Ptr> rs_pkgd;
