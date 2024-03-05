@@ -69,10 +69,7 @@ std::vector<Resource::Ptr> ResCast(std::vector<Resource::Ptr> rs) {
 }
 
 double GetFillMass(Resource::Ptr r, Package::Ptr pkg) {
-  if (r->quantity() == 0) {
-    throw Error("cannot fill zero resources into a package");
-  }
-  else if (r->quantity() < pkg->fill_min()) {
+  if (r->quantity() < pkg->fill_min()) {
     // less than one pkg of material available
     return 0;
   }
