@@ -272,7 +272,7 @@ class ResBuf {
   ///
   /// @throws KeyError the resource object to be pushed is already present in
   /// the buffer.
-  void Push(Resource::Ptr r) {
+  void Push(Resource::Ptr r, bool bulk_storage = true) {
     typename T::Ptr m = boost::dynamic_pointer_cast<T>(r);
     if (m == NULL) {
       throw CastError("pushing wrong type of resource onto ResBuf");
@@ -307,7 +307,7 @@ class ResBuf {
   /// @throws KeyError one or more of the resource objects to be added are
   /// already present in the buffer.
   template <class B>
-  void Push(std::vector<B> rs) {
+  void Push(std::vector<B> rs, bool bulk_storage = true) {
     std::vector<typename T::Ptr> rss;
     typename T::Ptr r;
     for (int i = 0; i < rs.size(); i++) {
