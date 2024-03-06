@@ -142,10 +142,7 @@ void Material::Transmute(Composition::Ptr c) {
 }
 
 void Material::ChangePackageId(int new_package_id) {
-  if (ctx_ != NULL) {
-    throw ValueError("Package Id cannot be changed with NULL context");
-  }
-  if (new_package_id == package_id_) {
+  if (new_package_id == package_id_ || ctx_ == NULL) {
     // no change needed
     return;
   }
