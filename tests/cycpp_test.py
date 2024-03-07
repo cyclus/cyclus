@@ -1049,7 +1049,7 @@ def test_internal_schema():
         msg = 'case {0} failed\n    ---- got ----\n    {1}\n    ---- want ----\n    {2}'.format(i + 1, impl.replace('\n', '\n    '), want.replace('\n', '\n    '))
         if want != impl:
             pprint.pprint(impl)
-            assert msg == False
+            assert False, msg
 
 def test_internal_infiletodb():
     # the expected output (i.e. 'want':...) is set as 'throw' if the
