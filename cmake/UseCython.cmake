@@ -61,7 +61,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #=============================================================================
-
+# set(Python3_FIND_UNVERSIONED_NAMES NEVER)
 # Configuration options.
 set( CYTHON_ANNOTATE OFF
   CACHE BOOL "Create an annotated .html file when compiling *.pyx." )
