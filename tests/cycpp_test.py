@@ -1131,7 +1131,7 @@ def test_internal_infiletodb():
             except:
                 haderr = True
             msg = 'case {0} failed: expected raised exception, got none.'
-            assert haderr == msg
+            assert haderr, msg
             continue
         else:
             impl = f.impl()
@@ -1139,8 +1139,8 @@ def test_internal_infiletodb():
         msg = 'case {0} failed\n    ---- got ----\n    {1}\n    ---- want ----\n    {2}'.format(i + 1, impl.replace('\n', '\n    '), want.replace('\n', '\n    '))
         if want != impl:
             pprint.pprint(impl)
-            assert msg == False
-            
+            assert False, msg
+
 def test_nuclide_uitype():
     m = MockCodeGenMachine()
     m.context = {"MyFactory": OrderedDict([('vars', OrderedDict([
