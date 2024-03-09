@@ -136,7 +136,9 @@ class Material: public Resource {
   /// not result in an updated material composition.  Does nothing if the
   /// simulation decay mode is set to "never" or none of the nuclides' decay
   /// constants are significant with respect to the time delta.
-  void Decay(int curr_time);
+  /// @param curr_time current time to use for the decay calculation 
+  ///        (default: -1 forces the decay to the context's current time)
+  virtual void Decay(int curr_time = -1);
 
   /// Returns the last time step on which a decay calculation was performed
   /// for the material.  This is not necessarily synonymous with the last time
