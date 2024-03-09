@@ -121,7 +121,7 @@ class Material: public Resource {
                   double threshold = eps_rsrc());
 
   /// Combines material mat with this one.  mat's quantity becomes zero.
-  void Absorb(Ptr mat);
+  virtual void Absorb(Ptr mat);
 
   /// Changes the material's composition to c without changing its mass.  Use
   /// this method for things like converting fresh to spent fuel via burning in
