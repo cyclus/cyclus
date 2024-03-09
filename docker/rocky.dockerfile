@@ -1,15 +1,18 @@
-FROM rockylinux:9 as common-base
+ARG rocky_version=9
+FROM rockylinux:${rocky_version} as common-base
 
 ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN yum update -y
+RUN dnf update -y
 
-FROM common-base as yum-deps
+FROM common-base as dnf-deps
 RUN alternatives --install /usr/bin/python python /bin/python3 10
-RUN yum install -y 'dnf-command(config-manager)' &&  yum config-manager --set-enabled crb && yum install -y epel-release
+RUN dnf install -y 'dnf-command(config-manager)' && \
+    dnf config-manager --set-enabled crb && \
+    dnf install -y epel-release
 
-RUN yum install -y \
+RUN dnf install -y \
         wget \
         which \
         git \
@@ -19,7 +22,6 @@ RUN yum install -y \
         cmake \
         hdf5-devel \
         libxml2-devel \
-        libxml++-devel \
         boost-devel \
         liblas-devel \
         lapack-devel \
@@ -33,11 +35,34 @@ RUN yum install -y \
         python3-pytest \
         python3-jinja2 \
         python3-tables \
-    && yum clean all
+    && dnf clean all
 
 RUN mkdir -p $(python -m site --user-site) && python -m pip install pandas cython
 
-FROM yum-deps as cyclus
+FROM dnf-deps as libxmlpp
+ENV PATH /usr/local/bin:$PATH
+RUN dnf install -y m4 doxygen perl-open perl-XML-Parser diffutils && \
+    python -m pip install meson ninja && \
+    wget https://github.com/libxmlplusplus/libxmlplusplus/releases/download/4.0.3/libxml++-4.0.3.tar.xz && \
+    tar xf libxml++-4.0.3.tar.xz && \
+    cd libxml++-4.0.3 && \
+    meson setup --prefix /usr --libdir lib64 \
+        --buildtype=release \
+        -Dbuild-documentation=false\
+        -Dbuild-manual=false \
+        -Dmm-common:use-network=true \
+        -Dglibmm-2.68:build-documentation=false \
+        -Dglibmm-2.68:build-examples=false \
+        -Dsigc++-3.0:build-documentation=false \
+        -Dsigc++-3.0:build-examples=false \
+        -Dsigc++-3.0:build-manual=false \
+        build_dir . && \
+    cd build_dir && \
+    ninja && \
+    ninja install
+
+
+FROM libxmlpp as cyclus
 ARG make_cores=2
 
 COPY . /cyclus
@@ -60,3 +85,4 @@ RUN cyclus_unit_tests
 FROM cyclus-test as cyclus-pytest
 
 RUN cd tests && python -m pytest
+

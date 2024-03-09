@@ -27,7 +27,7 @@ Since last release
 * Adds support for Cython3 (#1636)
 * Adds TotalInvTracker, which allows an inventory cap to be set for multiple resource buffers, and is now required for material buy policy (#1646)
 * AddMutalReqs and AddReciepe functions and exclusive bids in python API of DRE (#1584)
-* Created Package class and optional declaration of packages in input files (#1673)
+* Created Package class and optional declaration of packages in input files (#1673), package id is a member of resources (materials/products) (#1675)
 
 **Changed:**
 
@@ -50,6 +50,7 @@ Since last release
 * Resolve deprecation warnings involving <boost/detail/sp_typeinfo.hpp> (#1611)
 * Resolve segmentation faults when calling Cbc (#1614)
 * Resolve segmentation faults when using cyclus via Python (#1666)
+* Resolve pytest warnings related to invalid escape sequences (#1684)
 
 
 

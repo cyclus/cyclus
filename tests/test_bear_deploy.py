@@ -56,7 +56,7 @@ def test_bear_deploy():
     # test that the institution deploys a BearStore
     assert ("New fac: BearStore" in  s)
     # test that the first agents exist with right minimum production.
-    agents = re.compile('Agent \d+ 8\.0')
+    agents = re.compile(r'Agent \d+ 8\.0')
     all_agents = set(agents.findall(s))
     assert (len(all_agents) >=  9)
     if os.path.exists('bears.json'):

@@ -20,12 +20,8 @@ Package::Ptr Package::Create(std::string name, double fill_min, double fill_max,
   Ptr p(new Package(name, fill_min, fill_max, strategy));
   return p;
 }
-
-int Package::id() {
-  return id_;
-}
   
-Package::Package() : id_(next_id_++), fill_min_(0), fill_max_(std::numeric_limits<double>::max()), strategy_("first") {}
+Package::Package() : id_(next_id_++), fill_min_(0), fill_max_(std::numeric_limits<double>::max()) {}
 
 Package::Package(std::string name, double fill_min, double fill_max, std::string strategy) : name_(name), id_(next_id_++), fill_min_(fill_min), fill_max_(fill_max), strategy_(strategy) {}
 
