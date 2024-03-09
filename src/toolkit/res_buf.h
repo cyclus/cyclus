@@ -255,7 +255,7 @@ class ResBuf {
     } else if (rs_present_.count(m) == 1) {
       throw KeyError("duplicate resource push attempted");
     }
-    if (!is_bulk_) {
+    if (!is_bulk_  || rs_.size() == 0) {
       rs_.push_back(m);
       rs_present_.insert(m);
     } else {
@@ -304,7 +304,7 @@ class ResBuf {
     }
 
     for (int i = 0; i < rss.size(); i++) {
-      if (!is_bulk_) {
+      if (!is_bulk_ || rs_.size() == 0) {
         rs_.push_back(rss[i]);
         rs_present_.insert(rss[i]);
       } else {
