@@ -61,7 +61,7 @@ typedef std::vector<Product::Ptr> ProdVec;
 template <class T>
 class ResBuf {
  public:
-  ResBuf(bool is_bulk=false) : cap_(INFINITY), qty_(0), is_bulk_(is_bulk) { }
+  ResBuf(bool is_bulk=false, bool unpackaged=true) : cap_(INFINITY), qty_(0), is_bulk_(is_bulk), unpackaged_(unpackaged) { }
 
   virtual ~ResBuf() {}
 
@@ -178,30 +178,7 @@ class ResBuf {
   /// separate vector with default packaging
   /// If it's not possible to fill the package
   /// it returns an empty vector.
-  std::vector<typename T::Ptr> PopPackaged(double qty, Package::Ptr pkg) {
-    typename T::Ptr r = Pop(qty);
-    std::vector<typename T::Ptr> rs_pkgd;
-    typename T::Ptr r_pkgd;
-    
-    double fill_mass = GetFillMass(r, pkg);
-    if (fill_mass ==0) {
-      return rs_pkgd;
-    }
-
-    while (r->quantity() > pkg->fill_min()) {
-      double pkg_fill = std::min(r->quantity(), fill_mass);
-      r_pkgd = boost::dynamic_pointer_cast<T>(r->ExtractRes(pkg_fill));
-      r_pkgd->ChangePackageId(pkg->id());
-      rs_pkgd.push_back(r_pkgd);
-    }
-    // push leftover material back into the buffer
-    double remaining = r->quantity() - r_pkgd->quantity();
-    if (remaining > 0) {
-      rs_.push_front(boost::dynamic_pointer_cast<T>(r->ExtractRes(remaining)));
-    }
-
-    return rs_pkgd;
-  }
+  
 
   /// Pops the specified number of resource objects from the buffer.
   /// Resources are not split and are retrieved in the order they were
@@ -227,12 +204,6 @@ class ResBuf {
 
     UpdateQty();
     return rs;
-  }
-
-  /// Pops the specified number of resource objects from the buffer and returns
-  /// them as a single, squashed object.
-  typename T::Ptr PopNSquash(int n) {
-    return Squash(PopN(n));
   }
 
   /// Same as PopN except returns the Resource-typed objects.
@@ -287,9 +258,9 @@ class ResBuf {
   /// @throws ValueError the pushing of the given resource object would cause
   /// the buffer to exceed its capacity.
   ///
-  /// @throws KeyError the resource object to be pushed is already present
-  /// in the buffer.
-  void Push(Resource::Ptr r, bool unpackaged = true) {
+  /// @throws KeyError the resource object to be pushed is already present in
+  /// the buffer.
+  void Push(Resource::Ptr r) {
     typename T::Ptr m = boost::dynamic_pointer_cast<T>(r);
     if (m == NULL) {
       throw CastError("pushing wrong type of resource onto ResBuf");
@@ -301,9 +272,15 @@ class ResBuf {
     } else if (rs_present_.count(m) == 1) {
       throw KeyError("duplicate resource push attempted");
     }
+
     if (!is_bulk_  || rs_.size() == 0) {
+      // strip package id and set as default
+      m->ChangePackageId();
       rs_.push_back(m);
       rs_present_.insert(m);
+    } else if (unpackaged_) {
+      m->ChangePackageId();
+      rs_.front()->Absorb(m);
     } else {
       rs_.front()->Absorb(m);
     }
@@ -324,7 +301,7 @@ class ResBuf {
   /// @throws KeyError one or more of the resource objects to be added are
   /// already present in the buffer.
   template <class B>
-  void Push(std::vector<B> rs, bool unpackaged = true) {
+  void Push(std::vector<B> rs) {
     std::vector<typename T::Ptr> rss;
     typename T::Ptr r;
     for (int i = 0; i < rs.size(); i++) {
@@ -351,17 +328,15 @@ class ResBuf {
 
     for (int i = 0; i < rss.size(); i++) {
       if (!is_bulk_ || rs_.size() == 0) {
+        rss[i]->ChangePackageId();
         rs_.push_back(rss[i]);
         rs_present_.insert(rss[i]);
+      } else if (unpackaged_) {
+        rss[i]->ChangePackageId();
+        rs_.front()->Absorb(rss[i]);
       } else {
         rs_.front()->Absorb(rss[i]);
       }
-      if (unpackaged) {
-        // strip package id and set as default
-        rss[i]->ChangePackageId();
-      }
-      rs_.push_back(rss[i]);
-      rs_present_.insert(rss[i]);
     }
     qty_ += tot_qty;
   }
@@ -392,6 +367,9 @@ class ResBuf {
 
   /// Whether materials should be stored as a single squashed item or as individual resource objects
   bool is_bulk_;
+  /// Whether materials should be stripped of their packaging before being
+  /// pushed onto the resbuf. If res_buf is bulk, this is assumed true.
+  bool unpackaged_;
 
   /// List of constituent resource objects forming the buffer's inventory
   std::list<typename T::Ptr> rs_;
