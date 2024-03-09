@@ -79,6 +79,11 @@ class Resource {
   /// @return a new resource object with same state id and quantity == quantity
   virtual Ptr ExtractRes(double quantity) = 0;
 
+  /// To enable the Decay method to be called on any child resource, define
+  /// the a null op decay method here.
+  /// @param curr_time the current time for the decay oepration
+  virtual void Decay(int curr_time) { return; };
+
  protected:
   const static int default_package_id_ = 1;
  private:
