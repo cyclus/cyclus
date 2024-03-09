@@ -61,7 +61,7 @@ typedef std::vector<Product::Ptr> ProdVec;
 template <class T>
 class ResBuf {
  public:
-  ResBuf() : cap_(INFINITY), qty_(0) { }
+  ResBuf(bool is_bulk=false) : cap_(INFINITY), qty_(0), is_bulk_(is_bulk) { }
 
   virtual ~ResBuf() {}
 
@@ -233,16 +233,16 @@ class ResBuf {
     return r;
   }
 
-  /// Pushes a single resource object to the buffer.
-  /// Resource objects are never combined in the buffer; they are stored as
-  /// unique objects. The resource object is only pushed to the buffer if it
-  /// does not cause the buffer to exceed its capacity.
+  /// Pushes a single resource object to the buffer. If not classified as a bulk
+  /// storage buffer, resource objects are not combined in the buffer; they
+  /// are stored as unique objects. The resource object is only pushed to the
+  /// buffer if it does not cause the buffer to exceed its capacity.
   ///
-  /// @throws ValueError the pushing of the given resource object would
-  /// cause the buffer to exceed its capacity.
+  /// @throws ValueError the pushing of the given resource object would cause
+  /// the buffer to exceed its capacity.
   ///
-  /// @throws KeyError the resource object to be pushed is already present
-  /// in the buffer.
+  /// @throws KeyError the resource object to be pushed is already present in
+  /// the buffer.
   void Push(Resource::Ptr r) {
     typename T::Ptr m = boost::dynamic_pointer_cast<T>(r);
     if (m == NULL) {
@@ -255,24 +255,28 @@ class ResBuf {
     } else if (rs_present_.count(m) == 1) {
       throw KeyError("duplicate resource push attempted");
     }
-
-    rs_.push_back(m);
-    rs_present_.insert(m);
+    if (!is_bulk_) {
+      rs_.push_back(m);
+      rs_present_.insert(m);
+    } else {
+      rs_.front()->Absorb(m);
+    }
     qty_ += r->quantity();
     UpdateQty();
   }
 
-  /// Pushes one or more resource objects (as a std::vector) to the buffer.
-  /// Resource objects are never squashed in the buffer; they are stored as
-  /// unique objects. The resource objects are only pushed to the buffer if
-  /// they do not cause the buffer to exceed its capacity; otherwise none of the
-  /// given resource objects are added to the buffer.
+  /// Pushes one or more resource objects (as a std::vector) to the buffer. If
+  /// not classified as a bulk storage buffer, resource objects are not
+  /// squashed in the buffer; they are stored as unique objects. The resource
+  /// objects are only pushed to the buffer if they do not cause the buffer to
+  /// exceed its capacity; otherwise none of the given resource objects are
+  /// added to the buffer.
   ///
-  /// @throws ValueError adding the given resource objects would
-  /// cause the buffer to exceed its capacity.
+  /// @throws ValueError adding the given resource objects would cause the
+  /// buffer to exceed its capacity.
   ///
-  /// @throws KeyError one or more of the resource objects to be added
-  /// are already present in the buffer.
+  /// @throws KeyError one or more of the resource objects to be added are
+  /// already present in the buffer.
   template <class B>
   void Push(std::vector<B> rs) {
     std::vector<typename T::Ptr> rss;
@@ -300,10 +304,23 @@ class ResBuf {
     }
 
     for (int i = 0; i < rss.size(); i++) {
-      rs_.push_back(rss[i]);
-      rs_present_.insert(rss[i]);
+      if (!is_bulk_) {
+        rs_.push_back(rss[i]);
+        rs_present_.insert(rss[i]);
+      } else {
+        rs_.front()->Absorb(rss[i]);
+      }
     }
     qty_ += tot_qty;
+  }
+
+  /// Decays all the materials in a resource buffer
+  /// @param curr_time time to calculate decay inventory
+  ///        (default: -1 uses the current time of the context)
+  void Decay(int curr_time = -1) {
+    for (int i = 0; i < rs_.size(); i++) {
+      rs_.at(i)->Decay(curr_time);
+    }
   }
 
  private:
@@ -320,6 +337,8 @@ class ResBuf {
 
   /// Maximum quantity of resources this buffer can hold
   double cap_;
+
+  bool is_bulk_;
 
   /// List of constituent resource objects forming the buffer's inventory
   std::list<typename T::Ptr> rs_;
