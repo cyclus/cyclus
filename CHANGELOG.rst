@@ -51,6 +51,7 @@ Since last release
 * Resolve segmentation faults when calling Cbc (#1614)
 * Resolve segmentation faults when using cyclus via Python (#1666)
 * Resolve pytest warnings related to invalid escape sequences (#1684)
+* Fix how Env::GetInstallPath() finds the location of the cyclus installation (#1689)
 
 
 
