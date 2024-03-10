@@ -61,7 +61,6 @@ RUN dnf install -y m4 doxygen perl-open perl-XML-Parser diffutils && \
     ninja && \
     ninja install
 
-
 FROM libxmlpp as cyclus
 ARG make_cores=2
 
