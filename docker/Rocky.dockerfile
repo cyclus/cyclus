@@ -3,21 +3,15 @@ FROM rockylinux:${rocky_version} as common-base
 
 ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-RUN dnf update -y && \
-    dnf install -y 'dnf-command(config-manager)' && \
-    dnf install -y python3.11 epel-release
 
-FROM common-base as rocky-8-config
-RUN alternatives --set python /usr/bin/python3.11 && \
-    alternatives --set python3 /usr/bin/python3.11 && \
-    dnf config-manager --set-enabled powertools
+RUN dnf update -y
 
-FROM common-base as rocky-9-config
-RUN alternatives --install /usr/bin/python python /bin/python3.11 10 && \
-    alternatives --install /usr/bin/python3 python3 /bin/python3.11 10 && \
-    dnf config-manager --set-enabled crb
+FROM common-base as dnf-deps
+RUN alternatives --install /usr/bin/python python /bin/python3 10
+RUN dnf install -y 'dnf-command(config-manager)' && \
+    dnf config-manager --set-enabled crb && \
+    dnf install -y epel-release
 
-FROM rocky-${rocky_version}-config as dnf-deps
 RUN dnf install -y \
         wget \
         which \
@@ -29,22 +23,26 @@ RUN dnf install -y \
         hdf5-devel \
         libxml2-devel \
         boost-devel \
-        blas-devel \
+        liblas-devel \
         lapack-devel \
         sqlite-devel \
+        pcre2-devel \
         gettext \
         xz \
-        python3.11-devel \
-        python3.11-setuptools \
-        python3.11-pip \
-        python3.11-pytest \
+        python3-devel \
+        python3-setuptools \
+        python3-pip \
+        python3-pytest \
+        python3-jinja2 \
+        python3-tables \
     && dnf clean all
 
-RUN mkdir -p $(python -m site --user-site) && python -m pip install pandas tables cython jinja2
+RUN mkdir -p $(python -m site --user-site) && python -m pip install pandas cython
 
 FROM dnf-deps as libxmlpp
-RUN dnf install -y m4 doxygen perl-open perl-XML-Parser diffutils pcre-cpp pcre-devel  && \
-    python -m pip install meson ninja packaging && \
+ENV PATH /usr/local/bin:$PATH
+RUN dnf install -y m4 doxygen perl-open perl-XML-Parser diffutils && \
+    python -m pip install meson ninja && \
     wget https://github.com/libxmlplusplus/libxmlplusplus/releases/download/4.0.3/libxml++-4.0.3.tar.xz && \
     tar xf libxml++-4.0.3.tar.xz && \
     cd libxml++-4.0.3 && \
@@ -63,6 +61,7 @@ RUN dnf install -y m4 doxygen perl-open perl-XML-Parser diffutils pcre-cpp pcre-
     ninja && \
     ninja install
 
+
 FROM libxmlpp as cyclus
 ARG make_cores=2
 
@@ -75,7 +74,7 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
-RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999 -D Python3_EXECUTABLE=/usr/bin/python3.11
+RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 
