@@ -7,13 +7,15 @@
 #include "error.h"
 #include "logger.h"
 #include "product.h"
+#include "composition.h"
+#include "material.h"
 #include "toolkit/res_buf.h"
 
 namespace cyclus {
 namespace toolkit {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class ResBufTest : public ::testing::Test {
+class ProductBufTest : public ::testing::Test {
  protected:
   Product::Ptr mat1_, mat2_;
   double mass1, mass2;
@@ -62,6 +64,53 @@ class ResBufTest : public ::testing::Test {
     }
   }
 };
+
+class MaterialBufTest : public ::testing::Test {
+ protected:
+
+  ResBuf<Material> mat_store_;  // default constructed mat store
+  ResBuf<Material> bulk_store_ = ResBuf<Material>(true);
+
+  Nuc sr89_, fe59_;
+  Material::Ptr mat1_, mat2_, mat3_;
+  Composition::Ptr test_comp1_, test_comp2_;
+
+  double cap_;
+
+  virtual void SetUp() {
+    try {
+
+      sr89_ = 380890000;
+      fe59_ = 260590000;
+
+      CompMap v, w;
+      v[sr89_] = 1;
+      test_comp1_ = Composition::CreateFromMass(v);
+
+      w[fe59_] = 2;
+      test_comp2_ = Composition::CreateFromMass(w);
+
+      mat1_ = Material::CreateUntracked(5 * units::g, test_comp1_);
+      mat2_ = Material::CreateUntracked(5 * units::g, test_comp2_);
+      mat3_ = Material::CreateUntracked(5 * units::g, test_comp1_);
+
+      cap_ = 10 * mat1_->quantity();
+
+      mat_store_.capacity(cap_);
+      bulk_store_.capacity(cap_);
+
+      mat_store_.Push(mat1_);
+      mat_store_.Push(mat2_);
+
+      bulk_store_.Push(mat3_);
+      bulk_store_.Push(mat2_);
+
+    } catch (std::exception err) {
+      FAIL() << "An exception was thrown in the fixture SetUp.";
+    }
+  }
+};
+
 
 }  // namespace toolkit
 }  // namespace cyclus

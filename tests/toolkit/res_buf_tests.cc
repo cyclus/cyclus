@@ -12,20 +12,20 @@ namespace toolkit {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // - - - - - - Getters, Setters, and Property changers - - - - - - - - - - - -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, set_capacity_ExceptionsEmpty) {
+TEST_F(ProductBufTest, set_capacity_ExceptionsEmpty) {
   EXPECT_THROW(store_.capacity(neg_cap), ValueError);
   EXPECT_NO_THROW(store_.capacity(zero_cap));
   EXPECT_NO_THROW(store_.capacity(cap));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, set_capacity_ExceptionsFilled) {
+TEST_F(ProductBufTest, set_capacity_ExceptionsFilled) {
   EXPECT_THROW(filled_store_.capacity(low_cap), ValueError);
   EXPECT_NO_THROW(filled_store_.capacity(cap));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, GetCapacity_ExceptionsEmpty) {
+TEST_F(ProductBufTest, GetCapacity_ExceptionsEmpty) {
   ASSERT_NO_THROW(store_.capacity());
   store_.capacity(zero_cap);
   ASSERT_NO_THROW(store_.capacity());
@@ -34,12 +34,12 @@ TEST_F(ResBufTest, GetCapacity_ExceptionsEmpty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, GetCapacity_InitialEmpty) {
+TEST_F(ProductBufTest, GetCapacity_InitialEmpty) {
   EXPECT_DOUBLE_EQ(store_.capacity(), INFINITY);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, Getset_capacityEmpty) {
+TEST_F(ProductBufTest, Getset_capacityEmpty) {
   store_.capacity(zero_cap);
   EXPECT_DOUBLE_EQ(store_.capacity(), zero_cap);
 
@@ -48,7 +48,7 @@ TEST_F(ResBufTest, Getset_capacityEmpty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, GetSpace_Empty) {
+TEST_F(ProductBufTest, GetSpace_Empty) {
   ASSERT_NO_THROW(store_.space());
   EXPECT_DOUBLE_EQ(store_.space(), INFINITY);
 
@@ -62,33 +62,33 @@ TEST_F(ResBufTest, GetSpace_Empty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, GetSpace_Filled) {
+TEST_F(ProductBufTest, GetSpace_Filled) {
   double space = cap - (mat1_->quantity() + mat2_->quantity());
   ASSERT_NO_THROW(filled_store_.space());
   EXPECT_DOUBLE_EQ(filled_store_.space(), space);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, GetQuantity_Empty) {
+TEST_F(ProductBufTest, GetQuantity_Empty) {
   ASSERT_NO_THROW(store_.quantity());
   EXPECT_DOUBLE_EQ(store_.quantity(), 0.0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, GetQuantity_Filled) {
+TEST_F(ProductBufTest, GetQuantity_Filled) {
   ASSERT_NO_THROW(filled_store_.quantity());
   double quantity = mat1_->quantity() + mat2_->quantity();
   EXPECT_DOUBLE_EQ(filled_store_.quantity(), quantity);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, GetCount_Empty) {
+TEST_F(ProductBufTest, GetCount_Empty) {
   ASSERT_NO_THROW(store_.count());
   EXPECT_EQ(store_.count(), 0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, GetCount_Filled) {
+TEST_F(ProductBufTest, GetCount_Filled) {
   ASSERT_NO_THROW(filled_store_.count());
   EXPECT_DOUBLE_EQ(filled_store_.count(), 2);
 }
@@ -96,21 +96,21 @@ TEST_F(ResBufTest, GetCount_Filled) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // - - - - - Removing from buffer  - - - - - - - - - - - - - - - - - - - - - -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, RemoveQty_ExceptionsEmpty) {
+TEST_F(ProductBufTest, RemoveQty_ExceptionsEmpty) {
   Product::Ptr p;
   double qty = cap + overeps;
   ASSERT_THROW(p = filled_store_.Pop(qty), ValueError);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, RemoveQty_ExceptionsFilled) {
+TEST_F(ProductBufTest, RemoveQty_ExceptionsFilled) {
   Product::Ptr p;
   double qty = cap + overeps;
   ASSERT_THROW(p = store_.Pop(qty), ValueError);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, RemoveQty_SingleNoSplit) {
+TEST_F(ProductBufTest, RemoveQty_SingleNoSplit) {
   // pop one no splitting leaving one mat in the store
   Product::Ptr p;
 
@@ -121,7 +121,7 @@ TEST_F(ResBufTest, RemoveQty_SingleNoSplit) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, RemoveQty_SingleWithSplit) {
+TEST_F(ProductBufTest, RemoveQty_SingleWithSplit) {
   // pop one no splitting leaving one mat in the store
 
   Product::Ptr p;
@@ -134,7 +134,7 @@ TEST_F(ResBufTest, RemoveQty_SingleWithSplit) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, RemoveQty_DoubleWithSplit) {
+TEST_F(ProductBufTest, RemoveQty_DoubleWithSplit) {
   // pop one no splitting leaving one mat in the store
 
   Product::Ptr p;
@@ -147,14 +147,14 @@ TEST_F(ResBufTest, RemoveQty_DoubleWithSplit) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, RemoveNum_ExceptionsFilled) {
+TEST_F(ProductBufTest, RemoveNum_ExceptionsFilled) {
   ProdVec manifest;
   ASSERT_THROW(manifest = filled_store_.PopN(3), ValueError);
   ASSERT_THROW(manifest = filled_store_.PopN(-1), ValueError);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, RemoveNum_ZeroFilled) {
+TEST_F(ProductBufTest, RemoveNum_ZeroFilled) {
   ProdVec manifest;
   double tot_qty = filled_store_.quantity();
 
@@ -165,7 +165,7 @@ TEST_F(ResBufTest, RemoveNum_ZeroFilled) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, RemoveNum_OneFilled) {
+TEST_F(ProductBufTest, RemoveNum_OneFilled) {
   ProdVec manifest;
 
   ASSERT_NO_THROW(manifest = filled_store_.PopN(1));
@@ -177,7 +177,7 @@ TEST_F(ResBufTest, RemoveNum_OneFilled) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, RemoveNum_TwoFilled) {
+TEST_F(ProductBufTest, RemoveNum_TwoFilled) {
   ProdVec manifest;
 
   ASSERT_NO_THROW(manifest = filled_store_.PopN(2));
@@ -191,7 +191,7 @@ TEST_F(ResBufTest, RemoveNum_TwoFilled) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, RemoveOne_Filled) {
+TEST_F(ProductBufTest, RemoveOne_Filled) {
   Product::Ptr mat;
 
   ASSERT_NO_THROW(mat = filled_store_.Pop());
@@ -210,7 +210,7 @@ TEST_F(ResBufTest, RemoveOne_Filled) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, PopBack) {
+TEST_F(ProductBufTest, PopBack) {
   Product::Ptr mat;
 
   ASSERT_NO_THROW(mat = filled_store_.PopBack());
@@ -231,7 +231,7 @@ TEST_F(ResBufTest, PopBack) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // - - - - - Pushing into buffer - - - - - - - - - - - - - - - - - - - - - - -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, Push_Empty) {
+TEST_F(ProductBufTest, Push_Empty) {
   ASSERT_NO_THROW(store_.capacity(cap));
 
   ASSERT_NO_THROW(store_.Push(mat1_));
@@ -244,7 +244,7 @@ TEST_F(ResBufTest, Push_Empty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, Push_OverCapacityEmpty) {
+TEST_F(ProductBufTest, Push_OverCapacityEmpty) {
   ASSERT_NO_THROW(store_.capacity(cap));
 
   ASSERT_NO_THROW(store_.Push(mat1_));
@@ -266,7 +266,7 @@ TEST_F(ResBufTest, Push_OverCapacityEmpty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, Push_DuplicateEmpty) {
+TEST_F(ProductBufTest, Push_DuplicateEmpty) {
   ASSERT_NO_THROW(store_.capacity(cap));
 
   ASSERT_NO_THROW(store_.Push(mat1_));
@@ -277,7 +277,7 @@ TEST_F(ResBufTest, Push_DuplicateEmpty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, PushAll_Empty) {
+TEST_F(ProductBufTest, PushAll_Empty) {
   ASSERT_NO_THROW(store_.capacity(cap));
   ASSERT_NO_THROW(store_.Push(mats));
   ASSERT_EQ(store_.count(), 2);
@@ -285,7 +285,7 @@ TEST_F(ResBufTest, PushAll_Empty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, PushAll_ResCast) {
+TEST_F(ProductBufTest, PushAll_ResCast) {
   ResVec rs;
   for (int i = 0; i < mats.size(); ++i) {
     rs.push_back(mats[i]);
@@ -297,7 +297,7 @@ TEST_F(ResBufTest, PushAll_ResCast) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, PushAll_NoneEmpty) {
+TEST_F(ProductBufTest, PushAll_NoneEmpty) {
   ProdVec manifest;
   ASSERT_NO_THROW(store_.capacity(cap));
   ASSERT_NO_THROW(store_.Push(manifest));
@@ -306,7 +306,7 @@ TEST_F(ResBufTest, PushAll_NoneEmpty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, PushAll_RetrieveOrderEmpty) {
+TEST_F(ProductBufTest, PushAll_RetrieveOrderEmpty) {
   Product::Ptr mat;
 
   ASSERT_NO_THROW(store_.capacity(cap));
@@ -318,7 +318,7 @@ TEST_F(ResBufTest, PushAll_RetrieveOrderEmpty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, PushAll_OverCapacityEmpty) {
+TEST_F(ProductBufTest, PushAll_OverCapacityEmpty) {
   ASSERT_NO_THROW(store_.capacity(cap));
   ASSERT_NO_THROW(store_.Push(mats));
 
@@ -343,7 +343,7 @@ TEST_F(ResBufTest, PushAll_OverCapacityEmpty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResBufTest, PushAll_DuplicateEmpty) {
+TEST_F(ProductBufTest, PushAll_DuplicateEmpty) {
   ASSERT_NO_THROW(store_.capacity(2 * cap));
 
   ASSERT_NO_THROW(store_.Push(mats));
@@ -353,6 +353,21 @@ TEST_F(ResBufTest, PushAll_DuplicateEmpty) {
 
   ASSERT_EQ(store_.count(), 2);
   EXPECT_DOUBLE_EQ(store_.quantity(), mat1_->quantity() + mat2_->quantity());
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Special tests for material buffers
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+TEST_F(MaterialBufTest, NonBulkTest) {
+
+  ASSERT_EQ(mat_store_.count(), 2);
+  ASSERT_EQ(mat_store_.capacity(), cap_);
+  double qty_exp = 2 * mat1_->quantity();
+  double space_exp = cap_ - qty_exp;
+  ASSERT_EQ(mat_store_.space(), space_exp);
+  ASSERT_EQ(mat_store_.quantity(), qty_exp);
+
 }
 
 }  // namespace toolkit
