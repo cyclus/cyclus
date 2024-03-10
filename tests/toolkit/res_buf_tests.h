@@ -73,7 +73,7 @@ class MaterialBufTest : public ::testing::Test {
 
   Nuc sr89_, fe59_;
   Material::Ptr mat1_, mat2_, mat3_;
-  Composition::Ptr test_comp1_, test_comp2_;
+  Composition::Ptr test_comp1_, test_comp2_, test_comp3_;
 
   double cap_;
 
@@ -89,6 +89,9 @@ class MaterialBufTest : public ::testing::Test {
 
       w[fe59_] = 2;
       test_comp2_ = Composition::CreateFromMass(w);
+
+      w[sr89_] = 1;
+      test_comp3_ = Composition::CreateFromMass(w);
 
       mat1_ = Material::CreateUntracked(5 * units::g, test_comp1_);
       mat2_ = Material::CreateUntracked(5 * units::g, test_comp2_);

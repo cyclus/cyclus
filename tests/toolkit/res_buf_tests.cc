@@ -1,4 +1,5 @@
 #include "res_buf_tests.h"
+#include "toolkit/mat_query.h"
 
 #include <gtest/gtest.h>
 
@@ -368,7 +369,33 @@ TEST_F(MaterialBufTest, NonBulkTest) {
   ASSERT_EQ(mat_store_.space(), space_exp);
   ASSERT_EQ(mat_store_.quantity(), qty_exp);
 
+  Material::Ptr pop1_ = mat_store_.Pop();
+  ASSERT_EQ(pop1_->comp(), test_comp1_);
+  Material::Ptr pop2_ = mat_store_.Pop();
+  ASSERT_EQ(pop2_->comp(), test_comp2_);
+
 }
+
+TEST_F(MaterialBufTest, BulkTest) {
+
+  ASSERT_EQ(bulk_store_.count(), 1);
+  ASSERT_EQ(bulk_store_.capacity(), cap_);
+  double qty_exp = 2 * mat1_->quantity();
+  double space_exp = cap_ - qty_exp;
+  ASSERT_EQ(bulk_store_.space(), space_exp);
+  ASSERT_EQ(bulk_store_.quantity(), qty_exp);
+
+  Material::Ptr pop1_ = mat_store_.Pop();
+  cyclus::toolkit::MatQuery mq1(pop1_);
+  double sr89_qty = mq1.mass(sr89_);
+  double fe59_qty = mq1.mass(fe59_);
+
+  ASSERT_EQ(sr89_qty, 5.0 * units::g);  
+  ASSERT_EQ(fe59_qty, 5.0 * units::g);  
+
+
+}
+
 
 }  // namespace toolkit
 }  // namespace cyclus
