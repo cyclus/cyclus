@@ -1,4 +1,4 @@
-name: Build/Test Cyclus
+name: Rocky Build/Test Cyclus
 
 on:
   # allows us to run workflows manually
@@ -44,6 +44,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           file: docker/Rocky.dockerfile
-          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
+          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_rocky_${{ matrix.rocky_versions }}/cyclus:ci-layer-cache
           build-args: |
             rocky_version=${{ matrix.rocky_versions }}
