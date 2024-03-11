@@ -84,8 +84,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          asset_paths: '["./build/cyclus*.deb"]'
-
+          asset_paths: '["cyclus*.deb"]'
   build-and-test-rocky-release:
     runs-on: ubuntu-latest
     permissions:
@@ -137,4 +136,3 @@ jobs:
             ghcr.io/cyclus/cyclus_rocky_${{ matrix.rocky_versions }}/cyclus:${{ env.stable_tag }}
           build-args: |
             rocky_version=${{ matrix.rocky_versions }}
-      
