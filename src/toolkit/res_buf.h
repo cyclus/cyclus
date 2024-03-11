@@ -338,6 +338,7 @@ class ResBuf {
   /// Maximum quantity of resources this buffer can hold
   double cap_;
 
+  /// Whether materials should be stored as a single squashed item or as individual resource objects
   bool is_bulk_;
 
   /// List of constituent resource objects forming the buffer's inventory
