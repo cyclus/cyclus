@@ -11,7 +11,7 @@ jobs:
   build-and-test-for-release:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     strategy:
@@ -58,6 +58,7 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
           file: docker/Dockerfile
           push: true
+          target: cyclus
           tags: |
             ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.version_tag }}
             ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.stable_tag }}
@@ -65,3 +66,22 @@ jobs:
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
 
+      - name: Make Debian Package
+        if: matrix.pkg_mgr == 'apt' && matrix.ubuntu_versions == '22.04'
+        uses: docker/build-push-action@v5
+        with:
+          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
+          file: docker/Dockerfile
+          target: deb-package
+          outputs: type=local,dest=.
+          build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
+        
+      - name: Upload .deb to release
+        if: github.event_name == 'release' && matrix.pkg_mgr == 'apt' && matrix.ubuntu_versions == '22.04'
+        uses: alexellis/upload-assets@0.4.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          asset_paths: '["cyclus*.deb"]'
