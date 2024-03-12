@@ -9,10 +9,12 @@ RUN dnf update -y && \
 
 FROM common-base as rocky-8-config
 RUN alternatives --set python /usr/bin/python3.11 && \
+    alternatives --set python3 /usr/bin/python3.11 && \
     dnf config-manager --set-enabled powertools
 
 FROM common-base as rocky-9-config
 RUN alternatives --install /usr/bin/python python /bin/python3.11 10 && \
+    alternatives --install /usr/bin/python3 python3 /bin/python3.11 10 && \
     dnf config-manager --set-enabled crb
 
 FROM rocky-${rocky_version}-config as dnf-deps
@@ -73,7 +75,7 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
-RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999
+RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999 -D Python3_EXECUTABLE=/usr/bin/python3.11
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 
