@@ -168,4 +168,3 @@ RUN cyclus_unit_tests
 FROM cyclus-test as cyclus-pytest
 
 RUN cd tests && python -m pytest
-
