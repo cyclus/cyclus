@@ -25,7 +25,6 @@ on:
 jobs:
   build-test-ubuntu:
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     strategy:
       fail-fast: false
@@ -156,7 +155,6 @@ jobs:
 
   build-test-rocky:
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     strategy:
       fail-fast: false
