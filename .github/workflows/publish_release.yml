@@ -26,7 +26,7 @@ jobs:
           conda
         ]
 
-    name: Build, Test, Publish
+    name: Publish Ubuntu Release
     steps:
       - name: Tag as ci-image-cache
         run: |
@@ -99,7 +99,7 @@ jobs:
           9,
         ]
 
-    name: Build, Test, Publish
+    name: Publish Rocky Release
     steps:
       - name: Tag as ci-image-cache
         run: |

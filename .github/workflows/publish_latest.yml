@@ -28,7 +28,7 @@ jobs:
           conda,
         ]
 
-    name: Build, Test, Publish
+    name: Publish Ubuntu Latest
     steps:
       - name: Tag as ci-image-cache
         run: |
@@ -119,7 +119,7 @@ jobs:
           9,
         ]
 
-    name: Build, Test, Publish
+    name: Publish Rocky Latest
     steps:
       - name: Tag as ci-image-cache
         run: |
