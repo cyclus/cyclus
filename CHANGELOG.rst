@@ -51,7 +51,7 @@ Since last release
 * Resolve deprecation warnings involving <boost/detail/sp_typeinfo.hpp> (#1611)
 * Resolve segmentation faults when calling Cbc (#1614)
 * Resolve segmentation faults when using cyclus via Python (#1666)
-* Resolve pytest warnings related to invalid escape sequences (#1684)
+* Resolve pytest and compilation warnings related to invalid escape sequences (#1684, #1698)
 * Fix how Env::GetInstallPath() finds the location of the cyclus installation (#1689)
 * Fix Debian package generation (#1676)
 
