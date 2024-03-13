@@ -101,16 +101,15 @@ class ResBuf {
   /// Returns true if there are no resources in the buffer.
   inline bool empty() const { return rs_.empty(); }
 
-  /// Pops and returns the specified quantity from the buffer as a single
-  /// resource object.
+  /// Pops and returns the specified quantity from the buffer as vector of 
+  /// resources.
   /// Resources are split if necessary in order to pop the exact quantity
   /// requested (within eps_rsrc()).  Resources are retrieved in the order they
-  /// were pushed (i.e. oldest first) and are squashed into a single object
-  /// when returned.
+  /// were pushed (i.e. oldest first).
   ///
   /// @throws ValueError the specified pop quantity is larger than the
   /// buffer's current inventory.
-  typename T::Ptr Pop(double qty) {
+  std::vector<typename T::Ptr> PopVector(double qty) {
     if (qty > this->quantity()) {
       std::stringstream ss;
       ss << std::setprecision(17) << "removal quantity " << qty
@@ -143,7 +142,17 @@ class ResBuf {
 
     UpdateQty();
 
-    return Squash(rs);
+    return rs;
+  }
+
+  /// Pops and returns the specified quantity from the buffer as a single
+  /// resource object.
+  /// Resources are split if necessary in order to pop the exact quantity
+  /// requested (within eps_rsrc()).  Resources are retrieved in the order they
+  /// were pushed (i.e. oldest first) and are squashed into a single object
+  /// when returned.
+  typename T::Ptr Pop(double qty) {
+    return Squash(PopVector(qty));
   }
 
   /// Same behavior as Pop(double) except a non-zero eps may be specified.  eps
@@ -218,6 +227,12 @@ class ResBuf {
     return rs;
   }
 
+  /// Pops the specified number of resource objects from the buffer and returns
+  /// them as a single, squashed object.
+  typename T::Ptr PopNSquash(int n) {
+    return Squash(PopN(n));
+  }
+
   /// Same as PopN except returns the Resource-typed objects.
   ResVec PopNRes(int n) { return ResCast(PopN(n)); }
 
@@ -270,9 +285,9 @@ class ResBuf {
   /// @throws ValueError the pushing of the given resource object would cause
   /// the buffer to exceed its capacity.
   ///
-  /// @throws KeyError the resource object to be pushed is already present in
-  /// the buffer.
-  void Push(Resource::Ptr r, bool bulk_storage = true) {
+  /// @throws KeyError the resource object to be pushed is already present
+  /// in the buffer.
+  void Push(Resource::Ptr r, bool unpackaged = true) {
     typename T::Ptr m = boost::dynamic_pointer_cast<T>(r);
     if (m == NULL) {
       throw CastError("pushing wrong type of resource onto ResBuf");
