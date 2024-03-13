@@ -206,6 +206,12 @@ class ResBuf {
     return rs;
   }
 
+  /// Pops the specified number of resource objects from the buffer and returns
+  /// them as a single, squashed object.
+  typename T::Ptr PopNSquash(int n) {
+    return Squash(PopN(n));
+  }
+
   /// Same as PopN except returns the Resource-typed objects.
   ResVec PopNRes(int n) { return ResCast(PopN(n)); }
 
@@ -274,6 +280,7 @@ class ResBuf {
     }
 
     if (!is_bulk_  || rs_.size() == 0) {
+    if (unpackaged) {
       // strip package id and set as default
       m->ChangePackageId();
       rs_.push_back(m);
