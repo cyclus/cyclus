@@ -28,7 +28,7 @@ def replace_in_file(pattern, new, fname):
 
 
 VERSION_UPDATE_PATTERNS = [
-    ('__version__\s*=.*', (lambda ver: "__version__ = '{0}'".format(ver)),
+    ('__version__\s=*', (lambda ver: "__version__ = '{0}'".format(ver)),
         [PROJECT, '__init__.py']),
     ]
 
