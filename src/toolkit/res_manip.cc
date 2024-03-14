@@ -90,6 +90,9 @@ double GetFillMass(Resource::Ptr r, Package::Ptr pkg) {
       fill_mass = pkg->fill_max();
     }
   }
+  // Handle the scenario when there's leftover material that cannot be packaged
+  // due to not enough material for minimum fill, but more than one max filled package worth of material.
+  // In this case, fill one package up all the way and return the remaining to the buffer.
   return fill_mass;
 }
 
