@@ -72,7 +72,7 @@ class MaterialBufTest : public ::testing::Test {
   ResBuf<Material> bulk_store_ = ResBuf<Material>(true);
 
   Nuc sr89_, fe59_;
-  Material::Ptr mat1_, mat2_, mat3_;
+  Material::Ptr mat1a_, mat1b_, mat2a_, mat2b_, mat3_;
   Composition::Ptr test_comp1_, test_comp2_, test_comp3_;
 
   double cap_;
@@ -93,20 +93,18 @@ class MaterialBufTest : public ::testing::Test {
       w[sr89_] = 1;
       test_comp3_ = Composition::CreateFromMass(w);
 
-      mat1_ = Material::CreateUntracked(5 * units::g, test_comp1_);
-      mat2_ = Material::CreateUntracked(5 * units::g, test_comp2_);
-      mat3_ = Material::CreateUntracked(5 * units::g, test_comp1_);
+      double mat_size = 5 * units::g;
 
-      cap_ = 10 * mat1_->quantity();
+      mat1a_ = Material::CreateUntracked(mat_size, test_comp1_);
+      mat1b_ = Material::CreateUntracked(mat_size, test_comp1_);
+      mat2a_ = Material::CreateUntracked(mat_size, test_comp2_);
+      mat2b_ = Material::CreateUntracked(mat_size, test_comp2_);
+      mat3_ = Material::CreateUntracked(mat_size, test_comp3_);
+
+      cap_ = 10 * mat_size;
 
       mat_store_.capacity(cap_);
       bulk_store_.capacity(cap_);
-
-      mat_store_.Push(mat1_);
-      mat_store_.Push(mat2_);
-
-      bulk_store_.Push(mat3_);
-      bulk_store_.Push(mat2_);
 
     } catch (std::exception err) {
       FAIL() << "An exception was thrown in the fixture SetUp.";

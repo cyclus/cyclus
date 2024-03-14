@@ -362,12 +362,18 @@ TEST_F(ProductBufTest, PushAll_DuplicateEmpty) {
 
 TEST_F(MaterialBufTest, NonBulkTest) {
 
+  ASSERT_EQ(mat_store_.count(), 0);
+  EXPECT_DOUBLE_EQ(mat_store_.capacity(), cap_);
+
+  mat_store_.Push(mat1a_);
+  mat_store_.Push(mat2a_);
+
   ASSERT_EQ(mat_store_.count(), 2);
-  ASSERT_EQ(mat_store_.capacity(), cap_);
-  double qty_exp = 2 * mat1_->quantity();
+  EXPECT_DOUBLE_EQ(mat_store_.capacity(), cap_);
+  double qty_exp = mat1a_->quantity() + mat2a_->quantity();
   double space_exp = cap_ - qty_exp;
-  ASSERT_EQ(mat_store_.space(), space_exp);
-  ASSERT_EQ(mat_store_.quantity(), qty_exp);
+  EXPECT_DOUBLE_EQ(mat_store_.space(), space_exp);
+  EXPECT_DOUBLE_EQ(mat_store_.quantity(), qty_exp);
 
   Material::Ptr pop1_ = mat_store_.Pop();
   ASSERT_EQ(pop1_->comp(), test_comp1_);
@@ -378,21 +384,58 @@ TEST_F(MaterialBufTest, NonBulkTest) {
 
 TEST_F(MaterialBufTest, BulkTest) {
 
-  ASSERT_EQ(bulk_store_.count(), 1);
-  ASSERT_EQ(bulk_store_.capacity(), cap_);
-  double qty_exp = 2 * mat1_->quantity();
-  double space_exp = cap_ - qty_exp;
-  ASSERT_EQ(bulk_store_.space(), space_exp);
-  ASSERT_EQ(bulk_store_.quantity(), qty_exp);
+  ASSERT_EQ(bulk_store_.count(), 0);
+  EXPECT_DOUBLE_EQ(bulk_store_.capacity(), cap_);
 
-  Material::Ptr pop1_ = mat_store_.Pop();
+  bulk_store_.Push(mat1b_);
+  bulk_store_.Push(mat2b_);
+
+  ASSERT_EQ(bulk_store_.count(), 1);
+  EXPECT_DOUBLE_EQ(bulk_store_.capacity(), cap_);
+  double qty_exp = mat1b_->quantity() + mat2b_->quantity();
+  double space_exp = cap_ - qty_exp;
+  EXPECT_DOUBLE_EQ(bulk_store_.space(), space_exp);
+  EXPECT_DOUBLE_EQ(bulk_store_.quantity(), qty_exp);
+
+  Material::Ptr pop1_ = bulk_store_.Pop();
   cyclus::toolkit::MatQuery mq1(pop1_);
   double sr89_qty = mq1.mass(sr89_);
   double fe59_qty = mq1.mass(fe59_);
 
-  ASSERT_EQ(sr89_qty, 5.0 * units::g);  
-  ASSERT_EQ(fe59_qty, 5.0 * units::g);  
+  double sr89_qty_exp = 5.0 * units::g;
+  double fe59_qty_exp = 5.0 * units::g;
 
+  EXPECT_DOUBLE_EQ(sr89_qty_exp, sr89_qty);  
+  EXPECT_DOUBLE_EQ(fe59_qty_exp, fe59_qty);  
+
+  ASSERT_EQ(bulk_store_.count(), 0);
+  EXPECT_DOUBLE_EQ(bulk_store_.capacity(), cap_);
+  EXPECT_DOUBLE_EQ(bulk_store_.space(), cap_);
+  EXPECT_DOUBLE_EQ(bulk_store_.quantity(), 0);
+  
+  EXPECT_DOUBLE_EQ(pop1_->quantity(), qty_exp);
+
+  bulk_store_.Push(pop1_);
+  // need to capture this now because mat3_ is about to disappear
+  qty_exp += mat3_->quantity();
+  space_exp -= mat3_->quantity();
+  sr89_qty_exp += mat3_->quantity()/3;
+  fe59_qty_exp += mat3_->quantity()*2/3;
+
+  bulk_store_.Push(mat3_);
+
+  ASSERT_EQ(bulk_store_.count(), 1);
+  EXPECT_DOUBLE_EQ(bulk_store_.capacity(), cap_);
+  EXPECT_DOUBLE_EQ(qty_exp, bulk_store_.quantity());
+  EXPECT_DOUBLE_EQ(space_exp, bulk_store_.space());
+
+  pop1_ = bulk_store_.Pop();
+
+  sr89_qty = mq1.mass(sr89_);
+  fe59_qty = mq1.mass(fe59_);
+
+  EXPECT_DOUBLE_EQ(sr89_qty_exp, sr89_qty);  
+  EXPECT_DOUBLE_EQ(fe59_qty_exp, fe59_qty);  
 
 }
 
