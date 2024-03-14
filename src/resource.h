@@ -5,6 +5,8 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+#include "error.h"
+
 class SimInitTest;
 
 namespace cyclus {
@@ -78,6 +80,16 @@ class Resource {
   ///
   /// @return a new resource object with same state id and quantity == quantity
   virtual Ptr ExtractRes(double quantity) = 0;
+
+  /// To enable the Decay method to be called on any child resource, define
+  /// a null op Decay method here.
+  /// @param curr_time the current time for the decay oepration
+  virtual void Decay(int curr_time) { throw Error("cannot decay resource type " + this->type()); };
+
+  /// To enable the Absorb method to be called on any child resource, define
+  /// a null op Absorb method here.
+  /// @param res pointer to a resource to be absorbed by this resource
+  virtual void Absorb(Ptr res) { throw Error("cannot absorb resource type " + this->type()); };
 
  protected:
   const static int default_package_id_ = 1;
