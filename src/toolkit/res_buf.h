@@ -322,7 +322,7 @@ class ResBuf {
   /// @throws KeyError one or more of the resource objects to be added are
   /// already present in the buffer.
   template <class B>
-  void Push(std::vector<B> rs, bool bulk_storage = true) {
+  void Push(std::vector<B> rs, bool unpackaged = true) {
     std::vector<typename T::Ptr> rss;
     typename T::Ptr r;
     for (int i = 0; i < rs.size(); i++) {
@@ -354,6 +354,12 @@ class ResBuf {
       } else {
         rs_.front()->Absorb(rss[i]);
       }
+      if (unpackaged) {
+        // strip package id and set as default
+        rss[i]->ChangePackageId();
+      }
+      rs_.push_back(rss[i]);
+      rs_present_.insert(rss[i]);
     }
     qty_ += tot_qty;
   }
