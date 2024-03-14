@@ -176,6 +176,8 @@ class ResBuf {
   /// package type provided. Returns any remaining material that doesn't
   /// fit in a package per the packaging strategy and limits as a 
   /// separate vector with default packaging
+  /// If it's not possible to fill the package
+  /// it returns an empty vector.
   std::vector<typename T::Ptr> PopPackaged(double qty, Package::Ptr pkg) {
     typename T::Ptr r = Pop(qty);
     std::vector<typename T::Ptr> rs_pkgd;
