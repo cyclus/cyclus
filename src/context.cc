@@ -211,6 +211,9 @@ Package::Ptr Context::GetPackageByName(std::string name) {
 }
 
 Package::Ptr Context::GetPackageById(int id) {
+  if (id < 0) {
+    throw ValueError("Invalid package id " + std::to_string(id));
+  }
   // iterate through the list of packages to get the one package with the correct id
   std::map<std::string, Package::Ptr>::iterator it;
   for (it = packages_.begin(); it != packages_.end(); ++it) {
@@ -218,6 +221,7 @@ Package::Ptr Context::GetPackageById(int id) {
       return it->second;
     }
   }
+  throw ValueError("Invalid package id " + std::to_string(id));
 }
 
 void Context::InitSim(SimInfo si) {
