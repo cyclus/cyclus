@@ -280,7 +280,6 @@ class ResBuf {
     }
 
     if (!is_bulk_  || rs_.size() == 0) {
-    if (unpackaged) {
       // strip package id and set as default
       m->ChangePackageId();
       rs_.push_back(m);
@@ -308,7 +307,7 @@ class ResBuf {
   /// @throws KeyError one or more of the resource objects to be added are
   /// already present in the buffer.
   template <class B>
-  void Push(std::vector<B> rs, bool unpackaged = true) {
+  void Push(std::vector<B> rs) {
     std::vector<typename T::Ptr> rss;
     typename T::Ptr r;
     for (int i = 0; i < rs.size(); i++) {
