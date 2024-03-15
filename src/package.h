@@ -4,6 +4,7 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <cmath>
 #include <boost/shared_ptr.hpp>
 #include "resource.h"
 
@@ -20,17 +21,6 @@ class Package {
 
     // create a new package type
     static Ptr Create(std::string name, double fill_min, double fill_max, std::string strategy);
-
-    /// Given a single resource and a package type, returns optimal fill mass
-    /// for the resource to be packaged. Can be used to determine how to   
-    /// respond to requests for material, and to actually package and send off
-    /// trades
-    double GetFillMass(Resource::Ptr r, Package::Ptr pkg);
-
-    /// Repackages a single resource into a package. If some quantity of the 
-    /// resource cannot be packaged, the remainder is left in the resource
-    /// object. 
-    std::vector<typename T::Ptr> Repackage(typename T::Ptr r, Package::Ptr pkg);
 
     // returns package id
     int id() const { return id_; }
@@ -54,6 +44,33 @@ class Package {
     double fill_min_;
     double fill_max_;
     std::string strategy_;
+};
+
+/// Returns optimal fill mass for a resource to be packaged. Can be used
+/// to determine how to respond to requests for material, and to actually
+/// package and send off trades
+double GetFillMass(Resource::Ptr r, Package::Ptr pkg);
+
+/// Repackages a single resource into a package. If some quantity of the 
+/// resource cannot be packaged using the given packaging strategy and
+/// restrictions, the remainder is left in the resource object. 
+template <class T>
+std::vector<typename T::Ptr> Repackage(typename T::Ptr r, Package::Ptr pkg) {
+  std::vector<typename T::Ptr> rs_pkgd;
+  typename T::Ptr r_pkgd;
+  
+  double fill_mass = GetFillMass(r, pkg);
+  if (fill_mass ==0) {
+    return rs_pkgd;
+  }
+
+  while (r->quantity() > pkg->fill_min()) {
+    double pkg_fill = std::min(r->quantity(), fill_mass);
+    r_pkgd = boost::dynamic_pointer_cast<T>(r->ExtractRes(pkg_fill));
+    r_pkgd->ChangePackageId(pkg->id());
+    rs_pkgd.push_back(r_pkgd);
+  }
+  return rs_pkgd;
 };
 
 }  // namespace cyclus
