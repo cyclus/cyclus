@@ -2,10 +2,10 @@
 from __future__ import print_function, unicode_literals
 import re
 
-RE_LAST_WORD = re.compile('.*?(\w+)[^\w]*$')
-RE_SQUARE_BRACKETS = re.compile('(\[[^\[\]]+?\])')
-RE_ANGLE_BRACKETS = re.compile('(<[^<>]+?>)')
-RE_VERSION = re.compile('.*?(\d+)\.(\d+)(\.\d+)?')
+RE_LAST_WORD = re.compile(r'.*?(\w+)[^\w]*$')
+RE_SQUARE_BRACKETS = re.compile(r'(\[[^\[\]]+?\])')
+RE_ANGLE_BRACKETS = re.compile(r'(<[^<>]+?>)')
+RE_VERSION = re.compile(r'.*?(\d+)\.(\d+)(\.\d+)?')
 
 
 def parse_version(src):

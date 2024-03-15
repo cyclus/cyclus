@@ -9,6 +9,7 @@ on:
       - '.github/workflows/publish_latest.yml'
       - '.github/workflows/publish_release.yml'
       - '.github/workflows/changelog_test.yml'
+      - '.github/workflows/rocky_build_test.yml'
       - 'doc/**'
       - 'CHANGELOG.rst'
   push:
@@ -64,7 +65,6 @@ jobs:
         with:
           file: ${{ github.workspace }}/total_coverage.info
           format: lcov
-          compare-ref: main
 
       - name: Upload Coverage HTML Artifact
         uses: actions/upload-pages-artifact@v2

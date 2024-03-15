@@ -17,16 +17,19 @@ Since last release
   will fail unless update-alternatives has been used to point python at the 
   correct python3 version (#1558)
 * build and test are now fown on githubAction in place or CircleCI (#1569)
-* Have separate workflows for testing, publishing dependency images, and publishing release images (#1597, #1602, #1606, #1609, #1629, #1633, #1637, #1668, #1672)
+* Have separate workflows for testing, publishing dependency images, and publishing release images (#1597, #1602, #1606, #1609, #1629, #1633, #1637, #1668, #1672, #1676)
 * Add Ubuntu 20.04 to the list of supported platforms (#1605, #1608)
-* Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599)
-* Added code coverage reporting to GitHub workflows (#1616)
+* Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599, #1677)
+* Added code coverage reporting to GitHub workflows (#1616, #1679)
 * Adds active and dormant buying cycles in buy policy (#1596)
 * Add random number generator (Mersenne Twister 19937, from boost) and the ability to set the seed in the simulation control block (#1599, #1639)
 * Allow randomness in request frequency and size through buy policy (#1634)
 * Adds support for Cython3 (#1636)
 * Adds TotalInvTracker, which allows an inventory cap to be set for multiple resource buffers, and is now required for material buy policy (#1646)
 * AddMutalReqs and AddReciepe functions and exclusive bids in python API of DRE (#1584)
+* Created Package class and optional declaration of packages in input files (#1673, #1699), package id is a member of resources (materials/products) (#1675)
+* CI support for Rocky Linux (#1691)
+* Added support for a ResBuf to behave as a single bulk storage with mixing & extraction of resources (#1687)
 * Add Housekeeping to Check Code Style with `clang-format` (#1674)
 
 **Changed:**
@@ -50,6 +53,9 @@ Since last release
 * Resolve deprecation warnings involving <boost/detail/sp_typeinfo.hpp> (#1611)
 * Resolve segmentation faults when calling Cbc (#1614)
 * Resolve segmentation faults when using cyclus via Python (#1666)
+* Resolve pytest and compilation warnings related to invalid escape sequences (#1684, #1698)
+* Fix how Env::GetInstallPath() finds the location of the cyclus installation (#1689)
+* Fix Debian package generation (#1676)
 
 
 

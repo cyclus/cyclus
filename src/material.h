@@ -81,7 +81,7 @@ class Material: public Resource {
   /// pointer to the agent creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
-  static Ptr Create(Agent* creator, double quantity, Composition::Ptr c);
+  static Ptr Create(Agent* creator, double quantity, Composition::Ptr c, int package_id = default_package_id_);
 
   /// Creates a new material resource that does not actually exist as part of
   /// the simulation and is untracked.
@@ -121,7 +121,7 @@ class Material: public Resource {
                   double threshold = eps_rsrc());
 
   /// Combines material mat with this one.  mat's quantity becomes zero.
-  void Absorb(Ptr mat);
+  virtual void Absorb(Ptr mat);
 
   /// Changes the material's composition to c without changing its mass.  Use
   /// this method for things like converting fresh to spent fuel via burning in
@@ -136,7 +136,9 @@ class Material: public Resource {
   /// not result in an updated material composition.  Does nothing if the
   /// simulation decay mode is set to "never" or none of the nuclides' decay
   /// constants are significant with respect to the time delta.
-  void Decay(int curr_time);
+  /// @param curr_time current time to use for the decay calculation 
+  ///        (default: -1 forces the decay to the context's current time)
+  virtual void Decay(int curr_time = -1);
 
   /// Returns the last time step on which a decay calculation was performed
   /// for the material.  This is not necessarily synonymous with the last time
@@ -153,8 +155,14 @@ class Material: public Resource {
   /// DEPRECATED - use non-const comp() function.
   Composition::Ptr comp() const;
 
+  int package_id();
+
+  /// Changes the package id. Checks that the resource fits the package 
+  /// type minimum and maximum mass criteria.
+  void ChangePackageId(int new_package_id = default_package_id_);
+
  protected:
-  Material(Context* ctx, double quantity, Composition::Ptr c);
+  Material(Context* ctx, double quantity, Composition::Ptr c, int package_id = default_package_id_);
 
  private:
   Context* ctx_;
@@ -162,6 +170,7 @@ class Material: public Resource {
   Composition::Ptr comp_;
   int prev_decay_time_;
   ResTracker tracker_;
+  int package_id_;
 };
 
 /// Creates and returns a new material with the specified quantity and a

@@ -40,6 +40,8 @@ void XMLFileLoaderTests::SetUp() {
   module_file = "modules.xml";
   CreateTestInputFile(module_file, ModuleSequence());
 
+  package_file = "packages.xml";
+  CreateTestInputFile(package_file, PackageSequence());
 }
 
 void XMLFileLoaderTests::TearDown() {
@@ -234,6 +236,19 @@ std::string XMLFileLoaderTests::ControlSchema() {
     "</element>"
     "</start>"
     "</grammar>";
+}
+
+std::string XMLFileLoaderTests::PackageSequence() {
+  return  "<simulation>"
+          " <control>"
+          "  <package>"
+          "    <name>TestPackage</name>"
+          "    <fill_min>1</fill_min>"
+          "    <fill_max>2</fill_max>"
+          "    <strategy>First</strategy>"
+          "  </package>"
+          " </control>"
+          "</simulation>";
 }
 
 TEST_F(XMLFileLoaderTests, openfile) {

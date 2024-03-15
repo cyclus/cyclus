@@ -154,6 +154,13 @@ RUN python install.py -j ${make_cores} --build-type=Release --core-version 99999
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 
+FROM cyclus as deb-generation
+WORKDIR /cyclus/build
+RUN make package
+
+FROM scratch as deb-package
+COPY --from=deb-generation /cyclus/build/cyclus*.deb /
+
 FROM cyclus as cyclus-test
 
 RUN cyclus_unit_tests
@@ -161,4 +168,3 @@ RUN cyclus_unit_tests
 FROM cyclus-test as cyclus-pytest
 
 RUN cd tests && python -m pytest
-

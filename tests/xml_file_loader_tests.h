@@ -15,7 +15,7 @@
 class XMLFileLoaderTests : public ::testing::Test {
  public:
   std::string control_file, decay_control_file, solver_control_file, eps_file,
-      false_file, module_file, recipe_file;
+      false_file, module_file, recipe_file, package_file;
 
   cyclus::FullBackend* b_;
   cyclus::Recorder rec_;
@@ -33,6 +33,7 @@ class XMLFileLoaderTests : public ::testing::Test {
   std::string RecipeSequence();
   std::string ModuleSequence();
   std::string ControlSchema();
+  std::string PackageSequence();
 
  private:
   void CreateTestInputFile(std::string fname, std::string contents) {

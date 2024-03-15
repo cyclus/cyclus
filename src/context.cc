@@ -192,6 +192,38 @@ Composition::Ptr Context::GetRecipe(std::string name) {
   return recipes_[name];
 }
 
+void Context::AddPackage(std::string name, double fill_min, double fill_max,
+                         std::string strategy) {
+  packages_[name] = Package::Create(name, fill_min, fill_max, strategy);
+  NewDatum("Packages")
+    ->AddVal("Package", name)
+    ->AddVal("FillMin", fill_min)
+    ->AddVal("FillMax", fill_max)
+    ->AddVal("Strategy", strategy)
+    ->Record();
+}
+
+Package::Ptr Context::GetPackageByName(std::string name) {
+  if (packages_.count(name) == 0) {
+    throw KeyError("Invalid package name " + name);
+  }
+  return packages_[name];
+}
+
+Package::Ptr Context::GetPackageById(int id) {
+  if (id < 0) {
+    throw ValueError("Invalid package id " + std::to_string(id));
+  }
+  // iterate through the list of packages to get the one package with the correct id
+  std::map<std::string, Package::Ptr>::iterator it;
+  for (it = packages_.begin(); it != packages_.end(); ++it) {
+    if (it->second->id() == id) {
+      return it->second;
+    }
+  }
+  throw ValueError("Invalid package id " + std::to_string(id));
+}
+
 void Context::InitSim(SimInfo si) {
   NewDatum("Info")
       ->AddVal("Handle", si.handle)

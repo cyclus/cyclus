@@ -122,9 +122,9 @@ class MatlBuyPolicy : public Trader {
                       TotalInvTracker* buf_tracker);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       TotalInvTracker* buf_tracker, double throughput,
-                      boost::shared_ptr<IntDistribution> active_dist = NULL,
-                      boost::shared_ptr<IntDistribution> dormant_dist = NULL,
-                      boost::shared_ptr<DoubleDistribution> size_dist = NULL);
+                      IntDistribution::Ptr active_dist = NULL, 
+                      IntDistribution::Ptr dormant_dist = NULL,
+                      DoubleDistribution::Ptr size_dist = NULL);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       TotalInvTracker* buf_tracker, double throughput,
                       double quantize);                    
@@ -138,7 +138,7 @@ class MatlBuyPolicy : public Trader {
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                       TotalInvTracker* buf_tracker, double throughput,
                       double cumulative_cap,
-                      boost::shared_ptr<IntDistribution> dormant_dist);
+                      IntDistribution::Ptr);
   /// @}
 
   /// Instructs the policy to fill its buffer with requests on the given
@@ -250,9 +250,9 @@ class MatlBuyPolicy : public Trader {
   int next_active_end_= 0;
   int next_dormant_end_= 0;
 
-  boost::shared_ptr<IntDistribution> active_dist_;
-  boost::shared_ptr<IntDistribution> dormant_dist_;
-  boost::shared_ptr<DoubleDistribution> size_dist_;
+  IntDistribution::Ptr active_dist_;
+  IntDistribution::Ptr dormant_dist_;
+  DoubleDistribution::Ptr size_dist_;
 
   std::map<Material::Ptr, std::string> rsrc_commods_;
   std::map<std::string, CommodDetail> commod_details_;
