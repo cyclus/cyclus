@@ -30,6 +30,7 @@ Since last release
 * Created Package class and optional declaration of packages in input files (#1673, #1699), package id is a member of resources (materials/products) (#1675)
 * CI support for Rocky Linux (#1691)
 * Added support for a ResBuf to behave as a single bulk storage with mixing & extraction of resources (#1687)
+* Add Housekeeping to Check Code Style with `clang-format` (#1674)
 
 **Changed:**
 
