@@ -27,6 +27,7 @@ void Region::Build(Agent* parent) {
 
 void Region::EnterNotify() {
   context()->RegisterTimeListener(this);
+  metadata.RecordMetadata(this);
 }
 
 void Region::Decommission() {
