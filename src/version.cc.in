@@ -32,7 +32,7 @@ namespace version {
 static char h5version[15];
 
 const char* describe() {
-  return "@core_version@";
+  return "@DATA_MODEL_VERSION@";
 }
 
 const char* core() {

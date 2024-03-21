@@ -11,7 +11,7 @@ IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 ENDIF()
 
 # This project name is cyclus.
-PROJECT(CYCLUS)
+PROJECT(CYCLUS VERSION 1.5.5)
 
 # check for and enable c++17 support (required for cyclus)
 INCLUDE(CheckCXXCompilerFlag)
@@ -185,7 +185,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     ENDIF ( NOT LIBXMLXX_LIBRARIES )
     SET(LIBS ${LIBS} ${LIBXMLXX_LIBRARIES})
     message("-- LibXML++ Include Dir: ${LIBXMLXX_INCLUDE_DIRS}")
-    message("-- LibXML++ Librarires: ${LIBXMLXX_LIBRARIES}")
+    message("-- LibXML++ Libraries: ${LIBXMLXX_LIBRARIES}")
     
     # find lapack and link to it
     FIND_PACKAGE(LAPACK REQUIRED)
@@ -383,19 +383,14 @@ IF(NOT CYCLUS_DOC_ONLY)
         INCLUDE_DIRECTORIES(AFTER "${Python3_INCLUDE_DIRS}" "${_Python3_NumPy_INCLUDE_DIR}")
     endif(Cython_FOUND)
     # set core version, one way or the other
-    IF(NOT "${CORE_VERSION}" STREQUAL "")
-        SET(core_version "${CORE_VERSION}")
-    ELSE(NOT "${CORE_VERSION}" STREQUAL "")
-        EXECUTE_PROCESS(COMMAND git describe --tags
-                        OUTPUT_VARIABLE core_version
-                        OUTPUT_STRIP_TRAILING_WHITESPACE)
-    ENDIF(NOT "${CORE_VERSION}" STREQUAL "")
-    IF("${core_version}" STREQUAL "")
-        MESSAGE(WARNING "Unable to read current core version, falling back to previous version. Core version will be set to -1")
-        SET(core_version "-1")
+    IF(NOT "${DATA_MODEL_VERSION}" STREQUAL "")
+        MESSAGE("-- $DATA_MODEL_VERSION set to: ${DATA_MODEL_VERSION}")
+    ENDIF(NOT "${DATA_MODEL_VERSION}" STREQUAL "")
+    IF("${DATA_MODEL_VERSION}" STREQUAL "")
+        MESSAGE("No data model version was specified... using version ${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}")
+        SET(DATA_MODEL_VERSION "${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}")
     ENDIF()
-    SET(ENV{CYCLUS_CORE_VERSION} "${core_version}")
-    MESSAGE("-- core version ($CYCLUS_CORE_VERSION) set to: ${core_version}")
+    MESSAGE("-- Cyclus version ($CYCLUS_PROJECT_VERSION) set to: ${CMAKE_PROJECT_VERSION}")
 
     ADD_SUBDIRECTORY("${CYCLUS_SHARE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
@@ -482,9 +477,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE.rst")
 
     # Version
-    SET(CPACK_PACKAGE_VERSION_MAJOR "1")
-    SET(CPACK_PACKAGE_VERSION_MINOR "5")
-    SET(CPACK_PACKAGE_VERSION_PATCH "5")
+    SET(CPACK_PACKAGE_VERSION_MAJOR  ${CMAKE_PROJECT_VERSION_MAJOR})
+    SET(CPACK_PACKAGE_VERSION_MINOR  ${CMAKE_PROJECT_VERSION_MINOR})
+    SET(CPACK_PACKAGE_VERSION_PATCH  ${CMAKE_PROJECT_VERSION_PATCH})
 
     # Dependencies
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-all-dev (>= 1.71.0)")

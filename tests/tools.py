@@ -167,6 +167,7 @@ def libcyclus_setup():
 
 
 def dbtest(f):
+    libcyclus_setup()
     def wrapper():
         for fname, oname, backend in DBS:
             if os.path.exists(fname):
