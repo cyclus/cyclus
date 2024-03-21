@@ -72,14 +72,14 @@ def run_setup(ver):
 
 def main(argv=None):
     """The main installer for cyclus Python bindings."""
-    core_version = os.environ.get('CYCLUS_CORE_VERSION', '')
-    if not core_version:
-        msg = "$CYCLUS_CORE_VERSION not set, this is needed to install cyclus. "
+    cyclus_version = os.environ.get('CYCLUS_PROJECT_VERSION', '')
+    if not cyclus_version:
+        msg = "$CYCLUS_PROJECT_VERSION not set, this is needed to install cyclus. "
         msg += "Normally this is set by the CMake build system, and you should "
         msg += "not be running setup.py directly."
         raise RuntimeError(msg)
-    version_update(core_version)
-    run_setup(core_version)
+    version_update(cyclus_version)
+    run_setup(cyclus_version)
 
 
 if __name__ == '__main__':
