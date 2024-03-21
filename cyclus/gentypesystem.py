@@ -2779,8 +2779,8 @@ def parse_args(argv):
                         dest='dbtypes_json',
                         help="the path to dbtypes.json file, "
                              "default " + dbtd)
-    parser.add_argument('--cyclus-version', default=None,
-                        dest='cyclus_version',
+    parser.add_argument('--data-model-version', default=None,
+                        dest='data_model_version',
                         help="The Cyclus API version to target."
                         )
     ns = parser.parse_args(argv)
@@ -2802,7 +2802,7 @@ def setup(ns):
     with io.open(ns.dbtypes_json, 'r') as f:
         tab = json.load(f)
     # get cyclus version
-    verstr = ns.cyclus_version
+    verstr = ns.data_model_version
     if verstr is None:
         try:
             verstr = safe_output(['cyclus', '--version']).split()[2]
@@ -2817,7 +2817,7 @@ def setup(ns):
     if verstr is not None:
         if isinstance(verstr, bytes):
             verstr = verstr.decode()
-        ns.cyclus_version = verstr
+        ns.data_model_version = verstr
         ver = tuple(map(int, verstr.partition('-')[0].split('.')))
     if ns.verbose:
         print('Found cyclus version: ' + verstr, file=sys.stderr)
