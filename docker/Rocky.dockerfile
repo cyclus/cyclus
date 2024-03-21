@@ -65,7 +65,6 @@ RUN dnf install -y m4 doxygen perl-open perl-XML-Parser diffutils pcre-cpp pcre-
 
 FROM libxmlpp as cyclus
 ARG make_cores=2
-ARG core_version=999.999.999
 
 COPY . /cyclus
 WORKDIR /cyclus
@@ -76,7 +75,7 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
-RUN python install.py -j ${make_cores} --build-type=Release --core-version ${core_version} -D Python3_EXECUTABLE=/usr/bin/python3.11
+RUN python install.py -j ${make_cores} --build-type=Release -D Python3_EXECUTABLE=/usr/bin/python3.11
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 
