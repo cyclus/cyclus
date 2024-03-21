@@ -80,10 +80,7 @@ def install_cyclus(args):
         if args.build_type:
             cmake_cmd += ['-DCMAKE_BUILD_TYPE=' + args.build_type]
         if args.core_version:
-            core_version = args.core_version
-            while len(core_version.split('.')) < 3: # add minor/micro version number if missing
-                core_version += '.0'
-            cmake_cmd += ['-DCORE_VERSION=' + core_version]
+            cmake_cmd += ['-DCORE_VERSION=' + args.core_version]
         if args.D is not None:
             cmake_cmd += ['-D' + x for x in args.D]
         if args.cmake_debug:
@@ -193,7 +190,7 @@ def main():
     build_type = "the CMAKE_BUILD_TYPE"
     parser.add_argument('--build-type', '--build_type', help=build_type)
 
-    parser.add_argument('--core-version', dest='core_version', default=None, required=True,
+    parser.add_argument('--core-version', dest='core_version', default=None,
                         help='Sets the core version number.')
 
     parser.add_argument('-D', metavar='VAR', action='append',

@@ -2,8 +2,8 @@
 # Runs setup.py install
 #
 set(PYTHON_EXECUTABLE @Python3_EXECUTABLE@)
-set(core_version @core_version@)
-set(ENV{CYCLUS_CORE_VERSION} "${core_version}")
+set(CYCLUS_CORE_VERSION @CMAKE_PROJECT_VERSION@)
+set(ENV{CYCLUS_CORE_VERSION} "${CYCLUS_CORE_VERSION}")
 message("############### Begin Python Install ###############")
 message("-- Python installer:")
 message("  PYTHON_EXECUTABLE: ${PYTHON_EXECUTABLE}")

@@ -11,7 +11,7 @@ IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 ENDIF()
 
 # This project name is cyclus.
-PROJECT(CYCLUS)
+PROJECT(CYCLUS VERSION 1.5.5)
 
 # check for and enable c++17 support (required for cyclus)
 INCLUDE(CheckCXXCompilerFlag)
@@ -385,23 +385,13 @@ IF(NOT CYCLUS_DOC_ONLY)
     # set core version, one way or the other
     IF(NOT "${CORE_VERSION}" STREQUAL "")
         SET(core_version "${CORE_VERSION}")
-    ELSE(NOT "${CORE_VERSION}" STREQUAL "")
-        EXECUTE_PROCESS(COMMAND git describe --tags
-                        OUTPUT_VARIABLE core_version
-                        OUTPUT_STRIP_TRAILING_WHITESPACE)
     ENDIF(NOT "${CORE_VERSION}" STREQUAL "")
     IF("${core_version}" STREQUAL "")
-        MESSAGE(WARNING "Unable to read current core version, falling back to previous version. Core version will be set to -1")
-        SET(core_version "-1")
+        MESSAGE("No core version was specified... using version ${CMAKE_PROJECT_VERSION}")
+        SET(core_version ${CMAKE_PROJECT_VERSION})
     ENDIF()
     SET(ENV{CYCLUS_CORE_VERSION} "${core_version}")
     MESSAGE("-- core version ($CYCLUS_CORE_VERSION) set to: ${core_version}")
-
-    STRING(REPLACE "." ";" CORE_VERSION_PARTS ${core_version})
-    LIST(GET CORE_VERSION_PARTS 0 CYCLUS_MAJOR_VERSION)
-    LIST(GET CORE_VERSION_PARTS 1 CYCLUS_MINOR_VERSION)
-    LIST(GET CORE_VERSION_PARTS 2 CYCLUS_MICRO_VERSION)
-    MESSAGE("-- Major: ${CYCLUS_MAJOR_VERSION}, Minor: ${CYCLUS_MINOR_VERSION}, Micro ${CYCLUS_MICRO_VERSION}")
 
     ADD_SUBDIRECTORY("${CYCLUS_SHARE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
@@ -488,9 +478,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE.rst")
 
     # Version
-    SET(CPACK_PACKAGE_VERSION_MAJOR  ${CYCLUS_MAJOR_VERSION})
-    SET(CPACK_PACKAGE_VERSION_MINOR  ${CYCLUS_MINOR_VERSION})
-    SET(CPACK_PACKAGE_VERSION_PATCH  ${CYCLUS_MICRO_VERSION})
+    SET(CPACK_PACKAGE_VERSION_MAJOR  ${CMAKE_PROJECT_VERSION_MAJOR})
+    SET(CPACK_PACKAGE_VERSION_MINOR  ${CMAKE_PROJECT_VERSION_MINOR})
+    SET(CPACK_PACKAGE_VERSION_PATCH  ${CMAKE_PROJECT_VERSION_PATCH})
 
     # Dependencies
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-all-dev (>= 1.71.0)")
