@@ -101,7 +101,7 @@ class ResBuf {
   /// Returns true if there are no resources in the buffer.
   inline bool empty() const { return rs_.empty(); }
 
-  /// Pops and returns the specified quantity from the buffer as vector of 
+  /// Pops and returns the specified quantity from the buffer as a vector of 
   /// resources.
   /// Resources are split if necessary in order to pop the exact quantity
   /// requested (within eps_rsrc()).  Resources are retrieved in the order they
