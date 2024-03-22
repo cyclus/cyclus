@@ -170,15 +170,7 @@ class ResBuf {
       return Squash(PopN(count()));
     }
     return Pop(qty);
-  }
-
-  /// Pops the specified amount of material, re-packed into the the 
-  /// package type provided. Returns any remaining material that doesn't
-  /// fit in a package per the packaging strategy and limits as a 
-  /// separate vector with default packaging
-  /// If it's not possible to fill the package
-  /// it returns an empty vector.
-  
+  }  
 
   /// Pops the specified number of resource objects from the buffer.
   /// Resources are not split and are retrieved in the order they were
@@ -275,12 +267,11 @@ class ResBuf {
 
     if (!is_bulk_  || rs_.size() == 0) {
       // strip package id and set as default
-      m->ChangePackageId();
+      if (unpackaged_) {
+        m->ChangePackageId();
+      }
       rs_.push_back(m);
       rs_present_.insert(m);
-    } else if (unpackaged_) {
-      m->ChangePackageId();
-      rs_.front()->Absorb(m);
     } else {
       rs_.front()->Absorb(m);
     }
@@ -328,12 +319,11 @@ class ResBuf {
 
     for (int i = 0; i < rss.size(); i++) {
       if (!is_bulk_ || rs_.size() == 0) {
-        rss[i]->ChangePackageId();
+        if (unpackaged_) {
+          rss[i]->ChangePackageId();
+        }
         rs_.push_back(rss[i]);
         rs_present_.insert(rss[i]);
-      } else if (unpackaged_) {
-        rss[i]->ChangePackageId();
-        rs_.front()->Absorb(rss[i]);
       } else {
         rs_.front()->Absorb(rss[i]);
       }
