@@ -26,6 +26,7 @@ src/cyclus_nuc_data.h5
 stubs/stub_version.h
 src/env.cc
 src/version.cc
+src/version.h
 share/cyclus_nuc_data.h5
 src/pyne_decay.h
 src/pyne_decay.cc
