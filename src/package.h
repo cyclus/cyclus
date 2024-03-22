@@ -55,7 +55,11 @@ class Package {
 /// This tries to find the optimal number and fill mass of packages given the
 /// packaging limitations. It does this by calculating bounding fills, 
 /// floor(quantity/fill_min) and ceiling(quantity/fill_max). 
-/// There might be a scenario w
+/// There might be a scenario where there is no solution, i.e. an integer
+/// number of packages cannot be filled with no remainder. In this case,
+/// the most effective fill strategy is to fill to the max. Numeric example:
+/// quantity = 5, fill_min = 3, fill_max = 4. num_min_fill = floor(5/3) = 1,
+/// num_max_fill = ceil(5/4) = 2. num_min_fill < num_max_fill, so fill to max.
 double GetFillMass(Resource::Ptr r, Package::Ptr pkg);
 
 /// Repackages a single resource into a package. If some quantity of the 
