@@ -48,7 +48,14 @@ class Package {
 
 /// Returns optimal fill mass for a resource to be packaged. Can be used
 /// to determine how to respond to requests for material, and to actually
-/// package and send off trades
+/// package and send off trades.
+/// Packaging strategy "first" simply fills the packages one by one to the
+/// maximum fill. Therefore, it should always try to max fill.
+/// Packaging strategy "equal" tries to fill all packages to the same mass.
+/// This tries to find the optimal number and fill mass of packages given the
+/// packaging limitations. It does this by calculating bounding fills, 
+/// floor(quantity/fill_min) and ceiling(quantity/fill_max). 
+/// There might be a scenario w
 double GetFillMass(Resource::Ptr r, Package::Ptr pkg);
 
 /// Repackages a single resource into a package. If some quantity of the 
