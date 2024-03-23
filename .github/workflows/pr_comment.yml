@@ -21,7 +21,7 @@ jobs:
       - name: Merge artifacts and get PR number
         run: |
           echo "### Downstream Build Status Report" > artifacts_merged.md
-          echo "# $(echo "$(date +'%m/%d/%Y %H:%M')") ($(cat commit_hash))" > artifacts_merged.md
+          echo "# $(echo "$(date +'%m/%d/%Y %H:%M')") ($(cat commit_hash))" >> artifacts_merged.md
           cat ./*.txt >> artifacts_merged.md
           echo "PR_NUMBER=$(cat pr_number)" >> "$GITHUB_ENV"
 
