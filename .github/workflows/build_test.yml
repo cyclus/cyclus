@@ -146,7 +146,7 @@ jobs:
       - name: Save PR number and Commit hash to file
         run: |
           echo "${{ github.event.number }}" > pr_number
-          echo "${{ github.sha }}" > commit_hash
+          echo "$(git rev-parse --short HEAD)" > commit_hash
       
       - name: Upload PR number artifact
         uses: actions/upload-artifact@v4
