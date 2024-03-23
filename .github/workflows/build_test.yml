@@ -143,6 +143,9 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
+      - name: Checkout Cyclus
+        uses: actions/checkout@v4
+        
       - name: Save PR number and Commit hash to file
         run: |
           echo "${{ github.event.number }}" > pr_number
