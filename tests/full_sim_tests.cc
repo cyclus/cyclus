@@ -12,7 +12,7 @@
 
 namespace cyclus {
 
-class FullSimTests : public ::testing::TestWithParam<int> {
+class FullSimTestsFixture : public ::testing::TestWithParam<int> {
   protected:
     #if CYCLUS_IS_PARALLEL
     virtual void SetUp() {
@@ -27,7 +27,7 @@ class FullSimTests : public ::testing::TestWithParam<int> {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_P(FullSimTests, LoneTrader) {
+TEST_P(FullSimTestsFixture, LoneTrader) {
   TestContext tc;
   GreedySolver* solver = new GreedySolver();  // context deletes
   tc.get()->solver(solver);
@@ -53,7 +53,7 @@ TEST_P(FullSimTests, LoneTrader) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_P(FullSimTests, NullTrade) {
+TEST_P(FullSimTestsFixture, NullTrade) {
   TestContext tc;
   GreedySolver* solver = new GreedySolver();  // context deletes
   tc.get()->solver(solver);
@@ -87,7 +87,7 @@ TEST_P(FullSimTests, NullTrade) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_P(FullSimTests, Trade) {
+TEST_P(FullSimTestsFixture, Trade) {
   TestContext tc;
   GreedySolver* solver = new GreedySolver();  // context deletes
   tc.get()->solver(solver);
@@ -137,8 +137,8 @@ TEST_P(FullSimTests, Trade) {
 }
 
 #if CYCLUS_IS_PARALLEL
-INSTANTIATE_TEST_CASE_P(FullSimParallel, FullSimTests, ::testing::Values(1, 2, 3, 4));
+INSTANTIATE_TEST_CASE_P(FullSimTestsParallel, FullSimTestsFixture, ::testing::Values(1, 2, 3, 4));
 #else
-INSTANTIATE_TEST_CASE_P(FullSim, FullSimTests, ::testing::Values(1));
+INSTANTIATE_TEST_CASE_P(FullSimTests, FullSimTestsFixture, ::testing::Values(1));
 #endif // CYCLUS_IS_PARALLEL
 }  // namespace cyclus
