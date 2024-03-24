@@ -149,7 +149,7 @@ jobs:
       - name: Save PR number and Commit hash to file
         run: |
           echo "${{ github.event.number }}" > pr_number
-          echo "$(git show -s --format=%cd --date=format:'%m/%d/%Y %H:%M' ${{ github.event.pull_request.head.sha }}) - ${{ github.event.pull_request.head.sha }}" > commit_hash_timestamp
+          echo "${{ github.event.pull_request.head.sha }} - $(git log -1 --format=%ci)" > commit_hash_timestamp
       
       - name: Upload PR number artifact
         uses: actions/upload-artifact@v4
