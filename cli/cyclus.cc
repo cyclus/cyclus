@@ -539,11 +539,6 @@ void GetSimInfo(ArgInfo* ai) {
   int nthreads = 1;
   if (ai->vm.count("nthreads")) {
     nthreads = ai->vm["nthreads"].as<int>();
-  } else {
-    std::string omp_nthreads = std::getenv("OMP_NUM_THREADS");
-    if (!omp_nthreads.empty()) {
-      nthreads = stoi(omp_nthreads);
-    }
   }
   omp_set_num_threads(nthreads);
   #endif // CYCLUS_IS_PARALLEL
