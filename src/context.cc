@@ -1,8 +1,11 @@
+#include "platform.h"
 #include "context.h"
 
 #include <vector>
 #include <boost/uuid/uuid_generators.hpp>
+#if CYCLUS_IS_PARALLEL
 #include <omp.h>
+#endif // CYCLUS_IS_PARALLEL
 
 #include "error.h"
 #include "exchange_solver.h"
