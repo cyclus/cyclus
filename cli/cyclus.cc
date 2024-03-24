@@ -9,6 +9,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/string_generator.hpp>
+#include <omp.h>
 
 #include "cyclus.h"
 #include "hdf5_back.h"
@@ -280,6 +281,7 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("py-to-json", po::value<std::string>(), "*.py input file")
       ("py-to-xml", po::value<std::string>(), "*.py input file")
       ("xml-to-py", po::value<std::string>(), "*.xml input file")
+      ("nthreads,j", po::value<int>(), "number of threads to use")
       ;
 
   po::variables_map vm;
@@ -529,4 +531,16 @@ void GetSimInfo(ArgInfo* ai) {
   if (ai->vm.count("output-path")) {
     ai->output_path = ai->vm["output-path"].as<std::string>();
   }
+
+  // Thread param
+  int nthreads = 1;
+  if (ai->vm.count("nthreads")) {
+    nthreads = ai->vm["nthreads"].as<int>();
+  } else {
+    std::string omp_nthreads = std::getenv("OMP_NUM_THREADS");
+    if (!omp_nthreads.empty()) {
+      nthreads = stoi(omp_nthreads);
+    }
+  }
+  omp_set_num_threads(nthreads);
 }
