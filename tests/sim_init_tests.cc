@@ -1,3 +1,7 @@
+#include "platform.h"
+#if CYCLUS_IS_PARALLEL
+#include <omp.h>
+#endif // CYCLUS_IS_PARALLEL
 #include <gtest/gtest.h>
 
 #include "comp_math.h"
@@ -86,12 +90,16 @@ Agent* ConstructInver(cy::Context* ctx) {
   return new Inver(ctx);
 }
 
-class SimInitTest : public ::testing::Test {
+class SimInitTest : public ::testing::TestWithParam<int> {
  public:
   SimInitTest() : rec((unsigned int) 300) {}
 
  protected:
   virtual void SetUp() {
+    #if CYCLUS_IS_PARALLEL
+    int nthreads = GetParam();
+    omp_set_num_threads(nthreads);
+    #endif // CYCLUS_IS_PARALLEL
     resetnextids();
     cy::DynamicModule::man_ctors_[":Inver:Inver"] = ConstructInver;
 
@@ -143,6 +151,9 @@ class SimInitTest : public ::testing::Test {
     rec.Close();
     delete ctx;
     delete b;
+    #if CYCLUS_IS_PARALLEL
+    omp_set_num_threads(1);
+    #endif // CYCLUS_IS_PARALLEL
   }
 
   void resetnextids() {
@@ -177,7 +188,7 @@ class SimInitTest : public ::testing::Test {
   cy::SqliteBack* b;
 };
 
-TEST_F(SimInitTest, InitNextIds) {
+TEST_P(SimInitTest, InitNextIds) {
   // retrieve next ids from global static vars before overwriting them
   int agent_id = agentid();
   int rsrc_state_id = stateid();
@@ -204,7 +215,7 @@ TEST_F(SimInitTest, InitNextIds) {
   EXPECT_EQ(prod_qual_id, prodid());
 }
 
-TEST_F(SimInitTest, InitSimInfo) {
+TEST_P(SimInitTest, InitSimInfo) {
   cy::SimInit si;
   si.Init(&rec, b);
   cy::Context* init_ctx = si.context();
@@ -222,7 +233,7 @@ TEST_F(SimInitTest, InitSimInfo) {
   EXPECT_EQ(si_orig.branch_time, si_init.branch_time);
 }
 
-TEST_F(SimInitTest, InitRecipes) {
+TEST_P(SimInitTest, InitRecipes) {
   cy::SimInit si;
   si.Init(&rec, b);
   cy::Context* init_ctx = si.context();
@@ -242,7 +253,7 @@ TEST_F(SimInitTest, InitRecipes) {
   EXPECT_FLOAT_EQ(orig2[922380000], init2[922380000]);
 }
 
-TEST_F(SimInitTest, InitTimeListeners) {
+TEST_P(SimInitTest, InitTimeListeners) {
   cy::SimInit si;
   si.Init(&rec, b);
   std::map<int, cy::TimeListener*> init_tickers = tickers(si.timer());
@@ -250,7 +261,7 @@ TEST_F(SimInitTest, InitTimeListeners) {
   ASSERT_EQ(2, init_tickers.size());
 }
 
-TEST_F(SimInitTest, InitBuildSched) {
+TEST_P(SimInitTest, InitBuildSched) {
   cy::SimInit si;
   si.Init(&rec, b);
   std::map<int, std::vector<std::pair<std::string, Agent*> > > queue = build_queue(si.timer());
@@ -270,7 +281,7 @@ TEST_F(SimInitTest, InitBuildSched) {
   }
 }
 
-TEST_F(SimInitTest, InitDecomSched) {
+TEST_P(SimInitTest, InitDecomSched) {
   cy::SimInit si;
   si.Init(&rec, b);
   std::map<int, std::vector<Agent*> > queue = decom_queue(si.timer());
@@ -290,7 +301,7 @@ TEST_F(SimInitTest, InitDecomSched) {
   }
 }
 
-TEST_F(SimInitTest, InitProtos) {
+TEST_P(SimInitTest, InitProtos) {
   cy::SimInit si;
   si.Init(&rec, b);
   cy::Context* init_ctx = si.context();
@@ -312,7 +323,7 @@ TEST_F(SimInitTest, InitProtos) {
   EXPECT_EQ("proto2", p2->prototype());
 }
 
-TEST_F(SimInitTest, InitAgentState) {
+TEST_P(SimInitTest, InitAgentState) {
   cy::SimInit si;
   si.Init(&rec, b);
   std::set<Agent*> agents = agent_list(ctx);
@@ -357,7 +368,7 @@ TEST_F(SimInitTest, InitAgentState) {
   }
 }
 
-TEST_F(SimInitTest, InitAgentInventories) {
+TEST_P(SimInitTest, InitAgentInventories) {
   cy::SimInit si;
   si.Init(&rec, b);
   std::set<Agent*> init_agents = agent_list(si.context());
@@ -421,7 +432,7 @@ TEST_F(SimInitTest, InitAgentInventories) {
   }
 }
 
-TEST_F(SimInitTest, RestartSimInfo) {
+TEST_P(SimInitTest, RestartSimInfo) {
   cy::PyStart();
   ti.RunSim();
   rec.Flush();
@@ -440,3 +451,9 @@ TEST_F(SimInitTest, RestartSimInfo) {
   EXPECT_EQ("restart", info.parent_type);
   EXPECT_EQ(2, info.branch_time);
 }
+
+#if CYCLUS_IS_PARALLEL
+INSTANTIATE_TEST_CASE_P(SimInitTests, SimInitTest, ::testing::Values(1, 2, 3, 4));
+#else
+INSTANTIATE_TEST_CASE_P(SimInitTestsParallel, SimInitTest, ::testing::Values(1));
+#endif // CYCLUS_IS_PARALLEL
