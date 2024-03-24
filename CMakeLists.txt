@@ -321,7 +321,6 @@ IF(NOT CYCLUS_DOC_ONLY)
     
     IF(PARALLEL) 
         FIND_PACKAGE(OpenMP)
-        message("-- Found OpenMP: ${OpenMP_CXX_FOUND}")
         IF (OpenMP_CXX_FOUND)
             message("-- OpenMP Version: ${OpenMP_CXX_VERSION}")
             SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
