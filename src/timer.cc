@@ -105,8 +105,10 @@ void Timer::DoTock() {
 
   if (si_.explicit_inventory || si_.explicit_inventory_compact) {
     std::set<Agent*> ags = ctx_->agent_list_;
-    std::set<Agent*>::iterator it;
-    for (it = ags.begin(); it != ags.end(); ++it) {
+    #pragma omp parallel for
+    for (int i = 0; i < ags.size(); i++) {
+      std::set<Agent*>::iterator it = ags.begin();
+      std::advance(it, i);
       Agent* a = *it;
       if (a->enter_time() == -1) {
         continue; // skip agents that aren't alive
