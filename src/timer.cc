@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <omp.h>
 
 #include "agent.h"
 #include "error.h"
@@ -77,9 +78,13 @@ void Timer::DoBuild() {
 }
 
 void Timer::DoTick() {
-  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
-       agent != tickers_.end();
-       agent++) {
+  #pragma omp parallel for
+  for (int i = 0; i < tickers_.size(); i++) {
+    std::map<int, TimeListener*>::iterator agent = tickers_.begin();
+    std::advance(agent, i);
+    if (i == 0) {
+      std::cout << "nthreads in DoTick = " << omp_get_num_threads() << std::endl;
+    }
     agent->second->Tick();
   }
 }
@@ -91,9 +96,13 @@ void Timer::DoResEx(ExchangeManager<Material>* matmgr,
 }
 
 void Timer::DoTock() {
-  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
-       agent != tickers_.end();
-       agent++) {
+  #pragma omp parallel for
+  for (int i = 0; i < tickers_.size(); i++) {
+    std::map<int, TimeListener*>::iterator agent = tickers_.begin();
+    std::advance(agent, i);
+    if (i == 0) {
+      std::cout << "nthreads in DoTock = " << omp_get_num_threads() << std::endl;
+    }
     agent->second->Tock();
   }
 
