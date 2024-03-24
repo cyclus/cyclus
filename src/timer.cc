@@ -1,9 +1,12 @@
+#include "platform.h"
 // Implements the Timer class
 #include "timer.h"
 
 #include <iostream>
 #include <string>
+#if CYCLUS_IS_PARALLEL
 #include <omp.h>
+#endif // CYCLUS_IS_PARALLEL
 
 #include "agent.h"
 #include "error.h"
@@ -82,9 +85,6 @@ void Timer::DoTick() {
   for (int i = 0; i < tickers_.size(); i++) {
     std::map<int, TimeListener*>::iterator agent = tickers_.begin();
     std::advance(agent, i);
-    if (i == 0) {
-      std::cout << "nthreads in DoTick = " << omp_get_num_threads() << std::endl;
-    }
     agent->second->Tick();
   }
 }
@@ -100,9 +100,6 @@ void Timer::DoTock() {
   for (int i = 0; i < tickers_.size(); i++) {
     std::map<int, TimeListener*>::iterator agent = tickers_.begin();
     std::advance(agent, i);
-    if (i == 0) {
-      std::cout << "nthreads in DoTock = " << omp_get_num_threads() << std::endl;
-    }
     agent->second->Tock();
   }
 

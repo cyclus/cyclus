@@ -1,3 +1,7 @@
+#include "platform.h"
+#if CYCLUS_IS_PARALLEL
+#include <omp.h>
+#endif // CYCLUS_IS_PARALLEL
 #include <gtest/gtest.h>
 
 #include "greedy_solver.h"
@@ -8,8 +12,22 @@
 
 namespace cyclus {
 
+class FullSimTests : public ::testing::TestWithParam<int> {
+  protected:
+    #if CYCLUS_IS_PARALLEL
+    virtual void SetUp() {
+      int nthreads = GetParam();
+      omp_set_num_threads(nthreads);
+    }
+
+    virtual void TearDown() {
+      omp_set_num_threads(1);
+    }
+    #endif // CYCLUS_IS_PARALLEL
+};
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(FullSimTests, LoneTrader) {
+TEST_P(FullSimTests, LoneTrader) {
   TestContext tc;
   GreedySolver* solver = new GreedySolver();  // context deletes
   tc.get()->solver(solver);
@@ -35,7 +53,7 @@ TEST(FullSimTests, LoneTrader) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(FullSimTests, NullTrade) {
+TEST_P(FullSimTests, NullTrade) {
   TestContext tc;
   GreedySolver* solver = new GreedySolver();  // context deletes
   tc.get()->solver(solver);
@@ -69,7 +87,7 @@ TEST(FullSimTests, NullTrade) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(FullSimTests, Trade) {
+TEST_P(FullSimTests, Trade) {
   TestContext tc;
   GreedySolver* solver = new GreedySolver();  // context deletes
   tc.get()->solver(solver);
@@ -118,4 +136,9 @@ TEST(FullSimTests, Trade) {
   EXPECT_EQ(requester->mat, exp_mat);
 }
 
+#if CYCLUS_IS_PARALLEL
+INSTANTIATE_TEST_CASE_P(FullSimParallel, FullSimTests, ::testing::Values(1, 2, 3, 4));
+#else
+INSTANTIATE_TEST_CASE_P(FullSim, FullSimTests, ::testing::Values(1));
+#endif // CYCLUS_IS_PARALLEL
 }  // namespace cyclus

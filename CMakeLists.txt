@@ -31,7 +31,6 @@ IF(CODE_COVERAGE)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 ENDIF()
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
 
 # enable assembly
 enable_language(ASM)
@@ -319,14 +318,18 @@ IF(NOT CYCLUS_DOC_ONLY)
         SET(LIBS ${LIBS} ${Tcmalloc_LIBRARIES})
     endif(Cython_FOUND)
 
-    FIND_PACKAGE(OpenMP)
-    message("-- Found OpenMP: ${OpenMP_CXX_FOUND}")
-    IF (OpenMP_CXX_FOUND)
-        message("-- OpenMP Version: ${OpenMP_CXX_VERSION}")
-    ENDIF(OpenMP_CXX_FOUND)
-    IF(OpenMP_CXX_LIBRARIES)
-        set(LIBS ${LIBS} ${OpenMP_CXX_LIBRARIES})
-    ENDIF(OpenMP_CXX_LIBRARIES)
+    
+    IF(PARALLEL) 
+        FIND_PACKAGE(OpenMP)
+        message("-- Found OpenMP: ${OpenMP_CXX_FOUND}")
+        IF (OpenMP_CXX_FOUND)
+            message("-- OpenMP Version: ${OpenMP_CXX_VERSION}")
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp")
+        ENDIF(OpenMP_CXX_FOUND)
+        IF(OpenMP_CXX_LIBRARIES)
+            set(LIBS ${LIBS} ${OpenMP_CXX_LIBRARIES})
+        ENDIF(OpenMP_CXX_LIBRARIES)
+    ENDIF(PARALLEL)
 
     ##############################################################################################
     #################################### end find libraries ######################################
