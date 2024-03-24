@@ -143,10 +143,13 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
+      - name: Checkout cyclus
+        uses: actions/checkout@v4
+
       - name: Save PR number and Commit hash to file
         run: |
           echo "${{ github.event.number }}" > pr_number
-          echo "${{ github.event.pull_request.head.sha }}" > commit_hash
+          echo "$(git show -s --format=%cd --date=format:'%m/%d/%Y %H:%M' ${{ github.event.pull_request.head.sha }}) - ${{ github.event.pull_request.head.sha }}" > commit_hash_timestamp
       
       - name: Upload PR number artifact
         uses: actions/upload-artifact@v4
@@ -157,8 +160,8 @@ jobs:
       - name: Upload Commit hash artifact
         uses: actions/upload-artifact@v4
         with:
-          name: commit_hash
-          path: commit_hash
+          name: commit_hash_timestamp
+          path: commit_hash_timestamp
 
   build-test-rocky:
     runs-on: ubuntu-latest
