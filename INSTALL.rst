@@ -17,14 +17,16 @@ A full list of the Cyclus package dependencies is shown below:
 ====================   ==================
 Package                Minimum Version
 ====================   ==================
-``CMake``                2.8
-``boost``                1.46.1
-``libxml2``              2
-``libxml++``             2.36
-``python``               2.7 or 3.3+
-``sqlite3``              3.7.10
-``HDF5``                 1.8.4
-``Coin-Cbc``             2.5
+``CMake``                3.16.3
+``boost``                1.71.0
+``libxml2``              2.9.10+
+``libxml++``             2.40.1
+``python``               3.8.10
+``sqlite3``              3.31.1
+``HDF5``                 1.10.4+
+``Coin-Cbc``             2.10.3
+``Coin-Clp``             1.17.5
+``zlib``                 1.2.11
 ====================   ==================
 
 ************
