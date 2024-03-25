@@ -10,7 +10,7 @@ INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 message(STATUS "Generating Type System API for Python")
 EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/gentypesystem.py
     "--src-dir=${CMAKE_CURRENT_SOURCE_DIR}"
-    "--cyclus-version=${core_version}"
+    "--data-model-version=${DATA_MODEL_VERSION}"
     "--verbose"
     RESULT_VARIABLE res_var)
 IF(NOT "${res_var}" STREQUAL "0")
@@ -43,3 +43,5 @@ foreach(file ${CYCLUS_CYTHON_FILES})
     install(TARGETS ${targ} LIBRARY DESTINATION "${PYTHON_SITE_PACKAGES}/cyclus")
 endforeach()
 
+FILE(GLOB CYCLUS_PYTHON_FILES "${CYCLUS_PYSOURCE_DIR}/*.py")
+INSTALL(FILES ${CYCLUS_PYTHON_FILES} DESTINATION "${PYTHON_SITE_PACKAGES}/cyclus")

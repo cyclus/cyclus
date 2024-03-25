@@ -5,10 +5,7 @@ from functools import wraps
 
 from cyclus import lib
 
-from tools import libcyclus_setup, dbtest
-
-
-setup = libcyclus_setup
+from tools import dbtest
 
 @dbtest
 def test_name(db, fname, backend):

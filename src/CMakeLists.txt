@@ -9,6 +9,7 @@ endif()
 CONFIGURE_FILE(platform.h.in "${CMAKE_CURRENT_SOURCE_DIR}/platform.h" @ONLY)
 
 CONFIGURE_FILE(version.cc.in "${CMAKE_CURRENT_SOURCE_DIR}/version.cc" @ONLY)
+CONFIGURE_FILE(version.h.in "${CMAKE_CURRENT_SOURCE_DIR}/version.h" @ONLY)
 
 SET(cyclus_install_dir "${CMAKE_INSTALL_PREFIX}")
 SET(cyclus_build_dir "${CYCLUS_BINARY_DIR}")
@@ -98,6 +99,7 @@ copy_when_diff(
 ###########################################################
 ############# cython configuration ########################
 ###########################################################
+SET(NoCythonLibs ${LIBS})
 if(Cython_FOUND)
     # some setup
     set(cython_include_directories "")
@@ -143,6 +145,28 @@ if(Cython_FOUND)
         IF(NOT "${res_var_c}" STREQUAL "0")
             message(FATAL_ERROR "Cython compilation of ${file} failed!")
         ENDIF()
+
+        ADD_LIBRARY(${name} ${_cc_file})
+        SET(CythonModuleSrc ${CythonModuleSrc} ${_cc_file})
+        SET_TARGET_PROPERTIES(${name} PROPERTIES 
+          OUTPUT_NAME "${name}"
+          PREFIX ""
+          INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+          INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+          )
+        SET(LIBS ${LIBS} ${name})
+
+        TARGET_LINK_LIBRARIES(${name} dl ${NoCythonLibs})
+
+        INSTALL(
+          TARGETS ${name}
+          LIBRARY DESTINATION lib
+          )
+        INSTALL(
+          TARGETS ${name}
+          LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES}
+          )
+
         copy_when_diff(${_generated_h} ${_h_file})
         copy_when_diff(${_generated_cc} ${_cc_file})
     endforeach()
@@ -175,6 +199,9 @@ foreach(ccfile ${CYCLUS_COIN_SRC})
 endforeach()
 list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc)
 list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc)
+# The cython modules are built as their own shared libraries
+# We don't want them to be included in libcyclus.so
+list(REMOVE_ITEM cc_files ${CythonModuleSrc})
 
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${cc_files})
 

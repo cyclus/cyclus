@@ -77,8 +77,9 @@ class ResourceExchange {
     std::for_each(
         traders_.begin(),
         traders_.end(),
-        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddRequests_),
-                     this));
+        std::bind(&cyclus::ResourceExchange<T>::AddRequests_,
+                     this,
+                     std::placeholders::_1));
   }
 
   /// @brief queries traders and collects all responses to requests for bids
@@ -87,8 +88,9 @@ class ResourceExchange {
     std::for_each(
         traders_.begin(),
         traders_.end(),
-        std::bind1st(std::mem_fun(&cyclus::ResourceExchange<T>::AddBids_),
-                     this));
+        std::bind(&cyclus::ResourceExchange<T>::AddBids_,
+                     this,
+                     std::placeholders::_1));
   }
 
   /// @brief adjust preferences for requests given bid responses
@@ -98,9 +100,10 @@ class ResourceExchange {
     std::for_each(
         traders.begin(),
         traders.end(),
-        std::bind1st(
-            std::mem_fun(&cyclus::ResourceExchange<T>::AdjustPrefs_),
-            this));
+        std::bind(
+            &cyclus::ResourceExchange<T>::AdjustPrefs_,
+            this,
+            std::placeholders::_1));
   }
 
   /// return true if this is an empty exchange (i.e., no requests exist,

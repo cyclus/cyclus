@@ -377,6 +377,7 @@ CYTHON_TYPES = {
     'std::list': 'std_list',
     'std::vector': 'std_vector',
     'cyclus::toolkit::ResBuf': 'cpp_cyclus.ResBuf',
+    'cyclus::toolkit::TotalInvTracker': 'cpp_cyclus.TotalInvTracker',
     'cyclus::toolkit::ResMap': 'cpp_cyclus.ResMap',
     }
 
@@ -384,7 +385,7 @@ CYTHON_TYPES = {
 RESOURCES = ['MATERIAL', 'PRODUCT']
 
 INVENTORIES = ['cyclus::toolkit::ResourceBuff', 'cyclus::toolkit::ResBuf',
-               'cyclus::toolkit::ResMap']
+               'cyclus::toolkit::TotalInvTracker', 'cyclus::toolkit::ResMap']
 
 USE_SHARED_PTR = ('MATERIAL', 'PRODUCT', 'cyclus::Material', 'cyclus::Product')
 
@@ -419,6 +420,7 @@ FUNCNAMES = {
     'std::list': 'std_list',
     'std::vector': 'std_vector',
     'cyclus::toolkit::ResBuf': 'res_buf',
+    'cyclus::toolkit::TotalInvTracker': 'total_inv_tracker',
     'cyclus::toolkit::ResMap': 'res_map',
     }
 
@@ -453,6 +455,7 @@ CLASSNAMES = {
     'std::list': 'List',
     'std::vector': 'Vector',
     'cyclus::toolkit::ResBuf': 'ResBuf',
+    'cyclus::toolkit::TotalInvTracker': 'total_inv_tracker',
     'cyclus::toolkit::ResMap': 'ResMap',
     }
 
@@ -489,6 +492,7 @@ TEMPLATE_ARGS = {
     'std::list': ('val',),
     'std::vector': ('val',),
     'cyclus::toolkit::ResBuf': ('val',),
+    'cyclus::toolkit::TotalInvTracker': ('val',),
     'cyclus::toolkit::ResMap': ('key', 'val'),
     }
 
@@ -509,6 +513,7 @@ NPTYPES = {
     'std::list': 'np.NPY_OBJECT',
     'std::vector': 'np.NPY_OBJECT',
     'cyclus::toolkit::ResBuf': 'np.NPY_OBJECT',
+    'cyclus::toolkit::TotalInvTracker': 'np.NPY_OBJECT',
     'cyclus::toolkit::ResMap': 'np.NPY_OBJECT',
     }
 
@@ -529,6 +534,7 @@ NEW_PY_INSTS = {
     'std::list': '[]',
     'std::vector': '[]',
     'cyclus::toolkit::ResBuf': 'None',
+    'cyclus::toolkit::TotalInvTracker': 'None',
     'cyclus::toolkit::ResMap': 'None',
     }
 
@@ -646,6 +652,7 @@ TO_PY_CONVERTERS = {
         '    py{var}[i] = {var}_i\n',
         'py{var}'),
     'cyclus::toolkit::ResBuf': ('', '', 'None'),
+    'cyclus::toolkit::TotalInvTracker': ('', '', 'None'),
     'cyclus::toolkit::ResMap': ('', '', 'None'),
     }
 
@@ -755,6 +762,12 @@ TO_CPP_CONVERTERS = {
     'cyclus::toolkit::ResBuf': (
         'cdef _{classname} py{var}\n'
         'cdef cpp_cyclus.ResBuf[{valtype}] cpp{var}\n',
+        'py{var} = <_{classname}> {var}\n'
+        'cpp{var} = deref(py{var}.ptx)\n',
+        'cpp{var}'),
+    'cyclus::toolkit::TotalInvTracker': (
+        'cdef _{classname} py{var}\n'
+        'cdef cpp_cyclus.TotalInvTracker[{valtype}] cpp{var}\n',
         'py{var} = <_{classname}> {var}\n'
         'cpp{var} = deref(py{var}.ptx)\n',
         'cpp{var}'),
@@ -2266,21 +2279,29 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
         shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]](
             new cpp_cyclus.RequestPortfolio[{{cyr}}]()
             )
+
+    cdef std_vector[cpp_cyclus.RequestPortfolio[{{cyr}}].request_ptr] mreqs
+    cdef cpp_cyclus.Request[{{cyr}}]* single_request
     cdef std_string commod
     cdef _{{rclsname}} targ
     cdef shared_ptr[{{cyr}}] targ_ptr
+
     # add requests
-    for name, reqs in pyport['commodities'].items():
-        commod = str_py_to_cpp(name)
-        for req in reqs:
-            targ = <_{{rclsname}}> req['target']
-            targ_ptr = reinterpret_pointer_cast[{{ts.cython_type(r)}},
-                                                cpp_cyclus.Resource](targ.ptx)
-            if req['cost'] is not None:
-                raise ValueError('setting cost functions from Python is not yet '
-                                 'supported.')
-            port.get().AddRequest(targ_ptr, requester, commod, req['preference'],
-                                  req['exclusive'])
+    for commodity in pyport['commodities']:
+        for name, reqs in commodity.items():
+            commod = str_py_to_cpp(name)
+            for req in reqs:
+                targ = <_{{rclsname}}> req['target']
+                targ_ptr = reinterpret_pointer_cast[{{ts.cython_type(r)}},
+                                                    cpp_cyclus.Resource](targ.ptx)
+                if req['cost'] is not None:
+                    raise ValueError('setting cost functions from Python is not yet '
+                                    'supported.')
+                single_request = port.get().AddRequest(targ_ptr, requester, commod, req['preference'],
+                                req['exclusive'])
+                mreqs.push_back(single_request)
+    port.get().AddMutualReqs(mreqs)
+    
     # add constraints
     for constr in pyport['constraints']:
         port.get().AddConstraint(
@@ -2758,8 +2779,8 @@ def parse_args(argv):
                         dest='dbtypes_json',
                         help="the path to dbtypes.json file, "
                              "default " + dbtd)
-    parser.add_argument('--cyclus-version', default=None,
-                        dest='cyclus_version',
+    parser.add_argument('--data-model-version', default=None,
+                        dest='data_model_version',
                         help="The Cyclus API version to target."
                         )
     ns = parser.parse_args(argv)
@@ -2781,7 +2802,7 @@ def setup(ns):
     with io.open(ns.dbtypes_json, 'r') as f:
         tab = json.load(f)
     # get cyclus version
-    verstr = ns.cyclus_version
+    verstr = ns.data_model_version
     if verstr is None:
         try:
             verstr = safe_output(['cyclus', '--version']).split()[2]
@@ -2796,7 +2817,7 @@ def setup(ns):
     if verstr is not None:
         if isinstance(verstr, bytes):
             verstr = verstr.decode()
-        ns.cyclus_version = verstr
+        ns.data_model_version = verstr
         ver = tuple(map(int, verstr.partition('-')[0].split('.')))
     if ns.verbose:
         print('Found cyclus version: ' + verstr, file=sys.stderr)

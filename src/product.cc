@@ -12,17 +12,18 @@ int Product::next_qualid_ = 1;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Product::Ptr Product::Create(Agent* creator, double quantity,
-                             std::string quality) {
+                             std::string quality, int package_id) {
   if (qualids_.count(quality) == 0) {
     qualids_[quality] = next_qualid_++;
     creator->context()->NewDatum("Products")
         ->AddVal("QualId", qualids_[quality])
         ->AddVal("Quality", quality)
+        ->AddVal("PackageId", package_id)
         ->Record();
   }
 
   // the next lines must come after qual id setting
-  Product::Ptr r(new Product(creator->context(), quantity, quality));
+  Product::Ptr r(new Product(creator->context(), quantity, quality, package_id));
   r->tracker_.Create(creator);
   return r;
 }
@@ -62,7 +63,7 @@ Product::Ptr Product::Extract(double quantity) {
 
   quantity_ -= quantity;
 
-  Product::Ptr other(new Product(ctx_, quantity, quality_));
+  Product::Ptr other(new Product(ctx_, quantity, quality_, package_id_));
   tracker_.Extract(&other->tracker_);
   return other;
 }
@@ -72,11 +73,40 @@ Resource::Ptr Product::ExtractRes(double qty) {
   return boost::static_pointer_cast<Resource>(Extract(qty));
 }
 
+int Product::package_id() {
+  return package_id_;
+}
+
+void Product::ChangePackageId(int new_package_id) {
+  if (ctx_ != NULL) {
+    throw ValueError("Package Id cannot be changed with NULL context");
+  }
+  if (new_package_id == package_id_) {
+    // no change needed
+    return;
+  }
+  else if (new_package_id == default_package_id_) {
+    // default has functionally no restrictions
+    package_id_ = new_package_id;
+    return;
+  }
+  
+  Package::Ptr p = ctx_->GetPackageById(package_id_);
+  double min = p->fill_min();
+  double max = p->fill_max();
+  if (quantity_ >= min && quantity_ <= max) {
+    package_id_ = new_package_id;
+  } else {
+    throw ValueError("Material quantity is outside of package fill limits.");
+  }
+}
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Product::Product(Context* ctx, double quantity, std::string quality)
+Product::Product(Context* ctx, double quantity, std::string quality, int package_id)
     : quality_(quality),
       quantity_(quantity),
       tracker_(ctx, this),
-      ctx_(ctx) {}
+      ctx_(ctx),
+      package_id_(package_id) {}
 
 }  // namespace cyclus

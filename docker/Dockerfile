@@ -1,5 +1,4 @@
 ARG pkg_mgr=apt
-ARG make_cores=2
 ARG ubuntu_version=22.04
 
 FROM ubuntu:${ubuntu_version} as common-base
@@ -112,6 +111,33 @@ ENV CC /opt/conda/bin/x86_64-conda_cos6-linux-gnu-gcc
 ENV CXX /opt/conda/bin/x86_64-conda_cos6-linux-gnu-g++
 ENV CPP /opt/conda/bin/x86_64-conda_cos6-linux-gnu-cpp
 
+FROM apt-deps as apt-coverage-deps
+RUN apt install -y lcov curl
+ENV GCOV /usr/bin/gcov
+
+FROM conda-deps as conda-coverage-deps
+RUN mamba install -y lcov curl
+ENV GCOV /opt/conda/bin/x86_64-conda-linux-gnu-gcov
+
+FROM ${pkg_mgr}-coverage-deps as cyclus-coverage
+ARG make_cores=2
+
+COPY . /cyclus
+WORKDIR /cyclus
+
+RUN python install.py -j ${make_cores} --build-type=Release --allow-milps --code_coverage
+ENV PATH /root/.local/bin:$PATH
+ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
+RUN lcov -c --rc lcov_branch_coverage=1 -d /cyclus -o initial_coverage.info --gcov-tool ${GCOV} --initial --no-external && \
+    cyclus_unit_tests && \
+    cd tests && python -m pytest && cd .. && \
+    lcov -c --rc lcov_branch_coverage=1 -d /cyclus -o test_coverage.info --gcov-tool ${GCOV} --no-external && \
+    lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info --rc lcov_branch_coverage=1 -o total_coverage.info && \
+    mkdir -p html && genhtml total_coverage.info --output-directory html --branch-coverage
+
+FROM scratch as coverage-report
+COPY --from=cyclus-coverage /cyclus /
+
 FROM ${pkg_mgr}-deps as cyclus
 ARG make_cores=2
 
@@ -124,9 +150,16 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
-RUN python install.py -j ${make_cores} --build-type=Release --core-version 999999.999999 --allow-milps
+RUN python install.py -j ${make_cores} --build-type=Release --allow-milps
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
+
+FROM cyclus as deb-generation
+WORKDIR /cyclus/build
+RUN make package
+
+FROM scratch as deb-package
+COPY --from=deb-generation /cyclus/build/cyclus*.deb /
 
 FROM cyclus as cyclus-test
 
@@ -134,5 +167,4 @@ RUN cyclus_unit_tests
 
 FROM cyclus-test as cyclus-pytest
 
-RUN cd tests && python -m pytest --ignore test_main.py
-
+RUN cd tests && python -m pytest

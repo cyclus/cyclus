@@ -1,25 +1,29 @@
-name: Build/Test for PR and collaborator push
+name: Build/Test Cyclus
 
 on:
   # allows us to run workflows manually
   workflow_dispatch:
   pull_request:
     paths-ignore:
-      - '.github/workflows/build_test_publish.yml'
+      - '.github/workflows/publish_latest.yml'
+      - '.github/workflows/publish_release.yml'
       - '.github/workflows/changelog_test.yml'
-      - 'docker/**'
+      - '.github/workflows/code_coverage.yml'
+      - '.github/workflows/rocky_build_test.yml'
       - 'doc/**'
       - 'CHANGELOG.rst'
   push:
     paths-ignore:
-      - '.github/workflows/build_test_publish.yml'
+      - '.github/workflows/publish_latest.yml'
+      - '.github/workflows/publish_release.yml'
       - '.github/workflows/changelog_test.yml'
-      - 'docker/**'
+      - '.github/workflows/code_coverage.yml'
+      - '.github/workflows/rocky_build_test.yml'
       - 'doc/**'
       - 'CHANGELOG.rst'
 
 jobs:
-  build-and-test:
+  build-test-ubuntu:
     runs-on: ubuntu-latest
 
     strategy:
@@ -30,77 +34,158 @@ jobs:
           22.04,
         ]
         pkg_mgr : [
-            apt,
-            conda,
+          apt,
+          conda,
         ]
-    
-    container:
-      image: ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/${{ matrix.pkg_mgr }}-deps
+
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
 
     steps:
-      - name: Checkout and Build Cyclus
-        uses: actions/checkout@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: network=host
 
-      - name: Building Cyclus
-        run: |
-          mkdir -p `python -m site --user-site`
-          python install.py -j 2 --build-type=Release --core-version 999999.999999 --allow-milps --code_coverage
-          echo "PATH=${HOME}/.local/bin:$PATH" >> "$GITHUB_ENV"
-          echo "LD_LIBRARY_PATH=${HOME}/.local/lib:${HOME}/.local/lib/cyclus:$LD_LIBRARY_PATH" >> "$GITHUB_ENV"
+      - name: Checkout Cyclus
+        uses: actions/checkout@v4
 
-      - name: Install lcov for apt
-        if: matrix.pkg_mgr == 'apt'
+      - name: Build and Test Cyclus
+        id: build-cyclus
+        uses: docker/build-push-action@v5
+        with:
+          file: docker/Dockerfile
+          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:ci-layer-cache
+          tags: localhost:5000/cyclus:local
+          push: true
+          build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
+
+      - name: Checkout Cycamore
+        if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
+        uses: actions/checkout@v4
+        with:
+          repository: cyclus/cycamore
+          path: ${{ github.workspace }}/cycamore
+
+      - name: Build and Test Cycamore
+        id: build-cycamore
+        if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
+        continue-on-error: true
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ github.workspace }}/cycamore
+          file: ${{ github.workspace }}/cycamore/docker/Dockerfile
+          build-contexts: |
+            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus=docker-image://localhost:5000/cyclus:local
+          cache-from: type=registry,ref=ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore:ci-layer-cache
+          tags: localhost:5000/cycamore:local
+          push: true
+          build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
+
+      - name: Checkout Cymetric
+        if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
+        uses: actions/checkout@v4
+        with:
+          repository: cyclus/cymetric
+          path: ${{ github.workspace }}/cymetric
+
+      - name: Build and Test Cymetric
+        if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
+        id: build-cymetric
+        continue-on-error: true
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ github.workspace }}/cymetric
+          file: ${{ github.workspace }}/cymetric/docker/Dockerfile
+          build-contexts: |
+            ghcr.io/cyclus/cycamore_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cycamore=docker-image://localhost:5000/cycamore:local
+          cache-from: type=registry,ref=ghcr.io/cyclus/cymetric_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cymetric:ci-layer-cache
+          build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
+  
+      - name: Export Environment Variables
+        if: github.event_name == 'pull_request'
         run: |
-          apt update --fix-missing && apt install -y lcov curl
-          echo "GCOV=/usr/bin/gcov" >> "$GITHUB_ENV"
+          echo "CYCAMORE_BUILD_STATUS=${{steps.build-cycamore.outcome == 'success' && '**Success** :white_check_mark:' || 
+          steps.build-cycamore.outcome == 'failure' && '**Failure** :x:' || 
+          '**Skipped due to upstream failure** :warning:'}}" >> "$GITHUB_ENV"
+
+          echo "CYMETRIC_BUILD_STATUS=${{steps.build-cymetric.outcome == 'success' && '**Success** :white_check_mark:' || 
+          steps.build-cymetric.outcome == 'failure' && '**Failure** :x:' || 
+          '**Skipped due to upstream failure** :warning:'}}" >> "$GITHUB_ENV"
+
+          echo "ARTIFACT_NAME=${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}" >> "$GITHUB_ENV"
+
+      - name: Construct Artifact
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "
+          ##### Build \`FROM cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus\`
+            - Cycamore: ${{ env.CYCAMORE_BUILD_STATUS }}
+            - Cymetric: ${{ env.CYMETRIC_BUILD_STATUS }}" > ${{ env.ARTIFACT_NAME }}.txt
       
-      - name: Install lcov for conda
-        if: matrix.pkg_mgr == 'conda'
-        run: |
-            mamba install -c conda-forge -y lcov curl
-            echo "GCOV=/opt/conda/bin/x86_64-conda-linux-gnu-gcov" >> "$GITHUB_ENV"
-
-      - name: Initial Coverage Report
-        run: |
-          lcov -c --rc lcov_branch_coverage=1 --initial -d ${PWD}/build/src -o ${HOME}/initial_coverage.info --gcov-tool ${{ env.GCOV }}
-
-      - name: Cyclus Unit Tests
-        run: |
-          cyclus_unit_tests
-
-      - name: Cyclus Python Tests
-        run: |
-          cd tests && python -m pytest --ignore test_main.py
-
-      - name: Unit Test Coverage Report
-        run: |
-          lcov -c --rc lcov_branch_coverage=1 -d ${PWD}/build/src -o ${HOME}/test_coverage.info --gcov-tool ${{ env.GCOV }}
-          lcov --add-tracefile ${HOME}/initial_coverage.info --add-tracefile  ${HOME}/test_coverage.info --rc lcov_branch_coverage=1 -o ${HOME}/total_coverage.info
-          lcov --remove ${HOME}/total_coverage.info -o ${HOME}/src_coverage.info --rc lcov_branch_coverage=1 "/usr/**" "/opt/**"
-          mkdir -p ${HOME}/cyclus_coverage/html
-          genhtml ${HOME}/src_coverage.info --output-directory ${HOME}/cyclus_coverage/html --branch-coverage
-          echo "artifactPath=${HOME}/cyclus_coverage/html/" >> $GITHUB_ENV
-     
-      - name: Upload Coverage HTML Artifacts
-        uses: actions/upload-pages-artifact@v2
+      - name: Upload Artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
         with:
-          name: cyclus-coverage-report-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
-          path: ${{ env.artifactPath }}
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_NAME }}.txt
 
-      - name: Coveralls
-        uses: coverallsapp/github-action@v2
-        with:
-          flag-name: ${{ join(matrix.*, '-') }}
-          parallel: true
-          file: ${HOME}/src_coverage.info
-          format: lcov
-          compare-ref: main
-
-  finish-coveralls:
-    needs: build-and-test
+  upload-pr-number:
     runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
     steps:
-    - name: Coveralls Finished
-      uses: coverallsapp/github-action@v2
-      with:
-        parallel-finished: true
+      - name: Checkout cyclus
+        uses: actions/checkout@v4
+
+      - name: Save PR number and Commit hash to file
+        run: |
+          echo "${{ github.event.number }}" > pr_number
+          echo "${{ github.event.pull_request.head.sha }} - $(git log -1 --format=%ci)" > commit_hash_timestamp
+      
+      - name: Upload PR number artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number
+      
+      - name: Upload Commit hash artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: commit_hash_timestamp
+          path: commit_hash_timestamp
+
+  build-test-rocky:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        rocky_versions : [
+          8,
+          9,
+        ]
+
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Checkout Cyclus
+        uses: actions/checkout@v4
+
+      - name: Build and Test Cyclus
+        id: build-cyclus
+        uses: docker/build-push-action@v5
+        with:
+          file: docker/Rocky.dockerfile
+          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_rocky_${{ matrix.rocky_versions }}/cyclus:ci-layer-cache
+          build-args: |
+            rocky_version=${{ matrix.rocky_versions }}

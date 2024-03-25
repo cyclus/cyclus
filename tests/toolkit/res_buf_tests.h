@@ -7,13 +7,15 @@
 #include "error.h"
 #include "logger.h"
 #include "product.h"
+#include "composition.h"
+#include "material.h"
 #include "toolkit/res_buf.h"
 
 namespace cyclus {
 namespace toolkit {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class ResBufTest : public ::testing::Test {
+class ProductBufTest : public ::testing::Test {
  protected:
   Product::Ptr mat1_, mat2_;
   double mass1, mass2;
@@ -62,6 +64,54 @@ class ResBufTest : public ::testing::Test {
     }
   }
 };
+
+class MaterialBufTest : public ::testing::Test {
+ protected:
+
+  ResBuf<Material> mat_store_;  // default constructed mat store
+  ResBuf<Material> bulk_store_ = ResBuf<Material>(true);
+
+  Nuc sr89_, fe59_;
+  Material::Ptr mat1a_, mat1b_, mat2a_, mat2b_, mat3_;
+  Composition::Ptr test_comp1_, test_comp2_, test_comp3_;
+
+  double cap_;
+
+  virtual void SetUp() {
+    try {
+
+      sr89_ = 380890000;
+      fe59_ = 260590000;
+
+      CompMap v, w;
+      v[sr89_] = 1;
+      test_comp1_ = Composition::CreateFromMass(v);
+
+      w[fe59_] = 2;
+      test_comp2_ = Composition::CreateFromMass(w);
+
+      w[sr89_] = 1;
+      test_comp3_ = Composition::CreateFromMass(w);
+
+      double mat_size = 5 * units::g;
+
+      mat1a_ = Material::CreateUntracked(mat_size, test_comp1_);
+      mat1b_ = Material::CreateUntracked(mat_size, test_comp1_);
+      mat2a_ = Material::CreateUntracked(mat_size, test_comp2_);
+      mat2b_ = Material::CreateUntracked(mat_size, test_comp2_);
+      mat3_ = Material::CreateUntracked(mat_size, test_comp3_);
+
+      cap_ = 10 * mat_size;
+
+      mat_store_.capacity(cap_);
+      bulk_store_.capacity(cap_);
+
+    } catch (std::exception err) {
+      FAIL() << "An exception was thrown in the fixture SetUp.";
+    }
+  }
+};
+
 
 }  // namespace toolkit
 }  // namespace cyclus

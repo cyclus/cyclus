@@ -816,14 +816,6 @@ def py_import_init():
     """
     cpp_cyclus.PyImportInit()
 
-
-def py_import_call_init():
-    """Calls Cyclus-internal Python imports. This is called
-    automatically when cyclus is imported. Users should not need to call
-    this function.
-    """
-    cpp_cyclus.PyImportCallInit()
-
 #
 # XML
 #
@@ -1621,6 +1613,24 @@ cdef class _Context:
             return
         del self.ptx
 
+    def add_recipe(self, name, comp, basis):
+        """
+        Adds a new recipe to a simulation 
+
+        Parameters:
+        ----------
+        name: str
+            name for recipe
+        comp: dict
+            dictionary mapping nuclides to their compostion fraction
+        basis: str
+            'atom' or 'mass' to specify the type of composition fraction
+        """
+        cdef std_string cpp_name = str_py_to_cpp(name)
+        cpp_comp = ts.composition_ptr_from_py(comp, basis)
+        self.ptx.AddRecipe(cpp_name, cpp_comp)
+
+
     def del_agent(self, agent):
         """Destructs and cleans up an agent (and it's children recursively)."""
         self.ptx.DelAgent(dynamic_agent_ptr(agent))
@@ -1808,44 +1818,62 @@ cpdef dict normalize_request_portfolio(object inp):
     if not isinstance(inp, Mapping):
         inp = dict(inp)
     if 'commodities' in inp:
-        commods = inp['commodities']
+        commods = []
+        for commodity in inp['commodities']:
+            for name, reqs in commodity.items():
+                if name == 'preference' or name == 'exclusive':
+                    continue
+
+                commods.append({name:reqs})
         constrs = inp.get('constraints', [])
     else:
-        commods = inp
+        commods = []
+        for name, reqs in inp.items():
+            if name == 'preference' or name == 'exclusive':
+                continue
+            commods.append({name:reqs})
         constrs = []
     # canonize constraints
     if not isinstance(constrs, Iterable):
         constrs = [constrs]
     # canonize commods
-    if not isinstance(commods, Mapping):
-        commods = dict(commods)
+    if not isinstance(commods, Iterable):
+        commods = list(commods)
     cdef dict default_req = {'target': None, 'preference': 1.0,
                              'exclusive': False, 'cost': None}
-    for key, val in commods.items():
-        if isinstance(val, ts.Resource):
-            req = default_req.copy()
-            req['target'] = val
-            commods[key] = [req]
-        elif isinstance(val, Mapping):
-            req = default_req.copy()
-            req.update(val)
-            commods[key] = [req]
-        elif isinstance(val, Sequence):
-            newval = []
-            for x in val:
+    for index, commodity in enumerate(commods):
+        for key, val in commodity.items():
+            if isinstance(val, ts.Resource):
                 req = default_req.copy()
-                if isinstance(x, ts.Resource):
-                    req['target'] = x
-                elif isinstance(x, Mapping):
-                    req.update(x)
-                else:
-                    raise TypeError('Did not recognize type of request while '
-                                    'converting to portfolio: ' + repr(inp))
-                newval.append(req)
-            commods[key] = newval
-        else:
-            raise TypeError('Did not recognize type of commodity while '
-                            'converting to portfolio: ' + repr(inp))
+                req['target'] = val
+                if 'commodities' in inp:
+                    if 'preference' in inp['commodities'][index]:
+                        req['preference'] = inp['commodities'][index]['preference']
+                    if 'exclusive' in inp['commodities'][index]:
+                        req['exclusive'] = inp['commodities'][index]['exclusive']
+                commods[index][key] = [req]
+
+            elif isinstance(val, Mapping):
+                req = default_req.copy()
+                req.update(val)
+                commods[key] = [req]
+            elif isinstance(val, Sequence):
+                newval = []
+                for x in val:
+                    req = default_req.copy()
+                    if isinstance(x, ts.Resource):
+                        req['target'] = x
+                    elif isinstance(x, Mapping):
+                        req.update(x)
+                    else:
+                        raise TypeError('Did not recognize type of request while '
+                                        'converting to portfolio: ' + repr(inp))
+                    newval.append(req)
+                commods[key] = newval
+            else:
+                raise TypeError('Did not recognize type of commodity while '
+                                'converting to portfolio: ' + repr(inp))
+
     cdef dict rtn = {'commodities': commods, 'constraints': constrs}
     return rtn
 

@@ -1,0 +1,74 @@
+name: Code Coverage
+
+on:
+  # allows us to run workflows manually
+  workflow_dispatch:
+  pull_request:
+    paths-ignore:
+      - '.github/workflows/build_test.yml'
+      - '.github/workflows/publish_latest.yml'
+      - '.github/workflows/publish_release.yml'
+      - '.github/workflows/changelog_test.yml'
+      - '.github/workflows/rocky_build_test.yml'
+      - 'doc/**'
+      - 'CHANGELOG.rst'
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu_versions : [
+          22.04,
+        ]
+        pkg_mgr : [
+          apt,
+        ]
+
+    name: Build, Test, Report Coverage
+    steps:
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout Cyclus
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build, Test, and Report Coverage
+        uses: docker/build-push-action@v5
+        with:
+          cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache
+          cache-to: type=registry,ref=ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus-coverage:ci-layer-cache,mode=max,ignore-error=true
+          file: docker/Dockerfile
+          target: coverage-report
+          outputs: type=local,dest=.
+          build-args: |
+            pkg_mgr=${{ matrix.pkg_mgr }}
+            ubuntu_version=${{ matrix.ubuntu_versions }}
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@v2
+        with:
+          file: ${{ github.workspace }}/total_coverage.info
+          format: lcov
+
+      - name: Upload Coverage HTML Artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          name: cyclus-coverage-report-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
+          path: ${{ github.workspace }}/html
+        

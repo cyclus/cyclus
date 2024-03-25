@@ -35,7 +35,7 @@ SUPPORTED_INDEX = 6
 CANON_INDEX = 7
 VL_INDEX = 8
 
-RE_ENUM_ENTRY = re.compile('\s*\w+\s*?(=\s*?\d+)?,\s*?//.*')
+RE_ENUM_ENTRY = re.compile(r'\s*\w+\s*?(=\s*?\d+)?,\s*?//.*')
 
 
 def main():

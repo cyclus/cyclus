@@ -15,15 +15,15 @@ const ResourceType Material::kType = "Material";
 Material::~Material() {}
 
 Material::Ptr Material::Create(Agent* creator, double quantity,
-                               Composition::Ptr c) {
-  Material::Ptr m(new Material(creator->context(), quantity, c));
+                               Composition::Ptr c, int package_id) {
+  Material::Ptr m(new Material(creator->context(), quantity, c, package_id));
   m->tracker_.Create(creator);
   return m;
 }
 
 Material::Ptr Material::CreateUntracked(double quantity,
                                         Composition::Ptr c) {
-  Material::Ptr m(new Material(NULL, quantity, c));
+  Material::Ptr m(new Material(NULL, quantity, c, default_package_id_));
   return m;
 }
 
@@ -48,6 +48,7 @@ void Material::Record(Context* ctx) const {
   ctx_->NewDatum("MaterialInfo")
       ->AddVal("ResourceId", state_id())
       ->AddVal("PrevDecayTime", prev_decay_time_)
+      ->AddVal("PackageId", package_id_)
       ->Record();
 
   comp_->Record(ctx);
@@ -87,8 +88,7 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
   }
 
   qty_ -= qty;
-
-  Material::Ptr other(new Material(ctx_, qty, c));
+  Material::Ptr other(new Material(ctx_, qty, c, default_package_id_));
 
   // Decay called on the extracted material should have the same dt as for
   // this material regardless of composition.
@@ -138,6 +138,30 @@ void Material::Transmute(Composition::Ptr c) {
   //                               V
   if (ctx_ != NULL && ctx_->time() > prev_decay_time_) {
     prev_decay_time_ = ctx_->time();
+  }
+}
+
+void Material::ChangePackageId(int new_package_id) {
+  if (ctx_ != NULL) {
+    throw ValueError("Package Id cannot be changed with NULL context");
+  }
+  if (new_package_id == package_id_) {
+    // no change needed
+    return;
+  }
+  else if (new_package_id == default_package_id_) {
+    // default has functionally no restrictions
+    package_id_ = new_package_id;
+    return;
+  }
+ 
+  Package::Ptr p = ctx_->GetPackageById(package_id_);
+  double min = p->fill_min();
+  double max = p->fill_max();
+  if (qty_ >= min && qty_ <= max) {
+    package_id_ = new_package_id;
+  } else {
+    throw ValueError("Material quantity is outside of package fill limits.");
   }
 }
 
@@ -218,12 +242,13 @@ Composition::Ptr Material::comp() {
   return comp_;
 }
 
-Material::Material(Context* ctx, double quantity, Composition::Ptr c)
+Material::Material(Context* ctx, double quantity, Composition::Ptr c, int package_id)
     : qty_(quantity),
       comp_(c),
       tracker_(ctx, this),
       ctx_(ctx),
-      prev_decay_time_(0) {
+      prev_decay_time_(0),
+      package_id_(package_id) {
   if (ctx != NULL) {
     prev_decay_time_ = ctx->time();
   } else {
@@ -234,6 +259,10 @@ Material::Material(Context* ctx, double quantity, Composition::Ptr c)
 Material::Ptr NewBlankMaterial(double quantity) {
   Composition::Ptr comp = Composition::CreateFromMass(CompMap());
   return Material::CreateUntracked(quantity, comp);
+}
+
+int Material::package_id() {
+  return package_id_;
 }
 
 }  // namespace cyclus

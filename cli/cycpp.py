@@ -73,8 +73,8 @@ elif sys.version_info[0] >= 3:
 sys_cpp = os.environ.get('CPP', 'cpp')
 
 # Non-capturing and must be used wit re.DOTALL, DO NOT COMPILE!
-RE_MULTILINE_COMMENT = "(?:\s*?/\*(?!\*/)*?\*/)"
-RE_SINGLE_LINE_COMMENT = "(?:\s*?//[^\n]*?\n\s*?)"
+RE_MULTILINE_COMMENT = r"(?:\s*?/\*(?!\*/)*?\*/)"
+RE_SINGLE_LINE_COMMENT = r"(?:\s*?//[^\n]*?\n\s*?)"
 RE_COMMENTS = "(?:" + RE_MULTILINE_COMMENT + "|" + RE_SINGLE_LINE_COMMENT + ")"
 
 # This might miss files which start with '#' - however, after canonization
@@ -102,11 +102,14 @@ BUFFERS = {'{0}::toolkit::ResourceBuff'.format(CYCNS),
            ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Product'),
            ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Material'),
            '{0}::toolkit::ResMap'.format(CYCNS),
+           '{0}::toolkit::TotalInvTracker'.format(CYCNS),
+           ('{0}::toolkit::TotalInvTracker'.format(CYCNS), '{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Material'),
            }
 
 TEMPLATES = {'std::vector', 'std::set', 'std::list', 'std::pair',
              'std::map', '{0}::toolkit::ResBuf'.format(CYCNS),
-             CYCNS + '::toolkit::ResMap',}
+             CYCNS + '::toolkit::ResMap',
+             CYCNS + '::toolkit::TotalInvTracker',}
 
 WRANGLERS = {
     '{0}::Agent'.format(CYCNS),
@@ -274,7 +277,7 @@ class TypedefFilter(AliasFilter):
     """Filter for handling typedef as aliases. Note that in-line compound
     typedefs of structs and unions are not supported.
     """
-    regex = re.compile("\s*typedef\s+(.*?\s+.*)\s*$")
+    regex = re.compile(r"\s*typedef\s+(.*?\s+.*)\s*$")
 
     def transform(self, statement, sep):
         state = self.machine
@@ -287,7 +290,7 @@ class TypedefFilter(AliasFilter):
 
 class UsingFilter(AliasFilter):
     """Filter for accumumating using aliases."""
-    regex = re.compile("\s*using\s+(?!namespace\s+)([\w:]+)\s*")
+    regex = re.compile(r"\s*using\s+(?!namespace\s+)([\w:]+)\s*")
 
     def transform(self, statement, sep):
         state = self.machine
@@ -298,7 +301,7 @@ class UsingFilter(AliasFilter):
 class NamespaceFilter(Filter):
     """Filter for accumumating namespace encapsulations."""
     # handles anonymous namespaces as group(1) is None
-    regex = re.compile("\s*namespace(\s+\w*)?\s*[^=]*", re.DOTALL)
+    regex = re.compile(r"\s*namespace(\s+\w*)?\s*[^=]*", re.DOTALL)
 
     def transform(self, statement, sep):
         state = self.machine
@@ -317,7 +320,7 @@ class NamespaceFilter(Filter):
 
 class UsingNamespaceFilter(Filter):
     """Filter for accumumating using namespace statement."""
-    regex = re.compile("\s*using\s+namespace\s+([\w:]*)\s*")
+    regex = re.compile(r"\s*using\s+namespace\s+([\w:]*)\s*")
 
     def transform(self, statement, sep):
         state = self.machine
@@ -336,7 +339,7 @@ class UsingNamespaceFilter(Filter):
 
 class NamespaceAliasFilter(AliasFilter):
     """Filter for accumumating namespace renames."""
-    regex = re.compile("\s*namespace\s+(\w+)\s*=\s*([\w:]+)\s*")
+    regex = re.compile(r"\s*namespace\s+(\w+)\s*=\s*([\w:]+)\s*")
 
     def transform(self, statement, sep):
         state = self.machine
@@ -346,8 +349,8 @@ class NamespaceAliasFilter(AliasFilter):
 
 class ClassFilter(Filter):
     """Filter for picking out class names."""
-    regex = re.compile("(?:\s*template\s*<[\s\w,]*>)?"
-                       "\s*(?:class|struct)\s+(\w+)(\s*:[\n\s\w,:]+)?\s*", re.DOTALL)
+    regex = re.compile(r"(?:\s*template\s*<[\s\w,]*>)?"
+                       r"\s*(?:class|struct)\s+(\w+)(\s*:[\n\s\w,:]+)?\s*", re.DOTALL)
 
     def transform(self, statement, sep):
         state = self.machine
@@ -385,7 +388,7 @@ class ClassAndSuperclassFilter(ClassFilter):
 
 class AccessFilter(Filter):
     """Filter for setting the current access control flag."""
-    regex = re.compile('\s*(public|private|protected)\s*', re.DOTALL)
+    regex = re.compile(r'\s*(public|private|protected)\s*', re.DOTALL)
 
     def transform(self, statement, sep):
         access = self.match.group(1)
@@ -393,7 +396,7 @@ class AccessFilter(Filter):
 
 class PragmaCyclusErrorFilter(Filter):
     """Filter for handling invalid #pragma cyclus. This should be the last filter."""
-    regex = re.compile('\s*#\s*pragma\s+cyclus(.*)')
+    regex = re.compile(r'\s*#\s*pragma\s+cyclus(.*)')
 
     directives = frozenset(['var', 'note', 'exec', 'decl', 'def', 'impl'])
 
@@ -470,7 +473,7 @@ class VarDecorationFilter(DecorationFilter):
     This evals the contents of dict and puts them in state.var_annotations, to be
     consumed by the next match with VarDeclarationFilter.
     """
-    regex = re.compile("\s*#\s*pragma\s+cyclus\s+var\s+(.*)")
+    regex = re.compile(r"\s*#\s*pragma\s+cyclus\s+var\s+(.*)")
 
     def transform(self, statement, sep):
         state = self.machine
@@ -483,7 +486,7 @@ class VarDeclarationFilter(Filter):
     """State varible declaration.  Only operates if state.var_annotations is
     not None. Access for member variable must be public.
     """
-    regex = re.compile("(.*\w+.*?)\s+(\w+)")
+    regex = re.compile(r"(.*\w+.*?)\s+(\w+)")
 
     def transform_pass2(self, statement, sep):
         state = self.machine
@@ -612,7 +615,7 @@ class ExecFilter(Filter):
     Any Python statement(s) are valid as part of the code block. Be a little
     careful when using this pragma :).
     """
-    regex = re.compile("#\s*pragma\s+cyclus\s+exec\s+(.*)")
+    regex = re.compile(r"#\s*pragma\s+cyclus\s+exec\s+(.*)")
 
     def transform(self, statement, sep):
         execns = self.machine.execns
@@ -629,7 +632,7 @@ class NoteDecorationFilter(DecorationFilter):
     This evals the contents of dict and merges them in as the class-level
     annotations dict.
     """
-    regex = re.compile("\s*#\s*pragma\s+cyclus\s+note\s+(.*)")
+    regex = re.compile(r"\s*#\s*pragma\s+cyclus\s+note\s+(.*)")
 
     def transform(self, statement, sep):
         state = self.machine
@@ -917,9 +920,9 @@ def accumulate_state(canon):
 # pass 3
 #
 class CodeGeneratorFilter(Filter):
-    re_template = ("\s*#\s*pragma\s+cyclus\s*?"
-                   "(\s+def\s+|\s+decl\s+|\s+impl\s+|\s*?)?"
-                   "(?:\s*?{0}\s*?)(\s+?(?:[\w:\.]+)?)?")
+    re_template = (r"\s*#\s*pragma\s+cyclus\s*?"
+                   r"(\s+def\s+|\s+decl\s+|\s+impl\s+|\s*?)?"
+                   r"(?:\s*?{0}\s*?)(\s+?(?:[\w:\.]+)?)?")
 
     def_template = "\n{ind}{virt}{rtn} {ns}{methodname}({args}){sep}\n"
 
@@ -1079,6 +1082,7 @@ class InitFromCopyFilter(CodeGeneratorFilter):
                                             "m->{var}.capacity());\n"),
         CYCNS + '::toolkit::ResBuf': "{var}.capacity(m->{var}.capacity());\n",
         CYCNS + '::toolkit::ResMap': '{var}.obj_ids(m->obj_ids());\n',
+        CYCNS + '::toolkit::TotalInvTracker': "{var}.capacity();\n",
         }
 
 class InitFromDbFilter(CodeGeneratorFilter):
@@ -1145,6 +1149,7 @@ class InitFromDbFilter(CodeGeneratorFilter):
         CYCNS + '::toolkit::ResBuf': '{var}.capacity({capacity});\n',
         CYCNS + '::toolkit::ResMap': (
             '{var}.obj_ids(qr.GetVal<{tstr}>("{var}"))\n;'),
+        CYCNS + '::toolkit::TotalInvTracker': '{var}.capacity();\n',
         }
 
 
@@ -1893,6 +1898,7 @@ class SnapshotFilter(CodeGeneratorFilter):
         CYCNS + '::toolkit::ResourceBuff': None,
         CYCNS + '::toolkit::ResBuf': None,
         CYCNS + '::toolkit::ResMap': '{var}.obj_ids()',
+        CYCNS + '::toolkit::TotalInvTracker': None,
         }
 
 
@@ -1947,6 +1953,7 @@ class SnapshotInvFilter(CodeGeneratorFilter):
             'invs[\"{var}\"] = {var}.PopNRes({var}.count());\n'
             '{var}.Push(invs["{var}"]);\n'),
         CYCNS + '::toolkit::ResMap': "invs[\"{var}\"] = {var}.ResValues();\n",
+        CYCNS + '::toolkit::TotalInvTracker': ';\n',
         }
 
 
@@ -1995,6 +2002,7 @@ class InitInvFilter(CodeGeneratorFilter):
         CYCNS + '::toolkit::ResourceBuff': "{var}.PushAll(inv[\"{var}\"]);\n",
         CYCNS + '::toolkit::ResBuf': "{var}.Push(inv[\"{var}\"]);\n",
         CYCNS + '::toolkit::ResMap': "{var}.ResValues(inv[\"{var}\"]);\n",
+        CYCNS + '::toolkit::TotalInvTracker': ";\n",
         }
 
 
@@ -2002,7 +2010,7 @@ class DefaultPragmaFilter(Filter):
     """Filter for handling default pragma code generation:
         #pragma cyclus [def|decl|impl]
     """
-    regex = re.compile("\s*#\s*pragma\s+cyclus(\s+def|\s+decl|\s+impl)?\s*$",
+    regex = re.compile(r"\s*#\s*pragma\s+cyclus(\s+def|\s+decl|\s+impl)?\s*$",
                        re.DOTALL)
 
     def transform(self, statement, sep):

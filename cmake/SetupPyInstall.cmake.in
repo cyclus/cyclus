@@ -2,13 +2,14 @@
 # Runs setup.py install
 #
 set(PYTHON_EXECUTABLE @Python3_EXECUTABLE@)
-set(core_version @core_version@)
-set(ENV{CYCLUS_CORE_VERSION} "${core_version}")
+set(CYCLUS_PROJECT_VERSION @CMAKE_PROJECT_VERSION@)
+set(ENV{CYCLUS_PROJECT_VERSION} "${CYCLUS_PROJECT_VERSION}")
 message("############### Begin Python Install ###############")
 message("-- Python installer:")
 message("  PYTHON_EXECUTABLE: ${PYTHON_EXECUTABLE}")
-message("  CYCLUS_CORE_VERSION: $ENV{CYCLUS_CORE_VERSION}")
+message("  CYCLUS_PROJECT_VERSION: ${CYCLUS_PROJECT_VERSION}")
 message("  CMAKE_INSTALL_PREFIX: ${CMAKE_INSTALL_PREFIX}")
+set(CMAKE_CURRENT_BINARY_DIR @CMAKE_CURRENT_BINARY_DIR@)
 message("  CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 execute_process(COMMAND ${PYTHON_EXECUTABLE} -m site --user-site
                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}

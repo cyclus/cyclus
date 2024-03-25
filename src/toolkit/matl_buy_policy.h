@@ -7,6 +7,7 @@
 #include "composition.h"
 #include "material.h"
 #include "res_buf.h"
+#include "total_inv_tracker.h"
 #include "trader.h"
 #include "random_number_generator.h"
 
@@ -70,11 +71,26 @@ class MatlBuyPolicy : public Trader {
   /// @param name a unique name identifying this policy
   /// @param throughput a constraining value for total transaction quantities in
   /// a single time step
-  /// @param fill_to the amount or fraction of inventory to order when placing
-  /// an order. This is equivalent to the S in an (s, S) inventory policy.
-  /// @param req_when_under place an request when the buf's quantity is less
-  /// than its capacity * fill_to (as a fraction). This is equivalent to the s
-  /// in an (s, S) inventory policy.
+  /// @param inv_policy the inventory policy to use. Options are "sS", "RQ". 
+  /// Each inventory policy options has two additional required parameters. An 
+  /// (s,S) inventory policy orders material only when the buffer is below the 
+  /// minimum value, s, and orders only enough to bring the buffer to the 
+  /// maximum value, S. An (s,S) policy allows partial orders. Set s as req_at 
+  /// and S as fill. An (R,Q) inventory policy requests material when the 
+  /// buffer is below the minimum value, R, and places an exclusive request for 
+  /// size Q. Set R as req_at and Q as fill. 
+  /// @param req_at, the inventory minimum (s, and R) for (s,S) and (R,Q),. If 
+  /// the buffer has less than or equal to value, new material will be 
+  /// requested based on the policy in place. 
+  /// @param fill_behav, the quantity govering the fill strategy for inventory 
+  /// policies. For (s,S), this is the maximum value, and material will be 
+  /// ordered up to this amount. For (R,Q), this is the quantity of material 
+  /// that will be ordered (exclusive).
+  /// @param cumulative_cap the cumulative capacity of material to be received 
+  /// in one active cycle. A cumulative cap inventory policy allows for a 
+  /// cumulative capacity of material to be received in one active cycle. Once 
+  /// the cumulative capacity is recieved, the agent enters a dormant period. 
+  /// Also requires dormant distributions using dormant_dist.
   /// @param quantize If quantize is greater than zero, the policy will make
   /// exclusive, integral quantize kg requests.  Otherwise, single requests will
   /// be sent to fill the buffer's empty space.
@@ -102,17 +118,27 @@ class MatlBuyPolicy : public Trader {
   /// Note that active and dormant periods are note currently compatible with
   /// (s, S) inventory management
   /// @{
-  MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      double throughput, 
-                      boost::shared_ptr<IntDistribution> active_dist = NULL,
-                      boost::shared_ptr<IntDistribution> dormant_dist = NULL,
-                      boost::shared_ptr<DoubleDistribution> size_dist = NULL);
+                      TotalInvTracker* buf_tracker);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      double fill_to, double req_when_under);
+                      TotalInvTracker* buf_tracker, double throughput,
+                      IntDistribution::Ptr active_dist = NULL, 
+                      IntDistribution::Ptr dormant_dist = NULL,
+                      DoubleDistribution::Ptr size_dist = NULL);
   MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                      double throughput, double fill_to,
-                      double req_when_under, double quantize);
+                      TotalInvTracker* buf_tracker, double throughput,
+                      double quantize);                    
+  MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
+                      TotalInvTracker* buf_tracker,
+                      double throughput, std::string inv_policy,
+                      double fill_behav, double req_at);
+  MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
+                      TotalInvTracker* buf_tracker, std::string inv_policy,
+                      double fill_behav, double req_at);
+  MatlBuyPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
+                      TotalInvTracker* buf_tracker, double throughput,
+                      double cumulative_cap,
+                      IntDistribution::Ptr);
   /// @}
 
   /// Instructs the policy to fill its buffer with requests on the given
@@ -144,9 +170,14 @@ class MatlBuyPolicy : public Trader {
 
   /// the total amount available to request
   inline double TotalAvailable() const {
-    return std::min(throughput_,
-                   (fill_to_ * buf_->capacity()) - buf_->quantity());
+    return std::min({throughput_,
+                    fill_to_ - buf_->quantity(),
+                    buf_->space(),
+                    buf_tracker_->space()});
   }
+
+  /// whether a request can be made
+  inline bool MakeReq() const { return buf_tracker_->quantity() <= req_at_; }
 
   /// whether trades will be denoted as exclusive or not
   inline bool Excl() const { return quantize_ > 0; }
@@ -169,9 +200,15 @@ class MatlBuyPolicy : public Trader {
       return rsrc_commods_;
   };
 
-  inline bool never_dormant() {
+  inline bool no_cycle_end_time() {
     return (next_dormant_end_ < 0 || next_active_end_ < 0);
-  };
+  }
+
+  inline bool dormant(int time) { 
+    return (time >= next_active_end_ && time < next_dormant_end_); 
+  }
+
+  inline bool use_cumulative_capacity() { return cumulative_cap_ > 0; }
 
   /// Trader Methods
   /// @{
@@ -183,6 +220,7 @@ class MatlBuyPolicy : public Trader {
   void SetNextActiveTime();
   void SetNextDormantTime();
   double SampleRequestSize();
+  void CheckActiveDormantCumulativeTimes();
 
  private:
   struct CommodDetail {
@@ -191,24 +229,30 @@ class MatlBuyPolicy : public Trader {
   };
 
   void set_manager(Agent* m);
+  void set_total_inv_tracker(TotalInvTracker* t = NULL);
+  void set_inv_policy(std::string p, double x, 
+                      double y = std::numeric_limits<double>::max());
   /// requires buf_ already set
   void set_fill_to(double x);
   /// requires buf_ already set
-  void set_req_when_under(double x);
+  void set_req_at(double x);
+  void set_cumulative_cap(double x);
   void set_quantize(double x);
   void set_throughput(double x);
   void init_active_dormant();
 
   ResBuf<Material>* buf_;
-  std::string name_;
-  double fill_to_, req_when_under_, quantize_, throughput_;
+  TotalInvTracker* buf_tracker_;
+  std::string name_, inv_policy;
+  double fill_to_, req_at_, quantize_, throughput_, cumulative_cap_,
+    cycle_total_inv_;
 
   int next_active_end_= 0;
   int next_dormant_end_= 0;
 
-  boost::shared_ptr<IntDistribution> active_dist_;
-  boost::shared_ptr<IntDistribution> dormant_dist_;
-  boost::shared_ptr<DoubleDistribution> size_dist_;
+  IntDistribution::Ptr active_dist_;
+  IntDistribution::Ptr dormant_dist_;
+  DoubleDistribution::Ptr size_dist_;
 
   std::map<Material::Ptr, std::string> rsrc_commods_;
   std::map<std::string, CommodDetail> commod_details_;

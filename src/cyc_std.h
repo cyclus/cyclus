@@ -8,10 +8,11 @@
 namespace cyclus {
 
 /// @brief a less-than comparison for pairs
-template<class T> struct SecondLT : std::binary_function<T, T, bool> {
-  bool operator()(const T& x, const T& y) const {
-    return x.second < y.second;
-  }
+template <class T>
+struct SecondLT {
+    bool operator()(const T& x, const T& y) const {
+        return x.second < y.second;
+    }
 };
 
 // taken from
