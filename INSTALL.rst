@@ -12,7 +12,7 @@ provided with the source.
 Dependencies
 ************
 
-A full list of the Cyclus package dependencies is listed `here <DEPENDENCIES.rst>` :
+A full list of the Cyclus package dependencies is listed `here <DEPENDENCIES.rst>`_:
 
 ************
 Installation
@@ -21,7 +21,7 @@ Installation
 
 Before going further with the installation procedure be sure you have installed
 all the required dependencies listed above. We have provided detailed
-instructions for :doc:`installing dependencies <DEPENDENCIES>`.for the major supported
+instructions for :doc:`installing dependencies <DEPENDENCIES>`_.for the major supported
 systems.
 
 
