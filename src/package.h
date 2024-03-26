@@ -16,6 +16,45 @@ class Package {
   public:
     typedef boost::shared_ptr<Package> Ptr;
 
+    /// Returns optimal fill mass for a resource to be packaged. Can be used
+    /// to determine how to respond to requests for material, and to actually
+    /// package and send off trades.
+    /// Packaging strategy "first" simply fills the packages one by one to the
+    /// maximum fill. Therefore, it should always try to max fill.
+    /// Packaging strategy "equal" tries to fill all packages to the same mass.
+    /// This tries to find the optimal number and fill mass of packages given
+    /// the packaging limitations. It does this by calculating bounding fills, 
+    /// floor(quantity/fill_min) and ceiling(quantity/fill_max). 
+    /// There might be a scenario where there is no solution, i.e. an integer
+    /// number of packages cannot be filled with no remainder. In this case,
+    /// the most effective fill strategy is to fill to the max. Numeric example:
+    /// quantity = 5, fill_min = 3, fill_max = 4. num_min_fill = floor(5/3) = 1,
+    /// num_max_fill = ceil(5/4) = 2. num_min_fill < num_max_fill, so fill to
+    /// the max.
+    double GetFillMass(Resource::Ptr r);
+
+    /// Repackages a single resource into a package. If some quantity of the 
+    /// resource cannot be packaged using the given packaging strategy and
+    /// restrictions, the remainder is left in the resource object. 
+    template <class T>
+    std::vector<typename T::Ptr> PackageResource(typename T::Ptr r) {
+      std::vector<typename T::Ptr> rs_pkgd;
+      typename T::Ptr r_pkgd;
+      
+      double fill_mass = GetFillMass(r);
+      if (fill_mass ==0) {
+        return rs_pkgd;
+      }
+
+      while (r->quantity() > fill_min_) {
+        double pkg_fill = std::min(r->quantity(), fill_mass);
+        r_pkgd = boost::dynamic_pointer_cast<T>(r->ExtractRes(pkg_fill));
+        r_pkgd->ChangePackageId(id_);
+        rs_pkgd.push_back(r_pkgd);
+      }
+      return rs_pkgd;
+    };
+
     // create a new package type with default values 
     static Ptr Create();
 
@@ -44,44 +83,6 @@ class Package {
     double fill_min_;
     double fill_max_;
     std::string strategy_;
-};
-
-/// Returns optimal fill mass for a resource to be packaged. Can be used
-/// to determine how to respond to requests for material, and to actually
-/// package and send off trades.
-/// Packaging strategy "first" simply fills the packages one by one to the
-/// maximum fill. Therefore, it should always try to max fill.
-/// Packaging strategy "equal" tries to fill all packages to the same mass.
-/// This tries to find the optimal number and fill mass of packages given the
-/// packaging limitations. It does this by calculating bounding fills, 
-/// floor(quantity/fill_min) and ceiling(quantity/fill_max). 
-/// There might be a scenario where there is no solution, i.e. an integer
-/// number of packages cannot be filled with no remainder. In this case,
-/// the most effective fill strategy is to fill to the max. Numeric example:
-/// quantity = 5, fill_min = 3, fill_max = 4. num_min_fill = floor(5/3) = 1,
-/// num_max_fill = ceil(5/4) = 2. num_min_fill < num_max_fill, so fill to max.
-double GetFillMass(Resource::Ptr r, Package::Ptr pkg);
-
-/// Repackages a single resource into a package. If some quantity of the 
-/// resource cannot be packaged using the given packaging strategy and
-/// restrictions, the remainder is left in the resource object. 
-template <class T>
-std::vector<typename T::Ptr> Repackage(typename T::Ptr r, Package::Ptr pkg) {
-  std::vector<typename T::Ptr> rs_pkgd;
-  typename T::Ptr r_pkgd;
-  
-  double fill_mass = GetFillMass(r, pkg);
-  if (fill_mass ==0) {
-    return rs_pkgd;
-  }
-
-  while (r->quantity() > pkg->fill_min()) {
-    double pkg_fill = std::min(r->quantity(), fill_mass);
-    r_pkgd = boost::dynamic_pointer_cast<T>(r->ExtractRes(pkg_fill));
-    r_pkgd->ChangePackageId(pkg->id());
-    rs_pkgd.push_back(r_pkgd);
-  }
-  return rs_pkgd;
 };
 
 }  // namespace cyclus
