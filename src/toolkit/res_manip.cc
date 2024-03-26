@@ -13,6 +13,8 @@ Product::Ptr Squash(std::vector<Product::Ptr> ps) {
   for (int i = 1; i < ps.size(); ++i) {
     p->Absorb(ps[i]);
   }
+  // squash always removes package id (results in default packaging)
+  p->ChangePackageId();
   return p;
 }
 
@@ -25,6 +27,7 @@ Material::Ptr Squash(std::vector<Material::Ptr> ms) {
   for (int i = 1; i < ms.size(); ++i) {
     m->Absorb(ms[i]);
   }
+  m->ChangePackageId();
   return m;
 }
 

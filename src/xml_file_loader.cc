@@ -339,7 +339,7 @@ void XMLFileLoader::LoadPackages() {
     std::string name = cyclus::OptionalQuery<std::string>(qe, "name", "default");
     CLOG(LEV_DEBUG3) << "loading package: " << name;
     
-    double fill_min = cyclus::OptionalQuery<double>(qe, "fill_min", 0);
+    double fill_min = cyclus::OptionalQuery<double>(qe, "fill_min", eps());
     double fill_max = cyclus::OptionalQuery<double>(qe, "fill_max", std::numeric_limits<double>::max());
     
     std::string strategy = cyclus::OptionalQuery<std::string>(qe, "strategy", "first");

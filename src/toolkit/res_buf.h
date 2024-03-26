@@ -61,7 +61,7 @@ typedef std::vector<Product::Ptr> ProdVec;
 template <class T>
 class ResBuf {
  public:
-  ResBuf(bool is_bulk=false) : cap_(INFINITY), qty_(0), is_bulk_(is_bulk) { }
+  ResBuf(bool is_bulk=false, bool unpackaged=true) : cap_(INFINITY), qty_(0), is_bulk_(is_bulk), unpackaged_(unpackaged) { }
 
   virtual ~ResBuf() {}
 
@@ -101,16 +101,15 @@ class ResBuf {
   /// Returns true if there are no resources in the buffer.
   inline bool empty() const { return rs_.empty(); }
 
-  /// Pops and returns the specified quantity from the buffer as a single
-  /// resource object.
+  /// Pops and returns the specified quantity from the buffer as a vector of 
+  /// resources.
   /// Resources are split if necessary in order to pop the exact quantity
   /// requested (within eps_rsrc()).  Resources are retrieved in the order they
-  /// were pushed (i.e. oldest first) and are squashed into a single object
-  /// when returned.
+  /// were pushed (i.e. oldest first).
   ///
   /// @throws ValueError the specified pop quantity is larger than the
   /// buffer's current inventory.
-  typename T::Ptr Pop(double qty) {
+  std::vector<typename T::Ptr> PopVector(double qty) {
     if (qty > this->quantity()) {
       std::stringstream ss;
       ss << std::setprecision(17) << "removal quantity " << qty
@@ -143,7 +142,17 @@ class ResBuf {
 
     UpdateQty();
 
-    return Squash(rs);
+    return rs;
+  }
+
+  /// Pops and returns the specified quantity from the buffer as a single
+  /// resource object.
+  /// Resources are split if necessary in order to pop the exact quantity
+  /// requested (within eps_rsrc()).  Resources are retrieved in the order they
+  /// were pushed (i.e. oldest first) and are squashed into a single object
+  /// when returned.
+  typename T::Ptr Pop(double qty) {
+    return Squash(PopVector(qty));
   }
 
   /// Same behavior as Pop(double) except a non-zero eps may be specified.  eps
@@ -161,7 +170,7 @@ class ResBuf {
       return Squash(PopN(count()));
     }
     return Pop(qty);
-  }
+  }  
 
   /// Pops the specified number of resource objects from the buffer.
   /// Resources are not split and are retrieved in the order they were
@@ -241,8 +250,8 @@ class ResBuf {
   /// @throws ValueError the pushing of the given resource object would cause
   /// the buffer to exceed its capacity.
   ///
-  /// @throws KeyError the resource object to be pushed is already present in
-  /// the buffer.
+  /// @throws KeyError the resource object to be pushed is already present
+  /// in the buffer.
   void Push(Resource::Ptr r) {
     typename T::Ptr m = boost::dynamic_pointer_cast<T>(r);
     if (m == NULL) {
@@ -255,7 +264,12 @@ class ResBuf {
     } else if (rs_present_.count(m) == 1) {
       throw KeyError("duplicate resource push attempted");
     }
+
     if (!is_bulk_  || rs_.size() == 0) {
+      // strip package id and set as default
+      if (unpackaged_) {
+        m->ChangePackageId();
+      }
       rs_.push_back(m);
       rs_present_.insert(m);
     } else {
@@ -305,6 +319,9 @@ class ResBuf {
 
     for (int i = 0; i < rss.size(); i++) {
       if (!is_bulk_ || rs_.size() == 0) {
+        if (unpackaged_) {
+          rss[i]->ChangePackageId();
+        }
         rs_.push_back(rss[i]);
         rs_present_.insert(rss[i]);
       } else {
@@ -340,6 +357,9 @@ class ResBuf {
 
   /// Whether materials should be stored as a single squashed item or as individual resource objects
   bool is_bulk_;
+  /// Whether materials should be stripped of their packaging before being
+  /// pushed onto the resbuf. If res_buf is bulk, this is assumed true.
+  bool unpackaged_;
 
   /// List of constituent resource objects forming the buffer's inventory
   std::list<typename T::Ptr> rs_;

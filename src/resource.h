@@ -91,6 +91,12 @@ class Resource {
   /// @param res pointer to a resource to be absorbed by this resource
   virtual void Absorb(Ptr res) { throw Error("cannot absorb resource type " + this->type()); };
 
+  /// Returns the package id.
+  virtual int package_id() { return default_package_id_; };
+
+  /// Changes the product's package id
+  virtual void ChangePackageId(int new_package_id = default_package_id_ ) {};
+
  protected:
   const static int default_package_id_ = 1;
  private:
