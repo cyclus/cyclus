@@ -85,8 +85,8 @@ void Product::ChangePackageId(int new_package_id) {
     // no change needed
     return;
   }
-  else if (new_package_id == default_package_id_) {
-    // default has functionally no restrictions
+  else if (new_package_id == Package::unpackaged_id()) {
+    // unpackaged has functionally no restrictions
     package_id_ = new_package_id;
     return;
   }

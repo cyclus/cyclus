@@ -95,10 +95,8 @@ class Resource {
   virtual int package_id() { return default_package_id_; };
 
   /// Changes the product's package id
-  virtual void ChangePackageId(int new_package_id = default_package_id_ ) {};
+  virtual void ChangePackageId(int new_package_id = Package::unpackaged_id()) {};
 
- protected:
-  const static int default_package_id_ = 1;
  private:
   static int nextstate_id_;
   static int nextobj_id_;

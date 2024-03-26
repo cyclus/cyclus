@@ -56,6 +56,9 @@ class Package {
     // returns package strategy
     std::string strategy() const { return strategy_; }
 
+    // returns the unpackaged id (1)
+    static int unpackaged_id() { return unpackaged_id_; }
+
   protected:
     Package();
     Package(std::string name, double fill_min, double fill_max, std::string strategy);
@@ -67,6 +70,7 @@ class Package {
     double fill_min_;
     double fill_max_;
     std::string strategy_;
+    static const int unpackaged_id_ = 1;
 };
 
 }  // namespace cyclus
