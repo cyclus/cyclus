@@ -21,7 +21,7 @@ Dependencies
 In order to facilitate future compatibility with multiple platforms,
 Cyclus is built using ``CMake``. A full list of the Cyclus package
 dependencies is shown below:
-
+.. dependency_table_start
 ====================   ==================
 Package                Minimum Version
 ====================   ==================
@@ -36,7 +36,7 @@ Package                Minimum Version
 ``Coin-Clp``             1.17.5
 ``zlib``                 1.2.11
 ====================   ==================
-
+.. dependency_table_end
 .. website_include_end
 
 On some platforms, such as Ubuntu 16.04, the following are also necessary:
