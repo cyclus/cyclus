@@ -12,11 +12,7 @@ provided with the source.
 Dependencies
 ************
 
-A full list of the Cyclus package dependencies is shown below:
-
-.. include:: DEPENDENCIES.rst
-   :start-after: .. dependency_table_start
-   :end-before: .. dependency_table_end
+A full list of the Cyclus package dependencies is listed :doc:`here <DEPENDENCIES.rst>` :
 
 ************
 Installation

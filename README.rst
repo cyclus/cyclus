@@ -72,14 +72,7 @@ Dependencies
 ************
 
 In order to facilitate future compatibility with multiple platforms,
-Cyclus is built using ``CMake``. A full list of the Cyclus package
-dependencies is shown below:
-
-.. include:: DEPENDENCIES.rst
-   :start-after: .. dependency_table_start
-   :end-before: .. dependency_table_end
-
-For detailed instructions on installing dependencies, see `Installing Dependencies <DEPENDENCIES.rst>`_.
+Cyclus is built using ``CMake``. For detailed instructions on Cyclus dependencies, see `Installing Dependencies <DEPENDENCIES.rst>`_.
 
 *************************
 Quick Cyclus Installation
