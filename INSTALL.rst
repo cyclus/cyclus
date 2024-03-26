@@ -12,7 +12,7 @@ provided with the source.
 Dependencies
 ************
 
-A full list of the Cyclus package dependencies is listed :doc:`here <DEPENDENCIES.rst>` :
+A full list of the Cyclus package dependencies is listed `here <DEPENDENCIES.rst>` :
 
 ************
 Installation

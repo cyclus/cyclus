@@ -36,6 +36,7 @@ Package                Minimum Version
 ``Coin-Clp``             1.17.5
 ``zlib``                 1.2.11
 ====================   ==================
+
 .. website_include_end
 
 On some platforms, such as Ubuntu 16.04, the following are also necessary:
