@@ -15,7 +15,7 @@ Cyclus Projects Status
 -----------------------------------------------------------------------------------
 **Branch**              **Cyclus**         **Cycamore**           **Cymetric**
 ================    =================    ===================    ===================
-main              |cyclus_main|       |cycamore_main|      |cymetric_main|
+main                |cyclus_main|        |cycamore_main|        |cymetric_main|
 ================    =================    ===================    ===================
 
 
