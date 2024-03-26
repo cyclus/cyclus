@@ -37,23 +37,7 @@ class Package {
     /// resource cannot be packaged using the given packaging strategy and
     /// restrictions, the remainder is left in the resource object. 
     template <class T>
-    std::vector<typename T::Ptr> PackageResource(typename T::Ptr r) {
-      std::vector<typename T::Ptr> rs_pkgd;
-      typename T::Ptr r_pkgd;
-      
-      double fill_mass = GetFillMass(r);
-      if (fill_mass ==0) {
-        return rs_pkgd;
-      }
-
-      while (r->quantity() > fill_min_) {
-        double pkg_fill = std::min(r->quantity(), fill_mass);
-        r_pkgd = boost::dynamic_pointer_cast<T>(r->ExtractRes(pkg_fill));
-        r_pkgd->ChangePackageId(id_);
-        rs_pkgd.push_back(r_pkgd);
-      }
-      return rs_pkgd;
-    };
+    std::vector<typename T::Ptr> PackageResource(typename T::Ptr r);
 
     // create a new package type with default values 
     static Ptr Create();

@@ -30,6 +30,25 @@ double Package::GetFillMass(Resource::Ptr r) {
   return fill_mass;
 }
 
+template <class T>
+std::vector<typename T::Ptr> Package::PackageResource(typename T::Ptr r) {
+  std::vector<typename T::Ptr> rs_pkgd;
+  typename T::Ptr r_pkgd;
+  
+  double fill_mass = GetFillMass(r);
+  if (fill_mass ==0) {
+    return rs_pkgd;
+  }
+
+  while (r->quantity() > fill_min_) {
+    double pkg_fill = std::min(r->quantity(), fill_mass);
+    r_pkgd = boost::dynamic_pointer_cast<T>(r->ExtractRes(pkg_fill));
+    r_pkgd->ChangePackageId(id_);
+    rs_pkgd.push_back(r_pkgd);
+  }
+  return rs_pkgd;
+}
+
 Package::Ptr Package::Create() {
   Ptr p(new Package());
   return p;
