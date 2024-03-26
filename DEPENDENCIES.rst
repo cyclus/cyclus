@@ -39,15 +39,6 @@ Package                Minimum Version
 
 .. website_include_end
 
-On some platforms, such as Ubuntu 16.04, the following are also necessary:
-
-====================   ==================
-Package                Minimum Version
-====================   ==================
-``g++``                  4.8.2
-``libblas-dev``          1.2
-``liblapack-dev``        3.5.0
-====================   ==================
 
 
 And a few optional dependencies:
@@ -83,7 +74,7 @@ Installing Dependencies (Linux and Unix)
 This guide assumes that the user has root access (to issue ``sudo`` commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
-of Ubuntu versions 16.04, using ``apt-get`` as the package
+of Ubuntu versions 20.04 and 22.04, using ``apt-get`` as the package
 manager (scroll down further for Mac OSX instructions).
 
 The command to install a dependency takes the form of:
