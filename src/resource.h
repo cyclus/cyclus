@@ -6,6 +6,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "error.h"
+#include "package.h"
 
 class SimInitTest;
 
@@ -92,13 +93,11 @@ class Resource {
   virtual void Absorb(Ptr res) { throw Error("cannot absorb resource type " + this->type()); };
 
   /// Returns the package id.
-  virtual int package_id() { return default_package_id_; };
+  virtual int package_id() { return Package::unpackaged_id(); };
 
   /// Changes the product's package id
-  virtual void ChangePackageId(int new_package_id = default_package_id_ ) {};
+  virtual void ChangePackageId(int new_package_id = Package::unpackaged_id()) {};
 
- protected:
-  const static int default_package_id_ = 1;
  private:
   static int nextstate_id_;
   static int nextobj_id_;

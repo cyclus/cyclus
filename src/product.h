@@ -28,7 +28,7 @@ class Product : public Resource {
   /// pointer to the agent creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
-  static Ptr Create(Agent* creator, double quantity, std::string quality, int package_id = default_package_id_);
+  static Ptr Create(Agent* creator, double quantity, std::string quality, int package_id = Package::unpackaged_id());
 
   /// Creates a new product that does not actually exist as part of
   /// the simulation and is untracked.
@@ -75,13 +75,13 @@ class Product : public Resource {
   virtual int package_id();
 
   /// Changes the product's package id
-  virtual void ChangePackageId(int new_package_id = default_package_id_);
+  virtual void ChangePackageId(int new_package_id = Package::unpackaged_id());
 
  private:
   /// @param ctx the simulation context
   /// @param quantity is a double indicating the quantity
   /// @param quality the resource quality
-  Product(Context* ctx, double quantity, std::string quality, int package_id = default_package_id_);
+  Product(Context* ctx, double quantity, std::string quality, int package_id = Package::unpackaged_id());
 
   // map<quality, quality_id>
   static std::map<std::string, int> qualids_;

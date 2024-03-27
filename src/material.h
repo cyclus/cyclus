@@ -81,7 +81,7 @@ class Material: public Resource {
   /// pointer to the agent creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
-  static Ptr Create(Agent* creator, double quantity, Composition::Ptr c, int package_id = default_package_id_);
+  static Ptr Create(Agent* creator, double quantity, Composition::Ptr c, int package_id = Package::unpackaged_id());
 
   /// Creates a new material resource that does not actually exist as part of
   /// the simulation and is untracked.
@@ -159,10 +159,10 @@ class Material: public Resource {
 
   /// Changes the package id. Checks that the resource fits the package 
   /// type minimum and maximum mass criteria.
-  virtual void ChangePackageId(int new_package_id = default_package_id_);
+  virtual void ChangePackageId(int new_package_id = Package::unpackaged_id());
 
  protected:
-  Material(Context* ctx, double quantity, Composition::Ptr c, int package_id = default_package_id_);
+  Material(Context* ctx, double quantity, Composition::Ptr c, int package_id = Package::unpackaged_id());
 
  private:
   Context* ctx_;

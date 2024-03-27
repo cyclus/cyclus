@@ -5,14 +5,15 @@ namespace cyclus {
 
 int Package::next_id_ = 1;
 
-double Package::GetFillMass(Resource::Ptr r) {
+template <class T>
+double Package::GetFillMass(typename T::Ptr r) {
   if (r->quantity() < fill_min_) {
     // less than one pkg of material available
     return 0;
   }
 
-  std::vector<Resource::Ptr> rs;
-  Resource::Ptr r_pkgd;
+  std::vector<typename T::Ptr> rs;
+  typename T::Ptr r_pkgd;
   double fill_mass;
   if (strategy_ == "first") {
     fill_mass = fill_max_;
