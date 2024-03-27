@@ -27,7 +27,7 @@ Since last release
 * Adds support for Cython3 (#1636)
 * Adds TotalInvTracker, which allows an inventory cap to be set for multiple resource buffers, and is now required for material buy policy (#1646)
 * AddMutalReqs and AddReciepe functions and exclusive bids in python API of DRE (#1584)
-* Created Package class and optional declaration of packages in input files (#1673, #1699), package id is a member of resources (materials/products) (#1675). Can pop resources as packaged from resource buffer, pushing resource onto a buffer defaults to stripping packaging (#1683)
+* Created Package class and optional declaration of packages in input files (#1673, #1699), package id is default unpackaged (#1711) and is a member of resources (materials/products) (#1675). Can pop resources as packaged from resource buffer, pushing resource onto a buffer defaults to stripping packaging (#1683)
 * CI support for Rocky Linux (#1691)
 * Added support for a ResBuf to behave as a single bulk storage with mixing & extraction of resources (#1687)
 
