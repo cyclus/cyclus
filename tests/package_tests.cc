@@ -20,6 +20,11 @@ TEST(PackageTests, Create) {
     EXPECT_DOUBLE_EQ(exp_max, p->fill_max());
     EXPECT_EQ(exp_strat, p->strategy());
 
+    EXPECT_NE(Package::unpackaged_id(), p->id());
+
+    Package::Ptr q = Package::Create(exp_name, exp_min, exp_max, exp_strat);
+    EXPECT_NE(q->id(), p->id());
+
 }
 
 TEST(PackageTests, UnpackagedID) {
