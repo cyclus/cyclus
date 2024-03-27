@@ -3,7 +3,7 @@
 
 namespace cyclus {
 
-int Package::next_id_ = 1;
+int Package::next_id_ = 2;
 
 template <class T>
 double Package::GetFillMass(typename T::Ptr r) {
