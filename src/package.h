@@ -65,7 +65,7 @@ class Package {
 
   private:
     static const int unpackaged_id_ = 1;
-    static int next_id_ = 2;
+    static int next_id_;
 
     std::string name_;
     int id_;
