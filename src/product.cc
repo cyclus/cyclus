@@ -78,7 +78,7 @@ int Product::package_id() {
 }
 
 void Product::ChangePackageId(int new_package_id) {
-  if (ctx_ == NULL) {
+  if (ctx_ != NULL) {
     throw ValueError("Package Id cannot be changed with NULL context");
   }
   if (new_package_id == package_id_) {
