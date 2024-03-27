@@ -78,7 +78,7 @@ int Product::package_id() {
 }
 
 void Product::ChangePackageId(int new_package_id) {
-  if (ctx_ == NULL || new_package_id == package_id_) {
+  if (new_package_id == package_id_ || ctx_ == NULL) {
     // no change needed
     return;
   }
@@ -94,7 +94,7 @@ void Product::ChangePackageId(int new_package_id) {
   if (quantity_ >= min && quantity_ <= max) {
     package_id_ = new_package_id;
   } else {
-    throw ValueError("Material quantity is outside of package fill limits.");
+    throw ValueError("Product quantity is outside of package fill limits.");
   }
 }
 
