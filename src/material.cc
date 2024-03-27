@@ -23,7 +23,7 @@ Material::Ptr Material::Create(Agent* creator, double quantity,
 
 Material::Ptr Material::CreateUntracked(double quantity,
                                         Composition::Ptr c) {
-  Material::Ptr m(new Material(NULL, quantity, c, Package::unpackaged_id());
+  Material::Ptr m(new Material(NULL, quantity, c, Package::unpackaged_id()));
   return m;
 }
 
@@ -88,7 +88,7 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
   }
 
   qty_ -= qty;
-  Material::Ptr other(new Material(ctx_, qty, c, Package::unpackaged_id());
+  Material::Ptr other(new Material(ctx_, qty, c, Package::unpackaged_id()));
 
   // Decay called on the extracted material should have the same dt as for
   // this material regardless of composition.

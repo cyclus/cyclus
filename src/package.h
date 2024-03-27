@@ -6,7 +6,6 @@
 #include <vector>
 #include <cmath>
 #include <boost/shared_ptr.hpp>
-#include "resource.h"
 
 namespace cyclus {
 
@@ -31,7 +30,8 @@ class Package {
     /// quantity = 5, fill_min = 3, fill_max = 4. num_min_fill = floor(5/3) = 1,
     /// num_max_fill = ceil(5/4) = 2. num_min_fill < num_max_fill, so fill to
     /// the max.
-    double GetFillMass(Resource::Ptr r);
+    template <class T>
+    double GetFillMass(typename T::Ptr r);
 
     /// Repackages a single resource into a package. If some quantity of the 
     /// resource cannot be packaged using the given packaging strategy and
