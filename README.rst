@@ -10,13 +10,14 @@ information on the entire "ecosystem" please refer to the `Cyclus website
 <http://fuelcycle.org>`_.
 
 
-================    =================    ===================    ===================
 Cyclus Projects Status
------------------------------------------------------------------------------------
-**Branch**              **Cyclus**         **Cycamore**           **Cymetric**
-================    =================    ===================    ===================
-main                |cyclus_main|        |cycamore_main|        |cymetric_main|
-================    =================    ===================    ===================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
++--------------------+--------------------+--------------------+--------------------+
+| Branch             | Cyclus             | Cycamore           | Cymetric           |
++====================+====================+====================+====================+
+| ``main``           | |cyclus_main|      | |cycamore_main|    | |cymetric_main|    |
++--------------------+--------------------+--------------------+--------------------+
 
 .. |cyclus_main| image:: https://github.com/cyclus/cyclus/actions/workflows/publish_latest.yml/badge.svg
 .. |cycamore_main| image:: https://github.com/cyclus/cycamore/actions/workflows/publish_latest.yml/badge.svg
