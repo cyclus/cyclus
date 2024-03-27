@@ -3,8 +3,6 @@
 
 namespace cyclus {
 
-int Package::next_id_ = 1;
-
 template <class T>
 double Package::GetFillMass(typename T::Ptr r) {
   if (r->quantity() < fill_min_) {

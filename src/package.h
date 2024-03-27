@@ -64,13 +64,14 @@ class Package {
     Package(std::string name, double fill_min, double fill_max, std::string strategy);
 
   private:
+    static const int unpackaged_id_ = 1;
+    static int next_id_ = 2;
+
     std::string name_;
-    static int next_id_;
     int id_;
     double fill_min_;
     double fill_max_;
     std::string strategy_;
-    static const int unpackaged_id_ = 1;
 };
 
 }  // namespace cyclus
