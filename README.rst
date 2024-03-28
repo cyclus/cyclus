@@ -10,18 +10,18 @@ information on the entire "ecosystem" please refer to the `Cyclus website
 <http://fuelcycle.org>`_.
 
 
-================    =================    ===================    ===================
 Cyclus Projects Status
------------------------------------------------------------------------------------
-**Branch**              **Cyclus**         **Cycamore**           **Cymetric**
-================    =================    ===================    ===================
-main              |cyclus_main|       |cycamore_main|      |cymetric_main|
-================    =================    ===================    ===================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
++--------------------+--------------------+--------------------+--------------------+
+| Branch             | Cyclus             | Cycamore           | Cymetric           |
++====================+====================+====================+====================+
+| ``main``           | |cyclus_main|      | |cycamore_main|    | |cymetric_main|    |
++--------------------+--------------------+--------------------+--------------------+
 
-.. |cyclus_main| image:: https://circleci.com/gh/cyclus/cyclus/tree/main.png?&amp;circle-token= 35d82ba8661d4f32e0f084b9d8a2388fa62c0262
-.. |cycamore_main| image:: https://circleci.com/gh/cyclus/cycamore/tree/main.png?&amp;circle-token= 333211090d5d5a15110eed1adbe079a6f3a4a704
-.. |cymetric_main| image:: https://circleci.com/gh/cyclus/cymetric/tree/main.png?&amp;circle-token= 72639b59387f077973af98e7ce72996eac18b96c
+.. |cyclus_main| image:: https://github.com/cyclus/cyclus/actions/workflows/publish_latest.yml/badge.svg
+.. |cycamore_main| image:: https://github.com/cyclus/cycamore/actions/workflows/publish_latest.yml/badge.svg
+.. |cymetric_main| image:: https://github.com/cyclus/cymetric/actions/workflows/publish_latest.yml/badge.svg
 
 
 
@@ -72,24 +72,7 @@ Dependencies
 ************
 
 In order to facilitate future compatibility with multiple platforms,
-Cyclus is built using ``CMake``. A full list of the Cyclus package
-dependencies is shown below:
-
-====================   ==================
-Package                Minimum Version
-====================   ==================
-``CMake``                2.8
-``boost``                1.46.1
-``libxml2``              2
-``libxml++``             2.36
-``python``               2.7 or 3.10
-``sqlite3``              3.7.10
-``HDF5``                 1.8.4
-``Coin-Cbc``             2.5
-``zlib``                 1.1.4
-====================   ==================
-
-For detailed instructions on installing dependencies, see `Installing Dependencies <DEPENDENCIES.rst>`_.
+Cyclus is built using ``CMake``. For detailed instructions on Cyclus dependencies (including minimum version requirements), see `Installing Dependencies <DEPENDENCIES.rst>`_.
 
 *************************
 Quick Cyclus Installation

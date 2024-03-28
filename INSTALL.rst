@@ -12,20 +12,7 @@ provided with the source.
 Dependencies
 ************
 
-A full list of the Cyclus package dependencies is shown below:
-
-====================   ==================
-Package                Minimum Version
-====================   ==================
-``CMake``                2.8
-``boost``                1.46.1
-``libxml2``              2
-``libxml++``             2.36
-``python``               2.7 or 3.3+
-``sqlite3``              3.7.10
-``HDF5``                 1.8.4
-``Coin-Cbc``             2.5
-====================   ==================
+A full list of the Cyclus package dependencies is listed :doc:`here <DEPENDENCIES>`:
 
 ************
 Installation
@@ -33,8 +20,8 @@ Installation
 .. website_include_start
 
 Before going further with the installation procedure be sure you have installed
-all the required dependencies listed above. We have provided detailed
-instructions for :doc:`installing dependencies <DEPENDENCIES>`.for the major supported
+all the required dependencies. We have provided detailed
+instructions for :doc:`installing dependencies <DEPENDENCIES>` for the major supported
 systems.
 
 
