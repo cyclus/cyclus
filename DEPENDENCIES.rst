@@ -25,27 +25,20 @@ dependencies is shown below:
 ====================   ==================
 Package                Minimum Version
 ====================   ==================
-``CMake``                2.8
-``boost``                1.46.1
-``libxml2``              2
-``libxml++``             2.36
-``python``               2.7 or 3.3+
-``sqlite3``              3.7.10
-``HDF5``                 1.8.4
-``Coin-Cbc``             2.5
+``CMake``                3.16.3
+``boost``                1.71.0
+``libxml2``              2.9.10+
+``libxml++``             2.40.1
+``python``               3.8.10
+``sqlite3``              3.31.1
+``HDF5``                 1.10.4+
+``Coin-Cbc``             2.10.3
+``Coin-Clp``             1.17.5
+``zlib``                 1.2.11
 ====================   ==================
 
 .. website_include_end
 
-On some platforms, such as Ubuntu 16.04, the following are also necessary:
-
-====================   ==================
-Package                Minimum Version
-====================   ==================
-``g++``                  4.8.2
-``libblas-dev``          1.2
-``liblapack-dev``        3.5.0
-====================   ==================
 
 
 And a few optional dependencies:
@@ -55,8 +48,8 @@ Package                Minimum Version
 ====================   ==================
 doxygen (for docs)     1.7.6.1
 tcmalloc (for speed)   any
-Cython                  >=0.25 and  <0.27
-Python (dev version)   2.7 or 3.3+
+Cython                 0.29+
+Python (dev version)   3.8+
 Jinja2                 any
 NumPy                  1.9+
 Pandas                 any
@@ -81,7 +74,7 @@ Installing Dependencies (Linux and Unix)
 This guide assumes that the user has root access (to issue ``sudo`` commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
-of Ubuntu versions 16.04, using ``apt-get`` as the package
+of Ubuntu versions 20.04 and 22.04, using ``apt-get`` as the package
 manager (scroll down further for Mac OSX instructions).
 
 The command to install a dependency takes the form of:
@@ -114,13 +107,13 @@ and (optionally):
 #. libblas-dev
 #. liblapack-dev
 #. libgoogle-perftools-dev
-#. python-dev    or  python3-dev
-#. python-tables or  python3-tables
-#. python-pandas or  python3-pandas
-#. python-numpy  or  python3-numpy
-#. python-nose   or  python3-nose
-#. python-jinja2 or  python3-jinja2
-#. cython        or  cython3       (see note below)
+#. python3-dev
+#. python3-tables
+#. python3-pandas
+#. python3-numpy
+#. python3-nose
+#. python3-jinja2
+#. cython3       (see note below)
 
 For example, in order to install libxml++ (and libxml2) on your system, type:
 
@@ -139,18 +132,6 @@ If you'd prefer to copy/paste, the following line will install all **required**
 
 And to install all *Cyclus* dependencies (**required and optional**):
 
-- if using python 2.x:
-
-.. code-block:: bash
-
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev \
-   libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev \
-   coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ \
-   libgoogle-perftools-dev python-dev python-tables python-pandas python-numpy python-nose \
-   python-jinja2 cython
-
-- if using python 3.x:
-
 .. code-block:: bash
 
    sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev \
@@ -166,7 +147,7 @@ To determine which version of Python is already installed on your computer, run:
    python -V
 
 
-Despite having installed python3, Ubuntu installations may still point at python2.7 by default. So Python -V can return a version of python that is not preferred. In that case the python version can be changed system-wide with the update-alternatives command. 
+Despite having installed python3, Ubuntu installations may still point at python2 by default. So Python -V can return a version of python that is not preferred. In that case the python version can be changed system-wide with the update-alternatives command. 
 
 First, you can list alternatives with the following command:
 
@@ -174,12 +155,11 @@ First, you can list alternatives with the following command:
 
    update-alternatives --list python
 
-Ubuntu may not list any alternatives. To make Ubuntu aware of python 2.7 and python 3.5, use:
+Ubuntu may not list any alternatives. To make Ubuntu aware of python 3, use:
 
  .. code-block:: bash
 
-   sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1
-   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.5 2
+   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 From now on, to switch between different versions, use:
 
@@ -206,7 +186,7 @@ Cython Note
 ^^^^^^^^^^^
 If you get an error related to an old Cython version, then this may be 
 because the Debian stable version of Cython is 0.23.4. However, 
-Cyclus requires 0.25.0+. To install the latest cython version, please 
+Cyclus requires 0.29.0+. To install the latest cython version, please 
 visit the `Cython Documentation`_.
 
 Boost Note
