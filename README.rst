@@ -72,7 +72,7 @@ Dependencies
 ************
 
 In order to facilitate future compatibility with multiple platforms,
-Cyclus is built using ``CMake``. For detailed instructions on Cyclus dependencies, see `Installing Dependencies <DEPENDENCIES.rst>`_.
+Cyclus is built using ``CMake``. For detailed instructions on Cyclus dependencies (including minimum version requirements), see `Installing Dependencies <DEPENDENCIES.rst>`_.
 
 *************************
 Quick Cyclus Installation
