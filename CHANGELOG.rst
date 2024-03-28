@@ -30,6 +30,7 @@ Since last release
 * Created Package class and optional declaration of packages in input files (#1673, #1699), package id is default unpackaged (#1711) and is a member of resources (materials/products) (#1675). Can pop resources as packaged from resource buffer, pushing resource onto a buffer defaults to stripping packaging (#1683)
 * CI support for Rocky Linux (#1691)
 * Added support for a ResBuf to behave as a single bulk storage with mixing & extraction of resources (#1687)
+* Added support for multithreading using OpenMP (#1709)
 
 **Changed:**
 

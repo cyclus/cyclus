@@ -1,8 +1,12 @@
+#include "platform.h"
 // Implements the Timer class
 #include "timer.h"
 
 #include <iostream>
 #include <string>
+#if CYCLUS_IS_PARALLEL
+#include <omp.h>
+#endif // CYCLUS_IS_PARALLEL
 
 #include "agent.h"
 #include "error.h"
@@ -77,9 +81,10 @@ void Timer::DoBuild() {
 }
 
 void Timer::DoTick() {
-  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
-       agent != tickers_.end();
-       agent++) {
+  #pragma omp parallel for
+  for (int i = 0; i < tickers_.size(); i++) {
+    std::map<int, TimeListener*>::iterator agent = tickers_.begin();
+    std::advance(agent, i);
     agent->second->Tick();
   }
 }
@@ -91,16 +96,19 @@ void Timer::DoResEx(ExchangeManager<Material>* matmgr,
 }
 
 void Timer::DoTock() {
-  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
-       agent != tickers_.end();
-       agent++) {
+  #pragma omp parallel for
+  for (int i = 0; i < tickers_.size(); i++) {
+    std::map<int, TimeListener*>::iterator agent = tickers_.begin();
+    std::advance(agent, i);
     agent->second->Tock();
   }
 
   if (si_.explicit_inventory || si_.explicit_inventory_compact) {
     std::set<Agent*> ags = ctx_->agent_list_;
-    std::set<Agent*>::iterator it;
-    for (it = ags.begin(); it != ags.end(); ++it) {
+    #pragma omp parallel for
+    for (int i = 0; i < ags.size(); i++) {
+      std::set<Agent*>::iterator it = ags.begin();
+      std::advance(it, i);
       Agent* a = *it;
       if (a->enter_time() == -1) {
         continue; // skip agents that aren't alive

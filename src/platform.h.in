@@ -1,3 +1,4 @@
 #define SUFFIX "@suffix@"
 #define DYNAMICLOADLIB "@dynamicloadlib@"
 #define CYCLUS_HAS_COIN @cyclus_has_coin@
+#define CYCLUS_IS_PARALLEL @cyclus_is_parallel@
