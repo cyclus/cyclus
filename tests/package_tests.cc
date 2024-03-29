@@ -20,9 +20,19 @@ TEST(PackageTests, Create) {
     EXPECT_DOUBLE_EQ(exp_max, p->fill_max());
     EXPECT_EQ(exp_strat, p->strategy());
 
+    // note: can't test this against a specific package ID because
+    //       that value changes depending on which order all the
+    //       tests are run and whether they are all run
+    // Therefore: test that it's not the same as the unpackaged ID
     EXPECT_NE(Package::unpackaged_id(), p->id());
 
     Package::Ptr q = Package::Create(exp_name, exp_min, exp_max, exp_strat);
+    // note: can't test this against a specific package ID because
+    //       that value changes depending on which order all the
+    //       tests are run and whether they are all run
+    // Therefore: test that it's not the same as the unpackaged ID
+    //            or as the previous package
+    EXPECT_NE(Package::unpackaged_id(), q->id());
     EXPECT_NE(q->id(), p->id());
 
 }
