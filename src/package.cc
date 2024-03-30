@@ -3,6 +3,7 @@
 
 namespace cyclus {
 
+// unpackaged id is 1, so start the user-declared packaging id at 2
 int Package::next_id_ = 2;
 
 template <class T>
