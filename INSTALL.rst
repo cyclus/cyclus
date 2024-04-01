@@ -12,7 +12,7 @@ provided with the source.
 Dependencies
 ************
 
-A full list of the Cyclus package dependencies is listed `here <DEPENDENCIES.rst>`_.
+A full list of the Cyclus package dependencies is listed `DEPENDENCIES`_.
 
 ************
 Installation
@@ -174,7 +174,7 @@ dependencies through conda-forge.
 .. code-block:: bash
 
   conda config --add channels conda-forge
-  conda install cyclus-build-deps
+  conda install cyclus --only-deps
 
 
 *************
