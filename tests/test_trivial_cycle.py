@@ -7,13 +7,13 @@ import tables
 import numpy as np
 import pytest
 
-from tools import check_cmd, cyclus_has_coin
+from tools import check_cmd, cyclus_has_coin, thread_count
 from helper import tables_exist, find_ids, exit_times, create_sim_input, \
     h5out, sqliteout, clean_outs, to_ary, which_outfile
 
 INPUT = os.path.join(os.path.dirname(__file__), "input")
 
-def test_source_to_sink():
+def test_source_to_sink(thread_count):
     """Tests simulations with one facility that has a conversion factor.
 
     The trivial cycle simulation involves only one KFacility which provides
@@ -40,7 +40,7 @@ def test_source_to_sink():
 
         holdsrtn = [1]  # needed because nose does not send() to test generator
         outfile = which_outfile()
-        cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
+        cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim_input]
         check_cmd(cmd, '.', holdsrtn)
         rtn = holdsrtn[0]
         if rtn != 0:
