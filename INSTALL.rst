@@ -196,3 +196,4 @@ proper functioning of Cyclus. You can run the tests yourself via:
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
 .. _`for installing those dependencies for the major supported systems`: DEPENDENCIES.rst
+.. _`DEPENDENCIES`: DEPENDENCIES.rst
