@@ -21,7 +21,7 @@ Installation
 
 Before going further with the installation procedure be sure you have installed
 all the required dependencies. We have provided detailed
-instructions for `DEPENDENCIES_` for the major supported
+instructions for `DEPENDENCIES`_ for the major supported
 systems.
 
 
