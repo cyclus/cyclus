@@ -9,7 +9,7 @@ import tables
 import numpy as np
 import pytest
 
-from tools import check_cmd, cyclus_has_coin
+from tools import check_cmd, cyclus_has_coin, thread_count
 from helper import tables_exist, find_ids, exit_times, create_sim_input, \
     h5out, sqliteout, clean_outs, sha1array, to_ary, which_outfile
 
@@ -84,7 +84,7 @@ def change_minimal_input(ref_input, k_factor_a, k_factor_b):
 
     return fw_path
 
-def test_minimal_cycle():
+def test_minimal_cycle(thread_count):
     """Tests simulations with two facilities with several conversion factors.
 
     The commodities of the facilities are different. Facility A offers a
@@ -113,7 +113,7 @@ def test_minimal_cycle():
 
             holdsrtn = [1]  # needed b/c nose does not send() to test generator
             outfile = which_outfile()
-            cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
+            cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim_input]
             check_cmd(cmd, '.', holdsrtn)
             rtn = holdsrtn[0]
             if rtn != 0:

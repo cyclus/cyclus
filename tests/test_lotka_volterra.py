@@ -7,7 +7,7 @@ import tables
 import numpy as np
 import hashlib
 
-from tools import check_cmd
+from tools import check_cmd, thread_count
 from helper import tables_exist, clean_outs, agent_time_series, \
     h5out, sqliteout, which_outfile
 
@@ -16,7 +16,7 @@ pred = "Predator"
 
 DIR = os.path.dirname(__file__)
 
-def test_predator_only():
+def test_predator_only(thread_count):
     """Tests simulations with Predators only.
 
     The population is expected to die off after a timestep.
@@ -29,7 +29,7 @@ def test_predator_only():
     holdsrtn = [1]  # needed because nose does not send() to test generator
     outfile = which_outfile()
 
-    cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
+    cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim_input]
     check_cmd(cmd, '.', holdsrtn)
     rtn = holdsrtn[0]
 
@@ -47,7 +47,7 @@ def test_predator_only():
 
     clean_outs()
 
-def test_prey_only():
+def test_prey_only(thread_count):
     """Tests simulations with Preys only.
 
     The population is expected to grow exponentially.
@@ -57,7 +57,7 @@ def test_prey_only():
     holdsrtn = [1]  # needed because nose does not send() to test generator
     outfile = which_outfile()
 
-    cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
+    cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim_input]
     check_cmd(cmd, '.', holdsrtn)
     rtn = holdsrtn[0]
 
@@ -75,7 +75,7 @@ def test_prey_only():
 
     clean_outs()
 
-def test_lotka_volterra():
+def test_lotka_volterra(thread_count):
     """Tests simulations with Preys and Predators
 
     Preys offer a resource representing itself. Predators acquire the resources
@@ -94,7 +94,7 @@ def test_lotka_volterra():
     holdsrtn = [1]  # needed because nose does not send() to test generator
     outfile = which_outfile()
 
-    cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
+    cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim_input]
     check_cmd(cmd, '.', holdsrtn)
     rtn = holdsrtn[0]
 
