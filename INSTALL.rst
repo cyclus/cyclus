@@ -12,7 +12,7 @@ provided with the source.
 Dependencies
 ************
 
-A full list of the Cyclus package dependencies is listed `here <DEPENDENCIES.rst>`_.
+A full list of the Cyclus package dependencies is listed `here`_.
 
 ************
 Installation
@@ -21,7 +21,7 @@ Installation
 
 Before going further with the installation procedure be sure you have installed
 all the required dependencies. We have provided detailed
-instructions for `DEPENDENCIES`_ for the major supported
+instructions `for installing those dependencies for the major supported systems`_ for the major supported
 systems.
 
 
@@ -196,4 +196,4 @@ proper functioning of Cyclus. You can run the tests yourself via:
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
 .. _`for installing those dependencies for the major supported systems`: DEPENDENCIES.rst
-.. _`DEPENDENCIES`: DEPENDENCIES.rst
+.. _`here`: DEPENDENCIES.rst
