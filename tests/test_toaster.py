@@ -115,7 +115,7 @@ COMPANYFILE = {'simulation': {'archetypes': {'spec': [
                            'name': 'SingleRegion'}}}
 
 
-def test_pyagent_attr_toaster_company():
+def test_pyagent_attr_toaster_company(thread_count):
     oname = 'attr-toaster-company.h5'
     iname = 'attr-toaster-company.json'
     if os.path.exists(oname):
@@ -124,7 +124,7 @@ def test_pyagent_attr_toaster_company():
         json.dump(COMPANYFILE, f)
     env = dict(os.environ)
     env['PYTHONPATH'] = "."
-    s = subprocess.check_output(['cyclus', '-o', oname, iname],
+    s = subprocess.check_output(['cyclus', '-j', thread_count, '-o', oname, iname],
                                 universal_newlines=True, env=env)
     info = s.split('=== Start AttrToasterCompany ===\n')[-1]
     info = info.split('\n=== End AttrToasterCompany ===')[0]
@@ -171,7 +171,7 @@ REGIONFILE = {'simulation': {'archetypes': {'spec': [
                            'name': 'RepublicOfToast'}}}
 
 
-def test_pyagent_attr_toaster_region():
+def test_pyagent_attr_toaster_region(thread_count):
     oname = 'attr-toaster-region.h5'
     iname = 'attr-toaster-region.json'
     if os.path.exists(oname):
@@ -180,7 +180,7 @@ def test_pyagent_attr_toaster_region():
         json.dump(REGIONFILE, f)
     env = dict(os.environ)
     env['PYTHONPATH'] = "."
-    s = subprocess.check_output(['cyclus', '-o', oname, iname],
+    s = subprocess.check_output(['cyclus', '-j', thread_count, '-o', oname, iname],
                                 universal_newlines=True, env=env)
     info = s.split('=== Start AttrToasterRegion ===\n')[-1]
     info = info.split('\n=== End AttrToasterRegion ===')[0]
