@@ -9,6 +9,7 @@ from libcpp cimport bool as cpp_bool
 from libcpp.cast cimport reinterpret_cast, dynamic_cast
 from cython.operator cimport dereference as deref
 cimport cython
+cimport openmp
 
 from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
     PyDict_GetItemString, PyDict_SetItemString, PyString_FromString,
@@ -51,6 +52,8 @@ cdef int _GET_PROD_PREFS_TIME = -9999999999
 cdef cpp_cyclus.PrefMap[cpp_cyclus.Product].type* _GET_PROD_PREFS_PTR = NULL
 cdef dict _GET_PROD_PREFS = {}
 
+cdef openmp.omp_lock_t lock
+openmp.omp_init_lock(&lock)
 
 #
 # Shims
@@ -302,10 +305,14 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
             prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = pref
 
     void Tick() except *:
+        openmp.omp_set_lock(&lock)
         (<object> this.self).tick()
+        openmp.omp_unset_lock(&lock)
 
     void Tock() except *:
+        openmp.omp_set_lock(&lock)
         (<object> this.self).tock()
+        openmp.omp_unset_lock(&lock)
 
     void Decision() except *:
         (<object> this.self).decision()
@@ -435,11 +442,15 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
             prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = pref
 
     void Tick() except *:
+        openmp.omp_set_lock(&lock)
         (<object> this.self).tick()
+        openmp.omp_unset_lock(&lock)
 
     void Tock() except *:
+        openmp.omp_set_lock(&lock)
         cpp_cyclus.Institution.Institution_Tock()
         (<object> this.self).tock()
+        openmp.omp_unset_lock(&lock)
 
     void Decision() except *:
         (<object> this.self).decision()
@@ -577,10 +588,14 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
             prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = pref
 
     void Tick() except *:
+        openmp.omp_set_lock(&lock)
         (<object> this.self).tick()
+        openmp.omp_unset_lock(&lock)
 
     void Tock() except *:
+        openmp.omp_set_lock(&lock)
         (<object> this.self).tock()
+        openmp.omp_unset_lock(&lock)
 
     void Decision() except *:
         (<object> this.self).decision()
