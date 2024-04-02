@@ -40,6 +40,8 @@ Since last release
 * Resolved various compilation warnings due to use of deprecated APIs (#1671)
 * Update version management in CMake build (#1696)
 * Changed dependency versions in README.rst, INSTALL.rst, and DEPENDENCIES.rst (#1703)
+* Updated minor documentation about updating CHNAGELOG.rst, fix formatting for rendering 
+  hyperlinks, and change branch name in README instructions on forking for development (#1715)
 
 **Removed:**
 
