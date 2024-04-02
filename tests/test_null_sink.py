@@ -8,7 +8,7 @@ import tables
 from helper import tables_exist, find_ids, exit_times, \
     h5out, sqliteout, clean_outs, to_ary, which_outfile
 
-from tools import check_cmd, cyclus_has_coin
+from tools import check_cmd, cyclus_has_coin, thread_count
 
 
 INPUT = os.path.join(os.path.dirname(__file__), "input")
@@ -19,7 +19,7 @@ def null_sink_case(request):
     yield request.param
 
 
-def test_null_sink(null_sink_case):
+def test_null_sink(null_sink_case, thread_count):
     """Testing for null sink case without a source facility.
 
     No transactions are expected in this test; therefore, a table with
@@ -36,7 +36,7 @@ def test_null_sink(null_sink_case):
     sim_input = os.path.join(INPUT, fname)
     holdsrtn = [1]  # needed because nose does not send() to test generator
     outfile = which_outfile()
-    cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
+    cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim_input]
     check_cmd(cmd, '.', holdsrtn)
     rtn = holdsrtn[0]
     if rtn != 0:
