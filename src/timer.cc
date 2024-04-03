@@ -14,9 +14,6 @@
 #include "pyhooks.h"
 #include "sim_init.h"
 
-#define quote(x) #x
-
-
 namespace cyclus {
 
 void Timer::RunSim() {
