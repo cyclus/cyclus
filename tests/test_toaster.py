@@ -2,7 +2,7 @@ import os
 import re
 import json
 import subprocess
-
+from tools import thread_count
 
 
 DEFAULTFILE = {'simulation': {'archetypes': {'spec': [
@@ -23,14 +23,14 @@ DEFAULTFILE = {'simulation': {'archetypes': {'spec': [
                            'name': 'SingleRegion'}}}
 
 
-def test_pyagent_defaults():
+def test_pyagent_defaults(thread_count):
     if os.path.exists('default-toaster.h5'):
         os.remove('default-toaster.h5')
     with open('default-toaster.json', 'w') as f:
         json.dump(DEFAULTFILE, f)
     env = dict(os.environ)
     env['PYTHONPATH'] = "."
-    s = subprocess.check_output(['cyclus', '-o', 'default-toaster.h5', 'default-toaster.json'],
+    s = subprocess.check_output(['cyclus', '-j', thread_count, '-o', 'default-toaster.h5', 'default-toaster.json'],
                                 universal_newlines=True, env=env)
     # tests default value set on facility
     assert ("Bread is rye" in  s)
@@ -60,7 +60,7 @@ ATTRFILE = {'simulation': {'archetypes': {'spec': [
                            'name': 'SingleRegion'}}}
 
 
-def test_pyagent_attr_toasters():
+def test_pyagent_attr_toasters(thread_count):
     oname = 'attr-toaster.h5'
     iname = 'attr-toaster.json'
     if os.path.exists(oname):
@@ -69,7 +69,7 @@ def test_pyagent_attr_toasters():
         json.dump(ATTRFILE, f)
     env = dict(os.environ)
     env['PYTHONPATH'] = "."
-    s = subprocess.check_output(['cyclus', '-o', oname, iname],
+    s = subprocess.check_output(['cyclus', '-j', thread_count, '-o', oname, iname],
                                 universal_newlines=True, env=env)
     info = s.split('=== Start AttrToaster ===\n')[-1].split('\n=== End AttrToaster ===')[0]
     info = json.loads(info)
