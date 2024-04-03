@@ -310,6 +310,9 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
     void Decision() except *:
         (<object> this.self).decision()
 
+    cpp_bool IsShim() except *:
+        return True
+
 
 cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institution):
     # A C++ class that acts as a Institution. It implements the Institution virtual
@@ -444,6 +447,9 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
     void Decision() except *:
         (<object> this.self).decision()
 
+    cpp_bool IsShim() except *:
+        return True
+    
 
 cdef int _GET_MAT_BIDS_TIME = -9999999999
 cdef cpp_cyclus.CommodMap[cpp_cyclus.Material].type* _GET_MAT_BIDS_PTR = NULL
@@ -584,6 +590,9 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
 
     void Decision() except *:
         (<object> this.self).decision()
+
+    cpp_bool IsShim() except *:
+        return True
 
     cpp_bool CheckDecommissionCondition() except *:
         rtn = (<object> this.self).check_decommission_condition()
