@@ -93,29 +93,14 @@ void Timer::DoTick() {
       cpp_agents.push_back(pair.second);
     }
   }
-  // start parallel execution of the two agent vectors
-  #pragma omp parallel sections
-  {
-    #pragma omp section // Tick() py_agents in serial
-    {
-      for (std::vector<TimeListener*>::iterator agent = py_agents.begin();
-          agent != py_agents.end();
-          ++agent) {
-        TimeListener* tl = *agent;
-        tl->Tick();
-      }
-    }
+  
+  for (TimeListener* agent : py_agents) {
+    agent->Tick();
+  }
 
-    #pragma omp section // Tick() cpp_agents in parallel
-    {
-      #pragma omp parallel for
-      for (std::vector<TimeListener*>::iterator agent = cpp_agents.begin();
-          agent != cpp_agents.end();
-          ++agent) {
-        TimeListener* tl = *agent;
-        tl->Tick();
-      }
-    }
+  #pragma omp parallel for
+  for (TimeListener* agent : cpp_agents) {
+    agent->Tick();
   }
 }
 
@@ -139,30 +124,14 @@ void Timer::DoTock() {
       cpp_agents.push_back(pair.second);
     }
   }
+  
+  for (TimeListener* agent : py_agents) {
+    agent->Tock();
+  }
 
-  // start parallel execution of the two agent vectors
-  #pragma omp parallel sections
-  {
-    #pragma omp section // Tock() py_agents in serial
-    {
-      for (std::vector<TimeListener*>::iterator agent = py_agents.begin();
-          agent != py_agents.end();
-          ++agent) {
-        TimeListener* tl = *agent;
-        tl->Tock();
-      }
-    }
-
-    #pragma omp section // Tock() cpp_agents in parallel
-    {
-      #pragma omp parallel for
-      for (std::vector<TimeListener*>::iterator agent = cpp_agents.begin();
-          agent != cpp_agents.end();
-          ++agent) {
-        TimeListener* tl = *agent;
-        tl->Tock();
-      }
-    }
+  #pragma omp parallel for
+  for (TimeListener* agent : cpp_agents) {
+    agent->Tock();
   }
 
   if (si_.explicit_inventory || si_.explicit_inventory_compact) {
