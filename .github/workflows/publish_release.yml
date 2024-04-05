@@ -34,7 +34,7 @@ jobs:
           echo "stable_tag=ci-image-cache" >> "$GITHUB_ENV"
 
       - name: Tag as stable
-        if: ${{ github.repository_owner == 'cyclus' && github.event_name == 'release' }}
+        if: ${{ github.repository_owner == 'bennibbelink' && github.event_name == 'release' }}
         run: |
           echo "version_tag=${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
           echo "stable_tag=stable" >> "$GITHUB_ENV"
@@ -60,8 +60,8 @@ jobs:
           push: true
           target: cyclus
           tags: |
-            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.version_tag }}
-            ghcr.io/cyclus/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.stable_tag }}
+            ghcr.io/bennibbelink/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.version_tag }}
+            ghcr.io/bennibbelink/cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus:${{ env.stable_tag }}
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
@@ -108,7 +108,7 @@ jobs:
           echo "stable_tag=ci-image-cache" >> "$GITHUB_ENV"
 
       - name: Tag as stable
-        if: ${{ github.repository_owner == 'cyclus' && github.event_name == 'release' }}
+        if: ${{ github.repository_owner == 'bennibbelink' && github.event_name == 'release' }}
         run: |
           echo "version_tag=${{ github.event.release.tag_name }}" >> "$GITHUB_ENV"
           echo "stable_tag=stable" >> "$GITHUB_ENV"
@@ -133,7 +133,7 @@ jobs:
           file: docker/Rocky.dockerfile
           push: true
           tags: |
-            ghcr.io/cyclus/cyclus_rocky_${{ matrix.rocky_versions }}/cyclus:${{ env.version_tag }}
-            ghcr.io/cyclus/cyclus_rocky_${{ matrix.rocky_versions }}/cyclus:${{ env.stable_tag }}
+            ghcr.io/bennibbelink/cyclus_rocky_${{ matrix.rocky_versions }}/cyclus:${{ env.version_tag }}
+            ghcr.io/bennibbelink/cyclus_rocky_${{ matrix.rocky_versions }}/cyclus:${{ env.stable_tag }}
           build-args: |
             rocky_version=${{ matrix.rocky_versions }}
