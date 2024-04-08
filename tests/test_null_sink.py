@@ -5,8 +5,8 @@ import sqlite3
 import pytest
 import numpy as np
 import tables
-from helper import tables_exist, find_ids, exit_times, \
-    h5out, sqliteout, clean_outs, to_ary, which_outfile
+from helper import tables_exist, find_ids, \
+    h5_suffix, clean_outs, to_ary, which_outfile
 
 from tools import check_cmd, cyclus_has_coin, thread_count
 
@@ -35,7 +35,7 @@ def test_null_sink(null_sink_case, thread_count):
     # Cyclus simulation input for null sink testing
     sim_input = os.path.join(INPUT, fname)
     holdsrtn = [1]  # needed because nose does not send() to test generator
-    outfile = which_outfile()
+    outfile = which_outfile(thread_count)
     cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim_input]
     check_cmd(cmd, '.', holdsrtn)
     rtn = holdsrtn[0]
@@ -52,8 +52,8 @@ def test_null_sink(null_sink_case, thread_count):
         return  # don't execute further commands
 
     # Get specific data
-    if outfile == h5out:
-        output = tables.open_file(h5out, mode = "r")
+    if outfile.endswith(h5_suffix):
+        output = tables.open_file(outfile, mode = "r")
         agent_entry = output.get_node("/AgentEntry")[:]
         info = output.get_node("/Info")[:]
         output.close()
