@@ -51,6 +51,13 @@ On MacOSX you also need to add ~/.local/lib/pythonX.Y/site-packages to your
   print(".".join(map(str, sys.version_info[:2])))'`/site-packages:\$PYTHONPATH\"" >> ~/.bashrc
   source ~/.bashrc
 
+
+.. _`Cyclus Homepage`: http://fuelcycle.org/
+.. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
+.. _`Cyclus repo`: https://github.com/cyclus/cyclus
+.. _`Cycamore Repo`: https://github.com/cyclus/cycamore
+.. _`for installing those dependencies for the major supported systems`: https://github.com/cyclus/cyclus/blob/main/DEPENDENCIES.rst
+.. _`here`: https://github.com/cyclus/cyclus/blob/main/DEPENDENCIES.rst
 .. website_include_end
 
 .. website_custom_start
@@ -190,9 +197,3 @@ proper functioning of Cyclus. You can run the tests yourself via:
     $ cyclus_unit_tests
 
 
-.. _`Cyclus Homepage`: http://fuelcycle.org/
-.. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
-.. _`Cyclus repo`: https://github.com/cyclus/cyclus
-.. _`Cycamore Repo`: https://github.com/cyclus/cycamore
-.. _`for installing those dependencies for the major supported systems`: https://github.com/cyclus/cyclus/blob/main/DEPENDENCIES.rst
-.. _`here`: https://github.com/cyclus/cyclus/blob/main/DEPENDENCIES.rst
