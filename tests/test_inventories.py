@@ -6,8 +6,8 @@ import tables
 import numpy as np
 import sqlite3
 from tools import check_cmd, thread_count
-from helper import tables_exist, find_ids, exit_times, \
-    h5out, sqliteout, clean_outs, to_ary, which_outfile
+from helper import tables_exist,\
+    h5_suffix, clean_outs, to_ary, which_outfile
 
 INPUT = os.path.join(os.path.dirname(__file__), "input")
 
@@ -21,7 +21,7 @@ def test_inventories_false(thread_count):
     paths = [["/ExplicitInventory"], ["/ExplicitInventoryCompact"]]
     for sim, path in zip(sim_inputs, paths):
         holdsrtn = [1]  # needed because nose does not send() to test generator
-        outfile = sqliteout
+        outfile = which_outfile(thread_count)
         cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim]
         check_cmd(cmd, '.', holdsrtn)
         rtn = holdsrtn[0]
@@ -46,7 +46,7 @@ def test_inventories(thread_count):
     paths = [["/ExplicitInventory"], ["/ExplicitInventoryCompact"]]
     for sim, path in zip(sim_inputs, paths):
         holdsrtn = [1]  # needed because nose does not send() to test generator
-        outfile = sqliteout
+        outfile = which_outfile(thread_count)
         cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim]
         check_cmd(cmd, '.', holdsrtn)
         rtn = holdsrtn[0]
@@ -63,8 +63,8 @@ def test_inventories(thread_count):
 
         # Get specific table
         table = path[0]
-        if outfile == h5out:
-            output = tables.open_file(h5out, mode = "r")
+        if outfile.endswith(h5_suffix):
+            output = tables.open_file(outfile, mode = "r")
             inventory = output.get_node(table)[:]
             compositions = output.get_node("/Compositions")[:]
             output.close()

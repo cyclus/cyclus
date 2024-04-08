@@ -10,8 +10,7 @@ import numpy as np
 import pytest
 
 from tools import check_cmd, cyclus_has_coin, thread_count
-from helper import tables_exist, find_ids, exit_times, create_sim_input, \
-    h5out, sqliteout, clean_outs, sha1array, to_ary, which_outfile
+from helper import tables_exist, find_ids, h5_suffix, clean_outs, to_ary, which_outfile
 
 INPUT = os.path.join(os.path.dirname(__file__), "input")
 
@@ -112,7 +111,7 @@ def test_minimal_cycle(thread_count):
             sim_input = change_minimal_input(ref_input, k_factor_a, k_factor_b)
 
             holdsrtn = [1]  # needed b/c nose does not send() to test generator
-            outfile = which_outfile()
+            outfile = which_outfile(thread_count)
             cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim_input]
             check_cmd(cmd, '.', holdsrtn)
             rtn = holdsrtn[0]
@@ -130,8 +129,8 @@ def test_minimal_cycle(thread_count):
                 return  # don't execute further commands
 
             # Get specific tables and columns
-            if outfile == h5out:
-                output = tables.open_file(h5out, mode = "r")
+            if outfile.endswith(h5_suffix):
+                output = tables.open_file(outfile, mode = "r")
                 agent_entry = output.root.AgentEntry[:]
                 info = output.get_node("/Info")[:]
                 resources = output.get_node("/Resources")[:]
@@ -139,7 +138,7 @@ def test_minimal_cycle(thread_count):
                 output.close()
 
             else:
-                conn = sqlite3.connect(sqliteout)
+                conn = sqlite3.connect(outfile)
                 conn.row_factory = sqlite3.Row
                 cur = conn.cursor()
                 exc = cur.execute

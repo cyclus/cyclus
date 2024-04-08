@@ -8,8 +8,7 @@ import numpy as np
 import hashlib
 
 from tools import check_cmd, thread_count
-from helper import tables_exist, clean_outs, agent_time_series, \
-    h5out, sqliteout, which_outfile
+from helper import clean_outs, agent_time_series, which_outfile
 
 prey = "Prey"
 pred = "Predator"
@@ -27,8 +26,8 @@ def test_predator_only(thread_count):
     sim_input = os.path.join(DIR, "input", "predator.xml")
 
     holdsrtn = [1]  # needed because nose does not send() to test generator
-    outfile = which_outfile()
-
+    outfile = which_outfile(thread_count)
+    print(outfile)
     cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim_input]
     check_cmd(cmd, '.', holdsrtn)
     rtn = holdsrtn[0]
@@ -36,7 +35,7 @@ def test_predator_only(thread_count):
     print("Confirming valid Cyclus execution.")
     assert rtn ==  0
 
-    series = agent_time_series([prey, pred])
+    series = agent_time_series([prey, pred], outfile)
     print("Prey:", series[prey], "Predators:", series[pred])
 
     prey_exp = [0 for n in range(10)]
@@ -55,7 +54,7 @@ def test_prey_only(thread_count):
     clean_outs()
     sim_input = os.path.join(DIR, "input", "prey.xml")
     holdsrtn = [1]  # needed because nose does not send() to test generator
-    outfile = which_outfile()
+    outfile = which_outfile(thread_count)
 
     cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim_input]
     check_cmd(cmd, '.', holdsrtn)
@@ -64,7 +63,7 @@ def test_prey_only(thread_count):
     print("Confirming valid Cyclus execution.")
     assert rtn ==  0
 
-    series = agent_time_series([prey, pred])
+    series = agent_time_series([prey, pred], outfile)
     print("Prey:", series[prey], "Predators:", series[pred])
 
     prey_exp = [2**n for n in range(10)]
@@ -92,7 +91,7 @@ def test_lotka_volterra(thread_count):
     clean_outs()
     sim_input = os.path.join(DIR, "input", "lotka_volterra_determ.xml")
     holdsrtn = [1]  # needed because nose does not send() to test generator
-    outfile = which_outfile()
+    outfile = which_outfile(thread_count)
 
     cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim_input]
     check_cmd(cmd, '.', holdsrtn)
@@ -101,7 +100,7 @@ def test_lotka_volterra(thread_count):
     print("Confirming valid Cyclus execution.")
     assert rtn ==  0
 
-    series = agent_time_series([prey, pred])
+    series = agent_time_series([prey, pred], outfile)
     print("Prey:", series[prey], "Predators:", series[pred])
 
     prey_max = series[prey].index(max(series[prey]))
