@@ -79,12 +79,7 @@ void Timer::DoBuild() {
   }
 }
 
-void Timer::DoTick() {
-  // partition our tickers_ map into C++ agents and python agents.
-  // Python agents segfault when Tick'ed in parallel so we need to 
-  // run them serially
-  std::vector<TimeListener*> cpp_agents;
-  std::vector<TimeListener*> py_agents;
+inline void Timer::PartitionTickers(std::vector<TimeListener*> cpp_agents, std::vector<TimeListener*> py_agents) {
   for (std::pair<int, TimeListener*> pair : tickers_) {
     if (pair.second->IsShim()) {
       py_agents.push_back(pair.second);
@@ -93,6 +88,15 @@ void Timer::DoTick() {
       cpp_agents.push_back(pair.second);
     }
   }
+}
+
+void Timer::DoTick() {
+  // partition our tickers_ map into C++ agents and python agents.
+  // Python agents segfault when Tick'ed in parallel so we need to 
+  // run them serially
+  std::vector<TimeListener*> cpp_agents;
+  std::vector<TimeListener*> py_agents;
+  PartitionTickers(cpp_agents, py_agents);
   
   for (TimeListener* agent : py_agents) {
     agent->Tick();
@@ -116,21 +120,15 @@ void Timer::DoTock() {
   // run them serially
   std::vector<TimeListener*> cpp_agents;
   std::vector<TimeListener*> py_agents;
-  for (std::pair<int, TimeListener*> pair : tickers_) {
-    if (pair.second->IsShim()) {
-      py_agents.push_back(pair.second);
-    }
-    else {
-      cpp_agents.push_back(pair.second);
-    }
-  }
+  PartitionTickers(cpp_agents, py_agents);
   
   for (TimeListener* agent : py_agents) {
     agent->Tock();
   }
 
   #pragma omp parallel for
-  for (TimeListener* agent : cpp_agents) {
+  for (int i = 0; i < cpp_agents.size(); i++) {
+    TimeListener* agent = cpp_agents[i];
     agent->Tock();
   }
 
