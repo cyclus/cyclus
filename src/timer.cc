@@ -79,7 +79,7 @@ void Timer::DoBuild() {
   }
 }
 
-inline void Timer::PartitionTickers(std::vector<TimeListener*> cpp_agents, std::vector<TimeListener*> py_agents) {
+void Timer::PartitionTickers(std::vector<TimeListener*> cpp_agents, std::vector<TimeListener*> py_agents) {
   for (std::pair<int, TimeListener*> pair : tickers_) {
     if (pair.second->IsShim()) {
       py_agents.push_back(pair.second);
