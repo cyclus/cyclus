@@ -56,8 +56,8 @@ On MacOSX you also need to add ~/.local/lib/pythonX.Y/site-packages to your
 .. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
 .. _`Cyclus repo`: https://github.com/cyclus/cyclus
 .. _`Cycamore Repo`: https://github.com/cyclus/cycamore
-.. _`for installing those dependencies for the major supported systems`: https://github.com/cyclus/cyclus/blob/main/DEPENDENCIES.rst
-.. _`here`: https://github.com/cyclus/cyclus/blob/main/DEPENDENCIES.rst
+.. _`for installing those dependencies for the major supported systems`: https://fuelcycle.org/user/DEPENDENCIES.html
+.. _`here`: https://fuelcycle.org/user/DEPENDENCIES.html
 .. website_include_end
 
 .. website_custom_start
