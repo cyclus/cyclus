@@ -73,6 +73,7 @@ class Timer {
   /// builds all agents queued for the current timestep.
   void DoBuild();
 
+  void PartitionTickers(std::vector<TimeListener*> cpp_agents, std::vector<TimeListener*> py_agents);
   /// sends the tick signal to all of the agents receiving time
   /// notifications.
   void DoTick();
