@@ -6,11 +6,9 @@ FROM ubuntu:${ubuntu_version} as common-base
 ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN apt update --fix-missing
-
 FROM common-base as apt-deps
 
-RUN apt install -y \
+RUN apt update -y && install -y \
         libssh-dev \
         g++ \
         gcc \
@@ -48,7 +46,7 @@ RUN mkdir -p `python -m site --user-site`
 
 FROM common-base as conda-deps
 
-RUN apt install -y \
+RUN apt update -y && install -y \
         wget \
         bzip2 \
         ca-certificates \
