@@ -11,14 +11,12 @@ RUN apt update --fix-missing
 FROM common-base as apt-deps
 
 RUN apt install -y \
-        libssh-dev \
         g++ \
         gcc \
         cmake \
         make \
         libxml2-dev \
         libxml++2.6-dev \
-        libblas-dev \
         liblapack-dev \
         pkg-config \
         coinor-libcbc-dev \
@@ -29,8 +27,6 @@ RUN apt install -y \
         libhdf5-dev \
         libsqlite3-dev \
         libpcre2-dev \
-        gettext-base \
-        xz-utils \
         python3-setuptools \
         python3-pytest \ 
         python3-tables \
@@ -70,20 +66,14 @@ RUN conda uninstall -y conda-libmamba-solver
 RUN conda config --set solver classic
 RUN conda update -y --all && \
     mamba install -y \
-               openssh \
                gxx_linux-64 \
                gcc_linux-64 \
                cmake \
                make \
-               docker-pycreds \
                git \
-               xo \
-               python-json-logger \
                glib \
                libxml2 \
                libxmlpp-4.0 \
-               libblas \
-               libcblas \
                liblapack \
                pkg-config \
                coincbc \
@@ -91,9 +81,6 @@ RUN conda update -y --all && \
                hdf5 \
                sqlite \
                pcre \
-               gettext \
-               bzip2 \
-               xz \
                setuptools \
                pytest \
                pytables \

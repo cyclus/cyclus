@@ -22,20 +22,19 @@ In order to facilitate future compatibility with multiple platforms,
 Cyclus is built using ``CMake``. A full list of the Cyclus package
 dependencies is shown below:
 
-====================   ==================
-Package                Minimum Version
-====================   ==================
-``CMake``                3.16.3
-``boost``                1.71.0
-``libxml2``              2.9.10+
-``libxml++``             2.40.1
-``python``               3.8.10
-``sqlite3``              3.31.1
-``HDF5``                 1.10.4+
-``Coin-Cbc``             2.10.3
-``Coin-Clp``             1.17.5
-``zlib``                 1.2.11
-====================   ==================
+====================      ==================
+Package                   Minimum Version
+====================      ==================
+``CMake``                   3.16.3
+``pkg-config``              0.29.1
+``boost``                   1.71.0
+``libxml2``                 2.9.10
+``libxml++``                2.40.1
+``python`` (dev version)    3.8.10
+``sqlite3``                 3.31.1
+``HDF5``                    1.10.4
+``LAPACK``                  3.9.0
+====================      ==================
 
 .. website_include_end
 
@@ -43,23 +42,22 @@ Package                Minimum Version
 
 And a few optional dependencies:
 
-====================   ==================
-Package                Minimum Version
-====================   ==================
-doxygen (for docs)     1.7.6.1
-tcmalloc (for speed)   any
-Cython                 0.29+
-Python (dev version)   3.8+
-Jinja2                 any
-NumPy                  1.9+
-Pandas                 any
-====================   ==================
+====================   ==================  =============================================  ==================        
+Package                Minimum Version     Purpose                                        Notes
+====================   ==================  =============================================  ==================  
+``Coin-Cbc``             2.10.3             Enables use of Branch-and-Cut solver          Cyclus must be built with ``--allow-milps`` flag
+``Coin-Clp``             1.17.5             Enables use of Linear Programming solver      Cyclus must be built with ``--allow-milps`` flag
+``doxygen``              1.7.6.1            Building documentation
+``TCMmalloc``            any                Improves performance                          Only used if Cython is not present
+``Cython``               0.29               Enables use of Python agents and input files  
+``Jinja2``               2.10.1             Enables use of Python agents and input files  Only needed if Cython is installed
+``NumPy``                1.9                Enables use of Python agents and input files  Only needed if Cython is installed
+``pandas``               0.25.3             Enables use of Python agents and input files  Only needed if Cython is installed
+``pip``                  20.0.2             Enables use of Python agents and input files  Only needed if Cython is installed
+====================   ==================  =============================================  ==================
 
 *Note that the Debian/Ubuntu package ``libtcmalloc`` is NOT discovered correctly
 by our build system.  Instead use ``libgoogle-perftools-dev``.*
-
-*Also note that the development version of Python, Jinja2, NumPy, and Pandas are
-only needed if Cython is installed.*
 
 ***********************
 Installing Dependencies
@@ -88,31 +86,30 @@ required library package names is:
 
 #. make
 #. cmake
+#. pkg-config
 #. libboost-all-dev (see note below)
 #. libxml2-dev
 #. libxml++2.6-dev
+#. python3-dev
 #. libsqlite3-dev
-#. libhdf5-serial-dev
-#. libbz2-dev
-#. coinor-libcbc-dev
-#. coinor-libcoinutils-dev
-#. coinor-libosi-dev
-#. coinor-libclp-dev
-#. coinor-libcgl-dev
+#. libhdf5-dev
+#. liblapack-dev
+
 
 and (optionally):
 
 #. doxygen
-#. g++
-#. libblas-dev
-#. liblapack-dev
 #. libgoogle-perftools-dev
-#. python3-dev
+#. coinor-libcbc-dev
+#. coinor-libcoinutils-dev
+#. coinor-libosi-dev
+#. coinor-libclp-dev
 #. python3-tables
 #. python3-pandas
 #. python3-numpy
-#. python3-nose
+#. python3-pytest
 #. python3-jinja2
+#. python3-pip
 #. cython3       (see note below)
 
 For example, in order to install libxml++ (and libxml2) on your system, type:
@@ -126,19 +123,17 @@ If you'd prefer to copy/paste, the following line will install all **required**
 
 .. code-block:: bash
 
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev \
-   libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev \
-   coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev
+   sudo apt-get install -y cmake make pkg-config libboost-all-dev libxml2-dev libxml++2.6-dev \
+   python3 libsqlite3-dev libhdf5-dev liblapack-dev
 
 And to install all *Cyclus* dependencies (**required and optional**):
 
 .. code-block:: bash
 
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev \
-   libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev \
-   coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ \
-   libgoogle-perftools-dev python3-dev python3-tables python3-pandas python3-numpy python3-nose \
-   python3-jinja2 cython3
+   sudo apt-get install -y cmake make pkg-config libboost-all-dev libxml2-dev libxml++2.6-dev \
+   python3 libsqlite3-dev libhdf5-dev liblapack-dev coinor-libcbc-dev coinor-libcoinutils-dev \
+   coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev doxygen libgoogle-perftools-dev python3-tables \
+   python3-pandas python3-numpy python3-pytest python3-jinja2 cython3
 
 To determine which version of Python is already installed on your computer, run:
 
