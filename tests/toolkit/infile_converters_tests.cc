@@ -2,6 +2,8 @@
 
 #include "cyclus.h"
 
+#ifdef CYCLUS_WITH_PYTHON
+
 std::string MakeInput() {
   return std::string(
           "<simulation>"
@@ -109,3 +111,5 @@ TEST(InfileConverters, PyXmlRoundTrip) {
   EXPECT_STREQ(p1.c_str(), p2.c_str());
   EXPECT_STREQ(x1.c_str(), x2.c_str());
 }
+
+#endif // CYCLUS_WITH_PYTHON
