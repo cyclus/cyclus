@@ -42,7 +42,7 @@ RUN mkdir -p `python -m site --user-site`
 
 FROM common-base as conda-deps
 
-RUN apt update -y && install -y \
+RUN apt update -y && apt install -y \
         wget \
         bzip2 \
         ca-certificates \
