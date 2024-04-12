@@ -8,7 +8,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 FROM common-base as apt-deps
 
-RUN apt update -y && install -y \
+RUN apt update -y && apt install -y \
         libssh-dev \
         g++ \
         gcc \
@@ -46,7 +46,7 @@ RUN mkdir -p `python -m site --user-site`
 
 FROM common-base as conda-deps
 
-RUN apt update -y && install -y \
+RUN apt update -y && apt install -y \
         wget \
         bzip2 \
         ca-certificates \
