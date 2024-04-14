@@ -2,7 +2,6 @@
 
 #include "cyclus.h"
 
-#ifdef CYCLUS_WITH_PYTHON
 
 std::string MakeInput() {
   return std::string(
@@ -82,6 +81,8 @@ TEST(InfileConverters, JsonXmlRoundTrip) {
   EXPECT_STREQ(j1.c_str(), j2.c_str());
   EXPECT_STREQ(x1.c_str(), x2.c_str());
 }
+
+#ifdef CYCLUS_WITH_PYTHON
 
 TEST(InfileConverters, JsonPyRoundTrip) {
   using std::string;
