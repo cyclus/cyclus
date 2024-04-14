@@ -2,7 +2,6 @@
 
 #include "cyclus.h"
 
-
 std::string MakeInput() {
   return std::string(
           "<simulation>"
