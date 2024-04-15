@@ -161,6 +161,9 @@ class Material: public Resource {
   /// type minimum and maximum mass criteria.
   virtual void ChangePackageId(int new_package_id = Package::unpackaged_id());
 
+  /// Packages the material
+  std::vector<Material::Ptr> Package(Package::Ptr pkg);
+
  protected:
   Material(Context* ctx, double quantity, Composition::Ptr c, int package_id = Package::unpackaged_id());
 

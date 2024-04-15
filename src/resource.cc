@@ -10,9 +10,7 @@ void Resource::BumpStateId() {
   nextstate_id_++;
 }
 
-
-
-std::vector<Resource::Ptr> Resource::PackageResource(Package::Ptr pkg) {
+std::vector<Resource::Ptr> Resource::Package(Package::Ptr pkg) {
   std::vector<Resource::Ptr> rs_pkgd;
   Resource::Ptr r_pkgd;
 

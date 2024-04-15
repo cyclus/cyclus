@@ -4,7 +4,7 @@
 namespace cyclus {
 
 // unpackaged id is 1, so start the user-declared packaging id at 2
-int Package::next_id_ = 1;
+int Package::next_package_id_ = 2;
 
 Package::Ptr Package::Create() {
   Ptr p(new Package());
@@ -19,6 +19,11 @@ Package::Ptr Package::Create(std::string name, double fill_min, double fill_max,
     throw ValueError("fill_min must be less than or equal to fill_max");
   }
   Ptr p(new Package(name, fill_min, fill_max, strategy));
+  return p;
+}
+
+Package::Ptr Package::CreateUnpackaged() {
+  Ptr p(new Package(1, "unpackaged"));
   return p;
 }
 
@@ -45,8 +50,12 @@ double Package::GetFillMass(double qty) {
   return fill_mass;
 }
   
-Package::Package() : id_(next_id_++), fill_min_(0), fill_max_(std::numeric_limits<double>::max()) {}
+Package::Package() : id_(next_package_id_++), fill_min_(0), fill_max_(std::numeric_limits<double>::max()) {
+  name_ = "unnamed";
+}
 
-Package::Package(std::string name, double fill_min, double fill_max, std::string strategy) : name_(name), id_(next_id_++), fill_min_(fill_min), fill_max_(fill_max), strategy_(strategy) {}
+Package::Package(std::string name, double fill_min, double fill_max, std::string strategy) : name_(name), id_(next_package_id_++), fill_min_(fill_min), fill_max_(fill_max), strategy_(strategy) {}
+
+Package::Package(int id, std::string name) : id_(id), name_(name), fill_min_(0), fill_max_(std::numeric_limits<double>::max()) {}
 
 } // namespace cyclus

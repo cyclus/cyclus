@@ -11,7 +11,7 @@ namespace cyclus {
 
 /// Packager is a class that packages materials into discrete items in ways that mimic realistic nuclear material handling. Packages will eventually be a required parameter of resources.
 class Package {
-
+  friend class Context;
   public:
     typedef boost::shared_ptr<Package> Ptr;
 
@@ -23,7 +23,7 @@ class Package {
     // create a new package type
     static Ptr Create(std::string name, double fill_min, double fill_max, std::string strategy);
 
-      /// Returns optimal fill mass for a resource to be packaged. Can be used
+    /// Returns optimal fill mass for a resource to be packaged. Can be used
     /// to determine how to respond to requests for material, and to actually
     /// package and send off trades.
     /// Packaging strategy "first" simply fills the packages one by one to the
@@ -57,10 +57,13 @@ class Package {
   protected:
     Package();
     Package(std::string name, double fill_min, double fill_max, std::string strategy);
+    // creates the unpackaged type. Id is always 1.
+    static Package::Ptr CreateUnpackaged();
+    Package(int id, std::string name);
 
   private:
     static const int unpackaged_id_ = 1;
-    static int next_id_;
+    static int next_package_id_;
 
     std::string name_;
     int id_;
