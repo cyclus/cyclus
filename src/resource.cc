@@ -21,7 +21,7 @@ std::vector<Resource::Ptr> Resource::Package(Package::Ptr pkg) {
 
   while (quantity() > pkg->fill_min()) {
     double pkg_fill = std::min(quantity(), fill_mass);
-    r_pkgd = boost::dynamic_pointer_cast<Resource>(ExtractRes(pkg_fill));
+    r_pkgd = ExtractRes(pkg_fill);
     r_pkgd->ChangePackageId(pkg->id());
     rs_pkgd.push_back(r_pkgd);
   }
