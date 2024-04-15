@@ -87,8 +87,8 @@ void Product::ChangePackageId(int new_package_id) {
     package_id_ = new_package_id;
     return;
   }
-  
-  Package::Ptr p = ctx_->GetPackageById(package_id_);
+  Package::Ptr p = ctx_->GetPackageById(new_package_id);
+  Package::Ptr p_old = ctx_->GetPackageById(package_id_);
   double min = p->fill_min();
   double max = p->fill_max();
   if (quantity_ >= min && quantity_ <= max) {
@@ -96,6 +96,24 @@ void Product::ChangePackageId(int new_package_id) {
   } else {
     throw ValueError("Product quantity is outside of package fill limits.");
   }
+}
+
+std::vector<Product::Ptr> Product::Package(Package::Ptr pkg) {
+  std::vector<Product::Ptr> ps_pkgd;
+  Product::Ptr p_pkgd;
+
+  double fill_mass = pkg->GetFillMass(quantity());
+  if (fill_mass == 0) {
+    return ps_pkgd;
+  }
+
+  while (quantity() > pkg->fill_min()) {
+    double pkg_fill = std::min(quantity(), fill_mass);
+    p_pkgd = boost::dynamic_pointer_cast<Product>(ExtractRes(pkg_fill));
+    p_pkgd->ChangePackageId(pkg->id());
+    ps_pkgd.push_back(p_pkgd);
+  }
+  return ps_pkgd;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
