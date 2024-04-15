@@ -54,6 +54,9 @@ class Package {
     // returns the unpackaged id (1)
     static int unpackaged_id() { return unpackaged_id_; }
 
+    // returns the unpackaged package name
+    static std::string unpackaged_name() { return unpackaged_name_; }
+
   protected:
     Package();
     Package(std::string name, double fill_min, double fill_max, std::string strategy);
@@ -63,6 +66,7 @@ class Package {
 
   private:
     static const int unpackaged_id_ = 1;
+    static const std::string unpackaged_name_ = "unpackaged";
     static int next_package_id_;
 
     std::string name_;

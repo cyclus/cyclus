@@ -23,7 +23,7 @@ Package::Ptr Package::Create(std::string name, double fill_min, double fill_max,
 }
 
 Package::Ptr Package::CreateUnpackaged() {
-  Ptr p(new Package(1, "unpackaged"));
+  Ptr p(new Package(unpackaged_id_, unpackaged_name_));
   return p;
 }
 
