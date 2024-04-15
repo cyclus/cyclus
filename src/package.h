@@ -15,12 +15,9 @@ class Package {
   public:
     typedef boost::shared_ptr<Package> Ptr;
 
-    // create a new package type with default values. Should be called by 
-    // the context only (see Context::AddPackage), unless you want an 
-    // untracked package type (which you probably don't)
-    static Ptr Create();
-
-    // create a new package type
+    // create a new package type. Should be called by the context only
+    // (see Context::AddPackage), unless you want an untracked package
+    //  type (which you probably don't)
     static Ptr Create(std::string name, double fill_min, double fill_max, std::string strategy);
 
     /// Returns optimal fill mass for a resource to be packaged. Can be used
