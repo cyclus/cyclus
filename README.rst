@@ -165,11 +165,11 @@ to contribute into Cyclus, please follow this procedure:
 
 #. Fork Cyclus repository,
 
-#. Create a working branch on your fork from the ``develop`` branch,
+#. Create a working branch on your fork from the ``main`` branch,
 
 #. Implement your modification of the Cyclus source code,
 
-#. Submit a Pull request into ``Cyclus/develop`` branch,
+#. Submit a Pull request into ``Cyclus/main`` branch,
 
 #. Wait for reviews/merge (the proposer of a pull request cannot be the Merger).
 

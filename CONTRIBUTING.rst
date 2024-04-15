@@ -29,6 +29,9 @@ General Notes
 Issuing a Pull Request
 ======================
 
+* Please make sure you describe the changes you made to the code in the 
+  `CHANGELOG <CHANGELOG.rst>`_.
+
 * When you are ready to move changes from one of your topic branches into the
   "main" branch, it must be reviewed and accepted by another developer.
 
