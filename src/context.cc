@@ -84,9 +84,11 @@ Context::Context(Timer* ti, Recorder* rec)
       solver_(NULL),
       trans_id_(0),
       si_(0) {
-
         rng_ = new RandomNumberGenerator();
-      }
+        if (packages_.count("unpackaged") == 0) {
+          packages_["unpackaged"] = Package::CreateUnpackaged();
+        }
+}
 
 Context::~Context() {
   if (solver_ != NULL) {
@@ -192,7 +194,7 @@ Composition::Ptr Context::GetRecipe(std::string name) {
   return recipes_[name];
 }
 
-void Context::AddPackage(std::string name, double fill_min, double fill_max,
+Package::Ptr Context::AddPackage(std::string name, double fill_min, double fill_max,
                          std::string strategy) {
   packages_[name] = Package::Create(name, fill_min, fill_max, strategy);
   NewDatum("Packages")
@@ -201,6 +203,7 @@ void Context::AddPackage(std::string name, double fill_min, double fill_max,
     ->AddVal("FillMax", fill_max)
     ->AddVal("Strategy", strategy)
     ->Record();
+  return packages_[name];
 }
 
 Package::Ptr Context::GetPackageByName(std::string name) {

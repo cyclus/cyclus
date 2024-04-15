@@ -98,10 +98,10 @@ class Resource {
   /// Changes the product's package id
   virtual void ChangePackageId(int new_package_id = Package::unpackaged_id()) {};
 
-    /// Repackages a single resource into a package. If some quantity of the 
-    /// resource cannot be packaged using the given packaging strategy and
-    /// restrictions, the remainder is left in the resource object. 
-    std::vector<Resource::Ptr> PackageResource(Package::Ptr pkg);
+  /// Repackages a single resource into a package. If some quantity of the 
+  /// resource cannot be packaged using the given packaging strategy and
+  /// restrictions, the remainder is left in the resource object. 
+  std::vector<Resource::Ptr> Package(Package::Ptr pkg);
 
  private:
   static int nextstate_id_;
