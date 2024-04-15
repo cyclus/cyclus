@@ -99,3 +99,42 @@ TEST_F(ResourceTest, ProductExtractGraphid) {
   EXPECT_NE(p1->state_id(), p3->state_id());
 }
 
+TEST_F(ResourceTest, DefaultPackageId) {
+  EXPECT_EQ(m1->package_id(), cyclus::Package::unpackaged_id());
+  EXPECT_EQ(m2->package_id(), cyclus::Package::unpackaged_id());
+  EXPECT_EQ(p1->package_id(), cyclus::Package::unpackaged_id());
+  EXPECT_EQ(p2->package_id(), cyclus::Package::unpackaged_id());
+
+  Product::Ptr p3 = p1->Extract(2);
+  EXPECT_EQ(p3->package_id(), cyclus::Package::unpackaged_id());
+}
+
+TEST_F(ResourceTest, ChangePackageId) {
+  cyclus::Package::Ptr pkg = ctx->AddPackage("foo", 1, 5, "first");
+  int pkg_id = pkg->id();
+
+  Product::Ptr p3 = p1->Extract(2);
+  p3->ChangePackageId(pkg_id);
+  EXPECT_EQ(p3->package_id(), pkg_id);
+  EXPECT_EQ(p1->package_id(), cyclus::Package::unpackaged_id());
+
+  m1->ChangePackageId(pkg_id);
+  EXPECT_EQ(m1->package_id(), pkg_id);
+}
+
+TEST_F(ResourceTest, PackageResource) {
+  cyclus::Package::Ptr pkg = ctx->AddPackage("foo", 1, 5, "first");
+  int pkg_id = pkg->id();
+
+  // nothing packaged
+  Product::Ptr p3 = p1->Extract(0.5);
+  std::vector<Product::Ptr> p3_pkgd = p3->Package(pkg);
+  // everything stays in old product, with same (default) package id
+  EXPECT_EQ(p3->package_id(), cyclus::Package::unpackaged_id());
+  EXPECT_EQ(p3->quantity(), 0.5);
+
+  // all packaged
+  std::vector<Product::Ptr> p1_pkgd = p1->Package(pkg);
+  EXPECT_EQ(p1->quantity(), 0);
+  EXPECT_EQ(p1_pkgd[0]->package_id(), pkg_id);
+}
