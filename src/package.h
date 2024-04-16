@@ -64,8 +64,8 @@ class Package {
             std::string strategy = "first");
 
     static const int unpackaged_id_ = 1;
-    static const char unpackaged_name_[11] = "unpackaged";
-    static Package* unpackaged_ = NULL;
+    static constexpr char unpackaged_name_[11] = "unpackaged";
+    static Ptr unpackaged_;
     static int next_package_id_;
 
     std::string name_;
