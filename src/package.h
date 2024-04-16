@@ -65,7 +65,7 @@ class Package {
 
     static const int unpackaged_id_ = 1;
     static const char* unpackaged_name_ = "unpackaged";
-    static Ptr unpackaged_ = NULL;
+    static Ptr& unpackaged_ = NULL;
     static int next_package_id_;
 
     std::string name_;

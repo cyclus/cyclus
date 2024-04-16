@@ -20,7 +20,7 @@ Package::Ptr Package::Create(std::string name, double fill_min, double fill_max,
 // singleton pattern: 
 // if the static member is not yet set, create a new object
 // otherwise return the object that already exists
-Package::Ptr unpackaged() {
+Package::Ptr& unpackaged() {
 
   if !unpackaged_ {
     unpackaged_ = new Package(unpackaged_name_);
