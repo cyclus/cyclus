@@ -18,7 +18,9 @@ class Package {
     // create a new package type. Should be called by the context only
     // (see Context::AddPackage), unless you want an untracked package
     //  type (which you probably don't)
-    static Ptr Create(std::string name, double fill_min, double fill_max, std::string strategy);
+    static Ptr Create(std::string name, double fill_min = 0,
+                      double fill_max = std::numeric_limits<double>::max(),
+                      std::string strategy);
 
     /// Returns optimal fill mass for a resource to be packaged. Can be used
     /// to determine how to respond to requests for material, and to actually
