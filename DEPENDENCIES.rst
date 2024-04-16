@@ -124,14 +124,14 @@ If you'd prefer to copy/paste, the following line will install all **required**
 .. code-block:: bash
 
    sudo apt-get install -y cmake make pkg-config libboost-all-dev libxml2-dev libxml++2.6-dev \
-   python3 libsqlite3-dev libhdf5-dev liblapack-dev
+   python3-dev libsqlite3-dev libhdf5-dev liblapack-dev
 
 And to install all *Cyclus* dependencies (**required and optional**):
 
 .. code-block:: bash
 
    sudo apt-get install -y cmake make pkg-config libboost-all-dev libxml2-dev libxml++2.6-dev \
-   python3 libsqlite3-dev libhdf5-dev liblapack-dev coinor-libcbc-dev coinor-libcoinutils-dev \
+   python3-dev libsqlite3-dev libhdf5-dev liblapack-dev coinor-libcbc-dev coinor-libcoinutils-dev \
    coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev doxygen libgoogle-perftools-dev python3-tables \
    python3-pandas python3-numpy python3-pytest python3-jinja2 cython3
 

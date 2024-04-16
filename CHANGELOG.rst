@@ -38,12 +38,14 @@ Since last release
 **Changed:**
 
 * Moved to unified CHANGELOG Entry and check them with GithubAction (#1571)
-* Major update and modernization of build (#1587, #1632)
+* Major update and modernization of build (#1587, #1632, #1734)
 * Changed Json formatting for compatibility with current python standards (#1587)
 * Changed README.rst installation instructions, tested on fresh Ubuntu-22.04 system with Python 3.11 (#1617, #1644)
 * Resolved various compilation warnings due to use of deprecated APIs (#1671)
 * Update version management in CMake build (#1696)
 * Changed dependency versions in README.rst, INSTALL.rst, and DEPENDENCIES.rst (#1703, #1735)
+* Updated minor documentation about updating CHANGELOG.rst, fix formatting for rendering 
+  hyperlinks, and change branch name in README instructions on forking for development (#1715)
 
 **Removed:**
 

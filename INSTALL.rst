@@ -12,7 +12,7 @@ provided with the source.
 Dependencies
 ************
 
-A full list of the Cyclus package dependencies is listed :doc:`here <DEPENDENCIES>`:
+A full list of the Cyclus package dependencies is listed `here`_.
 
 ************
 Installation
@@ -21,8 +21,7 @@ Installation
 
 Before going further with the installation procedure be sure you have installed
 all the required dependencies. We have provided detailed
-instructions for :doc:`installing dependencies <DEPENDENCIES>` for the major supported
-systems.
+instructions `for installing those dependencies for the major supported systems`_.
 
 
 Default Installation
@@ -52,6 +51,13 @@ On MacOSX you also need to add ~/.local/lib/pythonX.Y/site-packages to your
   print(".".join(map(str, sys.version_info[:2])))'`/site-packages:\$PYTHONPATH\"" >> ~/.bashrc
   source ~/.bashrc
 
+
+.. _`Cyclus Homepage`: http://fuelcycle.org/
+.. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
+.. _`Cyclus repo`: https://github.com/cyclus/cyclus
+.. _`Cycamore Repo`: https://github.com/cyclus/cycamore
+.. _`for installing those dependencies for the major supported systems`: https://fuelcycle.org/user/DEPENDENCIES.html
+.. _`here`: https://fuelcycle.org/user/DEPENDENCIES.html
 .. website_include_end
 
 .. website_custom_start
@@ -174,7 +180,7 @@ dependencies through conda-forge.
 .. code-block:: bash
 
   conda config --add channels conda-forge
-  conda install cyclus-build-deps
+  conda install cyclus --only-deps
 
 
 *************
@@ -191,8 +197,3 @@ proper functioning of Cyclus. You can run the tests yourself via:
     $ cyclus_unit_tests
 
 
-.. _`Cyclus Homepage`: http://fuelcycle.org/
-.. _`Cyclus User Guide`: http://fuelcycle.org/user/index.html
-.. _`Cyclus repo`: https://github.com/cyclus/cyclus
-.. _`Cycamore Repo`: https://github.com/cyclus/cycamore
-.. _`for installing those dependencies for the major supported systems`: DEPENDENCIES.rst
