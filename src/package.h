@@ -54,16 +54,18 @@ class Package {
     // returns the unpackaged package name
     static std::string unpackaged_name() { return unpackaged_name_; }
 
-  protected:
-    Package();
-    Package(std::string name, double fill_min, double fill_max, std::string strategy);
-    // creates the unpackaged type. Id is always 1.
-    static Package::Ptr CreateUnpackaged();
-    Package(int id, std::string name);
+    // returns the unpackaged singleton object
+    static Ptr unpackaged();
 
   private:
+    Package(std::string name, 
+            double fill_min = 0, 
+            double fill_max = std::numeric_limits<double>::max(), 
+            std::string strategy = "first");
+
     static const int unpackaged_id_ = 1;
-    static const std::string unpackaged_name_ = "unpackaged";
+    static const char* unpackaged_name_ = "unpackaged";
+    static Ptr unpackaged_ = NULL;
     static int next_package_id_;
 
     std::string name_;

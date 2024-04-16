@@ -85,10 +85,7 @@ Context::Context(Timer* ti, Recorder* rec)
       trans_id_(0),
       si_(0) {
         rng_ = new RandomNumberGenerator();
-        if (packages_.count("unpackaged") == 0) {
-          packages_["unpackaged"] = Package::CreateUnpackaged();
-        }
-}
+      }
 
 Context::~Context() {
   if (solver_ != NULL) {
@@ -207,6 +204,9 @@ Package::Ptr Context::AddPackage(std::string name, double fill_min, double fill_
 }
 
 Package::Ptr Context::GetPackageByName(std::string name) {
+  if (name == Package::unpackaged_name()) {
+    return Package::unpackaged();
+  }
   if (packages_.count(name) == 0) {
     throw KeyError("Invalid package name " + name);
   }
@@ -214,6 +214,9 @@ Package::Ptr Context::GetPackageByName(std::string name) {
 }
 
 Package::Ptr Context::GetPackageById(int id) {
+  if (id == Package::unpackaged_id()) {
+    return Package::unpackaged();
+  }
   if (id < 0) {
     throw ValueError("Invalid package id " + std::to_string(id));
   }
