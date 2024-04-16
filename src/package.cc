@@ -5,6 +5,7 @@ namespace cyclus {
 
 // unpackaged id is 1, so start the user-declared packaging id at 2
 int Package::next_package_id_ = 2;
+Package::Ptr Package::unpackaged_ = NULL;
 
 Package::Ptr Package::Create(std::string name, double fill_min, double fill_max, std::string strategy) {
   if (fill_min < 0 || fill_max < 0) {
@@ -17,9 +18,16 @@ Package::Ptr Package::Create(std::string name, double fill_min, double fill_max,
   return p;
 }
 
-Package::Ptr Package::CreateUnpackaged() {
-  Ptr p(new Package(unpackaged_id_, unpackaged_name_));
-  return p;
+// singleton pattern: 
+// if the static member is not yet set, create a new object
+// otherwise return the object that already exists
+Package::Ptr& Package::unpackaged() {
+
+  if (!unpackaged_) {
+    unpackaged_ = Ptr(new Package(unpackaged_name_));
+  }
+
+  return unpackaged_;
 }
 
 double Package::GetFillMass(double qty) {
@@ -45,12 +53,16 @@ double Package::GetFillMass(double qty) {
   return fill_mass;
 }
   
-Package::Package() : id_(next_package_id_++), fill_min_(0), fill_max_(std::numeric_limits<double>::max()) {
-  name_ = "unnamed";
-}
-
-Package::Package(std::string name, double fill_min, double fill_max, std::string strategy) : name_(name), id_(next_package_id_++), fill_min_(fill_min), fill_max_(fill_max), strategy_(strategy) {}
-
-Package::Package(int id, std::string name) : id_(id), name_(name), fill_min_(0), fill_max_(std::numeric_limits<double>::max()) {}
+Package::Package(std::string name, double fill_min, double fill_max, std::string strategy) : 
+  name_(name), fill_min_(fill_min), fill_max_(fill_max), strategy_(strategy) {
+    if (name == unpackaged_name_) {
+      if (unpackaged_) {
+        throw ValueError("can't create a new package with name 'unpackaged'");
+      }
+      id_ = unpackaged_id_;
+    } else {
+      id_ = next_package_id_++;
+    }
+  }
 
 } // namespace cyclus
