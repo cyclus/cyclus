@@ -49,10 +49,10 @@ class Package {
     std::string strategy() const { return strategy_; }
 
     // returns the unpackaged id (1)
-    static int unpackaged_id() { return unpackaged_id_; }
+    static int unpackaged_id() const { return unpackaged_id_; }
 
     // returns the unpackaged package name
-    static std::string unpackaged_name() { return unpackaged_name_; }
+    static std::string unpackaged_name() const { return unpackaged_name_; }
 
     // returns the unpackaged singleton object
     static Ptr unpackaged();
