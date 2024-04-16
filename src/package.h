@@ -55,7 +55,7 @@ class Package {
     static std::string unpackaged_name() const { return unpackaged_name_; }
 
     // returns the unpackaged singleton object
-    static Ptr unpackaged();
+    static Ptr& unpackaged();
 
   private:
     Package(std::string name, 
@@ -65,7 +65,7 @@ class Package {
 
     static const int unpackaged_id_ = 1;
     static const char* unpackaged_name_ = "unpackaged";
-    static Ptr& unpackaged_ = NULL;
+    static Ptr unpackaged_ = NULL;
     static int next_package_id_;
 
     std::string name_;
