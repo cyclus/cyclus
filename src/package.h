@@ -20,7 +20,7 @@ class Package {
     //  type (which you probably don't)
     static Ptr Create(std::string name, double fill_min = 0,
                       double fill_max = std::numeric_limits<double>::max(),
-                      std::string strategy);
+                      std::string strategy = "first");
 
     /// Returns optimal fill mass for a resource to be packaged. Can be used
     /// to determine how to respond to requests for material, and to actually
