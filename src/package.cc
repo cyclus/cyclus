@@ -24,8 +24,7 @@ Package::Ptr Package::Create(std::string name, double fill_min, double fill_max,
 Package::Ptr& Package::unpackaged() {
 
   if (!unpackaged_) {
-    Ptr p(new Package(unpackaged_name_));
-    unpackaged_ = p;
+    unpackaged_ = Ptr(new Package(unpackaged_name_));
   }
 
   return unpackaged_;
