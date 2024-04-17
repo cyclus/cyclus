@@ -42,6 +42,3 @@ foreach(file ${CYCLUS_CYTHON_FILES})
     # by setup.py, along with the pure python files.
     install(TARGETS ${targ} LIBRARY DESTINATION "${PYTHON_SITE_PACKAGES}/cyclus")
 endforeach()
-
-FILE(GLOB CYCLUS_PYTHON_FILES "${CYCLUS_PYSOURCE_DIR}/*.py")
-INSTALL(FILES ${CYCLUS_PYTHON_FILES} DESTINATION "${PYTHON_SITE_PACKAGES}/cyclus")

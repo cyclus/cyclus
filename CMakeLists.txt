@@ -307,10 +307,11 @@ IF(NOT CYCLUS_DOC_ONLY)
     #
     # Use new Python library finder
     find_package (Python3 COMPONENTS Interpreter Development NumPy)
-
-    execute_process(COMMAND "${Python3_EXECUTABLE}" -m site --user-site
-                    OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
-                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if(NOT DEFINED PYTHON_SITE_PACKAGES)
+        execute_process(COMMAND "${Python3_EXECUTABLE}" -m site --user-site
+                        OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
+                        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    endif()
     message("-- PYTHON_EXECUTABLE: ${Python3_EXECUTABLE}")
     message("-- PYTHON_SITE_PACKAGES: ${PYTHON_SITE_PACKAGES}")
 
@@ -437,9 +438,17 @@ IF(NOT CYCLUS_DOC_ONLY)
         )
 
     if(Cython_FOUND)
-        set(pyinstallscript "${CMAKE_CURRENT_BINARY_DIR}/cmake/SetupPyInstall.cmake")
-        configure_file(cmake/SetupPyInstall.cmake.in ${pyinstallscript} @ONLY)
-        install(SCRIPT ${pyinstallscript})
+        install(CODE "
+            message(\"############### Begin Python Install ###############\")
+            set(ENV{CYCLUS_PROJECT_VERSION} \"${CMAKE_PROJECT_VERSION}\")
+            execute_process(COMMAND ${Python3_EXECUTABLE} -m pip install --target=${PYTHON_SITE_PACKAGES} --force-reinstall --upgrade --no-deps .
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                    RESULT_VARIABLE res_var)
+            Message(\"res var is ${res_var}\")
+            if(NOT \"${res_var}\" STREQUAL \"\")
+                message(FATAL_ERROR \"Process python -m pip install failed, res_var = '${res_var}'\")
+            endif()
+        ")
     endif(Cython_FOUND)
     ##############################################################################################
     ################################## begin uninstall target ####################################
