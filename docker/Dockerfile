@@ -85,7 +85,7 @@ RUN conda update -y --all && \
                liblapack \
                pkg-config \
                coincbc \
-               boost-cpp \
+               libboost-devel \
                hdf5 \
                sqlite \
                pcre \
