@@ -13,20 +13,20 @@ cycdir = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(cycdir, 'cli'))
 
 # pass 1 Filters
-from cycpp import NamespaceFilter, TypedefFilter, UsingFilter,\
+from cyclus.cycpp import NamespaceFilter, TypedefFilter, UsingFilter,\
         UsingNamespaceFilter, NamespaceAliasFilter, ClassFilter, \
         AccessFilter, PragmaCyclusErrorFilter
 
 # pass 2 Filters
-from cycpp import VarDecorationFilter, VarDeclarationFilter, ExecFilter, \
+from cyclus.cycpp import VarDecorationFilter, VarDeclarationFilter, ExecFilter, \
     NoteDecorationFilter, StateAccumulator
 
 # pass 3 Filters
-from cycpp import CloneFilter, InitFromCopyFilter, \
+from cyclus.cycpp import CloneFilter, InitFromCopyFilter, \
         InitFromDbFilter, InfileToDbFilter, SchemaFilter, SnapshotFilter, \
         SnapshotInvFilter, InitInvFilter, DefaultPragmaFilter, AnnotationsFilter
 
-import cycpp
+import cyclus.cycpp as cycpp
 
 class MockMachine(object):
     def __init__(self):
