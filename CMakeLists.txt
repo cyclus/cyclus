@@ -447,6 +447,7 @@ IF(NOT CYCLUS_DOC_ONLY)
             if(NOT \"${res_var}\" STREQUAL \"\")
                 message(FATAL_ERROR \"Process python -m pip install failed, res_var = '${res_var}'\")
             endif()
+            message(\"Cyclus Python package successfully installed in ${PYTHON_SITE_PACKAGES}\")
         ")
     endif(Cython_FOUND)
     ##############################################################################################
