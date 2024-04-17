@@ -101,7 +101,7 @@ class Resource {
   /// Repackages a single resource into a package. If some quantity of the 
   /// resource cannot be packaged using the given packaging strategy and
   /// restrictions, the remainder is left in the resource object. 
-  std::vector<Resource::Ptr> Package(Package::Ptr pkg);
+  virtual std::vector<Resource::Ptr> Package(Package::Ptr pkg) = 0;
 
  private:
   static int nextstate_id_;

@@ -78,7 +78,7 @@ class Product : public Resource {
   virtual void ChangePackageId(int new_package_id = Package::unpackaged_id());
 
   // Packages the product
-  std::vector<Product::Ptr> Package(Package::Ptr pkg); 
+  virtual std::vector<Product::Ptr> Package(Package::Ptr pkg); 
 
  private:
   /// @param ctx the simulation context
