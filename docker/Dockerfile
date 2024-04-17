@@ -150,7 +150,6 @@ WORKDIR /cyclus
 # for further CMake debugging.
 RUN python install.py -j ${make_cores} --build-type=Release --allow-milps
 ENV PATH /root/.local/bin:$PATH
-ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 
 FROM cyclus as deb-generation
 WORKDIR /cyclus/build

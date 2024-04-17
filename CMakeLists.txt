@@ -444,7 +444,6 @@ IF(NOT CYCLUS_DOC_ONLY)
             execute_process(COMMAND ${Python3_EXECUTABLE} -m pip install --target=${PYTHON_SITE_PACKAGES} --force-reinstall --upgrade --no-deps .
                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                     RESULT_VARIABLE res_var)
-            Message(\"res var is ${res_var}\")
             if(NOT \"${res_var}\" STREQUAL \"\")
                 message(FATAL_ERROR \"Process python -m pip install failed, res_var = '${res_var}'\")
             endif()
