@@ -191,7 +191,7 @@ Composition::Ptr Context::GetRecipe(std::string name) {
   return recipes_[name];
 }
 
-Package::Ptr Context::AddPackage(std::string name, double fill_min, double fill_max,
+void Context::AddPackage(std::string name, double fill_min, double fill_max,
                          std::string strategy) {
   packages_[name] = Package::Create(name, fill_min, fill_max, strategy);
   NewDatum("Packages")
@@ -200,7 +200,6 @@ Package::Ptr Context::AddPackage(std::string name, double fill_min, double fill_
     ->AddVal("FillMax", fill_max)
     ->AddVal("Strategy", strategy)
     ->Record();
-  return packages_[name];
 }
 
 Package::Ptr Context::GetPackageByName(std::string name) {
