@@ -11,7 +11,6 @@ namespace cyclus {
 
 /// Packager is a class that packages materials into discrete items in ways that mimic realistic nuclear material handling. Packages will eventually be a required parameter of resources.
 class Package {
-  friend class Context;
   public:
     typedef boost::shared_ptr<Package> Ptr;
 
