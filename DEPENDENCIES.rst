@@ -45,9 +45,9 @@ Package                Minimum Version     Purpose                              
 ====================   ==================  =============================================  ==================  
 ``Coin-Cbc``           2.10.3              Enables use of Branch-and-Cut solver           Cyclus must be built with ``--allow-milps`` flag
 ``Coin-Clp``           1.17.5              Enables use of Linear Programming solver       Cyclus must be built with ``--allow-milps`` flag
-``doxygen``            1.7.6.1             Building documentation
+``doxygen``            1.7.6.1             Building documentation                         N/A
 ``TCMmalloc``          any                 Improves performance                           Only used if Cython is not present
-``Cython``             0.29                Enables use of Python agents and input files  
+``Cython``             0.29                Enables use of Python agents and input files   N/A
 ``Jinja2``             2.10.1              Enables use of Python agents and input files   Only needed if Cython is installed
 ``NumPy``              1.9                 Enables use of Python agents and input files   Only needed if Cython is installed
 ``pandas``             0.25.3              Enables use of Python agents and input files   Only needed if Cython is installed
