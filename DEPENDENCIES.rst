@@ -25,35 +25,33 @@ dependencies is shown below:
 ====================      ==================
 Package                   Minimum Version
 ====================      ==================
-``CMake``                   3.16.3
-``pkg-config``              0.29.1
-``boost``                   1.71.0
-``libxml2``                 2.9.10
-``libxml++``                2.40.1
-``python`` (dev version)    3.8.10
-``sqlite3``                 3.31.1
-``HDF5``                    1.10.4
-``LAPACK``                  3.9.0
+``CMake``                 3.16.3
+``pkg-config``            0.29.1
+``boost``                 1.71.0
+``libxml2``               2.9.10
+``libxml++``              2.40.1
+``python``                3.8.10
+``sqlite3``               3.31.1
+``HDF5``                  1.10.4
+``LAPACK``                3.9.0
 ====================      ==================
 
 .. website_include_end
-
-
 
 And a few optional dependencies:
 
 ====================   ==================  =============================================  ==================        
 Package                Minimum Version     Purpose                                        Notes
 ====================   ==================  =============================================  ==================  
-``Coin-Cbc``             2.10.3             Enables use of Branch-and-Cut solver          Cyclus must be built with ``--allow-milps`` flag
-``Coin-Clp``             1.17.5             Enables use of Linear Programming solver      Cyclus must be built with ``--allow-milps`` flag
-``doxygen``              1.7.6.1            Building documentation
-``TCMmalloc``            any                Improves performance                          Only used if Cython is not present
-``Cython``               0.29               Enables use of Python agents and input files  
-``Jinja2``               2.10.1             Enables use of Python agents and input files  Only needed if Cython is installed
-``NumPy``                1.9                Enables use of Python agents and input files  Only needed if Cython is installed
-``pandas``               0.25.3             Enables use of Python agents and input files  Only needed if Cython is installed
-``pip``                  20.0.2             Enables use of Python agents and input files  Only needed if Cython is installed
+``Coin-Cbc``           2.10.3              Enables use of Branch-and-Cut solver           Cyclus must be built with ``--allow-milps`` flag
+``Coin-Clp``           1.17.5              Enables use of Linear Programming solver       Cyclus must be built with ``--allow-milps`` flag
+``doxygen``            1.7.6.1             Building documentation
+``TCMmalloc``          any                 Improves performance                           Only used if Cython is not present
+``Cython``             0.29                Enables use of Python agents and input files  
+``Jinja2``             2.10.1              Enables use of Python agents and input files   Only needed if Cython is installed
+``NumPy``              1.9                 Enables use of Python agents and input files   Only needed if Cython is installed
+``pandas``             0.25.3              Enables use of Python agents and input files   Only needed if Cython is installed
+``pip``                20.0.2              Enables use of Python agents and input files   Only needed if Cython is installed
 ====================   ==================  =============================================  ==================
 
 *Note that the Debian/Ubuntu package ``libtcmalloc`` is NOT discovered correctly
