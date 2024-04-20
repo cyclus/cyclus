@@ -99,7 +99,7 @@ To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18
 
 - ``conda activate cyclus``
 
-- ``conda install -y openssh gxx_linux-64 gcc_linux-64 cmake make docker-pycreds git xo python-json-logger glib glibmm zlib libxml2 libxmlpp libxmlpp-4.0 libblas libcblas liblapack pkg-config coincbc boost-cpp hdf5 sqlite pcre gettext bzip2 xz setuptools pytest pytables pandas jinja2 "cython<3" websockets pprintpp``
+- ``conda install -y gxx_linux-64 gcc_linux-64 cmake make git glib libxml2 libxmlpp-4.0 liblapack pkg-config coincbc boost-cpp hdf5 sqlite pcre setuptools pytest pytables pandas jinja2 cython websockets pprintpp pip``
 
 - ``conda install -y --force-reinstall libsqlite``
 
