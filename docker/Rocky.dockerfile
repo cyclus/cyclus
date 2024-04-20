@@ -19,7 +19,6 @@ RUN alternatives --install /usr/bin/python python /bin/python3.11 10 && \
 
 FROM rocky-${rocky_version}-config as dnf-deps
 RUN dnf update -y && dnf install -y \
-        wget \
         which \
         git \
         gcc \
@@ -29,10 +28,8 @@ RUN dnf update -y && dnf install -y \
         hdf5-devel \
         libxml2-devel \
         boost-devel \
-        blas-devel \
         lapack-devel \
         sqlite-devel \
-        gettext \
         xz \
         python3.11-devel \
         python3.11-setuptools \
@@ -43,7 +40,7 @@ RUN dnf update -y && dnf install -y \
 RUN mkdir -p $(python -m site --user-site) && python -m pip install pandas tables cython jinja2
 
 FROM dnf-deps as libxmlpp
-RUN dnf update -y && dnf install -y m4 doxygen perl-open perl-XML-Parser diffutils pcre-cpp pcre-devel  && \
+RUN dnf update -y && dnf install -y wget m4 doxygen perl-open perl-XML-Parser diffutils pcre-cpp pcre-devel  && \
     python -m pip install meson ninja packaging && \
     wget https://github.com/libxmlplusplus/libxmlplusplus/releases/download/4.0.3/libxml++-4.0.3.tar.xz && \
     tar xf libxml++-4.0.3.tar.xz && \
