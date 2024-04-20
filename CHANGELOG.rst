@@ -46,6 +46,7 @@ Since last release
 * Changed dependency versions in README.rst, INSTALL.rst, and DEPENDENCIES.rst (#1703)
 * Updated minor documentation about updating CHANGELOG.rst, fix formatting for rendering 
   hyperlinks, and change branch name in README instructions on forking for development (#1715)
+* Updated GTest suite to be fetched from GitHub during the build process (#1738)
 
 **Removed:**
 
