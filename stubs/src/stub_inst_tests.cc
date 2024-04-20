@@ -61,8 +61,8 @@ int ConnectAgentTests();
 static int cyclus_agent_tests_connected = ConnectAgentTests();
 #define CYCLUS_AGENT_TESTS_CONNECTED cyclus_agent_tests_connected
 #endif  // CYCLUS_AGENT_TESTS_CONNECTED
-INSTANTIATE_TEST_CASE_P(StubInst, InstitutionTests,
+INSTANTIATE_TEST_SUITE_P(StubInst, InstitutionTests,
                         ::testing::Values(&StubInstConstructor));
-INSTANTIATE_TEST_CASE_P(StubInst, AgentTests,
+INSTANTIATE_TEST_SUITE_P(StubInst, AgentTests,
                         ::testing::Values(&StubInstConstructor));
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
