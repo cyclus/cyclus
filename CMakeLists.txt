@@ -306,7 +306,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Cython & Python Bindings
     #
     # Use new Python library finder
-    find_package (Python3 COMPONENTS Interpreter Development NumPy)
+    find_package (Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
     if(NOT DEFINED PYTHON_SITE_PACKAGES)
         execute_process(COMMAND "${Python3_EXECUTABLE}" -m site --user-site
                         OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
