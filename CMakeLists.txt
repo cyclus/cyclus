@@ -306,7 +306,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Cython & Python Bindings
     #
     # Use new Python library finder
-    find_package (Python3 REQUIRED COMPONENTS Interpreter Development NumPy)
+    find_package (Python3 REQUIRED COMPONENTS Interpreter Development)
     if(NOT DEFINED PYTHON_SITE_PACKAGES)
         execute_process(COMMAND "${Python3_EXECUTABLE}" -m site --user-site
                         OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
@@ -314,6 +314,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     endif()
     message("-- PYTHON_EXECUTABLE: ${Python3_EXECUTABLE}")
     message("-- PYTHON_SITE_PACKAGES: ${PYTHON_SITE_PACKAGES}")
+    IF (NOT APPLE)
+        set(LIBS ${LIBS} ${Python3_LIBRARIES})
+    ENDIF (NOT APPLE)
 
     # Include the CMake script UseCython.cmake.  This defines add_cython_module().
     # Instruction for use can be found at the top of cmake/UseCython.cmake.
@@ -326,7 +329,7 @@ IF(NOT CYCLUS_DOC_ONLY)
           message(FATAL_ERROR "Cython version is too old, must be 0.25+.")
         endif()
         include(UseCython)
-
+        find_package (Python3 REQUIRED COMPONENTS NumPy)
         find_package(Jinja2 REQUIRED)
         find_package(Pandas REQUIRED)
 
@@ -342,9 +345,6 @@ IF(NOT CYCLUS_DOC_ONLY)
 
         # make sure we know about having python
         add_definitions(-DCYCLUS_WITH_PYTHON)
-        IF (NOT APPLE)
-            set(LIBS ${LIBS} ${Python3_LIBRARIES})
-        ENDIF (NOT APPLE)
         INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/cyclus")
     else(Cython_FOUND)
         # If we don't have Python bindings, we may try to find tcmalloc.
@@ -366,6 +366,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     # NOTE: for some reason, adding quotes around
     # ${Glibmm_INCLUDE_DIRS} breaks Ubuntu 12.04
     set(inc_dirs
+        "${Python3_INCLUDE_DIRS}"
         "${LIBXML2_INCLUDE_DIR}"
         "${LIBXMLXX_INCLUDE_DIRS}"
         "${Glibmm_INCLUDE_DIRS}"
@@ -378,7 +379,6 @@ IF(NOT CYCLUS_DOC_ONLY)
       INCLUDE_DIRECTORIES(${inc_dirs})
     ENDIF()
     message("-- Include Directories: ${inc_dirs}")
-
 
     if(Cython_FOUND)
         INCLUDE_DIRECTORIES(AFTER "${Python3_INCLUDE_DIRS}" "${_Python3_NumPy_INCLUDE_DIR}")
