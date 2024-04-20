@@ -126,12 +126,12 @@ WORKDIR /cyclus
 RUN python install.py -j ${make_cores} --build-type=Release --allow-milps --code_coverage
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
-RUN lcov -c --rc lcov_branch_coverage=1 -d /cyclus -o initial_coverage.info --gcov-tool ${GCOV} --initial --no-external && \
+RUN lcov -c -d /cyclus -o initial_coverage.info --gcov-tool ${GCOV} --initial --no-external && \
     cyclus_unit_tests && \
     cd tests && python -m pytest && cd .. && \
-    lcov -c --rc lcov_branch_coverage=1 -d /cyclus -o test_coverage.info --gcov-tool ${GCOV} --no-external && \
-    lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info --rc lcov_branch_coverage=1 -o total_coverage.info && \
-    mkdir -p html && genhtml total_coverage.info --output-directory html --branch-coverage
+    lcov -c -d /cyclus -o test_coverage.info --gcov-tool ${GCOV} --no-external && \
+    lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info -o total_coverage.info && \
+    mkdir -p html && genhtml total_coverage.info --output-directory html
 
 FROM scratch as coverage-report
 COPY --from=cyclus-coverage /cyclus /
