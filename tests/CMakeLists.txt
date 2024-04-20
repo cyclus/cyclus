@@ -29,7 +29,7 @@ INSTALL(TARGETS gtest
     )
 
 INSTALL(DIRECTORY ${googletest_SOURCE_DIR}/googletest/include/gtest
-    DESTINATION include/cyclus/gtest
+    DESTINATION include/cyclus
     COMPONENT testing
     )
 
