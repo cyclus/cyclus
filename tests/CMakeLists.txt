@@ -7,34 +7,16 @@ SET(GENERATED_TEST_LIST "" CACHE INTERNAL "")
 SET(GENERATED_FILTER_LIST "" CACHE INTERNAL "")
 SET(GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "")
 
-# The gtest include file directories.
-SET(GTEST_INCLUDE_DIRS
-    "${CMAKE_CURRENT_SOURCE_DIR}/GoogleTest"
-    )
-
-# The gtest library directories.
-SET(GTEST_LIBRARY_DIRS "${CMAKE_CURRENT_BINARY_DIR}/lib")
-
-# Alerts CMake to any tests we need to worry about
-INCLUDE_DIRECTORIES(${GTEST_INCLUDE_DIRS})
-
-FIND_PACKAGE(Threads)
-IF(CMAKE_USE_PTHREADS_INIT)  # The pthreads library is available.
-    SET(cxx_base_flags "${cxx_base_flags} -DGTEST_HAS_PTHREAD=1")
-ENDIF()
-
-# Build libgtest
-SET(GTest
-    "${CMAKE_CURRENT_SOURCE_DIR}/GoogleTest/gtest/gtest-all.cc"
-    )
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  BUILD_GMOCK FALSE # do not build googlemock subproject
+  INSTALL_GTEST FALSE # do not install googletest, we will do this ourselves
+  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+FetchContent_MakeAvailable(googletest)
 
 INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}")
-
-ADD_LIBRARY(gtest ${GTest})
-
-IF(CMAKE_USE_PTHREADS_INIT)
-    TARGET_LINK_LIBRARIES(gtest ${CMAKE_THREAD_LIBS_INIT})
-ENDIF()
 
 SET_TARGET_PROPERTIES(gtest
     PROPERTIES INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib/cyclus"
@@ -46,8 +28,8 @@ INSTALL(TARGETS gtest
     COMPONENT testing
     )
 
-INSTALL(FILES GoogleTest/gtest/gtest.h
-    DESTINATION include/cyclus/gtest
+INSTALL(DIRECTORY ${googletest_SOURCE_DIR}/googletest/include/gtest
+    DESTINATION include/cyclus
     COMPONENT testing
     )
 
@@ -95,7 +77,6 @@ SET(
 SET(
     CYCLUS_CORE_INCLUDE_DIRS "${CYCLUS_CORE_INCLUDE_DIRS}"
     "${CYCLUS_CORE_TEST_INCLUDE_DIRS}"
-    "${GTEST_INCLUDE_DIRS}"
     PARENT_SCOPE
     )
 
