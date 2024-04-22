@@ -97,13 +97,14 @@ void Product::ChangePackageId(int new_package_id) {
   }
 }
 
-std::vector<Product::Ptr> Product::Package(Package::Ptr pkg) {
+std::vector<Resource::Ptr> Product::Package(Package::Ptr pkg) {
   std::vector<Product::Ptr> ps_pkgd;
   Product::Ptr p_pkgd;
 
   double fill_mass = pkg->GetFillMass(quantity());
   if (fill_mass == 0) {
-    return ps_pkgd;
+    std::vector<Resource::Ptr> rs_pkgd;
+    return rs_pkgd;
   }
 
   while (quantity() > pkg->fill_min()) {
@@ -112,7 +113,11 @@ std::vector<Product::Ptr> Product::Package(Package::Ptr pkg) {
     p_pkgd->ChangePackageId(pkg->id());
     ps_pkgd.push_back(p_pkgd);
   }
-  return ps_pkgd;
+  std::vector<Resource::Ptr> rs_pkgd;
+  for (int i = 0; i < ps_pkgd.size(); ++i) {
+    rs_pkgd.push_back(boost::dynamic_pointer_cast<Resource>(ps_pkgd[i]));
+  }
+  return rs_pkgd;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

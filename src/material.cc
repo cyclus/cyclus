@@ -227,13 +227,14 @@ double Material::DecayHeat() {
   return decay_heat;
 }
 
-std::vector<Material::Ptr> Material::Package(Package::Ptr pkg) {
+std::vector<Resource::Ptr> Material::Package(Package::Ptr pkg) {
   std::vector<Material::Ptr> ms_pkgd;
   Material::Ptr m_pkgd;
 
   double fill_mass = pkg->GetFillMass(quantity());
   if (fill_mass == 0) {
-    return ms_pkgd;
+    std::vector<Resource::Ptr> rs_pkgd;
+    return rs_pkgd;
   }
 
   while (quantity() > pkg->fill_min()) {
@@ -242,7 +243,11 @@ std::vector<Material::Ptr> Material::Package(Package::Ptr pkg) {
     m_pkgd->ChangePackageId(pkg->id());
     ms_pkgd.push_back(m_pkgd);
   }
-  return ms_pkgd;
+  std::vector<Resource::Ptr> rs_pkgd;
+  for (int i = 0; i < ms_pkgd.size(); ++i) {
+    rs_pkgd.push_back(boost::dynamic_pointer_cast<Resource>(ms_pkgd[i]));
+  }
+  return rs_pkgd;
 }
 
 Composition::Ptr Material::comp() const {
