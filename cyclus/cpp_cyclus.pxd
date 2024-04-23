@@ -682,6 +682,7 @@ cdef extern from "time_listener.h" namespace "cyclus":
         void Tick()
         void Tock()
         void Decision()
+        cpp_bool IsShim()
 
 
 cdef extern from "trade.h" namespace "cyclus":

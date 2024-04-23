@@ -90,6 +90,8 @@ def install_cyclus(args):
         if args.fast is not None:
             fast = 'TRUE' if args.fast else 'FALSE'
             cmake_cmd.append('-DCYCLUS_FAST_COMPILE=' + fast)
+        if args.parallel is not None:
+            cmake_cmd +=  ['-DPARALLEL=' + ('TRUE' if args.parallel else 'FALSE')]
 
         check_windows_cmake(cmake_cmd)
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
@@ -210,6 +212,10 @@ def main():
                         action='store_false', help="Will NOT try to compile "
                         "from assembly, if possible. This is slower as it "
                         "must compile from source.")
+    
+    parser.add_argument('--parallel', dest='parallel',
+                        action='store_true', help="Will compile with -fopenmp flag to "
+                        "enable multithreaded simulation support.")
 
     args = parser.parse_args()
     # modify roots as needed

@@ -116,7 +116,10 @@ flags:
     - change the CMAKE_BUILD_TYPE                                                                      
 
   * - ``-D VAR``                                  
-    - set environment variable(s).                                                                    
+    - set environment variable(s).
+
+  * - ``--parallel``
+    - enable support for OpenMP directives                                                          
 
 
 For example, if you have installed coin-Cbc from source or otherwise have it

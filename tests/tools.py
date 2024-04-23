@@ -177,6 +177,10 @@ def dbtest(f):
             f(db, fname, backend)
     return wrapper
 
+@pytest.fixture(params=['1', '2', '3', '4'])
+def thread_count(request):
+    ret = request.param
+    yield ret
 
 
 #

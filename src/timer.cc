@@ -1,15 +1,18 @@
+#include "platform.h"
 // Implements the Timer class
 #include "timer.h"
 
 #include <iostream>
 #include <string>
+#if CYCLUS_IS_PARALLEL
+#include <omp.h>
+#endif // CYCLUS_IS_PARALLEL
 
 #include "agent.h"
 #include "error.h"
 #include "logger.h"
 #include "pyhooks.h"
 #include "sim_init.h"
-
 
 namespace cyclus {
 
@@ -76,11 +79,32 @@ void Timer::DoBuild() {
   }
 }
 
+void Timer::PartitionTickers(std::vector<TimeListener*>& cpp_agents, std::vector<TimeListener*>& py_agents) {
+  for (std::pair<int, TimeListener*> pair : tickers_) {
+    if (pair.second->IsShim()) {
+      py_agents.push_back(pair.second);
+    }
+    else {
+      cpp_agents.push_back(pair.second);
+    }
+  }
+}
+
 void Timer::DoTick() {
-  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
-       agent != tickers_.end();
-       agent++) {
-    agent->second->Tick();
+  // partition our tickers_ map into C++ agents and python agents.
+  // Python agents segfault when Tick'ed in parallel so we need to 
+  // run them serially
+  std::vector<TimeListener*> cpp_agents;
+  std::vector<TimeListener*> py_agents;
+  PartitionTickers(cpp_agents, py_agents);
+  
+  for (TimeListener* agent : py_agents) {
+    agent->Tick();
+  }
+
+  #pragma omp parallel for
+  for (TimeListener* agent : cpp_agents) {
+    agent->Tick();
   }
 }
 
@@ -91,16 +115,29 @@ void Timer::DoResEx(ExchangeManager<Material>* matmgr,
 }
 
 void Timer::DoTock() {
-  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
-       agent != tickers_.end();
-       agent++) {
-    agent->second->Tock();
+  // partition our tickers_ map into C++ agents and python agents.
+  // Python agents segfault when Tock'ed in parallel so we need to 
+  // run them serially
+  std::vector<TimeListener*> cpp_agents;
+  std::vector<TimeListener*> py_agents;
+  PartitionTickers(cpp_agents, py_agents);
+  
+  for (TimeListener* agent : py_agents) {
+    agent->Tock();
+  }
+
+  #pragma omp parallel for
+  for (int i = 0; i < cpp_agents.size(); i++) {
+    TimeListener* agent = cpp_agents[i];
+    agent->Tock();
   }
 
   if (si_.explicit_inventory || si_.explicit_inventory_compact) {
     std::set<Agent*> ags = ctx_->agent_list_;
-    std::set<Agent*>::iterator it;
-    for (it = ags.begin(); it != ags.end(); ++it) {
+    #pragma omp parallel for
+    for (int i = 0; i < ags.size(); i++) {
+      std::set<Agent*>::iterator it = ags.begin();
+      std::advance(it, i);
       Agent* a = *it;
       if (a->enter_time() == -1) {
         continue; // skip agents that aren't alive
