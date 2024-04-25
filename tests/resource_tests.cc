@@ -10,6 +10,7 @@
 
 using cyclus::Material;
 using cyclus::Product;
+using cyclus::Resource;
 using cyclus::Package;
 
 class Dummy : public cyclus::Region {
@@ -131,13 +132,14 @@ TEST_F(ResourceTest, PackageResource) {
 
   // nothing packaged
   Product::Ptr p3 = p1->Extract(0.5);
-  std::vector<Product::Ptr> p3_pkgd = p3->Package(pkg);
+  std::vector<Product::Ptr> p3_pkgd = p3->Package<Product>(pkg);
+
   // everything stays in old product, with same (default) package id
   EXPECT_EQ(p3->package_id(), Package::unpackaged_id());
   EXPECT_EQ(p3->quantity(), 0.5);
 
   // all packaged
-  std::vector<Product::Ptr> p1_pkgd = p1->Package(pkg);
+  std::vector<Product::Ptr> p1_pkgd = p1->Package<Product>(pkg);
   EXPECT_EQ(p1->quantity(), 0);
   EXPECT_EQ(p1_pkgd[0]->package_id(), pkg_id);
 }
