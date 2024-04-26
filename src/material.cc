@@ -227,29 +227,6 @@ double Material::DecayHeat() {
   return decay_heat;
 }
 
-std::vector<Resource::Ptr> Material::Package(Package::Ptr pkg) {
-  std::vector<Material::Ptr> ms_pkgd;
-  Material::Ptr m_pkgd;
-
-  double fill_mass = pkg->GetFillMass(quantity());
-  if (fill_mass == 0) {
-    std::vector<Resource::Ptr> rs_pkgd;
-    return rs_pkgd;
-  }
-
-  while (quantity() > pkg->fill_min()) {
-    double pkg_fill = std::min(quantity(), fill_mass);
-    m_pkgd = boost::dynamic_pointer_cast<Material>(ExtractRes(pkg_fill));
-    m_pkgd->ChangePackageId(pkg->id());
-    ms_pkgd.push_back(m_pkgd);
-  }
-  std::vector<Resource::Ptr> rs_pkgd;
-  for (int i = 0; i < ms_pkgd.size(); ++i) {
-    rs_pkgd.push_back(boost::dynamic_pointer_cast<Resource>(ms_pkgd[i]));
-  }
-  return rs_pkgd;
-}
-
 Composition::Ptr Material::comp() const {
   throw Error("comp() const is deprecated - use non-const comp() function."
               " Recompilation should fix the problem.");
