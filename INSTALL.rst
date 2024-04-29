@@ -77,7 +77,10 @@ flags:
     - where to place the build directory                                                               
 
   * - ``--uninstall``                             
-    - uninstall                                                                                        
+    - uninstall                       
+
+  * - ``--allow-milps``
+    - build with COIN solvers                                                                  
 
   * - ``--no-update``                             
     - do not update the hash in version.cc                                                             
