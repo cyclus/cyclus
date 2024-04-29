@@ -6,19 +6,15 @@ FROM ubuntu:${ubuntu_version} as common-base
 ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN apt update --fix-missing
-
 FROM common-base as apt-deps
 
-RUN apt install -y \
-        libssh-dev \
+RUN apt update -y && apt install -y \
         g++ \
         gcc \
         cmake \
         make \
         libxml2-dev \
         libxml++2.6-dev \
-        libblas-dev \
         liblapack-dev \
         pkg-config \
         coinor-libcbc-dev \
@@ -29,8 +25,6 @@ RUN apt install -y \
         libhdf5-dev \
         libsqlite3-dev \
         libpcre2-dev \
-        gettext-base \
-        xz-utils \
         python3-setuptools \
         python3-pytest \ 
         python3-tables \
@@ -48,7 +42,7 @@ RUN mkdir -p `python -m site --user-site`
 
 FROM common-base as conda-deps
 
-RUN apt install -y \
+RUN apt update -y && apt install -y \
         wget \
         bzip2 \
         ca-certificates \
@@ -70,30 +64,21 @@ RUN conda uninstall -y conda-libmamba-solver
 RUN conda config --set solver classic
 RUN conda update -y --all && \
     mamba install -y \
-               openssh \
                gxx_linux-64 \
                gcc_linux-64 \
                cmake \
                make \
-               docker-pycreds \
                git \
-               xo \
-               python-json-logger \
                glib \
                libxml2 \
                libxmlpp-4.0 \
-               libblas \
-               libcblas \
                liblapack \
                pkg-config \
                coincbc \
-               boost-cpp \
+               libboost-devel \
                hdf5 \
                sqlite \
                pcre \
-               gettext \
-               bzip2 \
-               xz \
                setuptools \
                pytest \
                pytables \
@@ -128,12 +113,12 @@ WORKDIR /cyclus
 RUN python install.py -j ${make_cores} --build-type=Release --allow-milps --code_coverage
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
-RUN lcov -c --rc lcov_branch_coverage=1 -d /cyclus -o initial_coverage.info --gcov-tool ${GCOV} --initial --no-external && \
+RUN lcov -c -d /cyclus -o initial_coverage.info --gcov-tool ${GCOV} --initial --no-external && \
     cyclus_unit_tests && \
     cd tests && python -m pytest && cd .. && \
-    lcov -c --rc lcov_branch_coverage=1 -d /cyclus -o test_coverage.info --gcov-tool ${GCOV} --no-external && \
-    lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info --rc lcov_branch_coverage=1 -o total_coverage.info && \
-    mkdir -p html && genhtml total_coverage.info --output-directory html --branch-coverage
+    lcov -c -d /cyclus -o test_coverage.info --gcov-tool ${GCOV} --no-external && \
+    lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info -o total_coverage.info && \
+    mkdir -p html && genhtml total_coverage.info --output-directory html
 
 FROM scratch as coverage-report
 COPY --from=cyclus-coverage /cyclus /
@@ -152,7 +137,6 @@ WORKDIR /cyclus
 # for further CMake debugging.
 RUN python install.py -j ${make_cores} --build-type=Release --allow-milps
 ENV PATH /root/.local/bin:$PATH
-ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 
 FROM cyclus as deb-generation
 WORKDIR /cyclus/build

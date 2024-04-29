@@ -201,8 +201,9 @@ list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc)
 list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc)
 # The cython modules are built as their own shared libraries
 # We don't want them to be included in libcyclus.so
-list(REMOVE_ITEM cc_files ${CythonModuleSrc})
-
+if(Cython_FOUND)
+  list(REMOVE_ITEM cc_files ${CythonModuleSrc})
+endif()
 SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${cc_files})
 
 # Add Cyclus source files that use COIN, if we have COIN

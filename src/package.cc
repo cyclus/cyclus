@@ -3,7 +3,8 @@
 
 namespace cyclus {
 
-int Package::next_id_ = 1;
+// unpackaged id is 1, so start the user-declared packaging id at 2
+int Package::next_id_ = 2;
 
 template <class T>
 double Package::GetFillMass(typename T::Ptr r) {

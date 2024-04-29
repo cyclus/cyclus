@@ -69,7 +69,7 @@ static int cyclus_agent_tests_connected = ConnectAgentTests();
 #endif  // CYCLUS_AGENT_TESTS_CONNECTED
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(NullRegion, RegionTests,
+INSTANTIATE_TEST_SUITE_P(NullRegion, RegionTests,
                         ::testing::Values(&NullRegionConstructor));
-INSTANTIATE_TEST_CASE_P(NullRegion, AgentTests,
+INSTANTIATE_TEST_SUITE_P(NullRegion, AgentTests,
                         ::testing::Values(&NullRegionConstructor));
