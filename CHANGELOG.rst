@@ -31,7 +31,7 @@ Since last release
   resources (materials/products) (#1675). Can pop resources as packaged from resource buffer, pushing resource onto a buffer defaults to stripping packaging (#1683)
 * CI support for Rocky Linux (#1691)
 * Added support for a ResBuf to behave as a single bulk storage with mixing & extraction of resources (#1687)
-
+* Added ``--allow-milps`` flag into INSTALL.rst table (#1740)
 
 **Changed:**
 
