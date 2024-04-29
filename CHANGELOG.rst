@@ -31,9 +31,7 @@ Since last release
   resources (materials/products) (#1675). Can pop resources as packaged from resource buffer, pushing resource onto a buffer defaults to stripping packaging (#1683)
 * CI support for Rocky Linux (#1691)
 * Added support for a ResBuf to behave as a single bulk storage with mixing & extraction of resources (#1687)
-* Removed deprecated `smbchk.py` ABI consistency checking functionality and tests (#1706). This functionality was 
-  originally deprecated in #1396, and is removed in #1706 to clean up deprecated functionality 
-  with the pending v1.6 release. 
+
 
 **Changed:**
 
@@ -52,6 +50,9 @@ Since last release
 
 * A duplicate `using std::list` in `src/hdf5_back.cc.in`, which triggers compiler 
   errors with some GCC versions. (#1560)
+* Removed deprecated `smbchk.py` ABI consistency checking functionality and tests (#1706). This functionality was 
+  originally deprecated in #1396, and is removed in #1706 to clean up deprecated functionality 
+  with the pending v1.6 release. 
 
 **Fixed:**
 
