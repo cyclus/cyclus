@@ -31,14 +31,12 @@ Since last release
   resources (materials/products) (#1675). Can pop resources as packaged from resource buffer, pushing resource onto a buffer defaults to stripping packaging (#1683)
 * CI support for Rocky Linux (#1691)
 * Added support for a ResBuf to behave as a single bulk storage with mixing & extraction of resources (#1687)
-* Removed deprecated `smbchk.py` ABI consistency checking functionality and tests (#1706). This functionality was 
-  originally deprecated in #1396, and is removed in #1706 to clean up deprecated functionality 
-  with the pending v1.6 release. 
+* Added ``--allow-milps`` flag into INSTALL.rst table (#1740)
 
 **Changed:**
 
 * Moved to unified CHANGELOG Entry and check them with GithubAction (#1571)
-* Major update and modernization of build (#1587, #1632, #1734)
+* Major update and modernization of build (#1587, #1632, #1734, #1737)
 * Changed Json formatting for compatibility with current python standards (#1587)
 * Changed README.rst installation instructions, tested on fresh Ubuntu-22.04 system with Python 3.11 (#1617, #1644)
 * Resolved various compilation warnings due to use of deprecated APIs (#1671)
@@ -46,11 +44,15 @@ Since last release
 * Changed dependency versions in README.rst, INSTALL.rst, and DEPENDENCIES.rst (#1703, #1735)
 * Updated minor documentation about updating CHANGELOG.rst, fix formatting for rendering 
   hyperlinks, and change branch name in README instructions on forking for development (#1715)
+* Updated GTest suite to be fetched from GitHub during the build process (#1738)
 
 **Removed:**
 
 * A duplicate `using std::list` in `src/hdf5_back.cc.in`, which triggers compiler 
   errors with some GCC versions. (#1560)
+* Removed deprecated `smbchk.py` ABI consistency checking functionality and tests (#1706). This functionality was 
+  originally deprecated in #1396, and is removed in #1706 to clean up deprecated functionality 
+  with the pending v1.6 release. 
 
 **Fixed:**
 
