@@ -252,8 +252,8 @@ class Context {
   /// Adds a package type to a simulation-wide accessible list.
   /// Agents should NOT add their own packages.
   void AddPackage(std::string name, double fill_min = 0,
-                          double fill_max = std::numeric_limits<double>::max(),
-                          std::string strategy = "first");
+                  double fill_max = std::numeric_limits<double>::max(),
+                  std::string strategy = "first");
 
   // Retrieve a registered package. 
   Package::Ptr GetPackageByName(std::string name);
