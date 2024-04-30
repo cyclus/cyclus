@@ -141,5 +141,23 @@ TEST_F(ResourceTest, PackageResource) {
   // all packaged
   std::vector<Product::Ptr> p1_pkgd = p1->Package<Product>(pkg);
   EXPECT_EQ(p1->quantity(), 0);
+  EXPECT_EQ(p1_pkgd.size(), 1);
   EXPECT_EQ(p1_pkgd[0]->package_id(), pkg_id);
+
+  // // two packages
+  std::vector<Product::Ptr> p2_pkgd = p2->Package<Product>(pkg);
+  EXPECT_EQ(p2->quantity(), 0);
+  EXPECT_EQ(p2_pkgd.size(), 2);
+  EXPECT_EQ(p2_pkgd[0]->quantity(), 5);
+  EXPECT_EQ(p2_pkgd[1]->quantity(), 2);
+  EXPECT_EQ(p2_pkgd[0]->package_id(), pkg_id);
+  EXPECT_EQ(p2_pkgd[1]->package_id(), pkg_id);
+  
+  Material::Ptr m3 = m2->ExtractQty(5.5);
+  std::vector<Material::Ptr> m3_pkgd = m3->Package<Material>(pkg);
+  EXPECT_EQ(m3->package_id(), Package::unpackaged_id());
+  EXPECT_EQ(m3->quantity(), 0.5);
+  EXPECT_EQ(m3_pkgd.size(), 1);
+  EXPECT_EQ(m3_pkgd[0]->package_id(), pkg_id);
+  EXPECT_EQ(m3_pkgd[0]->quantity(), 5);
 }
