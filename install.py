@@ -79,8 +79,6 @@ def install_cyclus(args):
                           ]
         if args.build_type:
             cmake_cmd += ['-DCMAKE_BUILD_TYPE=' + args.build_type]
-        else:
-            cmake_cmd += ['-DCMAKE_BUILD_TYPE=Release']
         if args.data_model_version:
             cmake_cmd += ['-DDATA_MODEL_VERSION=' + args.data_model_version]
         if args.D is not None:
@@ -190,7 +188,8 @@ def main():
     parser.add_argument('--cmake_prefix_path', help=cmake_prefix_path)
 
     build_type = "the CMAKE_BUILD_TYPE"
-    parser.add_argument('--build-type', '--build_type', help=build_type)
+    parser.add_argument('--build-type', '--build_type', help=build_type,
+                        default='Release')
 
     parser.add_argument('--data-model-version', dest='data_model_version', default=None,
                         help='Sets the core version number.')
