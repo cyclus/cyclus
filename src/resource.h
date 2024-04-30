@@ -98,6 +98,12 @@ class Resource {
   /// Changes the product's package id
   virtual void ChangePackageId(int new_package_id = Package::unpackaged_id()) {};
 
+  /// Repackages a single resource into a package. If some quantity of the 
+  /// resource cannot be packaged using the given packaging strategy and
+  /// restrictions, the remainder is left in the resource object. 
+  template <class T>
+  std::vector<typename T::Ptr> Package(Package::Ptr pkg);
+
  private:
   static int nextstate_id_;
   static int nextobj_id_;
@@ -120,6 +126,28 @@ template <class T>
 typename T::Ptr ResCast(Resource::Ptr r) {
   return boost::dynamic_pointer_cast<T>(r);
 }
+
+
+template <class T>
+std::vector<typename T::Ptr> Resource::Package(Package::Ptr pkg) {
+  std::vector<typename T::Ptr> ts_pkgd;
+  typename T::Ptr t_pkgd;
+
+  double fill_mass = pkg->GetFillMass(quantity());
+  if (fill_mass == 0) {
+    return ts_pkgd;
+  }
+
+  while (quantity() > pkg->fill_min()) {
+    double pkg_fill = std::min(quantity(), fill_mass);
+    t_pkgd = boost::dynamic_pointer_cast<T>(ExtractRes(pkg_fill));
+    t_pkgd->ChangePackageId(pkg->id());
+    ts_pkgd.push_back(t_pkgd);
+  }
+  
+  return ts_pkgd;
+}
+
 
 }  // namespace cyclus
 

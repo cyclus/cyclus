@@ -11,9 +11,15 @@ namespace cyclus {
 
 /// Packager is a class that packages materials into discrete items in ways that mimic realistic nuclear material handling. Packages will eventually be a required parameter of resources.
 class Package {
-
   public:
     typedef boost::shared_ptr<Package> Ptr;
+
+    // create a new package type. Should be called by the context only
+    // (see Context::AddPackage), unless you want an untracked package
+    //  type (which you probably don't)
+    static Ptr Create(std::string name, double fill_min = 0,
+                      double fill_max = std::numeric_limits<double>::max(),
+                      std::string strategy = "first");
 
     /// Returns optimal fill mass for a resource to be packaged. Can be used
     /// to determine how to respond to requests for material, and to actually
@@ -30,20 +36,7 @@ class Package {
     /// quantity = 5, fill_min = 3, fill_max = 4. num_min_fill = floor(5/3) = 1,
     /// num_max_fill = ceil(5/4) = 2. num_min_fill < num_max_fill, so fill to
     /// the max.
-    template <class T>
-    double GetFillMass(typename T::Ptr r);
-
-    /// Repackages a single resource into a package. If some quantity of the 
-    /// resource cannot be packaged using the given packaging strategy and
-    /// restrictions, the remainder is left in the resource object. 
-    template <class T>
-    std::vector<typename T::Ptr> PackageResource(typename T::Ptr r);
-
-    // create a new package type with default values 
-    static Ptr Create();
-
-    // create a new package type
-    static Ptr Create(std::string name, double fill_min, double fill_max, std::string strategy);
+    double GetFillMass(double qty);
 
     // returns package id
     int id() const { return id_; }
@@ -59,13 +52,22 @@ class Package {
     // returns the unpackaged id (1)
     static int unpackaged_id() { return unpackaged_id_; }
 
-  protected:
-    Package();
-    Package(std::string name, double fill_min, double fill_max, std::string strategy);
+    // returns the unpackaged package name
+    static std::string unpackaged_name() { return unpackaged_name_; }
+
+    // returns the unpackaged singleton object
+    static Ptr& unpackaged();
 
   private:
+    Package(std::string name, 
+            double fill_min = 0, 
+            double fill_max = std::numeric_limits<double>::max(), 
+            std::string strategy = "first");
+
     static const int unpackaged_id_ = 1;
-    static int next_id_;
+    static constexpr char unpackaged_name_[11] = "unpackaged";
+    static Ptr unpackaged_;
+    static int next_package_id_;
 
     std::string name_;
     int id_;

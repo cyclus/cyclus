@@ -10,6 +10,8 @@
 
 using cyclus::Material;
 using cyclus::Product;
+using cyclus::Resource;
+using cyclus::Package;
 
 class Dummy : public cyclus::Region {
  public:
@@ -99,3 +101,63 @@ TEST_F(ResourceTest, ProductExtractGraphid) {
   EXPECT_NE(p1->state_id(), p3->state_id());
 }
 
+TEST_F(ResourceTest, DefaultPackageId) {
+  EXPECT_EQ(m1->package_id(), Package::unpackaged_id());
+  EXPECT_EQ(m2->package_id(), Package::unpackaged_id());
+  EXPECT_EQ(p1->package_id(), Package::unpackaged_id());
+  EXPECT_EQ(p2->package_id(), Package::unpackaged_id());
+
+  Product::Ptr p3 = p1->Extract(2);
+  EXPECT_EQ(p3->package_id(), Package::unpackaged_id());
+}
+
+TEST_F(ResourceTest, ChangePackageId) {
+  ctx->AddPackage("foo", 1, 5, "first");
+  Package::Ptr pkg = ctx->GetPackageByName("foo");
+  int pkg_id = pkg->id();
+
+  Product::Ptr p3 = p1->Extract(2);
+  p3->ChangePackageId(pkg_id);
+  EXPECT_EQ(p3->package_id(), pkg_id);
+  EXPECT_EQ(p1->package_id(), Package::unpackaged_id());
+
+  m1->ChangePackageId(pkg_id);
+  EXPECT_EQ(m1->package_id(), pkg_id);
+}
+
+TEST_F(ResourceTest, PackageResource) {
+  ctx->AddPackage("foo", 1, 5, "first");
+  Package::Ptr pkg = ctx->GetPackageByName("foo");
+  int pkg_id = pkg->id();
+
+  // nothing packaged
+  Product::Ptr p3 = p1->Extract(0.5);
+  std::vector<Product::Ptr> p3_pkgd = p3->Package<Product>(pkg);
+
+  // everything stays in old product, with same (default) package id
+  EXPECT_EQ(p3->package_id(), Package::unpackaged_id());
+  EXPECT_EQ(p3->quantity(), 0.5);
+
+  // all packaged
+  std::vector<Product::Ptr> p1_pkgd = p1->Package<Product>(pkg);
+  EXPECT_EQ(p1->quantity(), 0);
+  EXPECT_EQ(p1_pkgd.size(), 1);
+  EXPECT_EQ(p1_pkgd[0]->package_id(), pkg_id);
+
+  // // two packages
+  std::vector<Product::Ptr> p2_pkgd = p2->Package<Product>(pkg);
+  EXPECT_EQ(p2->quantity(), 0);
+  EXPECT_EQ(p2_pkgd.size(), 2);
+  EXPECT_EQ(p2_pkgd[0]->quantity(), 5);
+  EXPECT_EQ(p2_pkgd[1]->quantity(), 2);
+  EXPECT_EQ(p2_pkgd[0]->package_id(), pkg_id);
+  EXPECT_EQ(p2_pkgd[1]->package_id(), pkg_id);
+  
+  Material::Ptr m3 = m2->ExtractQty(5.5);
+  std::vector<Material::Ptr> m3_pkgd = m3->Package<Material>(pkg);
+  EXPECT_EQ(m3->package_id(), Package::unpackaged_id());
+  EXPECT_EQ(m3->quantity(), 0.5);
+  EXPECT_EQ(m3_pkgd.size(), 1);
+  EXPECT_EQ(m3_pkgd[0]->package_id(), pkg_id);
+  EXPECT_EQ(m3_pkgd[0]->quantity(), 5);
+}

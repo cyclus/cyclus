@@ -87,8 +87,7 @@ void Product::ChangePackageId(int new_package_id) {
     package_id_ = new_package_id;
     return;
   }
-  
-  Package::Ptr p = ctx_->GetPackageById(package_id_);
+  Package::Ptr p = ctx_->GetPackageById(new_package_id);
   double min = p->fill_min();
   double max = p->fill_max();
   if (quantity_ >= min && quantity_ <= max) {

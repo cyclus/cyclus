@@ -329,8 +329,6 @@ void XMLFileLoader::LoadRecipes() {
 
 void XMLFileLoader::LoadPackages() {
   InfileTree xqe(*parser_);
-  // create default package
-  ctx_->AddPackage("default", 0, std::numeric_limits<int>::max(), "first");
 
   std::string query = "/*/package";
   int num_packages = xqe.NMatches(query);
@@ -344,7 +342,6 @@ void XMLFileLoader::LoadPackages() {
     
     std::string strategy = cyclus::OptionalQuery<std::string>(qe, "strategy", "first");
 
-    boost::shared_ptr<Package> p = Package::Create(name, fill_min, fill_max, strategy);
     ctx_->AddPackage(name, fill_min, fill_max, strategy);
   }
 }
