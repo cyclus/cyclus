@@ -79,6 +79,8 @@ def install_cyclus(args):
                           ]
         if args.build_type:
             cmake_cmd += ['-DCMAKE_BUILD_TYPE=' + args.build_type]
+        else:
+            cmake_cmd += ['-DCMAKE_BUILD_TYPE=Release']
         if args.data_model_version:
             cmake_cmd += ['-DDATA_MODEL_VERSION=' + args.data_model_version]
         if args.D is not None:
