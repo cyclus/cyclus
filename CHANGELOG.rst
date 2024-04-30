@@ -45,6 +45,7 @@ Since last release
 * Updated minor documentation about updating CHANGELOG.rst, fix formatting for rendering 
   hyperlinks, and change branch name in README instructions on forking for development (#1715)
 * Updated GTest suite to be fetched from GitHub during the build process (#1738)
+* Default to building a Release version of Cyclus when installing via the python script (#1741)
 
 **Removed:**
 

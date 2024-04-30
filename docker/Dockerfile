@@ -110,7 +110,7 @@ ARG make_cores=2
 COPY . /cyclus
 WORKDIR /cyclus
 
-RUN python install.py -j ${make_cores} --build-type=Release --allow-milps --code_coverage
+RUN python install.py -j ${make_cores} --allow-milps --code_coverage
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 RUN lcov -c -d /cyclus -o initial_coverage.info --gcov-tool ${GCOV} --initial --no-external && \
@@ -135,7 +135,7 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
-RUN python install.py -j ${make_cores} --build-type=Release --allow-milps
+RUN python install.py -j ${make_cores} --allow-milps
 ENV PATH /root/.local/bin:$PATH
 
 FROM cyclus as deb-generation
