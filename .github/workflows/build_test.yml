@@ -72,7 +72,7 @@ jobs:
         with:
           repository: bennibbelink/cycamore
           path: ${{ github.workspace }}/cycamore
-          ref: cyclus_large
+          ref: macos
 
       - name: Build and Test Cycamore
         id: build-cycamore
@@ -97,6 +97,7 @@ jobs:
         with:
           repository: cyclus/cymetric
           path: ${{ github.workspace }}/cymetric
+          ref: macos
 
       - name: Build and Test Cymetric
         if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
