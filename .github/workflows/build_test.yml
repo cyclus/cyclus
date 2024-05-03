@@ -190,3 +190,86 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_rocky_${{ matrix.rocky_versions }}/cyclus:ci-layer-cache
           build-args: |
             rocky_version=${{ matrix.rocky_versions }}
+
+  build-test-macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        osx_versions : [
+          macos-12,
+          macos-13,
+          macos-14,
+        ]
+
+    runs-on: [ "${{ matrix.osx_versions }}" ]
+
+    steps:
+      - name: Checkout Cyclus
+        uses: actions/checkout@v4
+
+      - name: --slow flag if on ARM
+        if: ${{ matrix.osx_versions == 'macos-14' }}
+        run: |
+          echo "SLOW_FLAG=--slow" >> "$GITHUB_ENV"
+
+      - name: Build and Test Cyclus
+        id: build-cyclus
+        run: |
+          brew install \
+            boost \
+            libxml++@4 \
+            hdf5 \
+            cbc \
+            clp \
+            python3
+          export PATH=$(brew --prefix python3)/bin:$PATH
+          python3 -m pip install --target $(python -m site --user-site) \
+            cython \
+            jinja2 \
+            numpy \
+            pandas \
+            setuptools \
+            pytest \
+            tables
+          python3 install.py -j 3 --coin-root $(brew --prefix) --allow-milps ${SLOW_FLAG}
+          export PATH=$HOME/.local/bin:$PATH
+          export DYLD_LIBRARY_PATH=$HOME/.local/lib
+          cyclus_unit_tests
+          cd tests && python3 -m pytest
+
+      - name: Checkout Cycamore
+        if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
+        uses: actions/checkout@v4
+        with:
+          repository: cyclus/cycamore
+          path: ${{ github.workspace }}/cycamore
+
+      - name: Build and Test Cycamore
+        id: build-cycamore
+        if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
+        continue-on-error: true
+        run: |
+          cd ${{ github.workspace }}/cycamore
+          python3 install.py -j 3
+          export PATH=$HOME/.local/bin:$PATH
+          export DYLD_LIBRARY_PATH=$HOME/.local/lib
+          cycamore_unit_tests
+          cd tests && python3 -m pytest
+
+      - name: Checkout Cymetric
+        if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
+        uses: actions/checkout@v4
+        with:
+          repository: cyclus/cymetric
+          path: ${{ github.workspace }}/cymetric
+
+      - name: Build and Test Cycamore
+        id: build-cymetric
+        if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
+        continue-on-error: true
+        run: |
+          cd ${{ github.workspace }}/cymetric
+          python3 install.py -j 3
+          export PATH=$HOME/.local/bin:$PATH
+          export DYLD_LIBRARY_PATH=$HOME/.local/lib
+          cd tests && python3 -m pytest
