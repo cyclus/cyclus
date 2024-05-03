@@ -52,6 +52,7 @@ v1.6.0
 * CI support for Rocky Linux (#1691)
 * Added support for a ResBuf to behave as a single bulk storage with mixing & extraction of resources (#1687)
 * Added ``--allow-milps`` flag into INSTALL.rst table (#1740)
+* CI support for MacOS (#1743)
 
 **Changed:**
 

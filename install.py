@@ -192,7 +192,7 @@ def main():
                         default='Release')
 
     parser.add_argument('--data-model-version', dest='data_model_version', default=None,
-                        help='Sets the core version number.')
+                        help='Sets the data model version number.')
 
     parser.add_argument('-D', metavar='VAR', action='append',
                         help='Set enviornment variable(s).')
