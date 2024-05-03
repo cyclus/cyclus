@@ -22,6 +22,7 @@ on:
       - 'doc/**'
       - 'CHANGELOG.rst'
 
+
 jobs:
   build-test-ubuntu:
     runs-on: ubuntu-latest
@@ -140,29 +141,6 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.ARTIFACT_NAME }}.txt
 
-  upload-pr-number:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - name: Checkout cyclus
-        uses: actions/checkout@v4
-
-      - name: Save PR number and Commit hash to file
-        run: |
-          echo "${{ github.event.number }}" > pr_number
-          echo "${{ github.event.pull_request.head.sha }} - $(git log -1 --format=%ci)" > commit_hash_timestamp
-      
-      - name: Upload PR number artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: pr_number
-          path: pr_number
-      
-      - name: Upload Commit hash artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: commit_hash_timestamp
-          path: commit_hash_timestamp
 
   build-test-rocky:
     runs-on: ubuntu-latest
@@ -190,6 +168,7 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_rocky_${{ matrix.rocky_versions }}/cyclus:ci-layer-cache
           build-args: |
             rocky_version=${{ matrix.rocky_versions }}
+
 
   build-test-macos:
     strategy:
@@ -273,3 +252,56 @@ jobs:
           export PATH=$HOME/.local/bin:$PATH
           export DYLD_LIBRARY_PATH=$HOME/.local/lib
           cd tests && python3 -m pytest
+
+      - name: Export Environment Variables
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "CYCAMORE_BUILD_STATUS=${{steps.build-cycamore.outcome == 'success' && '**Success** :white_check_mark:' || 
+          steps.build-cycamore.outcome == 'failure' && '**Failure** :x:' || 
+          '**Skipped due to upstream failure** :warning:'}}" >> "$GITHUB_ENV"
+
+          echo "CYMETRIC_BUILD_STATUS=${{steps.build-cymetric.outcome == 'success' && '**Success** :white_check_mark:' || 
+          steps.build-cymetric.outcome == 'failure' && '**Failure** :x:' || 
+          '**Skipped due to upstream failure** :warning:'}}" >> "$GITHUB_ENV"
+
+          echo "ARTIFACT_NAME=${{ matrix.osx_versions }}" >> "$GITHUB_ENV"
+  
+      - name: Construct Artifact
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "
+          ##### Build \`${{ matrix.osx_versions }}\`
+            - Cycamore: ${{ env.CYCAMORE_BUILD_STATUS }}
+            - Cymetric: ${{ env.CYMETRIC_BUILD_STATUS }}" > ${{ env.ARTIFACT_NAME }}.txt
+      
+      - name: Upload Artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_NAME }}.txt
+
+
+  upload-pr-number:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout cyclus
+        uses: actions/checkout@v4
+
+      - name: Save PR number and Commit hash to file
+        run: |
+          echo "${{ github.event.number }}" > pr_number
+          echo "${{ github.event.pull_request.head.sha }} - $(git log -1 --format=%ci)" > commit_hash_timestamp
+      
+      - name: Upload PR number artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number
+      
+      - name: Upload Commit hash artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: commit_hash_timestamp
+          path: commit_hash_timestamp
