@@ -97,7 +97,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
-          repository: cyclus/cymetric
+          repository: bennibbelink/cymetric
           path: ${{ github.workspace }}/cymetric
           ref: macos
 
