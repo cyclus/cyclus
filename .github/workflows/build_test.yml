@@ -242,7 +242,7 @@ jobs:
           repository: cyclus/cymetric
           path: ${{ github.workspace }}/cymetric
 
-      - name: Build and Test Cycamore
+      - name: Build and Test Cymetric
         id: build-cymetric
         if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
         continue-on-error: true

@@ -36,7 +36,6 @@ RUN apt update -y && apt install -y \
 
 RUN apt install -y python3-pprintpp; exit 0
 RUN apt clean -y all
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 RUN mkdir -p `python3 -m site --user-site`
 
 FROM common-base as conda-deps
