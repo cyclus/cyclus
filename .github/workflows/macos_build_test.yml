@@ -1,0 +1,163 @@
+name: MacOS Build/Test Cyclus
+
+on:
+  # allows us to run workflows manually
+  workflow_dispatch:
+  pull_request:
+    paths-ignore:
+      - '.github/workflows/build_test.yml'
+      - '.github/workflows/publish_latest.yml'
+      - '.github/workflows/publish_release.yml'
+      - '.github/workflows/changelog_test.yml'
+      - '.github/workflows/code_coverage.yml'
+      - '.github/workflows/rocky_build_test.yml'
+      - 'doc/**'
+      - 'CHANGELOG.rst'
+  push:
+    paths-ignore:
+      - '.github/workflows/build_test.yml'
+      - '.github/workflows/publish_latest.yml'
+      - '.github/workflows/publish_release.yml'
+      - '.github/workflows/changelog_test.yml'
+      - '.github/workflows/code_coverage.yml'
+      - '.github/workflows/rocky_build_test.yml'
+      - 'doc/**'
+      - 'CHANGELOG.rst'
+
+
+jobs:
+    build-test-macos:
+        strategy:
+          fail-fast: false
+          matrix:
+            macos_versions : [
+              macos-12,
+              macos-13,
+              macos-14,
+            ]
+    
+        runs-on: [ "${{ matrix.macos_versions }}" ]
+    
+        steps:
+          - name: Checkout Cyclus
+            uses: actions/checkout@v4
+    
+          - name: --slow flag if on ARM
+            if: ${{ matrix.macos_versions == 'macos-14' }}
+            run: |
+              echo "SLOW_FLAG=--slow" >> "$GITHUB_ENV"
+    
+          - name: Build and Test Cyclus
+            id: build-cyclus
+            run: |
+              brew install \
+                boost \
+                libxml++@4 \
+                hdf5 \
+                cbc \
+                clp \
+                python3
+              export PATH=$(brew --prefix python3)/bin:$PATH
+              python3 -m pip install --target $(python -m site --user-site) \
+                cython \
+                jinja2 \
+                numpy \
+                pandas \
+                setuptools \
+                pytest \
+                tables
+              python3 install.py -j 3 --coin-root $(brew --prefix) --allow-milps ${SLOW_FLAG}
+              export PATH=$HOME/.local/bin:$PATH
+              export DYLD_LIBRARY_PATH=$HOME/.local/lib
+              cyclus_unit_tests
+              cd tests && python3 -m pytest
+    
+          - name: Checkout Cycamore
+            if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
+            uses: actions/checkout@v4
+            with:
+              repository: cyclus/cycamore
+              path: ${{ github.workspace }}/cycamore
+    
+          - name: Build and Test Cycamore
+            id: build-cycamore
+            if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
+            continue-on-error: true
+            run: |
+              cd ${{ github.workspace }}/cycamore
+              python3 install.py -j 3
+              export PATH=$HOME/.local/bin:$PATH
+              export DYLD_LIBRARY_PATH=$HOME/.local/lib
+              cycamore_unit_tests
+              cd tests && python3 -m pytest
+    
+          - name: Checkout Cymetric
+            if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
+            uses: actions/checkout@v4
+            with:
+              repository: cyclus/cymetric
+              path: ${{ github.workspace }}/cymetric
+    
+          - name: Build and Test Cymetric
+            id: build-cymetric
+            if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
+            continue-on-error: true
+            run: |
+              cd ${{ github.workspace }}/cymetric
+              python3 install.py -j 3
+              export PATH=$HOME/.local/bin:$PATH
+              export DYLD_LIBRARY_PATH=$HOME/.local/lib
+              cd tests && python3 -m pytest
+    
+          - name: Export Environment Variables
+            if: github.event_name == 'pull_request'
+            run: |
+              echo "CYCAMORE_BUILD_STATUS=${{steps.build-cycamore.outcome == 'success' && '**Success** :white_check_mark:' || 
+              steps.build-cycamore.outcome == 'failure' && '**Failure** :x:' || 
+              '**Skipped due to upstream failure** :warning:'}}" >> "$GITHUB_ENV"
+    
+              echo "CYMETRIC_BUILD_STATUS=${{steps.build-cymetric.outcome == 'success' && '**Success** :white_check_mark:' || 
+              steps.build-cymetric.outcome == 'failure' && '**Failure** :x:' || 
+              '**Skipped due to upstream failure** :warning:'}}" >> "$GITHUB_ENV"
+    
+              echo "ARTIFACT_NAME=${{ matrix.macos_versions }}" >> "$GITHUB_ENV"
+      
+          - name: Construct Artifact
+            if: github.event_name == 'pull_request'
+            run: |
+              echo "
+              ##### Build \`${{ matrix.macos_versions }}\`
+                - Cycamore: ${{ env.CYCAMORE_BUILD_STATUS }}
+                - Cymetric: ${{ env.CYMETRIC_BUILD_STATUS }}" > ${{ env.ARTIFACT_NAME }}.txt
+          
+          - name: Upload Artifact
+            if: github.event_name == 'pull_request'
+            uses: actions/upload-artifact@v4
+            with:
+              name: ${{ env.ARTIFACT_NAME }}
+              path: ${{ env.ARTIFACT_NAME }}.txt  
+    
+    upload-pr-number:
+        runs-on: ubuntu-latest
+        if: github.event_name == 'pull_request'
+        steps:
+          - name: Checkout cyclus
+            uses: actions/checkout@v4
+    
+          - name: Save PR number and Commit hash to file
+            run: |
+              echo "${{ github.event.number }}" > pr_number
+              echo "${{ github.event.pull_request.head.sha }} - $(git log -1 --format=%ci)" > commit_hash_timestamp
+          
+          - name: Upload PR number artifact
+            uses: actions/upload-artifact@v4
+            with:
+              name: pr_number
+              path: pr_number
+          
+          - name: Upload Commit hash artifact
+            uses: actions/upload-artifact@v4
+            with:
+              name: commit_hash_timestamp
+              path: commit_hash_timestamp
+    
