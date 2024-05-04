@@ -7,6 +7,18 @@ Since last release
 
 **Added:**
 
+**Changed:**
+
+**Removed:**
+
+**Fixed:**
+
+
+v1.6.0
+====================
+
+**Added:**
+
 * adding compatibility with cbc 2.10 (#1557)
 * In `src/pyne.h`, replace a macro `isnan()` with `using std::isnan`, 
   as the former has led to undesired macro expansion in Boost header files. (#1560)

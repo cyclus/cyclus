@@ -11,7 +11,7 @@ IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 ENDIF()
 
 # This project name is cyclus.
-PROJECT(CYCLUS VERSION 1.5.5)
+PROJECT(CYCLUS VERSION 1.6.0)
 
 # check for and enable c++17 support (required for cyclus)
 INCLUDE(CheckCXXCompilerFlag)

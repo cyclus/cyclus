@@ -43,6 +43,7 @@ And a few optional dependencies:
 ====================   ==================  =============================================  ==================        
 Package                Minimum Version     Purpose                                        Notes
 ====================   ==================  =============================================  ==================  
+``git``                2.32.0              Enables access to source code via Github       N/A
 ``Coin-Cbc``           2.10.3              Enables use of Branch-and-Cut solver           Cyclus must be built with ``--allow-milps`` flag
 ``Coin-Clp``           1.17.5              Enables use of Linear Programming solver       Cyclus must be built with ``--allow-milps`` flag
 ``doxygen``            1.7.6.1             Building documentation                         N/A
