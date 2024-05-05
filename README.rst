@@ -78,38 +78,28 @@ Cyclus is built using ``CMake``. For detailed instructions on Cyclus dependencie
 Quick Cyclus Installation
 *************************
 The quickest way to install Cyclus and its dependencies relies on using the `conda-forge` channel and the `conda` package manager within the Anaconda python environment.  The following instructions guide you through that approach.
-To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18.04 LTS):
+To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 22.04 LTS):
 
-- Download the latest Anaconda installer for Linux at
-  ``https://www.anaconda.com/distribution/#download-section``
+- Download the latest Miniconda installer for Linux at
+  ``https://docs.anaconda.com/free/miniconda/miniconda-other-installer-links/``
 
 - Move the ``.sh`` to your Home directory
 
 - In Terminal, execute the following commands:
 
-- ``bash Anaconda3-2019.03-Linux-x86_64.sh``
+- ``bash ~/miniconda.sh -b -u -p ~/miniconda3``
 
-- ``echo 'export PATH="~/anaconda/bin:$PATH"' >> ~/.bashrc``
+- ``echo 'export PATH="~/miniconda3/bin:$PATH"' >> ~/.bashrc``
 
-- ``source .bashrc``
+- ``source ~/.bashrc``
 
 - ``conda config --add channels conda-forge``
 
-- ``conda create -n cyclus python=3.11``
+- ``conda create -n cyclus``
 
 - ``conda activate cyclus``
 
-- ``conda install -y gxx_linux-64 gcc_linux-64 cmake make git glib libxml2 libxmlpp-4.0 liblapack pkg-config coincbc boost-cpp hdf5 sqlite pcre setuptools pytest pytables pandas jinja2 cython websockets pprintpp pip``
-
-- ``conda install -y --force-reinstall libsqlite``
-
-- Use ``sudo apt install`` to install and configure git
-
-- Clone the Cyclus repository by running ``git clone https://github.com/cyclus/cyclus.git``
-
-- Navigate to the folder containing Cyclus
-
-- Run the command ``python install.py``
+- ``conda install -y cyclus``
 
 For more detailed installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_.
