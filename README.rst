@@ -80,26 +80,31 @@ Quick Cyclus Installation
 The quickest way to install Cyclus and its dependencies relies on using the `conda-forge` channel and the `conda` package manager within the Anaconda python environment.  The following instructions guide you through that approach.
 To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 22.04 LTS):
 
-- Download the latest Miniconda installer for Linux at
-  ``https://docs.anaconda.com/free/miniconda/miniconda-other-installer-links/``
+- Download and install Miniconda for Linux
 
-- Move the ``.sh`` to your Home directory
 
-- In Terminal, execute the following commands:
+.. code-block:: python
 
-- ``bash ~/miniconda.sh -b -u -p ~/miniconda3``
+  mkdir -p ~/miniconda3
+  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+  bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+  rm -rf ~/miniconda3/miniconda.sh
 
-- ``echo 'export PATH="~/miniconda3/bin:$PATH"' >> ~/.bashrc``
+- Execute the following commands to initialize Miniconda:
 
-- ``source ~/.bashrc``
+.. code-block:: python
 
-- ``conda config --add channels conda-forge``
+  echo 'export PATH="~/miniconda3/bin:$PATH"' >> ~/.bashrc
+  source ~/.bashrc
 
-- ``conda create -n cyclus``
+- Create a new environment and install the Cyclus package
 
-- ``conda activate cyclus``
+.. code-block:: python
 
-- ``conda install -y cyclus``
+  conda config --add channels conda-forge
+  conda create -n cyclus python=3.11
+  conda activate cyclus
+  conda install -y cyclus
 
 For more detailed installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_.
