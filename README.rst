@@ -102,7 +102,7 @@ To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 22
 .. code-block:: bash
 
   conda config --add channels conda-forge
-  conda create -n cyclus python=3.11
+  conda create -n cyclus
   conda activate cyclus
   conda install -y cyclus
 
