@@ -94,7 +94,7 @@ To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 22
 
 .. code-block:: bash
 
-  echo 'export PATH="~/miniconda3/bin:$PATH"' >> ~/.bashrc
+  ~/miniconda3/bin/conda init bash
   source ~/.bashrc
 
 - Create a new environment and install the Cyclus package
