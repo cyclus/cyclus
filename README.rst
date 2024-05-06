@@ -78,38 +78,33 @@ Cyclus is built using ``CMake``. For detailed instructions on Cyclus dependencie
 Quick Cyclus Installation
 *************************
 The quickest way to install Cyclus and its dependencies relies on using the `conda-forge` channel and the `conda` package manager within the Anaconda python environment.  The following instructions guide you through that approach.
-To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18.04 LTS):
+To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 22.04 LTS):
 
-- Download the latest Anaconda installer for Linux at
-  ``https://www.anaconda.com/distribution/#download-section``
+- Download and install Miniconda for Linux
 
-- Move the ``.sh`` to your Home directory
 
-- In Terminal, execute the following commands:
+.. code-block:: bash
 
-- ``bash Anaconda3-2019.03-Linux-x86_64.sh``
+  mkdir -p ~/miniconda3
+  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+  bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+  rm -rf ~/miniconda3/miniconda.sh
 
-- ``echo 'export PATH="~/anaconda/bin:$PATH"' >> ~/.bashrc``
+- Execute the following commands to initialize Miniconda:
 
-- ``source .bashrc``
+.. code-block:: bash
 
-- ``conda config --add channels conda-forge``
+  ~/miniconda3/bin/conda init bash
+  source ~/.bashrc
 
-- ``conda create -n cyclus python=3.11``
+- Create a new environment and install the Cyclus package
 
-- ``conda activate cyclus``
+.. code-block:: bash
 
-- ``conda install -y gxx_linux-64 gcc_linux-64 cmake make git glib libxml2 libxmlpp-4.0 liblapack pkg-config coincbc boost-cpp hdf5 sqlite pcre setuptools pytest pytables pandas jinja2 cython websockets pprintpp pip``
-
-- ``conda install -y --force-reinstall libsqlite``
-
-- Use ``sudo apt install`` to install and configure git
-
-- Clone the Cyclus repository by running ``git clone https://github.com/cyclus/cyclus.git``
-
-- Navigate to the folder containing Cyclus
-
-- Run the command ``python install.py``
+  conda config --add channels conda-forge
+  conda create -n cyclus
+  conda activate cyclus
+  conda install -y cyclus
 
 For more detailed installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_.
@@ -123,7 +118,7 @@ our tests). You can run the tests yourself via:
 
 .. code-block:: bash
 
-    $ cyclus_unit_tests
+    cyclus_unit_tests
 
 
 *******************
@@ -152,7 +147,7 @@ file ``input.xml``, you can run Cyclus via:
 
 .. code-block:: bash
 
-    $ cyclus path/to/input.xml
+    cyclus path/to/input.xml
 
 For a more detailed explanation, check out the `Cyclus User Guide`_.
 
