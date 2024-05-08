@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """The cyclus preprocessor.
 
 cycpp is a 3-pass preprocessor which adds reflection-like semantics to cyclus
