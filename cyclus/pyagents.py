@@ -3,6 +3,7 @@ from __future__ import unicode_literals, print_function
 
 from cyclus.agents import Region, Institution, Facility
 from cyclus import typesystem as ts
+import sys
 
 class NullRegion(Region):
     """A simple do nothing region."""
@@ -31,7 +32,7 @@ class Sink(Facility):
         uitype="recipe",
         )
     max_inv_size = ts.Double(
-        default=1e299,
+        default=sys.float_info.max,
         doc="total maximum inventory size of sink facility",
         uilabel= "Maximum Inventory",
         tooltip="sink maximum inventory size",
