@@ -93,7 +93,7 @@ class Sink : public cyclus::Facility  {
   std::string recipe_name;
 
   #pragma cyclus var {\
-    "default": 1e299,						\
+    "default": "kLinBoundLimit",						\
     "doc": "total maximum inventory size of "			\
            "sink facility",						\
     "uilabel": "Maximum Inventory",				\
@@ -106,7 +106,7 @@ class Sink : public cyclus::Facility  {
            "accept at each time step", \
     "uilabel": "Maximum Throughput", \
     "uitype": "range", \
-    "range": [0.0, 1e299], \
+    "range": [0.0, "kLinBoundLimit"], \
     "tooltip": "sink capacity" \
   }
   double capacity;

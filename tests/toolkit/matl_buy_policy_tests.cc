@@ -485,7 +485,7 @@ TEST_F(MatlBuyPolicyTests, NormalActiveDormant) {
 TEST_F(MatlBuyPolicyTests, MixedActiveDormant) {
   using cyclus::QueryResult;
   
-  boost::shared_ptr<NormalIntDist> a_dist = boost::shared_ptr<NormalIntDist>(new NormalIntDist(5, 1, 0, 1e299));
+  boost::shared_ptr<NormalIntDist> a_dist = boost::shared_ptr<NormalIntDist>(new NormalIntDist(5, 1, 0, kIntBoundLimit));
   boost::shared_ptr<UniformIntDist> d_dist = boost::shared_ptr<UniformIntDist>(new UniformIntDist(1, 3));
   
   int dur = 12;
