@@ -200,7 +200,7 @@ class KFacility : public cyclus::Facility {
   double current_capacity;
 
   #pragma cyclus var { \
-    "default": 1e299, \
+    "default": "kLinBoundLimit", \
     "tooltip": "k-facility maximum inventory size", \
     "doc": "total maximum inventory size of the k-facility", \
     "uilabel": "Maximum Inventory"			     \
