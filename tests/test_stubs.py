@@ -28,7 +28,7 @@ def test_stubs():
         inst = os.path.join(d, 'baz')
 
         stub_cmd = 'cycstub --type {0} {1}:{1}:{2}'
-        inst_cmd = 'python install.py --build_dir {0} --prefix {1}'
+        inst_cmd = 'python3 install.py --build_dir {0} --prefix {1}'
         tst_cmd = './bin/{}_unit_tests'
 
         log = 'stub_test.log'
