@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """This module generates HDF5 backend code found in src/hdf5_back.cc
 
 There are 8 distinct code generation options, one of which must be passed
@@ -14,7 +14,7 @@ Example
 -------
 To generate the code found in src/hdf5_back.cc::Query, use
 
-    $ python hdf5_back_gen.py QUERY
+    $ python3 hdf5_back_gen.py QUERY
 
 """
 import os

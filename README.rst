@@ -134,7 +134,7 @@ simulations, first download Cycamore
   https://github.com/cyclus/cycamore.git``,
 
 - Install in the same location you installed Cyclus (eg. in ``~/.local/``):
-  ``python install.py`` from the ``cycamore`` folder.
+  ``python3 install.py`` from the ``cycamore`` folder.
 
 
 **************
