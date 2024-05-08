@@ -31,7 +31,7 @@ Run the install script:
 
 .. code-block:: bash
   
-  python install.py
+  python3 install.py
 
 If you successfully followed the instruction above, the cyclus binary has been
 generated and placed in the  ``~/.local/`` in your home directory. 
@@ -47,7 +47,7 @@ On MacOSX you also need to add ~/.local/lib/pythonX.Y/site-packages to your
 
 .. code-block:: bash
 
-  echo "export PYTHONPATH=\"\$HOME/.local/lib/python`python -c 'import sys; \
+  echo "export PYTHONPATH=\"\$HOME/.local/lib/python`python3 -c 'import sys; \
   print(".".join(map(str, sys.version_info[:2])))'`/site-packages:\$PYTHONPATH\"" >> ~/.bashrc
   source ~/.bashrc
 
@@ -128,7 +128,7 @@ installation flag. The otherwise identical process would look like:
 
 .. code-block:: bash
 
-    .../cyclus$  python install.py --coin_root=path/to/coin
+    .../cyclus$  python3 install.py --coin_root=path/to/coin
 
 
 CMake Cyclus Installation

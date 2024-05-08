@@ -37,8 +37,7 @@ RUN apt update -y && apt install -y \
 RUN apt install -y python3-pprintpp; exit 0
 RUN apt clean -y all
 
-RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
-RUN mkdir -p `python -m site --user-site`
+RUN mkdir -p `python3 -m site --user-site`
 
 FROM common-base as conda-deps
 
@@ -91,7 +90,7 @@ RUN conda update -y --all && \
                && \
     mamba install -y --force-reinstall libsqlite && \
     conda clean -y --all
-RUN mkdir -p `python -m site --user-site`
+RUN mkdir -p `python3 -m site --user-site`
 ENV CC /opt/conda/bin/x86_64-conda_cos6-linux-gnu-gcc
 ENV CXX /opt/conda/bin/x86_64-conda_cos6-linux-gnu-g++
 ENV CPP /opt/conda/bin/x86_64-conda_cos6-linux-gnu-cpp
@@ -110,12 +109,12 @@ ARG make_cores=2
 COPY . /cyclus
 WORKDIR /cyclus
 
-RUN python install.py -j ${make_cores} --allow-milps --code_coverage
+RUN python3 install.py -j ${make_cores} --allow-milps --code_coverage
 ENV PATH /root/.local/bin:$PATH
 ENV LD_LIBRARY_PATH /root/.local/lib:/root/.local/lib/cyclus
 RUN lcov -c -d /cyclus -o initial_coverage.info --gcov-tool ${GCOV} --initial --no-external && \
     cyclus_unit_tests && \
-    cd tests && python -m pytest && cd .. && \
+    cd tests && python3 -m pytest && cd .. && \
     lcov -c -d /cyclus -o test_coverage.info --gcov-tool ${GCOV} --no-external && \
     lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info -o total_coverage.info && \
     mkdir -p html && genhtml total_coverage.info --output-directory html
@@ -135,7 +134,7 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
-RUN python install.py -j ${make_cores} --allow-milps
+RUN python3 install.py -j ${make_cores} --allow-milps
 ENV PATH /root/.local/bin:$PATH
 
 FROM cyclus as deb-generation
@@ -151,4 +150,4 @@ RUN cyclus_unit_tests
 
 FROM cyclus-test as cyclus-pytest
 
-RUN cd tests && python -m pytest
+RUN cd tests && python3 -m pytest
