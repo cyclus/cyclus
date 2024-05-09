@@ -175,8 +175,9 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     FIND_PACKAGE(LibXml2 REQUIRED)
     ADD_DEFINITIONS(${LIBXML2_DEFINITIONS})
-    SET(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
+    SET(LIBS ${LIBS} LibXml2::LibXml2)
     message("-- LibXML2 Include Dir: ${LIBXML2_INCLUDE_DIR}")
+    message("-- LibXML2 Libraries: ${LIBXML2_LIBRARIES}")
 
     # Then use pkg-config for locate specific package
     pkg_check_modules(LIBXMLXX IMPORTED_TARGET libxml++-4.0)
