@@ -92,6 +92,8 @@ def install_cyclus(args):
             cmake_cmd.append('-DCYCLUS_FAST_COMPILE=' + fast)
 
         check_windows_cmake(cmake_cmd)
+        print("benben")
+        print(cmake_cmd)
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
                                     shell=(os.name == 'nt'))
 
