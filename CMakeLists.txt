@@ -12,6 +12,7 @@ ENDIF()
 
 # This project name is cyclus.
 PROJECT(CYCLUS VERSION 1.6.0)
+message("CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
 
 # check for and enable c++17 support (required for cyclus)
 INCLUDE(CheckCXXCompilerFlag)
@@ -180,11 +181,11 @@ IF(NOT CYCLUS_DOC_ONLY)
     message("-- LibXML2 Libraries: ${LIBXML2_LIBRARIES}")
 
     # Then use pkg-config for locate specific package
-    pkg_check_modules(LIBXMLXX IMPORTED_TARGET libxml++-4.0)
+    pkg_check_modules(LIBXMLXX IMPORTED_TARGET libxml++)
     IF ( NOT LIBXMLXX_LIBRARIES )
-       pkg_check_modules(LIBXMLXX REQUIRED IMPORTED_TARGET libxml++-2.6)
+       pkg_check_modules(LIBXMLXX REQUIRED IMPORTED_TARGET libxml++)
     ENDIF ( NOT LIBXMLXX_LIBRARIES )
-    SET(LIBS ${LIBS} ${LIBXMLXX_LIBRARIES})
+    SET(LIBS ${LIBS} PkgConfig::libxml++)
     message("-- LibXML++ Include Dir: ${LIBXMLXX_INCLUDE_DIRS}")
     message("-- LibXML++ Libraries: ${LIBXMLXX_LIBRARIES}")
     
