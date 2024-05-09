@@ -185,9 +185,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     IF ( NOT LIBXMLXX_LIBRARIES )
        pkg_check_modules(LIBXMLXX REQUIRED IMPORTED_TARGET libxml++-2.6)
     ENDIF ( NOT LIBXMLXX_LIBRARIES )
-    SET(LIBS ${LIBS} ${LIBXMLXX_LIBRARIES})
+    SET(LIBS ${LIBS} ${LIBXMLXX_LINK_LIBRARIES})
     message("-- LibXML++ Include Dir: ${LIBXMLXX_INCLUDE_DIRS}")
-    message("-- LibXML++ Libraries: ${LIBXMLXX_LIBRARIES}")
+    message("-- LibXML++ Libraries: ${LIBXMLXX_LINK_LIBRARIES}")
     
     # find lapack and link to it
     FIND_PACKAGE(LAPACK REQUIRED)
