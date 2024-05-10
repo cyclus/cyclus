@@ -46,6 +46,7 @@ def install_cyclus(args):
     makefile = os.path.join(args.build_dir, 'Makefile')
     on_darwin = platform.system() == 'Darwin'
     libext = '.dylib' if on_darwin else '.so'
+
     if not os.path.exists(makefile):
         rtn = subprocess.call(['which', 'cmake'], shell=(os.name == 'nt'))
         if rtn != 0:
@@ -53,22 +54,24 @@ def install_cyclus(args):
                      "please install CMake before developing Cyclus.")
         cmake_cmd = ['cmake', os.path.abspath(root_dir)]
         if args.prefix:
-            cmake_cmd += ['-DCMAKE_INSTALL_PREFIX=' + args.prefix]
+            cmake_cmd += ['-DCMAKE_INSTALL_PREFIX=' +
+                          absexpanduser(args.prefix)]
         if args.cmake_prefix_path:
-            cmake_cmd += ['-DCMAKE_PREFIX_PATH=' + args.cmake_prefix_path]
+            cmake_cmd += ['-DCMAKE_PREFIX_PATH=' +
+                          absexpanduser(args.cmake_prefix_path)]
         if cmake_cmd is not None:
             cmake_cmd += ['-DDEFAULT_ALLOW_MILPS=' +
                           ('TRUE' if args.allow_milps else 'FALSE')]
         if args.deps_root:
-            cmake_cmd += ['-DDEPS_ROOT_DIR=' + args.deps_root]
+            cmake_cmd += ['-DDEPS_ROOT_DIR=' + absexpanduser(args.deps_root)]
         if args.coin_root:
-            cmake_cmd += ['-DCOIN_ROOT_DIR=' + args.coin_root]
+            cmake_cmd += ['-DCOIN_ROOT_DIR=' + absexpanduser(args.coin_root)]
         if args.boost_root:
-            cmake_cmd += ['-DBOOST_ROOT=' + args.boost_root]
+            cmake_cmd += ['-DBOOST_ROOT=' + absexpanduser(args.boost_root)]
         if args.cyclus_root:
-            cmake_cmd += ['-DCYCLUS_ROOT_DIR='+ args.cyclus_root]
+            cmake_cmd += ['-DCYCLUS_ROOT_DIR='+absexpanduser(args.cyclus_root)]
         if args.hdf5_root:
-            h5root = args.hdf5_root
+            h5root = absexpanduser(args.hdf5_root)
             cmake_cmd += ['-DHDF5_ROOT=' + h5root,
                           '-DHDF5_LIBRARIES={0}/lib/libhdf5{1};{0}/lib/libhdf5_hl{1}'.format(h5root, libext),
                           '-DHDF5_LIBRARY_DIRS=' + h5root + '/lib',
@@ -129,7 +132,7 @@ def main():
     parser = ap.ArgumentParser(description=description)
 
     build_dir = 'where to place the build directory'
-    parser.add_argument('--build-dir', dest='build_dir', help=build_dir, default='build')
+    parser.add_argument('--build_dir', help=build_dir, default='build')
 
     uninst = 'uninstall'
     parser.add_argument('--uninstall', action='store_true', help=uninst, default=False)
@@ -139,7 +142,7 @@ def main():
                         help=noupdate, default=True)
 
     clean = 'attempt to remove the build directory before building'
-    parser.add_argument('--clean-build', dest='clean_build', action='store_true', help=clean)
+    parser.add_argument('--clean-build', action='store_true', help=clean)
 
     threads = "the number of threads to use in the make step"
     parser.add_argument('-j', '--threads', type=int, help=threads)
@@ -148,10 +151,10 @@ def main():
     parser.add_argument('--prefix', help=prefix, default=localdir)
 
     config_only = 'only configure the package, do not build or install'
-    parser.add_argument('--config-only', dest='config_only', action='store_true', help=config_only)
+    parser.add_argument('--config-only', action='store_true', help=config_only)
 
     build_only = 'only build the package, do not install'
-    parser.add_argument('--build-only', dest='build_only', action='store_true', help=build_only)
+    parser.add_argument('--build-only', action='store_true', help=build_only)
 
     test = 'run tests after building'
     parser.add_argument('--test', action='store_true', help=test)
@@ -165,26 +168,28 @@ def main():
                              "by default")
 
     deps = "the path to the directory containing all dependencies"
-    parser.add_argument('--deps-root', dest='deps_root', help=deps)
+    parser.add_argument('--deps-root', '--deps_root', help=deps,
+                        default=None, dest='deps_root')
 
     coin = "the relative path to the Coin-OR libraries directory"
-    parser.add_argument('--coin-root', dest='coin_root', help=coin)
+    parser.add_argument('--coin-root', '--coin_root', help=coin)
 
     boost = "the relative path to the Boost libraries directory"
-    parser.add_argument('--boost-root', dest='boost_root', help=boost)
+    parser.add_argument('--boost_root', help=boost)
 
     hdf5 = "the path to the HDF5 libraries directory"
-    parser.add_argument('--hdf5-root', dest='hdf5_root', help=hdf5)
+    parser.add_argument('--hdf5_root', help=hdf5)
 
     cyclus = "the relative path to Cyclus installation directory"
-    parser.add_argument('--cyclus-root', dest='cyclus_root', help=cyclus)
+    parser.add_argument('--cyclus-root', '--cyclus_root', help=cyclus)
 
     cmake_prefix_path = "the cmake prefix path for use with FIND_PACKAGE, " + \
         "FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros"
-    parser.add_argument('--cmake-prefix-path', dest='cmake_prefix_path', help=cmake_prefix_path)
+    parser.add_argument('--cmake_prefix_path', help=cmake_prefix_path)
 
     build_type = "the CMAKE_BUILD_TYPE"
-    parser.add_argument('--build-type', help=build_type, default='Release')
+    parser.add_argument('--build-type', '--build_type', help=build_type,
+                        default='Release')
 
     parser.add_argument('--data-model-version', dest='data_model_version', default=None,
                         help='Sets the core version number.')
@@ -196,7 +201,7 @@ def main():
                                                  'when dealing with build system issues.')
 
     code_coverage = "Enable code coverage analysis using gcov/lcov"
-    parser.add_argument('--code-coverage', help=code_coverage, default=False, action="store_true")
+    parser.add_argument('--code_coverage', help=code_coverage, default=False, action="store_true")
 
     parser.add_argument('--fast', default=None, dest='fast',
                         action='store_true', help="Will try to compile "
