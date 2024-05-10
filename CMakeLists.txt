@@ -12,7 +12,6 @@ ENDIF()
 
 # This project name is cyclus.
 PROJECT(CYCLUS VERSION 1.6.0)
-message("CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
 
 # check for and enable c++17 support (required for cyclus)
 INCLUDE(CheckCXXCompilerFlag)

@@ -46,7 +46,6 @@ def install_cyclus(args):
     makefile = os.path.join(args.build_dir, 'Makefile')
     on_darwin = platform.system() == 'Darwin'
     libext = '.dylib' if on_darwin else '.so'
-    print(args)
     if not os.path.exists(makefile):
         rtn = subprocess.call(['which', 'cmake'], shell=(os.name == 'nt'))
         if rtn != 0:
@@ -90,8 +89,6 @@ def install_cyclus(args):
             cmake_cmd.append('-DCYCLUS_FAST_COMPILE=' + fast)
 
         check_windows_cmake(cmake_cmd)
-        print("benben")
-        print(cmake_cmd)
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
                                     shell=(os.name == 'nt'))
 
