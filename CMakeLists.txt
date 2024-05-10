@@ -187,7 +187,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     ENDIF ( NOT LIBXMLXX_FOUND )
     SET(LIBS ${LIBS} PkgConfig::LIBXMLXX)
     message("-- LibXML++ Include Dir: ${LIBXMLXX_INCLUDE_DIRS}")
-    message("-- LibXML++ Libraries: ${LIBXMLXX_LINK_LIBRARIES}")
+    message("-- LibXML++ Libraries: ${LIBXMLXX_LIBRARIES}")
     
     # find lapack and link to it
     FIND_PACKAGE(LAPACK REQUIRED)
