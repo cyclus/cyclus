@@ -132,7 +132,7 @@ def main():
     parser = ap.ArgumentParser(description=description)
 
     build_dir = 'where to place the build directory'
-    parser.add_argument('--build_dir', help=build_dir, default='build')
+    parser.add_argument('--build-dir', help=build_dir, default='build')
 
     uninst = 'uninstall'
     parser.add_argument('--uninstall', action='store_true', help=uninst, default=False)
@@ -175,7 +175,7 @@ def main():
     parser.add_argument('--coin-root', '--coin_root', help=coin)
 
     boost = "the relative path to the Boost libraries directory"
-    parser.add_argument('--boost_root', help=boost)
+    parser.add_argument('--boost-root', help=boost)
 
     hdf5 = "the path to the HDF5 libraries directory"
     parser.add_argument('--hdf5_root', help=hdf5)
@@ -185,7 +185,7 @@ def main():
 
     cmake_prefix_path = "the cmake prefix path for use with FIND_PACKAGE, " + \
         "FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros"
-    parser.add_argument('--cmake_prefix_path', help=cmake_prefix_path)
+    parser.add_argument('--cmake-prefix-path', help=cmake_prefix_path)
 
     build_type = "the CMAKE_BUILD_TYPE"
     parser.add_argument('--build-type', '--build_type', help=build_type,
@@ -201,7 +201,7 @@ def main():
                                                  'when dealing with build system issues.')
 
     code_coverage = "Enable code coverage analysis using gcov/lcov"
-    parser.add_argument('--code_coverage', help=code_coverage, default=False, action="store_true")
+    parser.add_argument('--code-coverage', help=code_coverage, default=False, action="store_true")
 
     parser.add_argument('--fast', default=None, dest='fast',
                         action='store_true', help="Will try to compile "

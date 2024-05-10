@@ -73,7 +73,7 @@ flags:
   * - ``-h, --help``                              
     - show the help message and exit                                                                   
 
-  * - ``--build_dir BUILD_DIR``                   
+  * - ``--build-dir BUILD_DIR``                   
     - where to place the build directory                                                               
 
   * - ``--uninstall``                             
@@ -103,19 +103,19 @@ flags:
   * - ``--test``                                  
     - run tests after  building                                                                        
 
-  * - ``--coin_root COIN_ROOT``                   
+  * - ``--coin-root COIN_ROOT``                   
     - the relative path to the Coin-OR libraries directory                                             
 
-  * - ``--boost_root BOOST_ROOT``                 
+  * - ``--boost-root BOOST_ROOT``                 
     - the relative path to the Boost libraries directory                                               
 
-  * - ``--hdf5_root HDF5_ROOT``                   
+  * - ``--hdf5-root HDF5_ROOT``                   
     - the path to the HDF5 libraries directory                                                         
 
-  * - ``--cmake_prefix_path CMAKE_PREFIX_PATH``   
+  * - ``--cmake-prefix-path CMAKE_PREFIX_PATH``   
     - the cmake prefix path for use with FIND_PACKAGE, FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros 
 
-  * - ``--build_type BUILD_TYPE``                 
+  * - ``--build-type BUILD_TYPE``                 
     - change the CMAKE_BUILD_TYPE                                                                      
 
   * - ``-D VAR``                                  
@@ -128,7 +128,7 @@ installation flag. The otherwise identical process would look like:
 
 .. code-block:: bash
 
-    .../cyclus$  python install.py --coin_root=path/to/coin
+    .../cyclus$  python install.py --coin-root=path/to/coin
 
 
 CMake Cyclus Installation
