@@ -128,7 +128,7 @@ installation flag. The otherwise identical process would look like:
 
 .. code-block:: bash
 
-    .../cyclus$  python install.py --coin-root=path/to/coin
+    .../cyclus$  python3 install.py --coin-root=path/to/coin
 
 
 CMake Cyclus Installation
