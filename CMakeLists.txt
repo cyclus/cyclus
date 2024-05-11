@@ -325,7 +325,6 @@ IF(NOT CYCLUS_DOC_ONLY)
         include(UseCython)
         find_package (Python3 REQUIRED COMPONENTS NumPy)
         find_package(Jinja2 REQUIRED)
-        # find_package(Pandas REQUIRED)
 
         # With CMake, a clean separation can be made between the source tree and the
         # build tree.  When all source is compiled, as with pure C/C++, the source is
