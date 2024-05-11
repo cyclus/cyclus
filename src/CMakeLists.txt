@@ -151,8 +151,8 @@ if(Cython_FOUND)
         SET_TARGET_PROPERTIES(${name} PROPERTIES 
           OUTPUT_NAME "${name}"
           PREFIX ""
-          # INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
-          # INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
+          INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
+          INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
           )
         SET(LIBS ${LIBS} ${name})
 
