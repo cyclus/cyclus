@@ -115,7 +115,7 @@ class Source : public cyclus::Facility {
     "doc": "amount of commodity that can be supplied at each time step", \
     "uilabel": "Maximum Throughput", \
     "uitype": "range", \
-    "range": [0.0, "kLinBoundLimit"], \
+    "range": [0.0, "cy_max_double"], \
     "tooltip": "source capacity" \
   }
   double capacity;
