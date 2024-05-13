@@ -37,11 +37,17 @@ static const double float_ulp_eq = 2;
 /// maximum value for a function modifier (i.e., a_i for variable x_i)
 static const double kModifierLimit = pow(10, 10);
 
-/// maximum (+ or -) value for an integer variable
-static const int kIntBoundLimit = std::numeric_limits<int>::max();
+/// maximum (+) value for an integer variable
+static const int cy_max_int = std::numeric_limits<int>::max();
 
-/// maximum (+ or -) value for a linear variable
-static const double kLinBoundLimit = std::numeric_limits<double>::max();
+/// maximum (-) value for an integer variable
+static const int cy_min_int = std::numeric_limits<int>::min();
+
+/// maximum (+) value for a linear variable
+static const double cy_max_double = std::numeric_limits<double>::max();
+
+/// maximum (-) value for a linear variable
+static const double cy_min_double = std::numeric_limits<double>::min();
 
 /// epsilon value to turn determine difference between constraint values
 static const double kConstraintEps = 1e-08;
