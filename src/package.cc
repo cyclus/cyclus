@@ -43,14 +43,14 @@ double Package::GetFillMass(double qty) {
     int num_min_fill = std::floor(qty / fill_min_);
     int num_max_fill = std::ceil(qty / fill_max_);
     if (num_min_fill >= num_max_fill) {
-      // all material can fit in a package
+      // all material can fit in package(s)
       double fill_mass = qty / num_max_fill;
     } else {
       // some material will remain unpackaged, fill up as many max packages as possible
       fill_mass = fill_max_;
     }
   }
-  return fill_mass;
+  return std::min(qty, fill_mass);
 }
   
 Package::Package(std::string name, double fill_min, double fill_max, std::string strategy) : 
