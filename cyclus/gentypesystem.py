@@ -1782,7 +1782,7 @@ cdef class StateVar:
     uitype       The type of the input field in reference in a UI,
                  currently supported types are; incommodity, outcommodity,
                  commodity, range, combobox, facility, prototype, recipe, nuclide,
-                 and none.
+                 package, and none.
                  For 'nuclide' when the type is an int, the values will be read in
                  from the input file in human readable string format ('U-235') and
                  automatically converted to results of ``pyne::nucname::id()``
