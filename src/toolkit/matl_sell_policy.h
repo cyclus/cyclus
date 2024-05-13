@@ -119,7 +119,7 @@ class MatlSellPolicy : public Trader {
       CommodMap<Material>::type& commod_requests);
   virtual void GetMatlTrades(
       const std::vector<Trade<Material> >& trades,
-      std::vector<std::pair<Trade<Material>, std::vector<Material::Ptr> > >& responses);
+      std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses);
   /// }@
 
  private:

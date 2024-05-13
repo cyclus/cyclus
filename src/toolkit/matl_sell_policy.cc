@@ -179,6 +179,8 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       } else {
         nbids = excl ? static_cast<int>(std::floor(qty / quantize_)) : static_cast<int>(std::floor(qty / package_fill));
       }
+      double remaining_qty = fmod(qty, package_fill);
+
       qty = excl ? quantize_ : package_fill;
       for (int i = 0; i < nbids; i++) {
         m = buf_->Pop();
@@ -189,6 +191,14 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
         port->AddBid(req, offer, this, excl);
         LG(INFO3) << "  - bid " << qty << " kg on a request for " << commod;
       }
+
+      if (!excl && remaining_qty > package_->fill_min()) {
+        offer = ignore_comp_ ? \
+                Material::CreateUntracked(remaining_qty, req->target()->comp()) : \
+                Material::CreateUntracked(remaining_qty, m->comp());
+        port->AddBid(req, offer, this, excl);
+        LG(INFO3) << "  - bid " << remaining_qty << " kg on a request for " << commod;
+      }
     }
   }
   return ports;
@@ -196,7 +206,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
 
 void MatlSellPolicy::GetMatlTrades(
     const std::vector<Trade<Material> >& trades,
-    std::vector<std::pair<Trade<Material>, std::vector<Material::Ptr> > >& responses) {
+    std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {
   Composition::Ptr c;
   std::vector<Trade<Material> >::const_iterator it;
   for (it = trades.begin(); it != trades.end(); ++it) {
@@ -207,12 +217,9 @@ void MatlSellPolicy::GetMatlTrades(
     // push any extra material that couldn't be packaged back onto buffer
     buf_->Push(mat);
     if (ignore_comp_) {
-      std::vector<Material::Ptr>::iterator pit;
-      for (pit = mat_pkgd.begin(); pit != mat_pkgd.end(); ++pit) {
-        (*pit)->Transmute(it->request->target()->comp());
+      mat_pkgd[0]->Transmute(it->request->target()->comp());
       }
-    }
-    responses.push_back(std::make_pair(*it, mat_pkgd));
+    responses.push_back(std::make_pair(*it, mat_pkgd[0]));
   }
 }
 
