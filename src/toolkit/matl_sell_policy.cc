@@ -17,7 +17,8 @@ MatlSellPolicy::MatlSellPolicy() :
     quantize_(0),
     throughput_(std::numeric_limits<double>::max()),
     ignore_comp_(false),
-    package_id_(Package::unpackaged_id()) {
+    package_id_(Package::unpackaged_id()),
+    package_(Package::unpackaged()) {
   Warn<EXPERIMENTAL_WARNING>(
       "MatlSellPolicy is experimental and its API may be subject to change");
 }
@@ -43,12 +44,10 @@ void MatlSellPolicy::set_ignore_comp(bool x) {
 
 void MatlSellPolicy::set_package(int x) {
   assert(x >= 1);
-  package_id_ = x;
+  // if no real context, only unpackaged can be used (keep default)
   if (manager() != NULL) {
-    package_ = manager()->context()->GetPackageById(package_id_);
-  } else {
-    // if no real context, only unpackaged can be used.
-    package_ = Package::unpackaged();
+    package_id_ = x;
+    package_ = manager()->context()->GetPackageById(x);
   }
 }
 
@@ -57,7 +56,6 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
-  package_ = Package::unpackaged();
   return *this;
 }
 
@@ -67,7 +65,6 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   buf_ = buf;
   name_ = name;
   set_throughput(throughput);
-  package_ = Package::unpackaged();
   return *this;
 }
 
@@ -77,7 +74,6 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   buf_ = buf;
   name_ = name;
   set_ignore_comp(ignore_comp);
-  package_ = Package::unpackaged();
   return *this;
 }
 
@@ -89,7 +85,6 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   name_ = name;
   set_throughput(throughput);
   set_ignore_comp(ignore_comp);
-  package_ = Package::unpackaged();
   return *this;
 }
 
@@ -103,7 +98,6 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   set_quantize(quantize);
   set_throughput(throughput);
   set_ignore_comp(ignore_comp);
-  set_package(package_id);
   return *this;
 }
 
@@ -118,7 +112,8 @@ void MatlSellPolicy::Start() {
     ss << "No manager set on Sell Policy " << name_;
     throw ValueError(ss.str());
   }
-  if (quantize_ < package_->fill_min() || quantize_ > package_->fill_max())  {
+  if ((quantize_ < package_->fill_min()) || 
+  (quantize_ > package_->fill_max()))  {
     std::stringstream ss;
     ss << "Quantize " << quantize_ << " is outside the package fill min/max values (" << package_->fill_min() << ", "
        << package_->fill_max() << ")";
@@ -178,8 +173,12 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
     for (rit = requests.begin(); rit != requests.end(); ++rit) {
       req = *rit;
       qty = std::min(req->target()->quantity(), limit);
-      package_fill = std::min(qty, package_->GetFillMass(qty));
-      nbids = excl ? static_cast<int>(std::floor(qty / quantize_)) : static_cast<int>(std::floor(qty / package_fill));
+      package_fill = package_->GetFillMass(qty);
+      if (package_fill == 0) {
+        nbids = 0;
+      } else {
+        nbids = excl ? static_cast<int>(std::floor(qty / quantize_)) : static_cast<int>(std::floor(qty / package_fill));
+      }
       qty = excl ? quantize_ : package_fill;
       for (int i = 0; i < nbids; i++) {
         m = buf_->Pop();
@@ -197,16 +196,23 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
 
 void MatlSellPolicy::GetMatlTrades(
     const std::vector<Trade<Material> >& trades,
-    std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {
+    std::vector<std::pair<Trade<Material>, std::vector<Material::Ptr> > >& responses) {
   Composition::Ptr c;
   std::vector<Trade<Material> >::const_iterator it;
   for (it = trades.begin(); it != trades.end(); ++it) {
     double qty = it->amt;
     LGH(INFO3) << " sending " << qty << " kg of " << it->request->commodity();
     Material::Ptr mat = buf_->Pop(qty, cyclus::eps_rsrc());
-    if (ignore_comp_)
-      mat->Transmute(it->request->target()->comp());
-    responses.push_back(std::make_pair(*it, mat));
+    std::vector<Material::Ptr> mat_pkgd = mat->Package<Material>(package_);
+    // push any extra material that couldn't be packaged back onto buffer
+    buf_->Push(mat);
+    if (ignore_comp_) {
+      std::vector<Material::Ptr>::iterator pit;
+      for (pit = mat_pkgd.begin(); pit != mat_pkgd.end(); ++pit) {
+        (*pit)->Transmute(it->request->target()->comp());
+      }
+    }
+    responses.push_back(std::make_pair(*it, mat_pkgd));
   }
 }
 
