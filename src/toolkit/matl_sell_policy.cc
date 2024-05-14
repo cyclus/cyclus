@@ -46,6 +46,13 @@ void MatlSellPolicy::set_package(int x) {
   assert(x >= 1);
   // if no real context, only unpackaged can be used (keep default)
   if (manager() != NULL) {
+    if ((quantize_ < package_->fill_min()) || 
+    (quantize_ > package_->fill_max()))  {
+      std::stringstream ss;
+      ss << "Quantize " << quantize_ << " is outside the package fill min/max values (" << package_->fill_min() << ", "
+       << package_->fill_max() << ")";
+      throw ValueError(ss.str());
+    }
     package_id_ = x;
     package_ = manager()->context()->GetPackageById(x);
   }
@@ -98,6 +105,7 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   set_quantize(quantize);
   set_throughput(throughput);
   set_ignore_comp(ignore_comp);
+  set_package(package_id);
   return *this;
 }
 
@@ -110,13 +118,6 @@ void MatlSellPolicy::Start() {
   if (manager() == NULL) {
     std::stringstream ss;
     ss << "No manager set on Sell Policy " << name_;
-    throw ValueError(ss.str());
-  }
-  if ((quantize_ < package_->fill_min()) || 
-  (quantize_ > package_->fill_max()))  {
-    std::stringstream ss;
-    ss << "Quantize " << quantize_ << " is outside the package fill min/max values (" << package_->fill_min() << ", "
-       << package_->fill_max() << ")";
     throw ValueError(ss.str());
   }
   manager()->context()->RegisterTrader(this);
