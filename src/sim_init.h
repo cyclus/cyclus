@@ -80,6 +80,7 @@ class SimInit {
 
   void LoadInfo();
   void LoadRecipes();
+  void LoadPackages();
   void LoadSolverInfo();
   void LoadPrototypes();
   void LoadInitialAgents();

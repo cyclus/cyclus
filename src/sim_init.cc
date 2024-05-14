@@ -190,6 +190,23 @@ void SimInit::LoadRecipes() {
   }
 }
 
+void SimInit::LoadPackages() {
+  QueryResult qr;
+  try {
+    qr = b_->Query("Packages", NULL);
+  } catch (std::exception err) {
+    return;
+  }  // table doesn't exist (okay)
+
+  for (int i = 0; i < qr.rows.size(); ++i) {
+    std::string package = qr.GetVal<std::string>("Package", i);
+    double fill_min = qr.GetVal<int>("FillMin", i);
+    double fill_max = qr.GetVal<int>("FillMax", i);
+    std::string strategy = qr.GetVal<std::string>("Strategy", i);
+    ctx_->AddPackage(package, fill_min, fill_max, strategy);
+  }
+}
+
 void* SimInit::LoadPreconditioner(std::string name) {
   using std::map;
   using std::string;
