@@ -134,7 +134,6 @@ class MatlSellPolicy : public Trader {
   double throughput_;
   std::string name_;
   bool ignore_comp_;
-  int package_id_;
   Package::Ptr package_;
 };
 

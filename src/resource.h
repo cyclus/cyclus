@@ -138,13 +138,12 @@ std::vector<typename T::Ptr> Resource::Package(Package::Ptr pkg) {
     return ts_pkgd;
   }
 
-  while (quantity() > pkg->fill_min()) {
+  while (quantity() > 0 && quantity() >= pkg->fill_min()) {
     double pkg_fill = std::min(quantity(), fill_mass);
     t_pkgd = boost::dynamic_pointer_cast<T>(ExtractRes(pkg_fill));
     t_pkgd->ChangePackageId(pkg->id());
-    ts_pkgd.push_back(t_pkgd);
+    ts_pkgd.push_back(t_pkgd); 
   }
-  
   return ts_pkgd;
 }
 

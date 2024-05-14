@@ -17,7 +17,6 @@ MatlSellPolicy::MatlSellPolicy() :
     quantize_(0),
     throughput_(std::numeric_limits<double>::max()),
     ignore_comp_(false),
-    package_id_(Package::unpackaged_id()),
     package_(Package::unpackaged()) {
   Warn<EXPERIMENTAL_WARNING>(
       "MatlSellPolicy is experimental and its API may be subject to change");
@@ -53,8 +52,9 @@ void MatlSellPolicy::set_package(int x) {
        << package_->fill_max() << ")";
       throw ValueError(ss.str());
     }
-    package_id_ = x;
-    package_ = manager()->context()->GetPackageById(x);
+    if (x > 1) {
+      package_ = manager()->context()->GetPackageById(x);
+    }
   }
 }
 
@@ -162,6 +162,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
   double qty;
   int nbids;
   double bid_qty;
+  double remaining_qty;
   std::set<std::string>::iterator sit;
   std::vector<Request<Material>*>::const_iterator rit;
   for (sit = commods_.begin(); sit != commods_.end(); ++sit) {
@@ -178,9 +179,9 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       if (bid_qty == 0) {
         nbids = 0;
       } else {
-        nbids = excl ? static_cast<int>(std::floor(qty / quantize_)) : static_cast<int>(std::floor(qty / bid_qty));
+        nbids = static_cast<int>(std::floor(qty / bid_qty));
       }
-      double remaining_qty = fmod(qty, bid_qty);
+      remaining_qty = fmod(qty, bid_qty);
 
       for (int i = 0; i < nbids; i++) {
         m = buf_->Pop();
@@ -192,14 +193,14 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
         LG(INFO3) << "  - bid " << bid_qty << " kg on a request for " << commod;
       }
 
-      if (!excl && remaining_qty > package_->fill_min()) {
+      if (!excl && remaining_qty > 0 && remaining_qty >= package_->fill_min()) {
         offer = ignore_comp_ ? \
                 Material::CreateUntracked(remaining_qty, req->target()->comp()) : \
                 Material::CreateUntracked(remaining_qty, m->comp());
         port->AddBid(req, offer, this, excl);
         LG(INFO3) << "  - bid " << remaining_qty << " kg on a request for " << commod;
       }
-    }
+    } 
   }
   return ports;
 }
@@ -216,6 +217,10 @@ void MatlSellPolicy::GetMatlTrades(
     std::vector<Material::Ptr> mat_pkgd = mat->Package<Material>(package_);
     // push any extra material that couldn't be packaged back onto buffer
     buf_->Push(mat);
+    if (mat_pkgd.size() == 0) {
+      // material couldn't be packaged, e.g. if the accepted bid was < fill min
+      return;
+    }
     if (ignore_comp_) {
       mat_pkgd[0]->Transmute(it->request->target()->comp());
       }
