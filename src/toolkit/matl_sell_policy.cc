@@ -183,9 +183,10 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       }
       remaining_qty = fmod(qty, bid_qty);
 
+      // Peek at resbuf to get current composition
+      m = buf_->Peek();
+
       for (int i = 0; i < nbids; i++) {
-        m = buf_->Pop();
-        buf_->Push(m);
         offer = ignore_comp_ ? \
                 Material::CreateUntracked(bid_qty, req->target()->comp()) : \
                 Material::CreateUntracked(bid_qty, m->comp());
