@@ -6,6 +6,7 @@
 #include <limits>
 
 #include "request.h"
+#include "package.h"
 
 namespace cyclus {
 
@@ -51,23 +52,26 @@ template <class T> class Bid {
                                    offer,
                                Trader* bidder,
                                typename BidPortfolio<T>::Ptr portfolio,
-                               bool exclusive = false) {
+                               bool exclusive = false,
+                               Package::Ptr package = Package::unpackaged()) {
     return Create(request, offer, bidder, portfolio, exclusive,
-                  std::numeric_limits<double>::quiet_NaN());
+                  std::numeric_limits<double>::quiet_NaN(), package);
   }
   /// @brief a factory method for a bid for a bid without a portfolio
   /// @warning this factory should generally only be used for testing
   inline static Bid<T>* Create(Request<T>* request, boost::shared_ptr<T> offer,
                                Trader* bidder, bool exclusive,
-                               double preference) {
-    return new Bid<T>(request, offer, bidder, exclusive, preference);
+                               double preference,
+                               Package::Ptr package = Package::unpackaged()) {
+    return new Bid<T>(request, offer, bidder, exclusive, preference, package);
   }
   /// @brief a factory method for a bid for a bid without a portfolio
   /// @warning this factory should generally only be used for testing
   inline static Bid<T>* Create(Request<T>* request, boost::shared_ptr<T> offer,
-                               Trader* bidder, bool exclusive = false) {
+                               Trader* bidder, bool exclusive = false,
+                               Package::Ptr package = Package::unpackaged()) {
     return Create(request, offer, bidder, exclusive,
-                  std::numeric_limits<double>::quiet_NaN());
+                  std::numeric_limits<double>::quiet_NaN(), package);
   }
 
   /// @return the request being responded to
@@ -91,38 +95,45 @@ template <class T> class Bid {
  private:
   /// @brief constructors are private to require use of factory methods
   Bid(Request<T>* request, boost::shared_ptr<T> offer, Trader* bidder,
-      bool exclusive, double preference)
+      bool exclusive, double preference,
+      Package::Ptr package = Package::unpackaged())
       : request_(request),
         offer_(offer),
         bidder_(bidder),
         exclusive_(exclusive),
-        preference_(preference) {}
+        preference_(preference),
+        package_(package) {}
   /// @brief constructors are private to require use of factory methods
   Bid(Request<T>* request, boost::shared_ptr<T> offer, Trader* bidder,
-      bool exclusive = false)
+      bool exclusive = false, Package::Ptr package = Package::unpackaged())
       : request_(request),
         offer_(offer),
         bidder_(bidder),
         exclusive_(exclusive),
-        preference_(std::numeric_limits<double>::quiet_NaN()) {}
+        preference_(std::numeric_limits<double>::quiet_NaN()),
+        package_(package) {}
 
   Bid(Request<T>* request, boost::shared_ptr<T> offer, Trader* bidder,
-      typename BidPortfolio<T>::Ptr portfolio, bool exclusive, double preference)
+      typename BidPortfolio<T>::Ptr portfolio, bool exclusive, double preference,
+      Package::Ptr package = Package::unpackaged())
       : request_(request),
         offer_(offer),
         bidder_(bidder),
         portfolio_(portfolio),
         exclusive_(exclusive),
-        preference_(preference) {}
+        preference_(preference),
+        package_(package) {}
 
   Bid(Request<T>* request, boost::shared_ptr<T> offer, Trader* bidder,
-      typename BidPortfolio<T>::Ptr portfolio, bool exclusive = false)
+      typename BidPortfolio<T>::Ptr portfolio, bool exclusive = false,
+      Package::Ptr package = Package::unpackaged())
       : request_(request),
         offer_(offer),
         bidder_(bidder),
         portfolio_(portfolio),
         exclusive_(exclusive),
-        preference_(std::numeric_limits<double>::quiet_NaN()) {}
+        preference_(std::numeric_limits<double>::quiet_NaN()),
+        package_(package)  {}
 
   Request<T>* request_;
   boost::shared_ptr<T> offer_;
@@ -130,6 +141,7 @@ template <class T> class Bid {
   boost::weak_ptr<BidPortfolio<T>> portfolio_;
   bool exclusive_;
   double preference_;
+  Package::Ptr package_;
 };
 
 }  // namespace cyclus
