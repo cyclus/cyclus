@@ -161,7 +161,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
   Material::Ptr m, offer;
   double qty;
   int nbids;
-  double package_fill;
+  double bid_qty;
   std::set<std::string>::iterator sit;
   std::vector<Request<Material>*>::const_iterator rit;
   for (sit = commods_.begin(); sit != commods_.end(); ++sit) {
@@ -174,23 +174,22 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
     for (rit = requests.begin(); rit != requests.end(); ++rit) {
       req = *rit;
       qty = std::min(req->target()->quantity(), limit);
-      package_fill = package_->GetFillMass(qty);
-      if (package_fill == 0) {
+      bid_qty = excl ? quantize_ : package_->GetFillMass(qty);
+      if (bid_qty == 0) {
         nbids = 0;
       } else {
-        nbids = excl ? static_cast<int>(std::floor(qty / quantize_)) : static_cast<int>(std::floor(qty / package_fill));
+        nbids = excl ? static_cast<int>(std::floor(qty / quantize_)) : static_cast<int>(std::floor(qty / bid_qty));
       }
-      double remaining_qty = fmod(qty, package_fill);
+      double remaining_qty = fmod(qty, bid_qty);
 
-      qty = excl ? quantize_ : package_fill;
       for (int i = 0; i < nbids; i++) {
         m = buf_->Pop();
         buf_->Push(m);
         offer = ignore_comp_ ? \
-                Material::CreateUntracked(qty, req->target()->comp()) : \
-                Material::CreateUntracked(qty, m->comp());
+                Material::CreateUntracked(bid_qty, req->target()->comp()) : \
+                Material::CreateUntracked(bid_qty, m->comp());
         port->AddBid(req, offer, this, excl);
-        LG(INFO3) << "  - bid " << qty << " kg on a request for " << commod;
+        LG(INFO3) << "  - bid " << bid_qty << " kg on a request for " << commod;
       }
 
       if (!excl && remaining_qty > package_->fill_min()) {
