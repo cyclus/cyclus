@@ -197,6 +197,7 @@ void XMLFileLoader::LoadSim() {
   LoadSolver();
   LoadRecipes();
   LoadPackages();
+  LoadTransportUnits();
   LoadSpecs();
   LoadInitialAgents();  // must be last
   SimInit::Snapshot(ctx_);
@@ -346,6 +347,24 @@ void XMLFileLoader::LoadPackages() {
 
     ctx_->AddPackage(name, fill_min, fill_max, strategy);
   }
+}
+
+void XMLFileLoader::LoadTransportUnits() {
+  InfileTree xqe(*parser_);
+
+  std::string query = "/*/transportunit";
+  int num_transport_units = xqe.NMatches(query);
+  for (int i = 0; i < num_transport_units; i++) {
+    InfileTree* qe = xqe.SubTree(query, i);
+    std::string name = cyclus::OptionalQuery<std::string>(qe, "name", "default");
+    CLOG(LEV_DEBUG3) << "loading transport unit: " << name;
+    
+    double fill_min = cyclus::OptionalQuery<double>(qe, "fill_min", eps());
+    double fill_max = cyclus::OptionalQuery<double>(qe, "fill_max", std::numeric_limits<double>::max());
+    
+    std::string strategy = cyclus::OptionalQuery<std::string>(qe, "strategy", "first");
+
+    ctx_->AddTransportUnit(name, fill_min, fill_max, strategy);
 }
 
 void XMLFileLoader::LoadSpecs() {

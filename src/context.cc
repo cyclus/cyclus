@@ -224,6 +224,40 @@ Package::Ptr Context::GetPackage(std::string name) {
   return packages_[name];
 }
 
+Package::Ptr Context::GetPackageById(int id) {
+  if (id == Package::unpackaged_id()) {
+    return Package::unpackaged();
+  }
+  if (id < 0) {
+    throw ValueError("Invalid package id " + std::to_string(id));
+  }
+  // iterate through the list of packages to get the one package with the correct id
+  std::map<std::string, Package::Ptr>::iterator it;
+  for (it = packages_.begin(); it != packages_.end(); ++it) {
+    if (it->second->id() == id) {
+      return it->second;
+    }
+  }
+  throw ValueError("Invalid package id " + std::to_string(id));
+}
+
+  void AddTransportUnit(std::string name, int fill_min, int fill_max, 
+                        std::string strategy) {
+    transport_units_[name] = TransportUnit::Create(name, fill_min, fill_max, strategy);
+    NewDatum("TransportUnit")
+      ->AddVal("TransportUnit", name)
+      ->AddVal("FillMin", fill_min)
+      ->AddVal("FillMax", fill_max)
+      ->AddVal("Strategy", strategy)
+      ->AddVal("Id", transport_units_[name]->id())
+      ->Record();
+  }
+
+  /// Retrieve a registered transport unit
+  TransportUnit::Ptr GetTransportUnitByName(std::string name);
+
+  TransportUnit::Ptr GetTransportUnitById(int id);
+
 void Context::InitSim(SimInfo si) {
   NewDatum("Info")
       ->AddVal("Handle", si.handle)
@@ -277,7 +311,7 @@ void Context::InitSim(SimInfo si) {
 int Context::time() {
   return ti_->time();
 }
-
+LoadPacka
 int Context::random() {
   return rng_->random();
 }
