@@ -218,14 +218,12 @@ void MatlSellPolicy::GetMatlTrades(
     std::vector<Material::Ptr> mat_pkgd = mat->Package<Material>(package_);
     // push any extra material that couldn't be packaged back onto buffer
     buf_->Push(mat);
-    if (mat_pkgd.size() == 0) {
-      // material couldn't be packaged, e.g. if the accepted bid was < fill min
-      return;
-    }
-    if (ignore_comp_) {
-      mat_pkgd[0]->Transmute(it->request->target()->comp());
-      }
-    responses.push_back(std::make_pair(*it, mat_pkgd[0]));
+    if (mat_pkgd.size() > 0) {
+      if (ignore_comp_) {
+        mat_pkgd[0]->Transmute(it->request->target()->comp());
+        }
+     responses.push_back(std::make_pair(*it, mat_pkgd[0]));
+}
   }
 }
 
