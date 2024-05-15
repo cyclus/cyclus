@@ -73,8 +73,8 @@ TransportUnit::Ptr TransportUnit::Create(std::string name, int fill_min, int fil
   else if (fill_min > fill_max) {
     throw ValueError("fill_min must be less than or equal to fill_max");
   }
-  Ptr p(new TransportUnit(name, fill_min, fill_max, strategy));
-  return p;
+  Ptr t(new TransportUnit(name, fill_min, fill_max, strategy));
+  return t;
 }
 
 // singleton pattern: 
@@ -88,7 +88,7 @@ TransportUnit::Ptr& TransportUnit::unrestricted() {
   return unrestricted_;
 }
 
-int TransportUnit::GetFillMass(double qty) {
+int TransportUnit::GetTransportUnitFill(int qty) {
   if (qty < fill_min_) {
     // less than one pkg of material available
     return 0;
@@ -104,11 +104,23 @@ int TransportUnit::GetFillMass(double qty) {
       // all material can fit in a package
       int fill_mass = qty / num_max_fill;
     } else {
-      // some material will remain unrestricted, fill up as many max packages as possible
+      // some material will remain unrestricted, fill up as many transport
+      // units as possible
       fill_mass = fill_max_;
     }
   }
   return fill_mass;
+}
+
+int TransportUnit:TotalShippablePackages(int pkgs) {
+  int fill = GetTransportUnitFill(pkgs);
+  int shippable = std::floor(pkgs / fill) * fill;
+  
+  int remainder = pkgs % fill;
+  if (remainder > 0 && remainder >= fill_min_) {
+    shippable += remainder;
+  }
+  return shippable;
 }
   
 TransportUnit::TransportUnit(std::string name, int fill_min, int fill_max, std::string strategy) : 

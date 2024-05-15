@@ -72,29 +72,21 @@ class TransportUnit {
   public:
     typedef boost::shared_ptr<TransportUnit> Ptr;
 
-    // create a new package type. Should be called by the context only
-    // (see Context::AddPackage), unless you want an untracked package
-    //  type (which you probably don't)
+    // create a new transport unit type. Should be called by the context only
+    // (see Context::AddTransportUnit), unless you want an untracked package
+    // type (which you probably don't)
     static Ptr Create(std::string name, int fill_min = 0,
                       int fill_max = std::numeric_limits<int>::max(),
                       std::string strategy = "first");
 
-    /// Returns optimal fill mass for a resource to be packaged. Can be used
-    /// to determine how to respond to requests for material, and to actually
-    /// package and send off trades.
-    /// Packaging strategy "first" simply fills the packages one by one to the
-    /// maximum fill. Therefore, it should always try to max fill.
-    /// Packaging strategy "equal" tries to fill all packages to the same mass.
-    /// This tries to find the optimal number and fill mass of packages given
-    /// the packaging limitations. It does this by calculating bounding fills, 
-    /// floor(quantity/fill_min) and ceiling(quantity/fill_max). 
-    /// There might be a scenario where there is no solution, i.e. an integer
-    /// number of packages cannot be filled with no remainder. In this case,
-    /// the most effective fill strategy is to fill to the max. Numeric example:
-    /// quantity = 5, fill_min = 3, fill_max = 4. num_min_fill = floor(5/3) = 1,
-    /// num_max_fill = ceil(5/4) = 2. num_min_fill < num_max_fill, so fill to
-    /// the max.
-    int GetShippableTransportUnits(int qty);
+    /// Returns number of packages for 
+    /// Strategy "first" simply fill transport units one by one to max fill
+    /// Strategy "equal" tries to fill all transport units with the
+    /// same number of packages
+    int GetTransportUnitFill(int qty);
+
+    /// Returns the max number of packages that can be shipped
+    int TotalShippablePackages(int pkgs);
 
     // returns package id
     int id() const { return id_; }
@@ -117,7 +109,7 @@ class TransportUnit {
     static Ptr& unrestricted();
 
   private:
-    Package(std::string name, 
+    TransportUnit(std::string name, 
             int fill_min = 0, 
             int fill_max = std::numeric_limits<int>::max(), 
             std::string strategy = "first");
