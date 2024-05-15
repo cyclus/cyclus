@@ -222,8 +222,8 @@ void MatlSellPolicy::GetMatlTrades(
       if (ignore_comp_) {
         mat_pkgd[0]->Transmute(it->request->target()->comp());
         }
-     responses.push_back(std::make_pair(*it, mat_pkgd[0]));
-}
+      responses.push_back(std::make_pair(*it, mat_pkgd[0]));
+    }
   }
 }
 
