@@ -58,7 +58,6 @@ extern "C" {
 #include "toolkit/infile_converters.h"
 #include "toolkit/mat_query.h"
 #include "toolkit/position.h"
-#include "toolkit/resource_buff.h"
 #include "toolkit/res_buf.h"
 #include "toolkit/res_manip.h"
 #include "toolkit/res_map.h"
