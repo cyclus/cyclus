@@ -313,7 +313,6 @@ enum DbTypes {
   // Resource Tools
   MATERIAL,  // ["cyclus::Material", 0, [], "MATERIAL", false]
   PRODUCT,  // ["cyclus::Product", 0, [], "PRODUCT", false]
-  RESOURCE_BUFF,  // ["cyclus::toolkit::ResourceBuff", 0, [], "RESOURCE_BUFF", false]
   RES_BUF_MATERIAL,  // ["cyclus::toolkit::ResBuf<cyclus::Material>", 1, [], ["RES_BUF", "MATERIAL"], false]
   RES_BUF_PRODUCT,  // ["cyclus::toolkit::ResBuf<cyclus::Product>", 1, [], ["RES_BUF", "PRODUCT"], false]
   RES_MAP_INT_MATERIAL,  // ["cyclus::toolkit::ResMap<int, cyclus::Material>", 2, [], ["RES_MAP", "INT", "MATERIAL"], false]
