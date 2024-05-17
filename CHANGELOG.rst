@@ -14,6 +14,8 @@ Since last release
 
 **Removed:**
 
+* Removed the ResourceBuff class and replaced its instances with ResBuf (#1755)
+
 **Fixed:**
 
 
