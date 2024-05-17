@@ -69,7 +69,8 @@ jobs:
         if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
-          repository: cyclus/cycamore
+          repository: bennibbelink/cycamore
+          ref: resource-buff
           path: ${{ github.workspace }}/cycamore
 
       - name: Build and Test Cycamore
