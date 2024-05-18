@@ -834,35 +834,6 @@ cdef extern from "toolkit/position.h" namespace "cyclus::toolkit":
 # Inventories and Resource Buffers
 #
 
-cdef extern from "toolkit/resource_buff.h" namespace "cyclus::toolkit":
-
-    ctypedef vector[Resource.Ptr] Manifest
-
-    cdef cppclass ResourceBuff:
-        enum AccessDir:
-            FRONT
-            BACK
-        ResourceBuff()
-        double capacity()
-        void set_capacity(double)
-        int count()
-        double quantity()
-        double space()
-        cpp_bool empty()
-        Manifest PopQty(double)
-        Manifest PopQty(double, double)
-        Manifest PopN(int)
-        Resource.Ptr Pop(AccessDir)
-        shared_ptr[T] Pop[T]()
-        void Push(shared_ptr[Resource])
-        void PushAll[B](vector[B])
-
-cdef extern from "toolkit/resource_buff.h" namespace "cyclus::toolkit::ResourceBuff":
-
-        enum AccessDir:
-            FRONT
-            BACK
-
 cdef extern from "toolkit/res_buf.h" namespace "cyclus::toolkit":
 
     ctypedef vector[Resource.Ptr] ResVec

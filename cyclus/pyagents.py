@@ -42,7 +42,7 @@ class Sink(Facility):
         tooltip="sink capacity",
         default=100.0,
         )
-    inventory = ts.ResourceBuffInv(capacity='max_inv_size')
+    inventory = ts.ResBufProduct()
 
     def get_material_requests(self):
         if len(self.recipe) == 0:

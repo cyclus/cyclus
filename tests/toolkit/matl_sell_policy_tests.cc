@@ -9,7 +9,6 @@
 #include "request.h"
 #include "error.h"
 #include "pyne.h"
-#include "toolkit/resource_buff.h"
 
 #include "test_context.h"
 #include "test_agents/test_facility.h"
