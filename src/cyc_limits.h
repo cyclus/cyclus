@@ -38,19 +38,13 @@ static const double float_ulp_eq = 2;
 static const double kModifierLimit = pow(10, 10);
 
 /// maximum (+) value for an integer variable
-static const int cy_max_int = std::numeric_limits<int>::max();
-
-/// maximum (-) value for an integer variable
-static const int cy_min_int = std::numeric_limits<int>::min();
+static const int cy_large_int = std::numeric_limits<int>::max();
 
 /// maximum (+) value for a linear variable
-static const double cy_max_double = std::numeric_limits<double>::max();
+static const double cy_large_double = 1e299;
 
-/// maximum (-) value for a linear variable
-static const double cy_min_double = std::numeric_limits<double>::min();
-
-/// epsilon value to turn determine difference between constraint values
-static const double kConstraintEps = 1e-08;
+/// constant near-zero value
+static const double cy_near_zero = 1e-08;
 
 }  // namespace cyclus
 

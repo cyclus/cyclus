@@ -2080,3 +2080,12 @@ class Position(_Position):
     calculated by multiplying decimal degrees by 3600.
     example: 05.2169 -> 18780.84
     """
+
+def cy_large_double():
+    return cpp_cyclus.cy_large_double
+
+def cy_large_int():
+    return cpp_cyclus.cy_large_int
+
+def cy_near_zero():
+    return cpp_cyclus.cy_near_zero
