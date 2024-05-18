@@ -175,15 +175,16 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     FIND_PACKAGE(LibXml2 REQUIRED)
     ADD_DEFINITIONS(${LIBXML2_DEFINITIONS})
-    SET(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
+    SET(LIBS ${LIBS} LibXml2::LibXml2)
     message("-- LibXML2 Include Dir: ${LIBXML2_INCLUDE_DIR}")
+    message("-- LibXML2 Libraries: ${LIBXML2_LIBRARIES}")
 
     # Then use pkg-config for locate specific package
     pkg_check_modules(LIBXMLXX IMPORTED_TARGET libxml++-4.0)
-    IF ( NOT LIBXMLXX_LIBRARIES )
+    IF ( NOT LIBXMLXX_FOUND )
        pkg_check_modules(LIBXMLXX REQUIRED IMPORTED_TARGET libxml++-2.6)
-    ENDIF ( NOT LIBXMLXX_LIBRARIES )
-    SET(LIBS ${LIBS} ${LIBXMLXX_LIBRARIES})
+    ENDIF ( NOT LIBXMLXX_FOUND )
+    SET(LIBS ${LIBS} PkgConfig::LIBXMLXX)
     message("-- LibXML++ Include Dir: ${LIBXMLXX_INCLUDE_DIRS}")
     message("-- LibXML++ Libraries: ${LIBXMLXX_LIBRARIES}")
     
@@ -261,11 +262,11 @@ IF(NOT CYCLUS_DOC_ONLY)
     ENDIF(GFORTRAN_LIBRARIES)
 
     # openblas
-    FIND_LIBRARY(OPENBLAS_LIBRARIES openblas ${DEPS_LIB_HINTS})
-    MESSAGE("-- Found OPENBLAS Libraries (optional): ${OPENBLAS_LIBRARIES}")
-    IF(OPENBLAS_LIBRARIES)
-        set(LIBS ${LIBS} ${OPENBLAS_LIBRARIES})
-    ENDIF(OPENBLAS_LIBRARIES)
+    FIND_LIBRARY(BLAS_LIBRARIES blas ${DEPS_LIB_HINTS})
+    MESSAGE("-- Found BLAS Libraries (optional): ${BLAS_LIBRARIES}")
+    IF(BLAS_FOUND)
+        set(LIBS ${LIBS} ${BLAS_LIBRARIES})
+    ENDIF(BLAS_FOUND)
 
     # ClpSolver
     FIND_LIBRARY(CLPSOLVER_LIBRARIES ClpSolver ${DEPS_LIB_HINTS})
@@ -331,7 +332,6 @@ IF(NOT CYCLUS_DOC_ONLY)
         include(UseCython)
         find_package (Python3 REQUIRED COMPONENTS NumPy)
         find_package(Jinja2 REQUIRED)
-        find_package(Pandas REQUIRED)
 
         # With CMake, a clean separation can be made between the source tree and the
         # build tree.  When all source is compiled, as with pure C/C++, the source is
