@@ -11,6 +11,7 @@ Since last release
 
 * Changed README.rst installation instructions, tested on fresh Ubuntu-22.04 system with Python3.11 (#1744)
 * Rely on `python3` in environment instead of `python` (#1747)
+* Define constants ``cy_large_double``, ``cy_large_int``, and ``cy_near_zero`` (#1757)
 
 **Removed:**
 
