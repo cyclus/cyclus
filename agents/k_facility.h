@@ -200,7 +200,7 @@ class KFacility : public cyclus::Facility {
   double current_capacity;
 
   #pragma cyclus var { \
-    "default": "cy_max_double", \
+    "default": "cy_large_double", \
     "tooltip": "k-facility maximum inventory size", \
     "doc": "total maximum inventory size of the k-facility", \
     "uilabel": "Maximum Inventory"			     \
