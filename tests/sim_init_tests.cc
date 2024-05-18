@@ -68,8 +68,8 @@ class Inver : public cy::Facility {
 
   virtual cy::Inventories SnapshotInv() {
     cy::Inventories invs;
-    invs["buf1"] = buf1.PopN(buf1.count());
-    invs["buf2"] = buf2.PopN(buf2.count());
+    invs["buf1"] = buf1.PopNRes(buf1.count());
+    invs["buf2"] = buf2.PopNRes(buf2.count());
     buf1.Push(invs["buf1"]);
     buf2.Push(invs["buf2"]);
     return invs;
@@ -77,8 +77,8 @@ class Inver : public cy::Facility {
   virtual void Tick() { context()->Snapshot(); }
   virtual void Tock() {};
 
-  cy::toolkit::ResBuf<cy::Resource> buf1;
-  cy::toolkit::ResBuf<cy::Resource> buf2;
+  cy::toolkit::ResBuf<cy::Material> buf1;
+  cy::toolkit::ResBuf<cy::Material> buf2;
   int val1;
 };
 
@@ -395,8 +395,8 @@ TEST_F(SimInitTest, InitAgentInventories) {
     EXPECT_EQ(2, init_agent->buf2.count());
 
     // check agents' buf1 inventory
-    cy::Resource::Ptr mat1 = agent->buf1.Pop();
-    cy::Resource::Ptr init_mat1 = init_agent->buf1.Pop();
+    cy::Material::Ptr mat1 = agent->buf1.Pop();
+    cy::Material::Ptr init_mat1 = init_agent->buf1.Pop();
 
     EXPECT_EQ(mat1->qual_id(), init_mat1->qual_id());
     EXPECT_EQ(mat1->obj_id(), init_mat1->obj_id());
@@ -406,8 +406,8 @@ TEST_F(SimInitTest, InitAgentInventories) {
     // check agents' buf2 inventories
     mat1 = agent->buf2.Pop();
     init_mat1 = init_agent->buf2.Pop();
-    cy::Resource::Ptr mat2 = agent->buf2.Pop();
-    cy::Resource::Ptr init_mat2 = init_agent->buf2.Pop();
+    cy::Material::Ptr mat2 = agent->buf2.Pop();
+    cy::Material::Ptr init_mat2 = init_agent->buf2.Pop();
 
     EXPECT_EQ(mat1->qual_id(), init_mat1->qual_id());
     EXPECT_EQ(mat1->obj_id(), init_mat1->obj_id());
