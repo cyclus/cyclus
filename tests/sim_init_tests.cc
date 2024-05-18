@@ -7,10 +7,10 @@
 #include "material.h"
 #include "pyhooks.h"
 #include "recorder.h"
+#include "toolkit/res_buf.h"
 #include "sim_init.h"
 #include "sqlite_back.h"
 #include "timer.h"
-#include "toolkit/resource_buff.h"
 
 // special name to tell sqlite to use in-mem db
 static const char* dbpath = ":memory:";
@@ -62,23 +62,23 @@ class Inver : public cy::Facility {
   }
 
   virtual void InitInv(cy::Inventories& inv) {
-    buf1.PushAll(inv["buf1"]);
-    buf2.PushAll(inv["buf2"]);
+    buf1.Push(inv["buf1"]);
+    buf2.Push(inv["buf2"]);
   }
 
   virtual cy::Inventories SnapshotInv() {
     cy::Inventories invs;
-    invs["buf1"] = buf1.PopN(buf1.count());
-    invs["buf2"] = buf2.PopN(buf2.count());
-    buf1.PushAll(invs["buf1"]);
-    buf2.PushAll(invs["buf2"]);
+    invs["buf1"] = buf1.PopNRes(buf1.count());
+    invs["buf2"] = buf2.PopNRes(buf2.count());
+    buf1.Push(invs["buf1"]);
+    buf2.Push(invs["buf2"]);
     return invs;
   }
   virtual void Tick() { context()->Snapshot(); }
   virtual void Tock() {};
 
-  cy::toolkit::ResourceBuff buf1;
-  cy::toolkit::ResourceBuff buf2;
+  cy::toolkit::ResBuf<cy::Material> buf1;
+  cy::toolkit::ResBuf<cy::Material> buf2;
   int val1;
 };
 
@@ -395,8 +395,8 @@ TEST_F(SimInitTest, InitAgentInventories) {
     EXPECT_EQ(2, init_agent->buf2.count());
 
     // check agents' buf1 inventory
-    cy::Material::Ptr mat1 = agent->buf1.Pop<cy::Material>();
-    cy::Material::Ptr init_mat1 = init_agent->buf1.Pop<cy::Material>();
+    cy::Material::Ptr mat1 = agent->buf1.Pop();
+    cy::Material::Ptr init_mat1 = init_agent->buf1.Pop();
 
     EXPECT_EQ(mat1->qual_id(), init_mat1->qual_id());
     EXPECT_EQ(mat1->obj_id(), init_mat1->obj_id());
@@ -404,10 +404,10 @@ TEST_F(SimInitTest, InitAgentInventories) {
     EXPECT_EQ(mat1->quantity(), init_mat1->quantity());
 
     // check agents' buf2 inventories
-    mat1 = agent->buf2.Pop<cy::Material>();
-    init_mat1 = init_agent->buf2.Pop<cy::Material>();
-    cy::Material::Ptr mat2 = agent->buf2.Pop<cy::Material>();
-    cy::Material::Ptr init_mat2 = init_agent->buf2.Pop<cy::Material>();
+    mat1 = agent->buf2.Pop();
+    init_mat1 = init_agent->buf2.Pop();
+    cy::Material::Ptr mat2 = agent->buf2.Pop();
+    cy::Material::Ptr init_mat2 = init_agent->buf2.Pop();
 
     EXPECT_EQ(mat1->qual_id(), init_mat1->qual_id());
     EXPECT_EQ(mat1->obj_id(), init_mat1->obj_id());

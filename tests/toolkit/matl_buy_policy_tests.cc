@@ -7,7 +7,6 @@
 #include "material.h"
 #include "request.h"
 #include "error.h"
-#include "toolkit/resource_buff.h"
 #include "random_number_generator.h"
 
 #include "test_context.h"
