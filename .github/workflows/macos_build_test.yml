@@ -158,6 +158,7 @@ jobs:
           if: ${{ matrix.macos_versions == 'macos-14' }}
           run: |
             echo "SLOW_FLAG=--slow" >> "$GITHUB_ENV"
+            echo "ARM=arm" >> "$GITHUB_ENV"
 
         - name: Set up Miniconda
           uses: conda-incubator/setup-miniconda@v3
@@ -171,8 +172,8 @@ jobs:
           id: build-cyclus
           run: |
             conda install -y \
-              clang_osx-arm64 \
-              clangxx_osx-arm64 \
+              clang_osx-${ARM}64 \
+              clangxx_osx-${ARM}64 \
               cmake \
               make \
               git \
