@@ -26,7 +26,7 @@ on:
 
 
 jobs:
-    build-test-macos:
+    build-test-brew:
         strategy:
           fail-fast: false
           matrix:
@@ -86,7 +86,7 @@ jobs:
             continue-on-error: true
             run: |
               cd ${{ github.workspace }}/cycamore
-              python3 install.py -j 3
+              python3 install.py -j 3 --allow-milps
               export PATH=$HOME/.local/bin:$PATH
               export DYLD_LIBRARY_PATH=$HOME/.local/lib
               cycamore_unit_tests
@@ -137,6 +137,135 @@ jobs:
             with:
               name: ${{ env.ARTIFACT_NAME }}
               path: ${{ env.ARTIFACT_NAME }}.txt  
+
+    build-test-conda:
+      strategy:
+        fail-fast: false
+        matrix:
+          macos_versions : [
+            macos-12,
+            macos-13,
+            macos-14,
+          ]
+
+      runs-on: [ "${{ matrix.macos_versions }}" ]
+
+      steps:
+        - name: Checkout Cyclus
+          uses: actions/checkout@v4
+
+        - name: --slow flag if on ARM
+          if: ${{ matrix.macos_versions == 'macos-14' }}
+          run: |
+            echo "SLOW_FLAG=--slow" >> "$GITHUB_ENV"
+
+        - name: Set up Miniconda
+          uses: conda-incubator/setup-miniconda@v3
+          with:
+            miniconda-version: "latest"
+            auto-update-conda: true
+            auto-activate-base: true
+            channels: conda-forge
+
+        - name: Build and Test Cyclus
+          id: build-cyclus
+          run: |
+            conda install -y \
+              clang_osx-arm64 \
+              clangxx_osx-arm64 \
+              cmake \
+              make \
+              git \
+              glib \
+              libxml2 \
+              libxmlpp-4.0 \
+              liblapack \
+              pkg-config \
+              coincbc \
+              libboost-devel \
+              hdf5 \
+              sqlite \
+              pcre \
+              setuptools \
+              pytest \
+              pytables \
+              pandas \
+              jinja2 \
+              cython \
+              websockets \
+              pprintpp \
+              pip
+            python3 install.py -j 3 --allow-milps ${SLOW_FLAG} -DCMAKE_CXX_FLAGS="-ld_classic"
+            export PATH=$HOME/.local/bin:$PATH
+            export DYLD_LIBRARY_PATH=$HOME/.local/lib
+            cyclus_unit_tests
+            cd tests && python3 -m pytest
+
+        - name: Checkout Cycamore
+          if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
+          uses: actions/checkout@v4
+          with:
+            repository: bennibbelink/cycamore
+            path: ${{ github.workspace }}/cycamore
+            ref: macos
+
+        - name: Build and Test Cycamore
+          id: build-cycamore
+          if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
+          continue-on-error: true
+          run: |
+            cd ${{ github.workspace }}/cycamore
+            python3 install.py -j 3 --allow-milps
+            export PATH=$HOME/.local/bin:$PATH
+            export DYLD_LIBRARY_PATH=$HOME/.local/lib
+            cycamore_unit_tests
+            cd tests && python3 -m pytest
+
+        - name: Checkout Cymetric
+          if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
+          uses: actions/checkout@v4
+          with:
+            repository: cyclus/cymetric
+            path: ${{ github.workspace }}/cymetric
+
+        - name: Build and Test Cymetric
+          id: build-cymetric
+          if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
+          continue-on-error: true
+          run: |
+            cd ${{ github.workspace }}/cymetric
+            python3 -m pip install --target $(python3 -m site --user-site) .
+            export PATH=$HOME/.local/bin:$PATH
+            export DYLD_LIBRARY_PATH=$HOME/.local/lib
+            cd tests && python3 -m pytest
+
+        - name: Export Environment Variables
+          if: github.event_name == 'pull_request'
+          run: |
+            echo "CYCAMORE_BUILD_STATUS=${{steps.build-cycamore.outcome == 'success' && '**Success** :white_check_mark:' || 
+            steps.build-cycamore.outcome == 'failure' && '**Failure** :x:' || 
+            '**Skipped due to upstream failure** :warning:'}}" >> "$GITHUB_ENV"
+
+            echo "CYMETRIC_BUILD_STATUS=${{steps.build-cymetric.outcome == 'success' && '**Success** :white_check_mark:' || 
+            steps.build-cymetric.outcome == 'failure' && '**Failure** :x:' || 
+            '**Skipped due to upstream failure** :warning:'}}" >> "$GITHUB_ENV"
+
+            echo "ARTIFACT_NAME=${{ matrix.macos_versions }}" >> "$GITHUB_ENV"
+    
+        - name: Construct Artifact
+          if: github.event_name == 'pull_request'
+          run: |
+            echo "
+            ##### Build \`${{ matrix.macos_versions }}\`
+              - Cycamore: ${{ env.CYCAMORE_BUILD_STATUS }}
+              - Cymetric: ${{ env.CYMETRIC_BUILD_STATUS }}" > ${{ env.ARTIFACT_NAME }}.txt
+        
+        - name: Upload Artifact
+          if: github.event_name == 'pull_request'
+          uses: actions/upload-artifact@v4
+          with:
+            name: ${{ env.ARTIFACT_NAME }}
+            path: ${{ env.ARTIFACT_NAME }}.txt  
     
     upload-pr-number:
         runs-on: ubuntu-latest
