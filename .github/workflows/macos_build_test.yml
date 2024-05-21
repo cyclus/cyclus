@@ -68,6 +68,7 @@ jobs:
                 tables
               python3 install.py -j 3 --coin-root $(brew --prefix) --allow-milps ${SLOW_FLAG}
               export PATH=$HOME/.local/bin:$PATH
+              export DYLD_LIBRARY_PATH=$HOME/.local/lib
               cyclus_unit_tests
               cd tests && python3 -m pytest
     
@@ -87,6 +88,7 @@ jobs:
               cd ${{ github.workspace }}/cycamore
               python3 install.py -j 3
               export PATH=$HOME/.local/bin:$PATH
+              export DYLD_LIBRARY_PATH=$HOME/.local/lib
               cycamore_unit_tests
               cd tests && python3 -m pytest
     
@@ -105,6 +107,7 @@ jobs:
               cd ${{ github.workspace }}/cymetric
               python3 -m pip install --target $(python3 -m site --user-site) .
               export PATH=$HOME/.local/bin:$PATH
+              export DYLD_LIBRARY_PATH=$HOME/.local/lib
               cd tests && python3 -m pytest
     
           - name: Export Environment Variables
