@@ -198,7 +198,7 @@ jobs:
             export CC=$(conda info --base)/bin/clang
             export CXX=$(conda info --base)/bin/clang++
             export CPP=$(conda info --base)/bin/clang-cpp
-            python3 install.py -j 3 --allow-milps ${SLOW_FLAG} -DCMAKE_CXX_FLAGS="-ld_classic"
+            python3 install.py -j 3 --allow-milps ${SLOW_FLAG}
             export PATH=$HOME/.local/bin:$PATH
             export DYLD_LIBRARY_PATH=$HOME/.local/lib
             cyclus_unit_tests
