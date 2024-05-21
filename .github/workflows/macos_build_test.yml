@@ -96,9 +96,8 @@ jobs:
             if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
             uses: actions/checkout@v4
             with:
-              repository: bennibbelink/cymetric
+              repository: cyclus/cymetric
               path: ${{ github.workspace }}/cymetric
-              ref: macos
     
           - name: Build and Test Cymetric
             id: build-cymetric
@@ -106,7 +105,7 @@ jobs:
             continue-on-error: true
             run: |
               cd ${{ github.workspace }}/cymetric
-              python3 install.py -j 3
+              python3 -m pip install --target $(python3 -m site --user-site) .
               export PATH=$HOME/.local/bin:$PATH
               export DYLD_LIBRARY_PATH=$HOME/.local/lib
               cd tests && python3 -m pytest
