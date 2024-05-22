@@ -58,6 +58,7 @@ void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
   // this sequence is imporant!!!
   LoadInfo();
   LoadRecipes();
+  LoadPackages();
   LoadSolverInfo();
   LoadPrototypes();
   LoadInitialAgents();
@@ -200,8 +201,8 @@ void SimInit::LoadPackages() {
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string package = qr.GetVal<std::string>("Package", i);
-    double fill_min = qr.GetVal<int>("FillMin", i);
-    double fill_max = qr.GetVal<int>("FillMax", i);
+    double fill_min = qr.GetVal<double>("FillMin", i);
+    double fill_max = qr.GetVal<double>("FillMax", i);
     std::string strategy = qr.GetVal<std::string>("Strategy", i);
     ctx_->AddPackage(package, fill_min, fill_max, strategy);
   }
