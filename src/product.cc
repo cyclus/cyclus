@@ -18,7 +18,6 @@ Product::Ptr Product::Create(Agent* creator, double quantity,
     creator->context()->NewDatum("Products")
         ->AddVal("QualId", qualids_[quality])
         ->AddVal("Quality", quality)
-        ->AddVal("PackageId", package_id)
         ->Record();
   }
 
@@ -85,6 +84,7 @@ void Product::ChangePackageId(int new_package_id) {
   else if (new_package_id == Package::unpackaged_id()) {
     // unpackaged has functionally no restrictions
     package_id_ = new_package_id;
+    tracker_.Package();
     return;
   }
   Package::Ptr p = ctx_->GetPackageById(new_package_id);
@@ -92,6 +92,7 @@ void Product::ChangePackageId(int new_package_id) {
   double max = p->fill_max();
   if (quantity_ >= min && quantity_ <= max) {
     package_id_ = new_package_id;
+    tracker_.Package();
   } else {
     throw ValueError("Product quantity is outside of package fill limits.");
   }

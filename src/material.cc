@@ -48,7 +48,6 @@ void Material::Record(Context* ctx) const {
   ctx_->NewDatum("MaterialInfo")
       ->AddVal("ResourceId", state_id())
       ->AddVal("PrevDecayTime", prev_decay_time_)
-      ->AddVal("PackageId", package_id_)
       ->Record();
 
   comp_->Record(ctx);
@@ -149,6 +148,7 @@ void Material::ChangePackageId(int new_package_id) {
   else if (new_package_id == Package::unpackaged_id()) {
     // unpackaged has functionally no restrictions
     package_id_ = new_package_id;
+    tracker_.Package();
     return;
   }
  
@@ -157,6 +157,7 @@ void Material::ChangePackageId(int new_package_id) {
   double max = p->fill_max();
   if (qty_ >= min && qty_ <= max) {
     package_id_ = new_package_id;
+    tracker_.Package();
   } else {
     throw ValueError("Material quantity is outside of package fill limits.");
   }
