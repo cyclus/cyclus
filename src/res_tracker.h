@@ -42,11 +42,15 @@ class ResTracker {
   /// decay).
   void Modify();
 
+  /// Should be called when a resource's package id gets modified
+  void Package();
+
  private:
   void Record();
 
   int parent1_;
   int parent2_;
+  int package_id_;
   bool tracked_;
   Resource* res_;
   Context* ctx_;

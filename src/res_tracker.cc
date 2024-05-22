@@ -64,16 +64,26 @@ void ResTracker::Absorb(ResTracker* absorbed) {
   Record();
 }
 
+void ResTracker::Package() {
+  if (!tracked_) {
+    return;
+  }
+
+  package_id_ = res_->package_id();
+  Record();
+}
+
 void ResTracker::Record() {
   res_->BumpStateId();
   ctx_->NewDatum("Resources")
       ->AddVal("ResourceId", res_->state_id())
-      ->AddVal("ObjId", res_->obj_id())
+      ->AddVal("ObjI", res_->obj_id())
       ->AddVal("Type", res_->type())
       ->AddVal("TimeCreated", ctx_->time())
       ->AddVal("Quantity", res_->quantity())
       ->AddVal("Units", res_->units())
       ->AddVal("QualId", res_->qual_id())
+      ->AddVal("PackageId", res_->package_id())
       ->AddVal("Parent1", parent1_)
       ->AddVal("Parent2", parent2_)
       ->Record();
