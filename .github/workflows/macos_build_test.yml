@@ -171,7 +171,7 @@ jobs:
         - name: Build and Test Cyclus
           id: build-cyclus
           run: |
-            brew uninstall cmake pkg-config
+            conda install -y libmamba
             conda install -y \
               clang_osx-${ARM}64 \
               clangxx_osx-${ARM}64 \
@@ -200,6 +200,7 @@ jobs:
             export CC=$(conda info --base)/bin/clang
             export CXX=$(conda info --base)/bin/clang++
             export CPP=$(conda info --base)/bin/clang-cpp
+            export PKG_CONFIG_PATH=${CONDA_PREFIX}/lib/pkgconfig
             python3 install.py -j 3 --allow-milps ${SLOW_FLAG}
             export PATH=$HOME/.local/bin:$PATH
             export DYLD_LIBRARY_PATH=$HOME/.local/lib
