@@ -193,12 +193,18 @@ Composition::Ptr Context::GetRecipe(std::string name) {
 
 void Context::AddPackage(std::string name, double fill_min, double fill_max,
                          std::string strategy) {
-  packages_[name] = Package::Create(name, fill_min, fill_max, strategy);
+  Package::Ptr pkg = Package::Create(name, fill_min, fill_max, strategy);
+  packages_[name] = pkg;
+  RecordPackage(pkg);
+}
+
+void Context::RecordPackage(Package::Ptr pkg) {
   NewDatum("Packages")
-    ->AddVal("Package", name)
-    ->AddVal("FillMin", fill_min)
-    ->AddVal("FillMax", fill_max)
-    ->AddVal("Strategy", strategy)
+    ->AddVal("Package", pkg->name())
+    ->AddVal("FillMin", pkg->fill_min())
+    ->AddVal("FillMax", pkg->fill_max())
+    ->AddVal("Strategy", pkg->strategy())
+    ->AddVal("PackageId", pkg->id())
     ->Record();
 }
 

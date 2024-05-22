@@ -255,6 +255,10 @@ class Context {
                   double fill_max = std::numeric_limits<double>::max(),
                   std::string strategy = "first");
 
+  /// Records package information. Should be used first on unpackaged, then
+  /// to record user-declared packages
+  void RecordPackage(Package::Ptr);
+
   // Retrieve a registered package. 
   Package::Ptr GetPackageByName(std::string name);
 

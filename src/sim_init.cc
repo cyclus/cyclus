@@ -199,6 +199,8 @@ void SimInit::LoadPackages() {
     return;
   }  // table doesn't exist (okay)
 
+  ctx_->RecordPackage(Package::unpackaged());
+
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string package = qr.GetVal<std::string>("Package", i);
     double fill_min = qr.GetVal<double>("FillMin", i);
