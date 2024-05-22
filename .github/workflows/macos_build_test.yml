@@ -164,6 +164,7 @@ jobs:
           uses: conda-incubator/setup-miniconda@v3
           with:
             miniconda-version: "latest"
+            conda-solver: "libmamba"
             auto-update-conda: true
             auto-activate-base: true
             channels: conda-forge
@@ -171,7 +172,6 @@ jobs:
         - name: Build and Test Cyclus
           id: build-cyclus
           run: |
-            conda install -y libmamba
             conda install -y \
               clang_osx-${ARM}64 \
               clangxx_osx-${ARM}64 \
