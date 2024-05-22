@@ -7,14 +7,15 @@ namespace cyclus {
 int Package::next_package_id_ = 2;
 Package::Ptr Package::unpackaged_ = NULL;
 
-Package::Ptr Package::Create(std::string name, double fill_min, double fill_max, std::string strategy) {
+Package::Ptr Package::Create(std::string name, double fill_min,
+                             double fill_max,std::string strategy, int id) {
   if (fill_min < 0 || fill_max < 0) {
     throw ValueError("fill_min and fill_max must be non-negative");
   }
   else if (fill_min > fill_max) {
     throw ValueError("fill_min must be less than or equal to fill_max");
   }
-  Ptr p(new Package(name, fill_min, fill_max, strategy));
+  Ptr p(new Package(name, fill_min, fill_max, strategy, id));
   return p;
 }
 
@@ -53,13 +54,16 @@ double Package::GetFillMass(double qty) {
   return std::min(qty, fill_mass);
 }
   
-Package::Package(std::string name, double fill_min, double fill_max, std::string strategy) : 
+Package::Package(std::string name, double fill_min, double fill_max,
+                 std::string strategy, int id) : 
   name_(name), fill_min_(fill_min), fill_max_(fill_max), strategy_(strategy) {
     if (name == unpackaged_name_) {
       if (unpackaged_) {
         throw ValueError("can't create a new package with name 'unpackaged'");
       }
       id_ = unpackaged_id_;
+    } else if (id != -1) {
+      id_ = id;
     } else {
       id_ = next_package_id_++;
     }
