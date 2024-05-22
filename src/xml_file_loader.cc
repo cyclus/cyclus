@@ -330,6 +330,8 @@ void XMLFileLoader::LoadRecipes() {
 void XMLFileLoader::LoadPackages() {
   InfileTree xqe(*parser_);
 
+  ctx_->RecordPackage(Package::unpackaged());
+
   std::string query = "/*/package";
   int num_packages = xqe.NMatches(query);
   for (int i = 0; i < num_packages; i++) {

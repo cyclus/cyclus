@@ -192,8 +192,8 @@ Composition::Ptr Context::GetRecipe(std::string name) {
 }
 
 void Context::AddPackage(std::string name, double fill_min, double fill_max,
-                         std::string strategy) {
-  Package::Ptr pkg = Package::Create(name, fill_min, fill_max, strategy);
+                         std::string strategy, int package_id) {
+  Package::Ptr pkg = Package::Create(name, fill_min, fill_max, strategy, package_id);
   packages_[name] = pkg;
   RecordPackage(pkg);
 }
