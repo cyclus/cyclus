@@ -206,6 +206,9 @@ Package::Ptr Context::GetPackageByName(std::string name) {
   if (name == Package::unpackaged_name()) {
     return Package::unpackaged();
   }
+  if (packages_.size() == 0 ) {
+    throw KeyError("No user-created packages exist");
+  }
   if (packages_.count(name) == 0) {
     throw KeyError("Invalid package name " + name);
   }
