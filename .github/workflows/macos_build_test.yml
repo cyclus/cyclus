@@ -199,10 +199,10 @@ jobs:
               websockets \
               pprintpp \
               pip
-            export PATH=$CONDA_PREFIX/bin:$PATH
-            export CC=$(conda info --base)/bin/clang
-            export CXX=$(conda info --base)/bin/clang++
-            export CPP=$(conda info --base)/bin/clang-cpp
+            export PATH=${CONDA_PREFIX}/bin:$PATH
+            export CC=${CONDA_PREFIX}/bin/clang
+            export CXX=${CONDA_PREFIX}/bin/clang++
+            export CPP=${CONDA_PREFIX}/bin/clang-cpp
             python3 install.py -j 3 --allow-milps ${SLOW_FLAG}
             export PATH=$HOME/.local/bin:$PATH
             export DYLD_LIBRARY_PATH=$HOME/.local/lib
