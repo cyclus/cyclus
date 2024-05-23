@@ -183,7 +183,6 @@ jobs:
               git \
               glib \
               libxml2 \
-              libxmlpp-4.0 \
               libxmlpp \
               liblapack \
               pkg-config \
