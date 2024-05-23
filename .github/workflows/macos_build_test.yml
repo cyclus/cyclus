@@ -167,8 +167,6 @@ jobs:
             miniforge-variant: "Mambaforge"
             conda-solver: "libmamba"
             auto-update-conda: true
-            auto-activate-base: true
-            activate-environment: ""
             channels: conda-forge
 
         - name: Build and Test Cyclus
