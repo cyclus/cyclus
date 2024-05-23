@@ -77,7 +77,7 @@ void ResTracker::Record() {
   res_->BumpStateId();
   ctx_->NewDatum("Resources")
       ->AddVal("ResourceId", res_->state_id())
-      ->AddVal("ObjI", res_->obj_id())
+      ->AddVal("ObjId", res_->obj_id())
       ->AddVal("Type", res_->type())
       ->AddVal("TimeCreated", ctx_->time())
       ->AddVal("Quantity", res_->quantity())
