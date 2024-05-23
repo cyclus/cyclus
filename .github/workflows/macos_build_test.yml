@@ -184,10 +184,11 @@ jobs:
               glib \
               libxml2 \
               libxmlpp-4.0 \
+              libxmlpp \
               liblapack \
               pkg-config \
               coincbc \
-              libboost-devel \
+              boost-cpp \
               hdf5 \
               sqlite \
               pcre \
