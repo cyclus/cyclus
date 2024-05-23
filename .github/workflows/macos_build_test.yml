@@ -173,7 +173,6 @@ jobs:
           id: build-cyclus
           shell: bash -el {0}
           run: |
-            brew uninstall cmake
             mamba install -y \
               clang_osx-${ARM}64 \
               clangxx_osx-${ARM}64 \
@@ -199,10 +198,10 @@ jobs:
               websockets \
               pprintpp \
               pip
-            export PATH=${CONDA_PREFIX}/bin:$PATH
             export CC=${CONDA_PREFIX}/bin/clang
             export CXX=${CONDA_PREFIX}/bin/clang++
             export CPP=${CONDA_PREFIX}/bin/clang-cpp
+            mkdir -p $(python3 -m site --user-site)
             python3 install.py -j 3 --allow-milps ${SLOW_FLAG}
             export PATH=$HOME/.local/bin:$PATH
             export DYLD_LIBRARY_PATH=$HOME/.local/lib
