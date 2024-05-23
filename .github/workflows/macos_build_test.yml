@@ -86,7 +86,7 @@ jobs:
             continue-on-error: true
             run: |
               cd ${{ github.workspace }}/cycamore
-              python3 install.py -j 3 --allow-milps
+              python3 install.py -j 3 --coin-root $(brew --prefix) --allow-milps
               export PATH=$HOME/.local/bin:$PATH
               export DYLD_LIBRARY_PATH=$HOME/.local/lib
               cycamore_unit_tests
@@ -204,7 +204,7 @@ jobs:
             mkdir -p $(python3 -m site --user-site)
             python3 install.py -j 3 --allow-milps ${SLOW_FLAG}
             export PATH=$HOME/.local/bin:$PATH
-            export DYLD_LIBRARY_PATH=$HOME/.local/lib
+            export DYLD_LIBRARY_PATH=$HOME/.local/lib:$HOME/.local/lib/cyclus
             cyclus_unit_tests
             cd tests && python3 -m pytest
 
@@ -222,7 +222,7 @@ jobs:
           continue-on-error: true
           run: |
             cd ${{ github.workspace }}/cycamore
-            python3 install.py -j 3 --allow-milps
+            python3 install.py -j 3 --coin-root $(brew --prefix) --allow-milps
             export PATH=$HOME/.local/bin:$PATH
             export DYLD_LIBRARY_PATH=$HOME/.local/lib
             cycamore_unit_tests
