@@ -163,7 +163,8 @@ jobs:
         - name: Set up Miniconda
           uses: conda-incubator/setup-miniconda@v3
           with:
-            miniconda-version: "latest"
+            miniforge-version: "latest"
+            miniforge-variant: "Mambaforge"
             conda-solver: "libmamba"
             auto-update-conda: true
             auto-activate-base: true
