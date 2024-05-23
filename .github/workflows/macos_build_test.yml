@@ -168,9 +168,11 @@ jobs:
             conda-solver: "libmamba"
             auto-update-conda: true
             channels: conda-forge
+            use-only-tar-bz2: true
 
         - name: Build and Test Cyclus
           id: build-cyclus
+          shell: bash -el {0}
           run: |
             brew uninstall cmake
             mamba install -y \
