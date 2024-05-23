@@ -43,6 +43,12 @@ ENDIF()
 # no overflow warnings because of silly coin-ness
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-overflow")
 
+IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 15.0.0)
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ld_classic")
+    ENDIF()
+ENDIF()
+
 IF(NOT CYCLUS_DOC_ONLY)
     ##############################################################################################
     ################################# begin cmake configuration ##################################
@@ -132,11 +138,6 @@ IF(NOT CYCLUS_DOC_ONLY)
         set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
         set(suffix ".dylib")
         set(dynamicloadlib "unix_helper_functions.h")
-        if (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-            if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "15.0.0")
-                set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -ld_classic)
-            endif()
-        endif()
     ELSE()
         set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--allow-shlib-undefined")
         set(suffix ".so")
