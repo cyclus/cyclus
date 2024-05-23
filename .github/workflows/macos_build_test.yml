@@ -172,6 +172,7 @@ jobs:
         - name: Build and Test Cyclus
           id: build-cyclus
           run: |
+            brew uninstall cmake
             conda install -y \
               clang_osx-${ARM}64 \
               clangxx_osx-${ARM}64 \
