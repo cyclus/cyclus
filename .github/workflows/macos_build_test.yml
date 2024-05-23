@@ -168,7 +168,6 @@ jobs:
             conda-solver: "libmamba"
             auto-update-conda: true
             channels: conda-forge
-            use-only-tar-bz2: true
 
         - name: Build and Test Cyclus
           id: build-cyclus
@@ -183,7 +182,7 @@ jobs:
               git \
               glib \
               libxml2 \
-              libxmlpp \
+              libxmlpp-4.0 \
               liblapack \
               pkg-config \
               coincbc \
