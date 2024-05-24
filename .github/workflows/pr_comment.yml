@@ -2,7 +2,7 @@ name: Comment on PR
 
 on:
   workflow_run:
-    workflows: ["Build/Test Cyclus"]
+    workflows: ["Build/Test Cyclus", "MacOS Build/Test Cyclus"]
     types:
       - completed
 
@@ -28,5 +28,5 @@ jobs:
         uses: thollander/actions-comment-pull-request@v2
         with:
           pr_number: ${{ env.PR_NUMBER }}
-          comment_tag: build_status_report
+          comment_tag: ${{ github.event.workflow_run.workflow_id }}
           filePath: artifacts_merged.md

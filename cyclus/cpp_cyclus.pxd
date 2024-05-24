@@ -68,6 +68,9 @@ cdef extern from "cyc_limits.h" namespace "cyclus":
 
     cdef double eps()
     cdef double eps_rsrc()
+    cdef double cy_large_double
+    cdef double cy_large_int
+    cdef double cy_near_zero
 
 
 cdef extern from "cyclus.h" namespace "cyclus":

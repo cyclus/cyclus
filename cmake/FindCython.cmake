@@ -34,6 +34,7 @@ if( Python3_FOUND )
   find_program(CYTHON_EXECUTABLE
     NAMES cython cython.bat cython3 cython-2.7 cython-3.3 cython-3.4 cython-3.5 cython-3.6 cython-3.7
     HINTS ENV PATH ${_python_path}
+    ${PYTHON_SITE_PACKAGES}/bin
     ${DEPS_BIN_HINTS}
     )
 else()

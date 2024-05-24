@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
   pull_request:
     paths-ignore:
+      - '.github/workflows/macos_build_test.yml'
       - '.github/workflows/publish_latest.yml'
       - '.github/workflows/publish_release.yml'
       - '.github/workflows/changelog_test.yml'
@@ -14,6 +15,7 @@ on:
       - 'CHANGELOG.rst'
   push:
     paths-ignore:
+      - '.github/workflows/macos_build_test.yml'
       - '.github/workflows/publish_latest.yml'
       - '.github/workflows/publish_release.yml'
       - '.github/workflows/changelog_test.yml'
@@ -21,6 +23,7 @@ on:
       - '.github/workflows/rocky_build_test.yml'
       - 'doc/**'
       - 'CHANGELOG.rst'
+
 
 jobs:
   build-test-ubuntu:
@@ -69,8 +72,9 @@ jobs:
         if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
-          repository: cyclus/cycamore
+          repository: bennibbelink/cycamore
           path: ${{ github.workspace }}/cycamore
+          ref: macos
 
       - name: Build and Test Cycamore
         id: build-cycamore
@@ -93,8 +97,9 @@ jobs:
         if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
         uses: actions/checkout@v4
         with:
-          repository: cyclus/cymetric
+          repository: bennibbelink/cymetric
           path: ${{ github.workspace }}/cymetric
+          ref: macos
 
       - name: Build and Test Cymetric
         if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
@@ -139,29 +144,6 @@ jobs:
           name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.ARTIFACT_NAME }}.txt
 
-  upload-pr-number:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - name: Checkout cyclus
-        uses: actions/checkout@v4
-
-      - name: Save PR number and Commit hash to file
-        run: |
-          echo "${{ github.event.number }}" > pr_number
-          echo "${{ github.event.pull_request.head.sha }} - $(git log -1 --format=%ci)" > commit_hash_timestamp
-      
-      - name: Upload PR number artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: pr_number
-          path: pr_number
-      
-      - name: Upload Commit hash artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: commit_hash_timestamp
-          path: commit_hash_timestamp
 
   build-test-rocky:
     runs-on: ubuntu-latest
@@ -189,3 +171,28 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/cyclus/cyclus_rocky_${{ matrix.rocky_versions }}/cyclus:ci-layer-cache
           build-args: |
             rocky_version=${{ matrix.rocky_versions }}
+
+
+  upload-pr-number:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout cyclus
+        uses: actions/checkout@v4
+
+      - name: Save PR number and Commit hash to file
+        run: |
+          echo "${{ github.event.number }}" > pr_number
+          echo "${{ github.event.pull_request.head.sha }} - $(git log -1 --format=%ci)" > commit_hash_timestamp
+      
+      - name: Upload PR number artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number
+      
+      - name: Upload Commit hash artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: commit_hash_timestamp
+          path: commit_hash_timestamp

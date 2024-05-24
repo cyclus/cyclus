@@ -17,7 +17,9 @@ PROJECT(CYCLUS VERSION 1.6.0)
 INCLUDE(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
 IF(COMPILER_SUPPORTS_CXX17)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+    SET(CMAKE_CXX_STANDARD 17)
+    SET(CMAKE_CXX_STANDARD_REQUIRED True)
+    SET(CMAKE_CXX_EXTENSIONS OFF)
 ELSE()
     MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler.")
 ENDIF()
@@ -40,6 +42,12 @@ IF(NOT ${BUILD_TYPE} STREQUAL "release")
 ENDIF()
 # no overflow warnings because of silly coin-ness
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-overflow")
+
+IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    IF (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 15.0.0)
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ld_classic")
+    ENDIF()
+ENDIF()
 
 IF(NOT CYCLUS_DOC_ONLY)
     ##############################################################################################
@@ -315,9 +323,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     endif()
     message("-- PYTHON_EXECUTABLE: ${Python3_EXECUTABLE}")
     message("-- PYTHON_SITE_PACKAGES: ${PYTHON_SITE_PACKAGES}")
-    IF (NOT APPLE)
-        set(LIBS ${LIBS} ${Python3_LIBRARIES})
-    ENDIF (NOT APPLE)
+    set(LIBS ${LIBS} ${Python3_LIBRARIES})
 
     # Include the CMake script UseCython.cmake.  This defines add_cython_module().
     # Instruction for use can be found at the top of cmake/UseCython.cmake.

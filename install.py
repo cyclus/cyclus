@@ -192,7 +192,7 @@ def main():
                         default='Release')
 
     parser.add_argument('--data-model-version', dest='data_model_version', default=None,
-                        help='Sets the core version number.')
+                        help='Sets the data model version number.')
 
     parser.add_argument('-D', metavar='VAR', action='append',
                         help='Set enviornment variable(s).')
@@ -210,7 +210,8 @@ def main():
     parser.add_argument('--slow', dest='fast',
                         action='store_false', help="Will NOT try to compile "
                         "from assembly, if possible. This is slower as it "
-                        "must compile from source.")
+                        "must compile from source. **This is required to "
+                        "build on Apple Silicon**")
 
     args = parser.parse_args()
     # modify roots as needed

@@ -33,9 +33,10 @@ MESSAGE(STATUS "COIN_ROOT_DIR hint is : ${COIN_ROOT_DIR}")
 # Find the path based on a required header file
 #
 MESSAGE(STATUS "Coin multiple library dependency status:")
-FIND_PATH(COIN_INCLUDE_DIR coin/CbcModel.hpp
+FIND_PATH(COIN_CBC_INCLUDE_DIR coin/CbcModel.hpp
     HINTS "${COIN_INCLUDE_DIR}"
     HINTS "${COIN_ROOT_DIR}/include"
+    HINTS "${COIN_ROOT_DIR}/include/cbc"
     ${DEPS_INCLUDE_HINTS}
     HINTS /usr/
     HINTS /usr/include/
@@ -46,8 +47,59 @@ FIND_PATH(COIN_INCLUDE_DIR coin/CbcModel.hpp
     HINTS /usr/local/coin/
     HINTS /usr/local/coin-Cbc/
     )
-set(COIN_INCLUDE_DIR ${COIN_INCLUDE_DIR}/coin)
-MESSAGE("\tCOIN Include Dir: ${COIN_INCLUDE_DIR}")
+set(COIN_CBC_INCLUDE_DIR ${COIN_CBC_INCLUDE_DIR}/coin)
+MESSAGE("\tCOIN_CBC_INCLUDE_DIR: ${COIN_CBC_INCLUDE_DIR}")
+
+FIND_PATH(COIN_OSI_INCLUDE_DIR coin/OsiSolverInterface.hpp
+    HINTS "${COIN_INCLUDE_DIR}"
+    HINTS "${COIN_ROOT_DIR}/include"
+    HINTS "${COIN_ROOT_DIR}/include/osi"
+    ${DEPS_INCLUDE_HINTS}
+    HINTS /usr/
+    HINTS /usr/include/
+    HINTS /usr/local/
+    HINTS /usr/local/include/
+    HINTS /usr/coin/
+    HINTS /usr/coin-Osi/
+    HINTS /usr/local/coin/
+    HINTS /usr/local/coin-osi/
+    )
+set(COIN_OSI_INCLUDE_DIR ${COIN_OSI_INCLUDE_DIR}/coin)
+MESSAGE("\tCOIN_OSI_INCLUDE_DIR: ${COIN_OSI_INCLUDE_DIR}")
+
+FIND_PATH(COIN_UTILS_INCLUDE_DIR coin/CoinTypes.hpp
+    HINTS "${COIN_INCLUDE_DIR}"
+    HINTS "${COIN_ROOT_DIR}/include"
+    HINTS "${COIN_ROOT_DIR}/include/coinutils"
+    ${DEPS_INCLUDE_HINTS}
+    HINTS /usr/
+    HINTS /usr/include/
+    HINTS /usr/local/
+    HINTS /usr/local/include/
+    HINTS /usr/coin/
+    HINTS /usr/coin-utils/
+    HINTS /usr/local/coin/
+    HINTS /usr/local/coin-utils/
+    )
+set(COIN_UTILS_INCLUDE_DIR ${COIN_UTILS_INCLUDE_DIR}/coin)
+MESSAGE("\tCOIN_UTILS_INCLUDE_DIR: ${COIN_UTILS_INCLUDE_DIR}")
+
+FIND_PATH(COIN_CLP_INCLUDE_DIR coin/ClpConfig.h
+    HINTS "${COIN_INCLUDE_DIR}"
+    HINTS "${COIN_ROOT_DIR}/include"
+    HINTS "${COIN_ROOT_DIR}/include/clp"
+    ${DEPS_INCLUDE_HINTS}
+    HINTS /usr/
+    HINTS /usr/include/
+    HINTS /usr/local/
+    HINTS /usr/local/include/
+    HINTS /usr/coin/
+    HINTS /usr/coin-Clp/
+    HINTS /usr/local/coin/
+    HINTS /usr/local/coin-clp/
+    )
+set(COIN_CLP_INCLUDE_DIR ${COIN_CLP_INCLUDE_DIR}/coin)
+MESSAGE("\tCOIN_CLP_INCLUDE_DIR: ${COIN_CLP_INCLUDE_DIR}")
 
 #
 # Find all coin library dependencies
@@ -142,12 +194,13 @@ MESSAGE("\tCOIN BZ2: ${COIN_BZ2_LIBRARY}")
 
 INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(COIN DEFAULT_MSG
-    COIN_INCLUDE_DIR
+    COIN_CBC_INCLUDE_DIR
     COIN_CBC_LIBRARY
     COIN_CBC_SOLVER_LIBRARY
     COIN_CGL_LIBRARY
     COIN_CLP_LIBRARY
     COIN_COIN_UTILS_LIBRARY
+    COIN_OSI_INCLUDE_DIR
     COIN_OSI_LIBRARY
     # Not required by cbc v2.5, but required by later versions
     COIN_OSI_CBC_LIBRARY
@@ -160,7 +213,7 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(COIN DEFAULT_MSG
 # Set all required cmake variables based on our findings
 #
 IF(COIN_FOUND)
-    SET(COIN_INCLUDE_DIRS ${COIN_INCLUDE_DIR})
+    SET(COIN_INCLUDE_DIRS ${COIN_CBC_INCLUDE_DIR} ${COIN_OSI_INCLUDE_DIR} ${COIN_UTILS_INCLUDE_DIR} ${COIN_CLP_INCLUDE_DIR})
     #SET(COIN_CLP_LIBRARIES "${COIN_CLP_LIBRARY};${COIN_COIN_UTILS_LIBRARY};${COIN_ZLIB_LIBRARY};${COIN_CLP_SOLVER_LIBRARY}")
     SET(COIN_CLP_LIBRARIES "${COIN_CLP_LIBRARY};${COIN_COIN_UTILS_LIBRARY};${COIN_ZLIB_LIBRARY}")
     IF (COIN_CLP_SOLVER_LIBRARY)
@@ -179,7 +232,7 @@ IF(COIN_FOUND)
     #SET(COIN_CBC_LIBRARIES "${COIN_CBC_LIBRARY};${COIN_CBC_SOLVER_LIBRARY};${COIN_CGL_LIBRARY};${COIN_OSI_LIBRARY};${COIN_OSI_CLP_LIBRARY};${COIN_CLP_LIBRARIES}")
     SET(COIN_LIBRARIES "${COIN_CBC_LIBRARIES}")
 
-    FILE(STRINGS "${COIN_INCLUDE_DIR}/CbcConfig.h" COIN_VERSION REGEX "define CBC_VERSION .*")
+    FILE(STRINGS "${COIN_CBC_INCLUDE_DIR}/CbcConfig.h" COIN_VERSION REGEX "define CBC_VERSION .*")
     STRING(REPLACE "#define CBC_VERSION " "" COIN_VERSION "${COIN_VERSION}")
     STRING(REPLACE "\"" "" COIN_VERSION "${COIN_VERSION}")
 ENDIF(COIN_FOUND)

@@ -13,6 +13,7 @@ Since last release
 * Rely on ``python3`` in environment instead of ``python`` (#1747)
 * Remove ``pandas`` as build dependency (#1748)
 * Consistently use hyphens in ``install.py`` flags (#1748)
+* Define constants ``cy_large_double``, ``cy_large_int``, and ``cy_near_zero`` (#1757)
 
 **Removed:**
 
@@ -51,6 +52,7 @@ v1.6.0
 * CI support for Rocky Linux (#1691)
 * Added support for a ResBuf to behave as a single bulk storage with mixing & extraction of resources (#1687)
 * Added ``--allow-milps`` flag into INSTALL.rst table (#1740)
+* CI support for MacOS (#1743)
 
 **Changed:**
 
