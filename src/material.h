@@ -81,7 +81,8 @@ class Material: public Resource {
   /// pointer to the agent creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
-  static Ptr Create(Agent* creator, double quantity, Composition::Ptr c, int package_id = Package::unpackaged_id());
+  static Ptr Create(Agent* creator, double quantity, Composition::Ptr c,
+                    std::string package_name = Package::unpackaged_name());
 
   /// Creates a new material resource that does not actually exist as part of
   /// the simulation and is untracked.
@@ -155,14 +156,15 @@ class Material: public Resource {
   /// DEPRECATED - use non-const comp() function.
   Composition::Ptr comp() const;
 
-  virtual int package_id();
+  virtual std::string package_name();
 
   /// Changes the package id. Checks that the resource fits the package 
   /// type minimum and maximum mass criteria.
-  virtual void ChangePackageId(int new_package_id = Package::unpackaged_id());
+  virtual void ChangePackage(std::string new_package_name = Package::unpackaged_name());
 
  protected:
-  Material(Context* ctx, double quantity, Composition::Ptr c, int package_id = Package::unpackaged_id());
+  Material(Context* ctx, double quantity, Composition::Ptr c,
+           std::string package_name = Package::unpackaged_name());
 
  private:
   Context* ctx_;
@@ -170,7 +172,7 @@ class Material: public Resource {
   Composition::Ptr comp_;
   int prev_decay_time_;
   ResTracker tracker_;
-  int package_id_;
+  std::string package_name_;
 };
 
 /// Creates and returns a new material with the specified quantity and a

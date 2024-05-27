@@ -200,14 +200,13 @@ void SimInit::LoadPackages() {
   }  // table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
-    std::string name = qr.GetVal<std::string>("Package", i);
+    std::string name = qr.GetVal<std::string>("PackageName", i);
     double fill_min = qr.GetVal<double>("FillMin", i);
     double fill_max = qr.GetVal<double>("FillMax", i);
     std::string strategy = qr.GetVal<std::string>("Strategy", i);
-    int package_id = qr.GetVal<int>("PackageId", i);
 
     if (name != Package::unpackaged_name()) {
-      ctx_->AddPackage(name, fill_min, fill_max, strategy, package_id);
+      ctx_->AddPackage(name, fill_min, fill_max, strategy);
     }
     else {
       ctx_->RecordPackage(Package::unpackaged());

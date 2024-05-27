@@ -41,8 +41,7 @@ void MatlSellPolicy::set_ignore_comp(bool x) {
   ignore_comp_ = x;
 }
 
-void MatlSellPolicy::set_package(int x) {
-  assert(x >= 1);
+void MatlSellPolicy::set_package(std::string x) {
   // if no real context, only unpackaged can be used (keep default)
   if (manager() != NULL) {
     if ((quantize_ < package_->fill_min()) || 
@@ -52,9 +51,7 @@ void MatlSellPolicy::set_package(int x) {
        << package_->fill_max() << ")";
       throw ValueError(ss.str());
     }
-    if (x > 1) {
-      package_ = manager()->context()->GetPackageById(x);
-    }
+    package_ = manager()->context()->GetPackageByName(x);
   }
 }
 
@@ -98,14 +95,14 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
 MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                      std::string name, double throughput,
                                      bool ignore_comp, double quantize,
-                                     int package_id) {
+                                     std::string package_name) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
   set_quantize(quantize);
   set_throughput(throughput);
   set_ignore_comp(ignore_comp);
-  set_package(package_id);
+  set_package(package_name);
   return *this;
 }
 

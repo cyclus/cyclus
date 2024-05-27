@@ -69,7 +69,7 @@ void ResTracker::Package() {
     return;
   }
 
-  package_id_ = res_->package_id();
+  package_name_ = res_->package_name();
   Record();
 }
 
@@ -83,7 +83,7 @@ void ResTracker::Record() {
       ->AddVal("Quantity", res_->quantity())
       ->AddVal("Units", res_->units())
       ->AddVal("QualId", res_->qual_id())
-      ->AddVal("PackageId", res_->package_id())
+      ->AddVal("PackageName", res_->package_name())
       ->AddVal("Parent1", parent1_)
       ->AddVal("Parent2", parent2_)
       ->Record();

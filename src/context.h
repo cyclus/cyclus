@@ -253,17 +253,14 @@ class Context {
   /// Agents should NOT add their own packages.
   void AddPackage(std::string name, double fill_min = 0,
                   double fill_max = std::numeric_limits<double>::max(),
-                  std::string strategy = "first",
-                  int package_id = -1);
+                  std::string strategy = "first");
 
   /// Records package information. Should be used first on unpackaged, then
   /// to record user-declared packages
   void RecordPackage(Package::Ptr);
 
-  // Retrieve a registered package. 
+  /// Retrieve a registered package. 
   Package::Ptr GetPackageByName(std::string name);
-
-  Package::Ptr GetPackageById(int id);
 
   int random();
 

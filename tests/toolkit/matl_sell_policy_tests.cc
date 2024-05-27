@@ -172,7 +172,7 @@ TEST_F(MatlSellPolicyTests, Package) {
   cm[922350000] = 0.05;
   cm[922380000] = 0.95;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
-  mat = Material::Create(a, qty, comp, Package::unpackaged_id());
+  mat = Material::Create(a, qty, comp, Package::unpackaged_name());
 
   buf.Push(mat);
 
@@ -180,7 +180,7 @@ TEST_F(MatlSellPolicyTests, Package) {
   Package::Ptr p = sim.context()->GetPackageByName("foo");
 
   cyclus::toolkit::MatlSellPolicy sellpol;
-  sellpol.Init(fac, &buf, "buf", 4, false, 0, p->id())
+  sellpol.Init(fac, &buf, "buf", 4, false, 0, p->name())
           .Set("commod").Start();
 
   EXPECT_NO_THROW(sim.Run());
