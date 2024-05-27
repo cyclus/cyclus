@@ -124,3 +124,15 @@ TEST_F(ContextTests, DoubleAgentNameThrow) {
   
   delete ctx;
 }
+
+TEST_F(ContextTests, DoublePackageNameThrow) {
+  Timer ti;
+  Recorder rec;
+  Context* ctx = new Context(&ti, &rec);
+
+  ctx->AddPackage("foo");
+
+  ASSERT_THROW(ctx->AddPackage("foo"), cyclus::KeyError);
+  
+  delete ctx;
+  }
