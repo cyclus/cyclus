@@ -177,7 +177,7 @@ TEST_F(MatlSellPolicyTests, Package) {
   buf.Push(mat);
 
   sim.context()->AddPackage("foo", 1, 2, "first");
-  Package::Ptr p = sim.context()->GetPackageByName("foo");
+  Package::Ptr p = sim.context()->GetPackage("foo");
 
   cyclus::toolkit::MatlSellPolicy sellpol;
   sellpol.Init(fac, &buf, "buf", 4, false, 0, p->name())

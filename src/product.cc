@@ -87,7 +87,7 @@ void Product::ChangePackage(std::string new_package_name) {
     tracker_.Package();
     return;
   }
-  Package::Ptr p = ctx_->GetPackageByName(new_package_name);
+  Package::Ptr p = ctx_->GetPackage(new_package_name);
   double min = p->fill_min();
   double max = p->fill_max();
   if (quantity_ >= min && quantity_ <= max) {

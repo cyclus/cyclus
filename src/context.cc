@@ -211,7 +211,7 @@ void Context::RecordPackage(Package::Ptr pkg) {
     ->Record();
 }
 
-Package::Ptr Context::GetPackageByName(std::string name) {
+Package::Ptr Context::GetPackage(std::string name) {
   if (name == Package::unpackaged_name()) {
     return Package::unpackaged();
   }

@@ -51,7 +51,7 @@ void MatlSellPolicy::set_package(std::string x) {
        << package_->fill_max() << ")";
       throw ValueError(ss.str());
     }
-    package_ = manager()->context()->GetPackageByName(x);
+    package_ = manager()->context()->GetPackage(x);
   }
 }
 

@@ -152,7 +152,7 @@ void Material::ChangePackage(std::string new_package_name) {
     return;
   }
  
-  Package::Ptr p = ctx_->GetPackageByName(package_name_);
+  Package::Ptr p = ctx_->GetPackage(package_name_);
   double min = p->fill_min();
   double max = p->fill_max();
   if (qty_ >= min && qty_ <= max) {

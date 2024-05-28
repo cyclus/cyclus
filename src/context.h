@@ -260,7 +260,7 @@ class Context {
   void RecordPackage(Package::Ptr);
 
   /// Retrieve a registered package. 
-  Package::Ptr GetPackageByName(std::string name);
+  Package::Ptr GetPackage(std::string name);
 
   int random();
 

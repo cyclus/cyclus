@@ -113,7 +113,7 @@ TEST_F(ResourceTest, DefaultPackageId) {
 
 TEST_F(ResourceTest, ChangePackage) {
   ctx->AddPackage("foo", 1, 5, "first");
-  Package::Ptr pkg = ctx->GetPackageByName("foo");
+  Package::Ptr pkg = ctx->GetPackage("foo");
   std::string pkg_name = pkg->name();
 
   Product::Ptr p3 = p1->Extract(2);
@@ -127,7 +127,7 @@ TEST_F(ResourceTest, ChangePackage) {
 
 TEST_F(ResourceTest, PackageResource) {
   ctx->AddPackage("foo", 1, 5, "first");
-  Package::Ptr pkg = ctx->GetPackageByName("foo");
+  Package::Ptr pkg = ctx->GetPackage("foo");
   std::string pkg_name = pkg->name();
 
   // nothing packaged
