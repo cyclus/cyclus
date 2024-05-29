@@ -262,6 +262,19 @@ class Context {
   /// Retrieve a registered package. 
   Package::Ptr GetPackage(std::string name);
 
+  /// Adds a transport unit type to a simulation-wide accessible list.
+  /// Agents should NOT add their own transport units.
+  void AddTransportUnit(std::string name, int fill_min = 0,
+                  int fill_max = std::numeric_limits<int>::max(),
+                  std::string strategy = "first");
+
+  /// Records transport unit information. Should be used first on unrestricted,
+  /// then to record user-declared transport units
+  void RecordTransportUnit(TransportUnit::Ptr);
+
+  /// Retrieve a registered transport unit. 
+  TransportUnit::Ptr GetTransportUnit(std::string name);
+
   int random();
 
   /// Generates a random number on the range [0,1)]

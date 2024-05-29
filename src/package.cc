@@ -62,8 +62,6 @@ Package::Package(std::string name, double fill_min, double fill_max,
   }
 }
 
-// unrestricted id is 1, so start the user-declared transport id at 2
-int TransportUnit::next_package_id_ = 2;
 TransportUnit::Ptr TransportUnit::unrestricted_ = NULL;
 
 TransportUnit::Ptr TransportUnit::Create(std::string name, int fill_min, int fill_max, std::string strategy) {
@@ -94,31 +92,41 @@ int TransportUnit::GetTransportUnitFill(int qty) {
     return 0;
   }
 
-  int fill_mass;
   if (strategy_ == "first") {
-    fill_mass = fill_max_;
+    return fill_max_;
   } else if (strategy_ == "equal") {
-    int num_min_fill = std::floor(qty / fill_min_);
-    int num_max_fill = std::ceil(qty / fill_max_);
-    if (num_min_fill >= num_max_fill) {
-      // all material can fit in a package
-      int fill_mass = qty / num_max_fill;
-    } else {
-      // some material will remain unrestricted, fill up as many transport
-      // units as possible
-      fill_mass = fill_max_;
+    // int division automatically rounds down. don't need floor in min, and 
+    // get ceil by hand instead 
+    int num_at_min_fill = qty / fill_min_;
+    int num_at_max_fill = (qty + fill_max_ - 1) / fill_max_;
+
+    if (num_at_min_fill >= num_at_max_fill) {
+      // all material *might* fit transport units. However, this is more
+      // challenging than packages because transport units are discrete. check:
+
+      double dbl_fill_mass = (double)qty / (double)num_at_max_fill;
+        return std::floor(dbl_fill_mass);
     }
+    // some material will remain unrestricted, fill up as many transport
+    // units as possible. Or, perfect fill is possible but not with integer
+    // fill (see above). Should also start filling to max until last partial
+    // filled transport unit
+    return fill_max_;
   }
-  return fill_mass;
 }
 
-int TransportUnit:TotalShippablePackages(int pkgs) {
-  int fill = GetTransportUnitFill(pkgs);
-  int shippable = std::floor(pkgs / fill) * fill;
+int TransportUnit::MaxShippablePackages(int pkgs) {
+  int TU_fill;
+  int shippable = 0;
   
-  int remainder = pkgs % fill;
-  if (remainder > 0 && remainder >= fill_min_) {
-    shippable += remainder;
+  if (pkgs == 0 && pkgs < fill_min_) {
+    return 0;
+  }
+
+  while (pkgs > 0 && pkgs >= fill_min_) {
+    TU_fill = GetTransportUnitFill(pkgs);
+    shippable += TU_fill;
+    pkgs -= TU_fill;
   }
   return shippable;
 }
@@ -126,13 +134,8 @@ int TransportUnit:TotalShippablePackages(int pkgs) {
 TransportUnit::TransportUnit(std::string name, int fill_min, int fill_max, std::string strategy) : 
   name_(name), fill_min_(fill_min), fill_max_(fill_max), strategy_(strategy) {
     if (name == unrestricted_name_) {
-      if (unrestricted_) {
-        throw ValueError("can't create a new transport unit with name 'unrestricted'");
-      }
-      id_ = unrestricted_id_;
-    } else {
-      id_ = next_transport_unit_id_++;
-    }
+      throw ValueError("can't create a new transport unit with name 'unrestricted'");
   }
+}
 
 } // namespace cyclus

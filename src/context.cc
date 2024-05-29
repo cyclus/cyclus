@@ -224,39 +224,41 @@ Package::Ptr Context::GetPackage(std::string name) {
   return packages_[name];
 }
 
-Package::Ptr Context::GetPackageById(int id) {
-  if (id == Package::unpackaged_id()) {
-    return Package::unpackaged();
+void Context::AddTransportUnit(std::string name, int fill_min, int fill_max, 
+                      std::string strategy) {
+  if (transport_units_.count(name) == 0) {
+    TransportUnit::Ptr tu = TransportUnit::Create(name, fill_min, fill_max,
+                                                strategy);
+    transport_units_[name] = tu;
+    RecordTransportUnit(tu);
+  } else {
+    throw KeyError("TransportUnit " + name + " already exists!");
   }
-  if (id < 0) {
-    throw ValueError("Invalid package id " + std::to_string(id));
-  }
-  // iterate through the list of packages to get the one package with the correct id
-  std::map<std::string, Package::Ptr>::iterator it;
-  for (it = packages_.begin(); it != packages_.end(); ++it) {
-    if (it->second->id() == id) {
-      return it->second;
-    }
-  }
-  throw ValueError("Invalid package id " + std::to_string(id));
 }
 
-  void AddTransportUnit(std::string name, int fill_min, int fill_max, 
-                        std::string strategy) {
-    transport_units_[name] = TransportUnit::Create(name, fill_min, fill_max, strategy);
-    NewDatum("TransportUnit")
-      ->AddVal("TransportUnit", name)
-      ->AddVal("FillMin", fill_min)
-      ->AddVal("FillMax", fill_max)
-      ->AddVal("Strategy", strategy)
-      ->AddVal("Id", transport_units_[name]->id())
-      ->Record();
+void Context::RecordTransportUnit(TransportUnit::Ptr tu) {
+  NewDatum("TransportUnit")
+    ->AddVal("TransportUnitName", tu->name())
+    ->AddVal("FillMin", tu->fill_min())
+    ->AddVal("FillMax", tu->fill_max())
+    ->AddVal("Strategy", tu->strategy())
+    ->Record();
+}
+
+/// Retrieve a registered transport unit
+TransportUnit::Ptr Context::GetTransportUnit(std::string name) {
+  if (name == TransportUnit::unrestricted_name()) {
+    return TransportUnit::unrestricted();
   }
+  if (transport_units_.size() == 0 ) {
+    throw KeyError("No user-created transport units exist");
+  }
+  if (transport_units_.count(name) == 0) {
+    throw KeyError("Invalid transport unit name " + name);
+  }
+  return transport_units_[name];
+}
 
-  /// Retrieve a registered transport unit
-  TransportUnit::Ptr GetTransportUnitByName(std::string name);
-
-  TransportUnit::Ptr GetTransportUnitById(int id);
 
 void Context::InitSim(SimInfo si) {
   NewDatum("Info")
@@ -311,7 +313,7 @@ void Context::InitSim(SimInfo si) {
 int Context::time() {
   return ti_->time();
 }
-LoadPacka
+
 int Context::random() {
   return rng_->random();
 }

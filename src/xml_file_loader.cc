@@ -365,6 +365,7 @@ void XMLFileLoader::LoadTransportUnits() {
     std::string strategy = cyclus::OptionalQuery<std::string>(qe, "strategy", "first");
 
     ctx_->AddTransportUnit(name, fill_min, fill_max, strategy);
+  }
 }
 
 void XMLFileLoader::LoadSpecs() {

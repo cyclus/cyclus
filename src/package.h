@@ -86,7 +86,7 @@ class TransportUnit {
     int GetTransportUnitFill(int qty);
 
     /// Returns the max number of packages that can be shipped
-    int TotalShippablePackages(int pkgs);
+    int MaxShippablePackages(int pkgs);
 
     // returns package id
     int id() const { return id_; }
@@ -115,7 +115,7 @@ class TransportUnit {
             std::string strategy = "first");
 
     static const int unrestricted_id_ = 1;
-    static constexpr char unrestricted_name_[11] = "unrestricted";
+    static constexpr char unrestricted_name_[13] = "unrestricted";
     static Ptr unrestricted_;
     static int next_tranport_unit_id_;
 
