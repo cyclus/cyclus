@@ -82,7 +82,7 @@ class XMLFileLoader {
   /// loads a specific recipe
   void LoadRecipe(InfileTree* qe);
 
-  // loads packages
+  /// Loads packages
   void LoadPackages();
 
   /// Creates all initial agent instances from the input file.

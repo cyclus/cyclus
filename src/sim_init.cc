@@ -58,6 +58,7 @@ void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
   // this sequence is imporant!!!
   LoadInfo();
   LoadRecipes();
+  LoadPackages();
   LoadSolverInfo();
   LoadPrototypes();
   LoadInitialAgents();
@@ -187,6 +188,29 @@ void SimInit::LoadRecipes() {
     int stateid = qr.GetVal<int>("QualId", i);
     Composition::Ptr c = LoadComposition(b_, stateid);
     ctx_->AddRecipe(recipe, c);
+  }
+}
+
+void SimInit::LoadPackages() {
+  QueryResult qr;
+  try {
+    qr = b_->Query("Packages", NULL);
+  } catch (std::exception err) {
+    return;
+  }  // table doesn't exist (okay)
+
+  for (int i = 0; i < qr.rows.size(); ++i) {
+    std::string name = qr.GetVal<std::string>("PackageName", i);
+    double fill_min = qr.GetVal<double>("FillMin", i);
+    double fill_max = qr.GetVal<double>("FillMax", i);
+    std::string strategy = qr.GetVal<std::string>("Strategy", i);
+
+    if (name != Package::unpackaged_name()) {
+      ctx_->AddPackage(name, fill_min, fill_max, strategy);
+    }
+    else {
+      ctx_->RecordPackage(Package::unpackaged());
+    }
   }
 }
 

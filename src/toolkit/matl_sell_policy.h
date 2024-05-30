@@ -7,6 +7,7 @@
 #include "material.h"
 #include "res_buf.h"
 #include "trader.h"
+#include "package.h"
 
 namespace cyclus {
 namespace toolkit {
@@ -83,7 +84,8 @@ class MatlSellPolicy : public Trader {
                        double throughput, bool ignore_comp);
   MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                        double throughput, bool ignore_comp,
-                       double quantize);
+                       double quantize,
+                       std::string package_name = Package::unpackaged_name());
   /// @}
 
   /// Instructs the policy to empty its buffer with offers on the given
@@ -124,6 +126,7 @@ class MatlSellPolicy : public Trader {
   void set_quantize(double x);
   void set_throughput(double x);
   void set_ignore_comp(bool x);
+  void set_package(std::string x);
 
   ResBuf<Material>* buf_;
   std::set<std::string> commods_;
@@ -131,6 +134,7 @@ class MatlSellPolicy : public Trader {
   double throughput_;
   std::string name_;
   bool ignore_comp_;
+  Package::Ptr package_;
 };
 
 }  // namespace toolkit

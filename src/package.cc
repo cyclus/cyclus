@@ -3,11 +3,10 @@
 
 namespace cyclus {
 
-// unpackaged id is 1, so start the user-declared packaging id at 2
-int Package::next_package_id_ = 2;
 Package::Ptr Package::unpackaged_ = NULL;
 
-Package::Ptr Package::Create(std::string name, double fill_min, double fill_max, std::string strategy) {
+Package::Ptr Package::Create(std::string name, double fill_min,
+                             double fill_max,std::string strategy) {
   if (fill_min < 0 || fill_max < 0) {
     throw ValueError("fill_min and fill_max must be non-negative");
   }
@@ -43,26 +42,24 @@ double Package::GetFillMass(double qty) {
     int num_min_fill = std::floor(qty / fill_min_);
     int num_max_fill = std::ceil(qty / fill_max_);
     if (num_min_fill >= num_max_fill) {
-      // all material can fit in a package
-      double fill_mass = qty / num_max_fill;
+      // all material can fit in package(s)
+      fill_mass = qty / num_max_fill;
     } else {
       // some material will remain unpackaged, fill up as many max packages as possible
       fill_mass = fill_max_;
     }
   }
-  return fill_mass;
+  return std::min(qty, fill_mass);
 }
   
-Package::Package(std::string name, double fill_min, double fill_max, std::string strategy) : 
+Package::Package(std::string name, double fill_min, double fill_max,
+                 std::string strategy) : 
   name_(name), fill_min_(fill_min), fill_max_(fill_max), strategy_(strategy) {
     if (name == unpackaged_name_) {
       if (unpackaged_) {
         throw ValueError("can't create a new package with name 'unpackaged'");
       }
-      id_ = unpackaged_id_;
-    } else {
-      id_ = next_package_id_++;
-    }
   }
+}
 
 } // namespace cyclus

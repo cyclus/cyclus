@@ -13,6 +13,7 @@ Since last release
 * Rely on ``python3`` in environment instead of ``python`` (#1747)
 * Remove ``pandas`` as build dependency (#1748)
 * Consistently use hyphens in ``install.py`` flags (#1748)
+* Material sell policy can package materials (#1749)
 
 **Removed:**
 

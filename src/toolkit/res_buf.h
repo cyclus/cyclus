@@ -268,7 +268,7 @@ class ResBuf {
     if (!is_bulk_  || rs_.size() == 0) {
       // strip package id and set as default
       if (unpackaged_) {
-        m->ChangePackageId();
+        m->ChangePackage();
       }
       rs_.push_back(m);
       rs_present_.insert(m);
@@ -320,7 +320,7 @@ class ResBuf {
     for (int i = 0; i < rss.size(); i++) {
       if (!is_bulk_ || rs_.size() == 0) {
         if (unpackaged_) {
-          rss[i]->ChangePackageId();
+          rss[i]->ChangePackage();
         }
         rs_.push_back(rss[i]);
         rs_present_.insert(rss[i]);

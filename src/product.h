@@ -28,7 +28,7 @@ class Product : public Resource {
   /// pointer to the agent creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
-  static Ptr Create(Agent* creator, double quantity, std::string quality, int package_id = Package::unpackaged_id());
+  static Ptr Create(Agent* creator, double quantity, std::string quality, std::string package_name = Package::unpackaged_name());
 
   /// Creates a new product that does not actually exist as part of
   /// the simulation and is untracked.
@@ -72,16 +72,17 @@ class Product : public Resource {
   void Absorb(Product::Ptr other);
 
   /// Returns the package id.
-  virtual int package_id();
+  virtual std::string package_name();
 
   /// Changes the product's package id
-  virtual void ChangePackageId(int new_package_id = Package::unpackaged_id());
+  virtual void ChangePackage(std::string new_package_name = Package::unpackaged_name());
 
  private:
   /// @param ctx the simulation context
   /// @param quantity is a double indicating the quantity
   /// @param quality the resource quality
-  Product(Context* ctx, double quantity, std::string quality, int package_id = Package::unpackaged_id());
+  Product(Context* ctx, double quantity, std::string quality,
+          std::string package_name = Package::unpackaged_name());
 
   // map<quality, quality_id>
   static std::map<std::string, int> qualids_;
@@ -91,7 +92,7 @@ class Product : public Resource {
   std::string quality_;
   double quantity_;
   ResTracker tracker_;
-  int package_id_;
+  std::string package_name_;
 };
 
 }  // namespace cyclus

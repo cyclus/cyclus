@@ -193,40 +193,35 @@ Composition::Ptr Context::GetRecipe(std::string name) {
 
 void Context::AddPackage(std::string name, double fill_min, double fill_max,
                          std::string strategy) {
-  packages_[name] = Package::Create(name, fill_min, fill_max, strategy);
+  if (packages_.count(name) == 0) {
+    Package::Ptr pkg = Package::Create(name, fill_min, fill_max, strategy);
+    packages_[name] = pkg;
+    RecordPackage(pkg);
+  } else {
+    throw KeyError("Package " + name + " already exists!");
+  }
+}
+
+void Context::RecordPackage(Package::Ptr pkg) {
   NewDatum("Packages")
-    ->AddVal("Package", name)
-    ->AddVal("FillMin", fill_min)
-    ->AddVal("FillMax", fill_max)
-    ->AddVal("Strategy", strategy)
+    ->AddVal("PackageName", pkg->name())
+    ->AddVal("FillMin", pkg->fill_min())
+    ->AddVal("FillMax", pkg->fill_max())
+    ->AddVal("Strategy", pkg->strategy())
     ->Record();
 }
 
-Package::Ptr Context::GetPackageByName(std::string name) {
+Package::Ptr Context::GetPackage(std::string name) {
   if (name == Package::unpackaged_name()) {
     return Package::unpackaged();
+  }
+  if (packages_.size() == 0 ) {
+    throw KeyError("No user-created packages exist");
   }
   if (packages_.count(name) == 0) {
     throw KeyError("Invalid package name " + name);
   }
   return packages_[name];
-}
-
-Package::Ptr Context::GetPackageById(int id) {
-  if (id == Package::unpackaged_id()) {
-    return Package::unpackaged();
-  }
-  if (id < 0) {
-    throw ValueError("Invalid package id " + std::to_string(id));
-  }
-  // iterate through the list of packages to get the one package with the correct id
-  std::map<std::string, Package::Ptr>::iterator it;
-  for (it = packages_.begin(); it != packages_.end(); ++it) {
-    if (it->second->id() == id) {
-      return it->second;
-    }
-  }
-  throw ValueError("Invalid package id " + std::to_string(id));
 }
 
 void Context::InitSim(SimInfo si) {

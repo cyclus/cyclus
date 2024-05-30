@@ -38,8 +38,6 @@ class Package {
     /// the max.
     double GetFillMass(double qty);
 
-    // returns package id
-    int id() const { return id_; }
     // returns package name
     std::string name() const { return name_; }
     // returns package fill min
@@ -48,9 +46,6 @@ class Package {
     double fill_max() const { return fill_max_; }
     // returns package strategy
     std::string strategy() const { return strategy_; }
-
-    // returns the unpackaged id (1)
-    static int unpackaged_id() { return unpackaged_id_; }
 
     // returns the unpackaged package name
     static std::string unpackaged_name() { return unpackaged_name_; }
@@ -64,13 +59,10 @@ class Package {
             double fill_max = std::numeric_limits<double>::max(), 
             std::string strategy = "first");
 
-    static const int unpackaged_id_ = 1;
     static constexpr char unpackaged_name_[11] = "unpackaged";
     static Ptr unpackaged_;
-    static int next_package_id_;
 
     std::string name_;
-    int id_;
     double fill_min_;
     double fill_max_;
     std::string strategy_;

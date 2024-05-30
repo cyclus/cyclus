@@ -16,7 +16,8 @@ MatlSellPolicy::MatlSellPolicy() :
     name_(""),
     quantize_(0),
     throughput_(std::numeric_limits<double>::max()),
-    ignore_comp_(false) {
+    ignore_comp_(false),
+    package_(Package::unpackaged()) {
   Warn<EXPERIMENTAL_WARNING>(
       "MatlSellPolicy is experimental and its API may be subject to change");
 }
@@ -38,6 +39,20 @@ void MatlSellPolicy::set_throughput(double x) {
 
 void MatlSellPolicy::set_ignore_comp(bool x) {
   ignore_comp_ = x;
+}
+
+void MatlSellPolicy::set_package(std::string x) {
+  // if no real context, only unpackaged can be used (keep default)
+  if (manager() != NULL) {
+    if ((quantize_ < package_->fill_min()) || 
+    (quantize_ > package_->fill_max()))  {
+      std::stringstream ss;
+      ss << "Quantize " << quantize_ << " is outside the package fill min/max values (" << package_->fill_min() << ", "
+       << package_->fill_max() << ")";
+      throw ValueError(ss.str());
+    }
+    package_ = manager()->context()->GetPackage(x);
+  }
 }
 
 MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
@@ -79,13 +94,15 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
 
 MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                      std::string name, double throughput,
-                                     bool ignore_comp, double quantize) {
+                                     bool ignore_comp, double quantize,
+                                     std::string package_name) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
   set_quantize(quantize);
   set_throughput(throughput);
   set_ignore_comp(ignore_comp);
+  set_package(package_name);
   return *this;
 }
 
@@ -141,6 +158,8 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
   Material::Ptr m, offer;
   double qty;
   int nbids;
+  double bid_qty;
+  double remaining_qty;
   std::set<std::string>::iterator sit;
   std::vector<Request<Material>*>::const_iterator rit;
   for (sit = commods_.begin(); sit != commods_.end(); ++sit) {
@@ -153,18 +172,33 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
     for (rit = requests.begin(); rit != requests.end(); ++rit) {
       req = *rit;
       qty = std::min(req->target()->quantity(), limit);
-      nbids = excl ? static_cast<int>(std::floor(qty / quantize_)) : 1;
-      qty = excl ? quantize_ : qty;
-      for (int i = 0; i < nbids; i++) {
-        m = buf_->Pop();
-        buf_->Push(m);
-        offer = ignore_comp_ ? \
-                Material::CreateUntracked(qty, req->target()->comp()) : \
-                Material::CreateUntracked(qty, m->comp());
-        port->AddBid(req, offer, this, excl);
-        LG(INFO3) << "  - bid " << qty << " kg on a request for " << commod;
+      bid_qty = excl ? quantize_ : package_->GetFillMass(qty);
+      if (bid_qty == 0) {
+        nbids = 0;
+      } else {
+        nbids = static_cast<int>(std::floor(qty / bid_qty));
       }
-    }
+      remaining_qty = fmod(qty, bid_qty);
+
+      // Peek at resbuf to get current composition
+      m = buf_->Peek();
+
+      for (int i = 0; i < nbids; i++) {
+        offer = ignore_comp_ ? \
+                Material::CreateUntracked(bid_qty, req->target()->comp()) : \
+                Material::CreateUntracked(bid_qty, m->comp());
+        port->AddBid(req, offer, this, excl);
+        LG(INFO3) << "  - bid " << bid_qty << " kg on a request for " << commod;
+      }
+
+      if (!excl && remaining_qty > 0 && remaining_qty >= package_->fill_min()) {
+        offer = ignore_comp_ ? \
+                Material::CreateUntracked(remaining_qty, req->target()->comp()) : \
+                Material::CreateUntracked(remaining_qty, m->comp());
+        port->AddBid(req, offer, this, excl);
+        LG(INFO3) << "  - bid " << remaining_qty << " kg on a request for " << commod;
+      }
+    } 
   }
   return ports;
 }
@@ -178,9 +212,15 @@ void MatlSellPolicy::GetMatlTrades(
     double qty = it->amt;
     LGH(INFO3) << " sending " << qty << " kg of " << it->request->commodity();
     Material::Ptr mat = buf_->Pop(qty, cyclus::eps_rsrc());
-    if (ignore_comp_)
-      mat->Transmute(it->request->target()->comp());
-    responses.push_back(std::make_pair(*it, mat));
+    std::vector<Material::Ptr> mat_pkgd = mat->Package<Material>(package_);
+    // push any extra material that couldn't be packaged back onto buffer
+    buf_->Push(mat);
+    if (mat_pkgd.size() > 0) {
+      if (ignore_comp_) {
+        mat_pkgd[0]->Transmute(it->request->target()->comp());
+        }
+      responses.push_back(std::make_pair(*it, mat_pkgd[0]));
+    }
   }
 }
 

@@ -9,6 +9,7 @@
 #include "request.h"
 #include "error.h"
 #include "pyne.h"
+#include "package.h"
 
 #include "test_context.h"
 #include "test_agents/test_facility.h"
@@ -150,5 +151,55 @@ TEST_F(MatlSellPolicyTests, Trades) {
   delete req;
 }
 
+TEST_F(MatlSellPolicyTests, Package) {
+  using cyclus::QueryResult;
+
+  int dur = 5;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSink("commod").Finalize();
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> buf;
+
+  double qty = 5;
+  CompMap cm;
+  cm[922350000] = 0.05;
+  cm[922380000] = 0.95;
+  Composition::Ptr comp = Composition::CreateFromMass(cm);
+  mat = Material::Create(a, qty, comp, Package::unpackaged_name());
+
+  buf.Push(mat);
+
+  sim.context()->AddPackage("foo", 1, 2, "first");
+  Package::Ptr p = sim.context()->GetPackage("foo");
+
+  cyclus::toolkit::MatlSellPolicy sellpol;
+  sellpol.Init(fac, &buf, "buf", 4, false, 0, p->name())
+          .Set("commod").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr_trans = sim.db().Query("Transactions", NULL);
+  QueryResult qr_res = sim.db().Query("Resources", NULL);
+  EXPECT_EQ(3, qr_trans.rows.size());
+
+  EXPECT_EQ(0, qr_trans.GetVal<int>("Time", 0));
+  EXPECT_EQ(0, qr_trans.GetVal<int>("Time", 1));
+  EXPECT_EQ(1, qr_trans.GetVal<int>("Time", 2));
+
+  // Resource 0 is the material of 5 that we first created. Resource 1/2 is 
+  // the first resource split into 3 and 2. Resource 3/4 is split into 1 and 2
+  EXPECT_NEAR(2, qr_res.GetVal<double>("Quantity", 2), 0.00001);
+  EXPECT_NEAR(2, qr_res.GetVal<double>("Quantity", 4), 0.00001);
+
+  // All material should have been transacted, including the resource of size 1
+  EXPECT_EQ(0, buf.quantity());
+}
 }
 }

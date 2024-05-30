@@ -102,47 +102,47 @@ TEST_F(ResourceTest, ProductExtractGraphid) {
 }
 
 TEST_F(ResourceTest, DefaultPackageId) {
-  EXPECT_EQ(m1->package_id(), Package::unpackaged_id());
-  EXPECT_EQ(m2->package_id(), Package::unpackaged_id());
-  EXPECT_EQ(p1->package_id(), Package::unpackaged_id());
-  EXPECT_EQ(p2->package_id(), Package::unpackaged_id());
+  EXPECT_EQ(m1->package_name(), Package::unpackaged_name());
+  EXPECT_EQ(m2->package_name(), Package::unpackaged_name());
+  EXPECT_EQ(p1->package_name(), Package::unpackaged_name());
+  EXPECT_EQ(p2->package_name(), Package::unpackaged_name());
 
   Product::Ptr p3 = p1->Extract(2);
-  EXPECT_EQ(p3->package_id(), Package::unpackaged_id());
+  EXPECT_EQ(p3->package_name(), Package::unpackaged_name());
 }
 
-TEST_F(ResourceTest, ChangePackageId) {
+TEST_F(ResourceTest, ChangePackage) {
   ctx->AddPackage("foo", 1, 5, "first");
-  Package::Ptr pkg = ctx->GetPackageByName("foo");
-  int pkg_id = pkg->id();
+  Package::Ptr pkg = ctx->GetPackage("foo");
+  std::string pkg_name = pkg->name();
 
   Product::Ptr p3 = p1->Extract(2);
-  p3->ChangePackageId(pkg_id);
-  EXPECT_EQ(p3->package_id(), pkg_id);
-  EXPECT_EQ(p1->package_id(), Package::unpackaged_id());
+  p3->ChangePackage(pkg_name);
+  EXPECT_EQ(p3->package_name(), pkg_name);
+  EXPECT_EQ(p1->package_name(), Package::unpackaged_name());
 
-  m1->ChangePackageId(pkg_id);
-  EXPECT_EQ(m1->package_id(), pkg_id);
+  m1->ChangePackage(pkg_name);
+  EXPECT_EQ(m1->package_name(), pkg_name);
 }
 
 TEST_F(ResourceTest, PackageResource) {
   ctx->AddPackage("foo", 1, 5, "first");
-  Package::Ptr pkg = ctx->GetPackageByName("foo");
-  int pkg_id = pkg->id();
+  Package::Ptr pkg = ctx->GetPackage("foo");
+  std::string pkg_name = pkg->name();
 
   // nothing packaged
   Product::Ptr p3 = p1->Extract(0.5);
   std::vector<Product::Ptr> p3_pkgd = p3->Package<Product>(pkg);
 
   // everything stays in old product, with same (default) package id
-  EXPECT_EQ(p3->package_id(), Package::unpackaged_id());
+  EXPECT_EQ(p3->package_name(), Package::unpackaged_name());
   EXPECT_EQ(p3->quantity(), 0.5);
 
   // all packaged
   std::vector<Product::Ptr> p1_pkgd = p1->Package<Product>(pkg);
   EXPECT_EQ(p1->quantity(), 0);
   EXPECT_EQ(p1_pkgd.size(), 1);
-  EXPECT_EQ(p1_pkgd[0]->package_id(), pkg_id);
+  EXPECT_EQ(p1_pkgd[0]->package_name(), pkg_name);
 
   // // two packages
   std::vector<Product::Ptr> p2_pkgd = p2->Package<Product>(pkg);
@@ -150,14 +150,14 @@ TEST_F(ResourceTest, PackageResource) {
   EXPECT_EQ(p2_pkgd.size(), 2);
   EXPECT_EQ(p2_pkgd[0]->quantity(), 5);
   EXPECT_EQ(p2_pkgd[1]->quantity(), 2);
-  EXPECT_EQ(p2_pkgd[0]->package_id(), pkg_id);
-  EXPECT_EQ(p2_pkgd[1]->package_id(), pkg_id);
+  EXPECT_EQ(p2_pkgd[0]->package_name(), pkg_name);
+  EXPECT_EQ(p2_pkgd[1]->package_name(), pkg_name);
   
   Material::Ptr m3 = m2->ExtractQty(5.5);
   std::vector<Material::Ptr> m3_pkgd = m3->Package<Material>(pkg);
-  EXPECT_EQ(m3->package_id(), Package::unpackaged_id());
+  EXPECT_EQ(m3->package_name(), Package::unpackaged_name());
   EXPECT_EQ(m3->quantity(), 0.5);
   EXPECT_EQ(m3_pkgd.size(), 1);
-  EXPECT_EQ(m3_pkgd[0]->package_id(), pkg_id);
+  EXPECT_EQ(m3_pkgd[0]->package_name(), pkg_name);
   EXPECT_EQ(m3_pkgd[0]->quantity(), 5);
 }

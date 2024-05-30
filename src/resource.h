@@ -93,10 +93,10 @@ class Resource {
   virtual void Absorb(Ptr res) { throw Error("cannot absorb resource type " + this->type()); };
 
   /// Returns the package id.
-  virtual int package_id() { return Package::unpackaged_id(); };
+  virtual std::string package_name() { return Package::unpackaged_name(); };
 
   /// Changes the product's package id
-  virtual void ChangePackageId(int new_package_id = Package::unpackaged_id()) {};
+  virtual void ChangePackage(std::string new_package_name = Package::unpackaged_name()) {};
 
   /// Repackages a single resource into a package. If some quantity of the 
   /// resource cannot be packaged using the given packaging strategy and
@@ -138,13 +138,12 @@ std::vector<typename T::Ptr> Resource::Package(Package::Ptr pkg) {
     return ts_pkgd;
   }
 
-  while (quantity() > pkg->fill_min()) {
+  while (quantity() > 0 && quantity() >= pkg->fill_min()) {
     double pkg_fill = std::min(quantity(), fill_mass);
     t_pkgd = boost::dynamic_pointer_cast<T>(ExtractRes(pkg_fill));
-    t_pkgd->ChangePackageId(pkg->id());
-    ts_pkgd.push_back(t_pkgd);
+    t_pkgd->ChangePackage(pkg->name());
+    ts_pkgd.push_back(t_pkgd); 
   }
-  
   return ts_pkgd;
 }
 

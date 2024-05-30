@@ -42,12 +42,16 @@ class ResTracker {
   /// decay).
   void Modify();
 
+  /// Should be called when a resource's package gets modified
+  void Package();
+
  private:
   void Record();
 
   int parent1_;
   int parent2_;
   bool tracked_;
+  std::string package_name_;
   Resource* res_;
   Context* ctx_;
 };

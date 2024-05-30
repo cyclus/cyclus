@@ -255,10 +255,12 @@ class Context {
                   double fill_max = std::numeric_limits<double>::max(),
                   std::string strategy = "first");
 
-  // Retrieve a registered package. 
-  Package::Ptr GetPackageByName(std::string name);
+  /// Records package information. Should be used first on unpackaged, then
+  /// to record user-declared packages
+  void RecordPackage(Package::Ptr);
 
-  Package::Ptr GetPackageById(int id);
+  /// Retrieve a registered package. 
+  Package::Ptr GetPackage(std::string name);
 
   int random();
 
