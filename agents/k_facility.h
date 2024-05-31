@@ -7,6 +7,8 @@
 
 #include "cyclus.h"
 
+#pragma cyclus exec from sidecar import CY_LARGE_DOUBLE, CY_LARGE_INT, CY_NEAR_ZERO
+
 namespace cyclus {
 
 class Context;
@@ -200,7 +202,7 @@ class KFacility : public cyclus::Facility {
   double current_capacity;
 
   #pragma cyclus var { \
-    "default": "cy_large_double", \
+    "default": CY_LARGE_DOUBLE, \
     "tooltip": "k-facility maximum inventory size", \
     "doc": "total maximum inventory size of the k-facility", \
     "uilabel": "Maximum Inventory"			     \

@@ -38,13 +38,13 @@ static const double float_ulp_eq = 2;
 static const double kModifierLimit = pow(10, 10);
 
 /// maximum (+) value for an integer variable
-static const int cy_large_int = std::numeric_limits<int>::max();
+static const int CY_LARGE_INT = std::numeric_limits<int>::max();
 
 /// maximum (+) value for a linear variable
-static const double cy_large_double = 1e299;
+static const double CY_LARGE_DOUBLE = 1e299;
 
 /// constant near-zero value
-static const double cy_near_zero = 1e-08;
+static const double CY_NEAR_ZERO = 1e-08;
 
 }  // namespace cyclus
 

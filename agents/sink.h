@@ -5,6 +5,8 @@
 
 #include "cyclus.h"
 
+#pragma cyclus exec from sidecar import CY_LARGE_DOUBLE, CY_LARGE_INT, CY_NEAR_ZERO
+
 namespace cyclus {
 
 /// @class Sink
@@ -93,7 +95,7 @@ class Sink : public cyclus::Facility  {
   std::string recipe_name;
 
   #pragma cyclus var {\
-    "default": "cy_large_double",						\
+    "default": CY_LARGE_DOUBLE,						\
     "doc": "total maximum inventory size of "			\
            "sink facility",						\
     "uilabel": "Maximum Inventory",				\
@@ -106,7 +108,7 @@ class Sink : public cyclus::Facility  {
            "accept at each time step", \
     "uilabel": "Maximum Throughput", \
     "uitype": "range", \
-    "range": [0.0, "cy_large_double"], \
+    "range": [0.0, CY_LARGE_DOUBLE], \
     "tooltip": "sink capacity" \
   }
   double capacity;

@@ -7,6 +7,8 @@
 
 #include "cyclus.h"
 
+#pragma cyclus exec from sidecar import CY_LARGE_DOUBLE, CY_LARGE_INT, CY_NEAR_ZERO
+
 namespace cyclus {
 
 class Context;
@@ -115,7 +117,7 @@ class Source : public cyclus::Facility {
     "doc": "amount of commodity that can be supplied at each time step", \
     "uilabel": "Maximum Throughput", \
     "uitype": "range", \
-    "range": [0.0, "cy_large_double"], \
+    "range": [0.0, CY_LARGE_DOUBLE], \
     "tooltip": "source capacity" \
   }
   double capacity;

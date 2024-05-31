@@ -42,7 +42,7 @@ MockAgent::MockAgent(Context* ctx, Recorder* rec, SqliteBack* b, bool is_source)
       rec_(rec),
       back_(b),
       source_(is_source),
-      cap_(cy_large_double),
+      cap_(cyclus::CY_LARGE_DOUBLE),
       lifetime_(-1),
       start_(0) {
   std::stringstream ss;
