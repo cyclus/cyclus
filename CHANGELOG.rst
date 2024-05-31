@@ -17,6 +17,7 @@ Since last release
 * Material sell policy can package materials (#1749)
 * Use miniforge for conda CI builds instead of miniconda (#1763)
 * Warning and limits on number of packages that can be created from a resource at once (#1771)
+* Define constants ``CY_LARGE_DOUBLE``, ``CY_LARGE_INT``, and ``CY_NEAR_ZERO`` (#1757)
 
 **Removed:**
 

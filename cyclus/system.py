@@ -37,4 +37,6 @@ else:
             concurrent_futures = None
          
 
-
+CY_LARGE_DOUBLE = 1e299
+CY_LARGE_INT = sys.maxsize
+CY_NEAR_ZERO = 1e-08

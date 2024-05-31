@@ -2081,11 +2081,11 @@ class Position(_Position):
     example: 05.2169 -> 18780.84
     """
 
-def cy_large_double():
-    return cpp_cyclus.cy_large_double
+def CY_LARGE_DOUBLE():
+    return cpp_cyclus.CY_LARGE_DOUBLE
 
-def cy_large_int():
-    return cpp_cyclus.cy_large_int
+def CY_LARGE_INT():
+    return cpp_cyclus.CY_LARGE_INT
 
-def cy_near_zero():
-    return cpp_cyclus.cy_near_zero
+def CY_NEAR_ZERO():
+    return cpp_cyclus.CY_NEAR_ZERO
