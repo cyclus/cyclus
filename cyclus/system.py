@@ -1,5 +1,6 @@
 """Some system-specific info for cyclus."""
 import sys
+import ctypes
 
 PY_VERSION_TUPLE = sys.version_info[:3]
 
@@ -36,7 +37,6 @@ else:
         except ImportError:
             concurrent_futures = None
          
-
 CY_LARGE_DOUBLE = 1e299
-CY_LARGE_INT = sys.maxsize
+CY_LARGE_INT = (2 ** (ctypes.sizeof(ctypes.c_int) * 8 - 1)) - 1
 CY_NEAR_ZERO = 1e-08
