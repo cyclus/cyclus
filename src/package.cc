@@ -79,8 +79,7 @@ TransportUnit::Ptr TransportUnit::Create(std::string name, int fill_min, int fil
 // if the static member is not yet set, create a new object
 // otherwise return the object that already exists
 TransportUnit::Ptr& TransportUnit::unrestricted() {
-
-  if (!unrestricted) {
+  if (!unrestricted_) {
     unrestricted_ = Ptr(new TransportUnit(unrestricted_name_));
   }
   return unrestricted_;
@@ -102,28 +101,26 @@ int TransportUnit::GetTransportUnitFill(int qty) {
 
     if (num_at_min_fill >= num_at_max_fill) {
       // all material *might* fit transport units. However, this is more
-      // challenging than packages because transport units are discrete. check:
-
+      // challenging than packages because transport units are discrete. 
       double dbl_fill_mass = (double)qty / (double)num_at_max_fill;
-        return std::floor(dbl_fill_mass);
+      return std::floor(dbl_fill_mass);
     }
     // some material will remain unrestricted, fill up as many transport
     // units as possible. Or, perfect fill is possible but not with integer
-    // fill (see above). Should also start filling to max until last partial
-    // filled transport unit
-    return fill_max_;
+    // fill (see above). 
   }
+  return fill_max_;
 }
 
 int TransportUnit::MaxShippablePackages(int pkgs) {
   int TU_fill;
   int shippable = 0;
-  
+
   if (pkgs == 0 && pkgs < fill_min_) {
     return 0;
   }
 
-  while (pkgs > 0 && pkgs >= fill_min_) {
+  while ((pkgs > 0) && (pkgs >= fill_min_)) {
     TU_fill = GetTransportUnitFill(pkgs);
     shippable += TU_fill;
     pkgs -= TU_fill;
@@ -134,7 +131,9 @@ int TransportUnit::MaxShippablePackages(int pkgs) {
 TransportUnit::TransportUnit(std::string name, int fill_min, int fill_max, std::string strategy) : 
   name_(name), fill_min_(fill_min), fill_max_(fill_max), strategy_(strategy) {
     if (name == unrestricted_name_) {
-      throw ValueError("can't create a new transport unit with name 'unrestricted'");
+      if (unrestricted_) {
+        throw ValueError("can't create a new transport unit with name 'unrestricted'");
+      }
   }
 }
 
