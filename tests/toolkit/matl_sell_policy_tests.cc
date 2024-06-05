@@ -162,7 +162,7 @@ TEST_F(MatlSellPolicyTests, Package) {
   
   sim.context()->AddPrototype(a->prototype(), a);
   sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
-  sim.AddSink("commod").Finalize();
+  sim.AddSink("commod").capacity(2).Finalize();
   TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
 
   cyclus::toolkit::ResBuf<cyclus::Material> buf;
@@ -190,16 +190,81 @@ TEST_F(MatlSellPolicyTests, Package) {
   EXPECT_EQ(3, qr_trans.rows.size());
 
   EXPECT_EQ(0, qr_trans.GetVal<int>("Time", 0));
-  EXPECT_EQ(0, qr_trans.GetVal<int>("Time", 1));
-  EXPECT_EQ(1, qr_trans.GetVal<int>("Time", 2));
+  EXPECT_EQ(1, qr_trans.GetVal<int>("Time", 1));
+  EXPECT_EQ(2, qr_trans.GetVal<int>("Time", 2));
 
-  // Resource 0 is the material of 5 that we first created. Resource 1/2 is 
-  // the first resource split into 3 and 2. Resource 3/4 is split into 1 and 2
-  EXPECT_NEAR(2, qr_res.GetVal<double>("Quantity", 2), 0.00001);
-  EXPECT_NEAR(2, qr_res.GetVal<double>("Quantity", 4), 0.00001);
+  std::vector<cyclus::Cond> conds;
+  conds.push_back(cyclus::Cond("PackageName", "==", std::string("foo")));
+  QueryResult qr_res = sim.db().Query("Resources", &conds);
+  EXPECT_EQ(qr_res.rows.size(), 3);
+  EXPECT_EQ(2, qr_res.GetVal<double>("Quantity", 0));
+  EXPECT_EQ(2, qr_res.GetVal<double>("Quantity", 1));
+  EXPECT_EQ(1, qr_res.GetVal<double>("Quantity", 2));
 
   // All material should have been transacted, including the resource of size 1
   EXPECT_EQ(0, buf.quantity());
 }
+
+TEST_F(MatlSellPolicyTests, TransportUnit) {
+  using cyclus::QueryResult;
+
+  int dur = 5;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSink("commod").Finalize();
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> buf;
+
+  double qty = 5;
+  CompMap cm;
+  cm[922350000] = 0.05;
+  cm[922380000] = 0.95;
+  Composition::Ptr comp = Composition::CreateFromMass(cm);
+  mat = Material::Create(a, qty, comp, Package::unpackaged_name());
+
+  buf.Push(mat);
+
+  sim.context()->AddPackage("foo", 1, 2, "first");
+  Package::Ptr p = sim.context()->GetPackage("foo");
+  sim.context()->AddTransportUnit("bar", 1, 2, "first");
+  TransportUnit::Ptr tu = sim.context()->GetTransportUnit("foo");
+
+  cyclus::toolkit::MatlSellPolicy sellpol;
+  sellpol.Init(fac, &buf, "buf", 4, false, 0, p->name(), tu->name())
+          .Set("commod").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr_trans = sim.db().Query("Transactions", NULL);
+  EXPECT_EQ(3, qr_trans.rows.size());
+
+  EXPECT_EQ(0, qr_trans.GetVal<int>("Time", 0));
+  EXPECT_EQ(0, qr_trans.GetVal<int>("Time", 1));
+  EXPECT_EQ(0, qr_trans.GetVal<int>("Time", 2));
+
+  // the order of trades that happen in the same time step is not guaranteed,
+  // so we can't use database order to confirm which resource (sizes 2, 2, 1)
+  // will appear in which order. Thus make a set, sort high-low, then compare
+  std::vector<cyclus::Cond> conds;
+  conds.push_back(cyclus::Cond("PackageName", "==", std::string("foo")));
+  QueryResult qr_res = sim.db().Query("Resources", &conds);
+  std::vector<double> pkgd_trades = {qr_res.GetVal<double>("Quantity", 0),
+                                     qr_res.GetVal<double>("Quantity", 1),
+                                     qr_res.GetVal<double>("Quantity", 2)};
+
+  std::sort(pkgd_trades.begin(), pkgd_trades.end(), std::greater<double>());
+  std::vector<double> exp = {2, 2, 1};
+  EXPECT_EQ(exp, pkgd_trades);
+
+  // All material should have been transacted, including the resource of size 1
+  EXPECT_EQ(0, buf.quantity());
+}
+
 }
 }
