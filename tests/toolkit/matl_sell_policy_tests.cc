@@ -186,7 +186,6 @@ TEST_F(MatlSellPolicyTests, Package) {
   EXPECT_NO_THROW(sim.Run());
 
   QueryResult qr_trans = sim.db().Query("Transactions", NULL);
-  QueryResult qr_res = sim.db().Query("Resources", NULL);
   EXPECT_EQ(3, qr_trans.rows.size());
 
   EXPECT_EQ(0, qr_trans.GetVal<int>("Time", 0));
@@ -232,11 +231,11 @@ TEST_F(MatlSellPolicyTests, TransportUnit) {
 
   sim.context()->AddPackage("foo", 1, 2, "first");
   Package::Ptr p = sim.context()->GetPackage("foo");
-  sim.context()->AddTransportUnit("bar", 1, 2, "first");
+  sim.context()->AddTransportUnit("foo", 3, 3, "first");
   TransportUnit::Ptr tu = sim.context()->GetTransportUnit("foo");
 
   cyclus::toolkit::MatlSellPolicy sellpol;
-  sellpol.Init(fac, &buf, "buf", 4, false, 0, p->name(), tu->name())
+  sellpol.Init(fac, &buf, "buf", 10, false, 0, p->name(), tu->name())
           .Set("commod").Start();
 
   EXPECT_NO_THROW(sim.Run());
