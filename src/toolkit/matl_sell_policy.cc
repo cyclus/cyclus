@@ -212,15 +212,26 @@ void MatlSellPolicy::GetMatlTrades(
     double qty = it->amt;
     LGH(INFO3) << " sending " << qty << " kg of " << it->request->commodity();
     Material::Ptr mat = buf_->Pop(qty, cyclus::eps_rsrc());
-    std::vector<Material::Ptr> mat_pkgd = mat->Package<Material>(package_);
-    // push any extra material that couldn't be packaged back onto buffer
-    buf_->Push(mat);
-    if (mat_pkgd.size() > 0) {
-      if (ignore_comp_) {
-        mat_pkgd[0]->Transmute(it->request->target()->comp());
-        }
-      responses.push_back(std::make_pair(*it, mat_pkgd[0]));
+    Material::Ptr trade_mat;
+
+    // don't go through packaging if you don't need to. packaging always bumps
+    // resource ids and records on resources table, which is not necessary
+    // when nothing is happening
+    if (package_->name() != mat->package_name()) { // packaging needed
+      std::vector<Material::Ptr> mat_pkgd = mat->Package<Material>(package_);
+      // push any extra material that couldn't be packaged back onto buffer
+      buf_->Push(mat);
+      if (mat_pkgd.size() > 0) {
+        trade_mat = mat_pkgd[0];
+      }
+    } else { // no packaging needed
+      trade_mat = mat;
     }
+
+    if (ignore_comp_) {
+      trade_mat->Transmute(it->request->target()->comp());
+    }
+    responses.push_back(std::make_pair(*it, trade_mat));
   }
 }
 
