@@ -48,16 +48,15 @@ RUN apt update -y && apt install -y \
     && apt clean -y all
 
 RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
-    wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
-    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
-    rm ~/miniconda.sh
+    wget --quiet "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" -O ~/miniforge.sh && \
+    /bin/bash ~/miniforge.sh -b -p /opt/conda && \
+    rm ~/miniforge.sh
 
 ENV PATH /opt/conda/bin:$PATH
-
-RUN conda config --add channels conda-forge
-RUN conda update -n base -c conda-forge conda
-RUN conda update -y --all && \
-    conda install -y \
+RUN mamba update -n base conda mamba && \
+    mamba update -y python --no-pin && \
+    mamba update -y --all && \
+    mamba install -y \
                gxx_linux-64 \
                gcc_linux-64 \
                cmake \
@@ -83,9 +82,8 @@ RUN conda update -y --all && \
                pprintpp \
                pip \
                && \
-    conda install -y --force-reinstall libsqlite libexpat && \
-    conda clean -y --all
-RUN mkdir -p `python3 -m site --user-site`
+    mamba clean -y --all
+RUN mkdir -p $(python3 -m site --user-site)
 ENV CC /opt/conda/bin/x86_64-conda-linux-gnu-gcc
 ENV CXX /opt/conda/bin/x86_64-conda-linux-gnu-g++
 ENV CPP /opt/conda/bin/x86_64-conda-linux-gnu-cpp
@@ -95,7 +93,7 @@ RUN apt install -y lcov curl
 ENV GCOV /usr/bin/gcov
 
 FROM conda-deps as conda-coverage-deps
-RUN conda install -y lcov curl
+RUN mamba install -y lcov curl
 ENV GCOV /opt/conda/bin/x86_64-conda-linux-gnu-gcov
 
 FROM ${pkg_mgr}-coverage-deps as cyclus-coverage
