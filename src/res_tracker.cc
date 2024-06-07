@@ -1,6 +1,7 @@
 #include "res_tracker.h"
 
 #include "recorder.h"
+#include "cyc_limits.h"
 
 namespace cyclus {
 
@@ -44,13 +45,17 @@ void ResTracker::Extract(ResTracker* removed) {
     return;
   }
 
-  parent1_ = res_->state_id();
-  parent2_ = 0;
+  if (res_->quantity() > eps_rsrc()) {
+    parent1_ = res_->state_id();
+    parent2_ = 0;
+    
+    Record();
+  }
+  
   removed->parent1_ = res_->state_id();
   removed->parent2_ = 0;
   removed->tracked_ = tracked_;
 
-  Record();
   removed->Record();
 }
 

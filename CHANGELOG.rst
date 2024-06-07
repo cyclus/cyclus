@@ -20,7 +20,7 @@ Since last release
 * Removed the ResourceBuff class and replaced its instances with ResBuf (#1755)
 
 **Fixed:**
-
+* Removed unnecessary records being added to the Resource database by packaging process (#1761)
 
 v1.6.0
 ====================
