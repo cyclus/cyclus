@@ -14,6 +14,7 @@ Since last release
 * Remove ``pandas`` as build dependency (#1748)
 * Consistently use hyphens in ``install.py`` flags (#1748)
 * Material sell policy can package materials (#1749)
+* Use miniforge for conda CI builds instead of miniconda (#1763)
 
 **Removed:**
 
@@ -28,13 +29,13 @@ v1.6.0
 **Added:**
 
 * adding compatibility with cbc 2.10 (#1557)
-* In `src/pyne.h`, replace a macro `isnan()` with `using std::isnan`, 
+* In `src/pyne.h`, replace a macro `isnan()` with `using std::isnan`,
   as the former has led to undesired macro expansion in Boost header files. (#1560)
 * updated cyclus_nuc_data.h5 URL after Dory retirement (#1567)
 * now default quantize are zero which corresponds to no quantize policy. (#1552)
-* Added several lines to DEPENDENCIES.rst to explain that even when using a 
-  machine with a single python3 install (such as a fresh Ubuntu 20.04), install 
-  will fail unless update-alternatives has been used to point python at the 
+* Added several lines to DEPENDENCIES.rst to explain that even when using a
+  machine with a single python3 install (such as a fresh Ubuntu 20.04), install
+  will fail unless update-alternatives has been used to point python at the
   correct python3 version (#1558)
 * build and test are now fown on githubAction in place or CircleCI (#1569)
 * Have separate workflows for testing, publishing dependency images, and publishing release images (#1597, #1602, #1606, #1609, #1629, #1633, #1637, #1668, #1672, #1676, #1708)
@@ -47,7 +48,7 @@ v1.6.0
 * Adds support for Cython3 (#1636)
 * Adds TotalInvTracker, which allows an inventory cap to be set for multiple resource buffers, and is now required for material buy policy (#1646)
 * AddMutalReqs and AddReciepe functions and exclusive bids in python API of DRE (#1584)
-* Created Package class and optional declaration of packages in input files (#1673, #1699, #1712, #1729), package id is default unpackaged (#1711) and is a member of 
+* Created Package class and optional declaration of packages in input files (#1673, #1699, #1712, #1729), package id is default unpackaged (#1711) and is a member of
   resources (materials/products) (#1675). Can pop resources as packaged from resource buffer, pushing resource onto a buffer defaults to stripping packaging (#1683)
 * CI support for Rocky Linux (#1691)
 * Added support for a ResBuf to behave as a single bulk storage with mixing & extraction of resources (#1687)
@@ -62,18 +63,18 @@ v1.6.0
 * Resolved various compilation warnings due to use of deprecated APIs (#1671)
 * Update version management in CMake build (#1696)
 * Changed dependency versions in README.rst, INSTALL.rst, and DEPENDENCIES.rst (#1703, #1735)
-* Updated minor documentation about updating CHANGELOG.rst, fix formatting for rendering 
+* Updated minor documentation about updating CHANGELOG.rst, fix formatting for rendering
   hyperlinks, and change branch name in README instructions on forking for development (#1715)
 * Updated GTest suite to be fetched from GitHub during the build process (#1738)
 * Default to building a Release version of Cyclus when installing via the python script (#1741)
 
 **Removed:**
 
-* A duplicate `using std::list` in `src/hdf5_back.cc.in`, which triggers compiler 
+* A duplicate `using std::list` in `src/hdf5_back.cc.in`, which triggers compiler
   errors with some GCC versions. (#1560)
-* Removed deprecated `smbchk.py` ABI consistency checking functionality and tests (#1706). This functionality was 
-  originally deprecated in #1396, and is removed in #1706 to clean up deprecated functionality 
-  with the pending v1.6 release. 
+* Removed deprecated `smbchk.py` ABI consistency checking functionality and tests (#1706). This functionality was
+  originally deprecated in #1396, and is removed in #1706 to clean up deprecated functionality
+  with the pending v1.6 release.
 
 **Fixed:**
 
@@ -140,7 +141,7 @@ v1.5.4
   variables for these classes are ``MaterialStateVar`` and ``ProductStateVar``.
 * Added the Decision Phase. This phase occurs after the tock phase and allows
   cyclus agents to make decisions based on what has occured during the
-  tick and tock phase of the current timestep. 
+  tick and tock phase of the current timestep.
 
 
 **Changed:**
@@ -157,7 +158,7 @@ v1.5.4
   Cython.
 * Updated cycstub readme to reflect changes
 * Updated the record time series function to also include the name of the field being
-  recorded. 
+  recorded.
 
 
 
@@ -240,7 +241,3 @@ v1.5.2
 * Fixed issue with Python agent prototypes not being registered correctly when created.
   This caused segfaults due the the agents being deallocated too soon.
 * Fixed many issues with institution kinds checking "Institution", rather than "Inst".
-
-
-
-
