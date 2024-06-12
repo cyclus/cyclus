@@ -85,7 +85,8 @@ class MatlSellPolicy : public Trader {
   MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                        double throughput, bool ignore_comp,
                        double quantize,
-                       std::string package_name = Package::unpackaged_name());
+                       std::string package_name = Package::unpackaged_name(),
+                       std::string transport_unit_name = TransportUnit::unrestricted_name());
   /// @}
 
   /// Instructs the policy to empty its buffer with offers on the given
@@ -127,6 +128,7 @@ class MatlSellPolicy : public Trader {
   void set_throughput(double x);
   void set_ignore_comp(bool x);
   void set_package(std::string x);
+  void set_transport_unit(std::string x);
 
   ResBuf<Material>* buf_;
   std::set<std::string> commods_;
@@ -135,6 +137,7 @@ class MatlSellPolicy : public Trader {
   std::string name_;
   bool ignore_comp_;
   Package::Ptr package_;
+  TransportUnit::Ptr transport_unit_;
 };
 
 }  // namespace toolkit

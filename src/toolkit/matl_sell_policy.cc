@@ -17,7 +17,8 @@ MatlSellPolicy::MatlSellPolicy() :
     quantize_(0),
     throughput_(std::numeric_limits<double>::max()),
     ignore_comp_(false),
-    package_(Package::unpackaged()) {
+    package_(Package::unpackaged()),
+    transport_unit_(TransportUnit::unrestricted()) {
   Warn<EXPERIMENTAL_WARNING>(
       "MatlSellPolicy is experimental and its API may be subject to change");
 }
@@ -44,14 +45,34 @@ void MatlSellPolicy::set_ignore_comp(bool x) {
 void MatlSellPolicy::set_package(std::string x) {
   // if no real context, only unpackaged can be used (keep default)
   if (manager() != NULL) {
-    if ((quantize_ < package_->fill_min()) || 
-    (quantize_ > package_->fill_max()))  {
+    Package::Ptr pkg = manager()->context()->GetPackage(x);
+    double pkg_fill = pkg->GetFillMass(quantize_);
+    if ((pkg->name() != Package::unpackaged_name()) && (quantize_ > 0) &&
+    (std::remainder(quantize_, pkg_fill) > 0)) { 
       std::stringstream ss;
-      ss << "Quantize " << quantize_ << " is outside the package fill min/max values (" << package_->fill_min() << ", "
-       << package_->fill_max() << ")";
+      ss << "Quantize " << quantize_ << " is not fully packagable based on fill min/max values (" 
+      << pkg->fill_min() << ", " << pkg->fill_max() << ")";
       throw ValueError(ss.str());
     }
-    package_ = manager()->context()->GetPackage(x);
+    package_ = pkg;
+  }
+}
+
+void MatlSellPolicy::set_transport_unit(std::string x) {
+  if (manager() != NULL) {
+    TransportUnit::Ptr tu = manager()->context()->GetTransportUnit(x);
+
+    int num_pkgs = quantize_ / (package_->GetFillMass(quantize_));
+    int max_shippable = tu->MaxShippablePackages(num_pkgs);
+
+    if ((tu->name() != TransportUnit::unrestricted_name()) && quantize_ > 0 &&
+    (max_shippable != num_pkgs))  {
+      std::stringstream ss;
+      ss << "Quantize " << quantize_ << " packages cannot be shipped according to transport unit fill min/max values (" << tu->fill_min() << ", "
+       << tu->fill_max() << ")";
+      throw ValueError(ss.str());
+    }
+    transport_unit_ = tu;
   }
 }
 
@@ -95,7 +116,8 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
 MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                      std::string name, double throughput,
                                      bool ignore_comp, double quantize,
-                                     std::string package_name) {
+                                     std::string package_name,
+                                     std::string transport_unit_name) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
@@ -103,6 +125,7 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   set_throughput(throughput);
   set_ignore_comp(ignore_comp);
   set_package(package_name);
+  set_transport_unit(transport_unit_name);
   return *this;
 }
 
@@ -157,9 +180,10 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
   Request<Material>* req;
   Material::Ptr m, offer;
   double qty;
-  int nbids;
-  double bid_qty;
+  int n_full_bids;
+  double bid_qty;  
   double remaining_qty;
+  std::vector<double> bids;
   std::set<std::string>::iterator sit;
   std::vector<Request<Material>*>::const_iterator rit;
   for (sit = commods_.begin(); sit != commods_.end(); ++sit) {
@@ -173,30 +197,37 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       req = *rit;
       qty = std::min(req->target()->quantity(), limit);
       bid_qty = excl ? quantize_ : package_->GetFillMass(qty);
-      if (bid_qty == 0) {
-        nbids = 0;
-      } else {
-        nbids = static_cast<int>(std::floor(qty / bid_qty));
+      if (bid_qty != 0) {
+        n_full_bids = static_cast<int>(std::floor(qty / bid_qty));
+        bids.assign(n_full_bids, bid_qty);
+
+        remaining_qty = fmod(qty, bid_qty);
+        if (!excl && (remaining_qty > 0) && 
+        (remaining_qty >= package_->fill_min())) {
+          // leftover material is enough to fill one more partial package. Add
+          // to bids
+          bids.push_back(remaining_qty);
+        }
       }
-      remaining_qty = fmod(qty, bid_qty);
+      // check transportability
+      int shippable_pkgs = transport_unit_->MaxShippablePackages(bids.size());
+      if (shippable_pkgs < bids.size()) {
+        // can't ship all bids. Pop the extras.
+        for (int i=0; i<(bids.size() - shippable_pkgs); i++) {
+          bids.pop_back();
+        }
+      }
 
       // Peek at resbuf to get current composition
       m = buf_->Peek();
 
-      for (int i = 0; i < nbids; i++) {
+      std::vector<double>::iterator bit;
+      for (bit = bids.begin(); bit != bids.end(); ++bit) {
         offer = ignore_comp_ ? \
-                Material::CreateUntracked(bid_qty, req->target()->comp()) : \
-                Material::CreateUntracked(bid_qty, m->comp());
+                Material::CreateUntracked(*bit, req->target()->comp()) : \
+                Material::CreateUntracked(*bit, m->comp());
         port->AddBid(req, offer, this, excl);
-        LG(INFO3) << "  - bid " << bid_qty << " kg on a request for " << commod;
-      }
-
-      if (!excl && remaining_qty > 0 && remaining_qty >= package_->fill_min()) {
-        offer = ignore_comp_ ? \
-                Material::CreateUntracked(remaining_qty, req->target()->comp()) : \
-                Material::CreateUntracked(remaining_qty, m->comp());
-        port->AddBid(req, offer, this, excl);
-        LG(INFO3) << "  - bid " << remaining_qty << " kg on a request for " << commod;
+        LG(INFO3) << "  - bid " << *bit << " kg on a request for " << commod;
       }
     } 
   }
@@ -208,22 +239,36 @@ void MatlSellPolicy::GetMatlTrades(
     std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {
   Composition::Ptr c;
   std::vector<Trade<Material> >::const_iterator it;
+
+  // confirm that trades are within transport unit limits
+  int shippable_pkgs = transport_unit_->MaxShippablePackages(trades.size());
+
+  double qty;
+
   for (it = trades.begin(); it != trades.end(); ++it) {
-    double qty = it->amt;
-    LGH(INFO3) << " sending " << qty << " kg of " << it->request->commodity();
-    Material::Ptr mat = buf_->Pop(qty, cyclus::eps_rsrc());
-    Material::Ptr trade_mat;
+    if (shippable_pkgs > 0){
+      qty = it->amt;
+      LGH(INFO3) << " sending " << qty << " kg of " << it->request->commodity();
+      Material::Ptr mat = buf_->Pop(qty, cyclus::eps_rsrc());
+      Material::Ptr trade_mat;
 
     // don't go through packaging if you don't need to. packaging always bumps
     // resource ids and records on resources table, which is not necessary
     // when nothing is happening
     if (package_->name() != mat->package_name()) { // packaging needed
       std::vector<Material::Ptr> mat_pkgd = mat->Package<Material>(package_);
-      // push any extra material that couldn't be packaged back onto buffer
-      buf_->Push(mat);
-      if (mat_pkgd.size() > 0) {
-        trade_mat = mat_pkgd[0];
+
+      if (mat->quantity() > eps()) {
+        // push any extra material that couldn't be packaged back onto buffer
+        // don't push unless there's leftover material
+        buf_->Push(mat);
       }
+      if (mat_pkgd.size() > 0) {
+        // packaging successful
+        trade_mat = mat_pkgd[0];
+        shippable_pkgs-=1;
+      }
+
     } else { // no packaging needed
       trade_mat = mat;
     }
@@ -232,6 +277,7 @@ void MatlSellPolicy::GetMatlTrades(
       trade_mat->Transmute(it->request->target()->comp());
     }
     responses.push_back(std::make_pair(*it, trade_mat));
+    }
   }
 }
 
