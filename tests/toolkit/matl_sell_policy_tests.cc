@@ -192,36 +192,24 @@ TEST_F(MatlSellPolicyTests, Package) {
   EXPECT_EQ(1, qr_trans.GetVal<int>("Time", 1));
   EXPECT_EQ(2, qr_trans.GetVal<int>("Time", 2));
 
-<<<<<<< Updated upstream
+  // Resource 0 is the material of 5 that we first created. 
+  QueryResult qr_all_res = sim.db().Query("Resources", NULL);
+  EXPECT_EQ(5, qr_all_res.GetVal<double>("Quantity", 0));
+
+  // Then check that three packaged materials were created of size 2, 2, and 1
   std::vector<cyclus::Cond> conds;
   conds.push_back(cyclus::Cond("PackageName", "==", std::string("foo")));
-  QueryResult qr_res = sim.db().Query("Resources", &conds);
-  EXPECT_EQ(qr_res.rows.size(), 3);
-  EXPECT_EQ(2, qr_res.GetVal<double>("Quantity", 0));
-  EXPECT_EQ(2, qr_res.GetVal<double>("Quantity", 1));
-  EXPECT_EQ(1, qr_res.GetVal<double>("Quantity", 2));
-=======
-  // Resource 0 is the material of 5 that we first created. The first resource 
-  // is split into 3 and 2, then split again into 1 and 2
-  // the first resource split into 3 and 2. Resource 3/4 is split into 1 and 2
-  EXPECT_EQ(5, qr_res.GetVal<double>("Quantity", 0));
+  QueryResult qr_pkgd_res = sim.db().Query("Resources", &conds);
+  EXPECT_EQ(qr_pkgd_res.rows.size(), 3);
 
-  std::vector<double> pkg_first_split = {qr_res.GetVal<double>("Quantity", 1),
-                                         qr_res.GetVal<double>("Quantity", 2),
-  std::sort(pkg_first_split.begin(), pkg_first_split.end(),
-            std::greater<double>());
-  std::vector<double> exp_first = {3, 2};
-  
-  EXPECT_EQ(exp_first, pkgng_split);
+  std::vector<double> pkged_res = {qr_pkgd_res.GetVal<double>("Quantity", 0),
+                                   qr_pkgd_res.GetVal<double>("Quantity", 1),
+                                   qr_pkgd_res.GetVal<double>("Quantity", 2)};
+  std::sort(pkged_res.begin(), pkged_res.end(), std::greater<double>());
 
-  std::vector<double> pkg_second_split = {qr_res.GetVal<double>("Quantity", 3),
-                                          qr_res.GetVal<double>("Quantity", 4)};
-  std::sort(pkg_second_split.begin(), pkg_second_split.end(), 
-            std::greater<double>());
-  std::vector<double> exp_second = {2, 1};
+  std::vector<double> exp = {2, 2, 1};
 
-  EXPECT_EQ(exp_second, pkg_second_split);
->>>>>>> Stashed changes
+  EXPECT_EQ(exp, pkged_res);
 
   // All material should have been transacted, including the resource of size 1
   EXPECT_EQ(0, buf.quantity());
