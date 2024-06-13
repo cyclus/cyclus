@@ -242,8 +242,8 @@ TEST_F(MatlSellPolicyTests, TransportUnit) {
 
   sim.context()->AddPackage("foo", 1, 2, "first");
   Package::Ptr p = sim.context()->GetPackage("foo");
-  sim.context()->AddTransportUnit("foo", 3, 3, "first");
-  TransportUnit::Ptr tu = sim.context()->GetTransportUnit("foo");
+  sim.context()->AddTransportUnit("foo-truck", 3, 3, "first");
+  TransportUnit::Ptr tu = sim.context()->GetTransportUnit("foo-truck");
 
   cyclus::toolkit::MatlSellPolicy sellpol;
   sellpol.Init(fac, &buf, "buf", 10, false, 0, p->name(), tu->name())

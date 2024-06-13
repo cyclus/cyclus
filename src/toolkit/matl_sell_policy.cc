@@ -48,10 +48,10 @@ void MatlSellPolicy::set_package(std::string x) {
     Package::Ptr pkg = manager()->context()->GetPackage(x);
     double pkg_fill = pkg->GetFillMass(quantize_);
     if ((pkg->name() != Package::unpackaged_name()) && (quantize_ > 0) &&
-    (std::remainder(quantize_, pkg_fill) > 0)) { 
+    (std::fmod(quantize_, pkg_fill) > 0)) { 
       std::stringstream ss;
       ss << "Quantize " << quantize_ << " is not fully packagable based on fill min/max values (" 
-      << pkg->fill_min() << ", " << pkg->fill_max() << ")";
+        << pkg->fill_min() << ", " << pkg->fill_max() << ")";
       throw ValueError(ss.str());
     }
     package_ = pkg;
@@ -213,7 +213,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       int shippable_pkgs = transport_unit_->MaxShippablePackages(bids.size());
       if (shippable_pkgs < bids.size()) {
         // can't ship all bids. Pop the extras.
-        bids.erase(bids.begin() + shippable_pkgs, bids.end())
+        bids.erase(bids.begin() + shippable_pkgs, bids.end());
       }
 
       // Peek at resbuf to get current composition
@@ -250,31 +250,31 @@ void MatlSellPolicy::GetMatlTrades(
       Material::Ptr mat = buf_->Pop(qty, cyclus::eps_rsrc());
       Material::Ptr trade_mat;
 
-    // don't go through packaging if you don't need to. packaging always bumps
-    // resource ids and records on resources table, which is not necessary
-    // when nothing is happening
-    if (package_->name() != mat->package_name()) { // packaging needed
-      std::vector<Material::Ptr> mat_pkgd = mat->Package<Material>(package_);
+      // don't go through packaging if you don't need to. packaging always bumps
+      // resource ids and records on resources table, which is not necessary
+      // when nothing is happening
+      if (package_->name() != mat->package_name()) { // packaging needed
+        std::vector<Material::Ptr> mat_pkgd = mat->Package<Material>(package_);
 
-      if (mat->quantity() > eps()) {
-        // push any extra material that couldn't be packaged back onto buffer
-        // don't push unless there's leftover material
-        buf_->Push(mat);
+        if (mat->quantity() > eps()) {
+          // push any extra material that couldn't be packaged back onto buffer
+          // don't push unless there's leftover material
+          buf_->Push(mat);
+        }
+        if (mat_pkgd.size() > 0) {
+          // packaging successful
+          trade_mat = mat_pkgd[0];
+          shippable_pkgs-=1;
+        }
+
+      } else { // no packaging needed
+        trade_mat = mat;
       }
-      if (mat_pkgd.size() > 0) {
-        // packaging successful
-        trade_mat = mat_pkgd[0];
-        shippable_pkgs-=1;
+
+      if (ignore_comp_) {
+        trade_mat->Transmute(it->request->target()->comp());
       }
-
-    } else { // no packaging needed
-      trade_mat = mat;
-    }
-
-    if (ignore_comp_) {
-      trade_mat->Transmute(it->request->target()->comp());
-    }
-    responses.push_back(std::make_pair(*it, trade_mat));
+      responses.push_back(std::make_pair(*it, trade_mat));
     }
   }
 }
