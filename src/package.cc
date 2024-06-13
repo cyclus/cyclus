@@ -60,6 +60,9 @@ Package::Package(std::string name, double fill_min, double fill_max,
         throw ValueError("can't create a new package with name 'unpackaged'");
       }
   }
+    if (strategy != "first" && strategy != "equal") {
+      throw ValueError("Invalid strategy for package: " + strategy_);
+    }
 }
 
 TransportUnit::Ptr TransportUnit::unrestricted_ = NULL;
@@ -93,7 +96,7 @@ int TransportUnit::GetTransportUnitFill(int qty) {
 
   if (strategy_ == "first") {
     return fill_max_;
-  } else if (strategy_ == "equal") {
+  } else if (strategy_ == "equal" || strategy_ == "hybrid") {
     // int division automatically rounds down. don't need floor in min, and 
     // get ceil by hand instead 
     int num_at_min_fill = qty / fill_min_;
@@ -116,16 +119,28 @@ int TransportUnit::MaxShippablePackages(int pkgs) {
   int TU_fill;
   int shippable = 0;
 
-  if (pkgs == 0 && pkgs < fill_min_) {
+  if (pkgs == 0 || pkgs < fill_min_) {
     return 0;
-  }
 
-  while ((pkgs > 0) && (pkgs >= fill_min_)) {
+  } else if (name_ == unrestricted_name_) {
+    return pkgs;
+
+  } else if (strategy_ == "first" || strategy_ == "equal") {
     TU_fill = GetTransportUnitFill(pkgs);
-    shippable += TU_fill;
-    pkgs -= TU_fill;
+    if (TU_fill == 0) {
+      return 0;
+    }
+    shippable = std::min(pkgs, (pkgs / TU_fill) * TU_fill);
+    return shippable;
+
+  } else if (strategy_ == "hybrid") {
+    while ((pkgs > 0) && (pkgs >= fill_min_)) {
+      TU_fill = GetTransportUnitFill(pkgs);
+      shippable += TU_fill;
+      pkgs -= TU_fill;
+    }
+    return shippable;
   }
-  return shippable;
 }
   
 TransportUnit::TransportUnit(std::string name, int fill_min, int fill_max, std::string strategy) : 
@@ -135,6 +150,9 @@ TransportUnit::TransportUnit(std::string name, int fill_min, int fill_max, std::
         throw ValueError("can't create a new transport unit with name 'unrestricted'");
       }
   }
+    if (strategy != "first" && strategy != "equal" && strategy != "hybrid") {
+      throw ValueError("Invalid strategy for transport unit: " + strategy_);
+    }
 }
 
 } // namespace cyclus

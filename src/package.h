@@ -76,6 +76,11 @@ class Package {
 /// simply applied at the response to request for bids phase and then the trade
 /// execution to determine whether the available number of packages is 
 /// allowable given the TransportUnit parameters. Default is unrestricted
+/// Strategy "first" simply fill transport units one by one to max fill
+/// Strategy "equal" tries to fill all transport units with the
+/// Strategy "hybrid" is iterative, recursively filling transport units
+/// with the max fill until the remaining quantity can be filled with the
+/// at least the min fill. This is the most efficient strategy
 class TransportUnit {
   public:
     typedef boost::shared_ptr<TransportUnit> Ptr;
@@ -88,8 +93,6 @@ class TransportUnit {
                       std::string strategy = "first");
 
     /// Returns number of packages for each transport unit.
-    /// Strategy "first" simply fill transport units one by one to max fill
-    /// Strategy "equal" tries to fill all transport units with the
     /// same number of packages
     int GetTransportUnitFill(int qty);
 
@@ -119,7 +122,7 @@ class TransportUnit {
     TransportUnit(std::string name, 
             int fill_min = 0, 
             int fill_max = std::numeric_limits<int>::max(), 
-            std::string strategy = "first");
+            std::string strategy = "hybrid");
 
     static const int unrestricted_id_ = 1;
     static constexpr char unrestricted_name_[13] = "unrestricted";

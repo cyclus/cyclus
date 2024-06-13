@@ -159,35 +159,58 @@ TEST(PackageTests, GetTransportUnitFillMass) {
 }
 
 TEST(PackageTests, MaxShippablePackages) {
-    int pq_min = 3;
-    int pq_max = 4;
-    int r_min = 6;
-    int r_max = 8;
-    TransportUnit::Ptr p = TransportUnit::Create("foo", pq_min, pq_max, "first");
-    TransportUnit::Ptr q = TransportUnit::Create("bar", pq_min, pq_max, "equal");
-    TransportUnit::Ptr r = TransportUnit::Create("baz", r_min, r_max, "equal");
+    int p_min = 3;
+    int p_max = 4;
+    int q_min = 6;
+    int q_max = 8;
+    TransportUnit::Ptr p_first = TransportUnit::Create("foo", p_min, p_max, "first");
+    TransportUnit::Ptr p_equal = TransportUnit::Create("bar", p_min, p_max, "equal");
+    TransportUnit::Ptr p_hybrid = TransportUnit::Create("baz", p_min, p_max, "hybrid");
 
+    TransportUnit::Ptr q_first = TransportUnit::Create("foobar", q_min, q_max, "first");
+    TransportUnit::Ptr q_equal = TransportUnit::Create("foobaz", q_min, q_max, "equal");
+    TransportUnit::Ptr q_hybrid = TransportUnit::Create("foobaz", q_min, q_max, "hybrid");
+    
     int exp;
 
     int none_fit = 2;
-    EXPECT_EQ(0, p->MaxShippablePackages(none_fit));
-    EXPECT_EQ(0, q->MaxShippablePackages(none_fit));
-    EXPECT_EQ(0, r->MaxShippablePackages(none_fit));
+    EXPECT_EQ(0, p_first->MaxShippablePackages(none_fit));
+    EXPECT_EQ(0, p_equal->MaxShippablePackages(none_fit));
+    EXPECT_EQ(0, p_hybrid->MaxShippablePackages(none_fit));
+    EXPECT_EQ(0, q_first->MaxShippablePackages(none_fit));
+    EXPECT_EQ(0, q_equal->MaxShippablePackages(none_fit));
+    EXPECT_EQ(0, q_hybrid->MaxShippablePackages(none_fit));
 
     int all_fit = 8;
-    EXPECT_EQ(all_fit, p->MaxShippablePackages(all_fit));
-    EXPECT_EQ(all_fit, q->MaxShippablePackages(all_fit));
-    EXPECT_EQ(all_fit, r->MaxShippablePackages(all_fit));
+    EXPECT_EQ(all_fit, p_first->MaxShippablePackages(all_fit));
+    EXPECT_EQ(all_fit, p_equal->MaxShippablePackages(all_fit));
+    EXPECT_EQ(all_fit, q_first->MaxShippablePackages(all_fit));
+    EXPECT_EQ(all_fit, q_equal->MaxShippablePackages(all_fit));
+    EXPECT_EQ(all_fit, q_hybrid->MaxShippablePackages(all_fit));
 
-    // all can ship for p/q, but will go 4-3-3, only 8 ship for r
+    // all can ship for p_hybrid, but will go 4-3-3. Only 8 ship for other
     int partial = 10; 
-    EXPECT_EQ(pq_max * 2, p->MaxShippablePackages(partial));
-    EXPECT_EQ(partial, q->MaxShippablePackages(partial));
-    EXPECT_EQ(r_max, r->MaxShippablePackages(partial));
+    EXPECT_EQ(p_max * 2, p_first->MaxShippablePackages(partial));
+    EXPECT_EQ(p_min * 3, p_equal->MaxShippablePackages(partial));
+    EXPECT_EQ(partial, p_hybrid->MaxShippablePackages(partial));
+    EXPECT_EQ(q_max, q_first->MaxShippablePackages(partial));
+    EXPECT_EQ(q_max, q_equal->MaxShippablePackages(partial));
+    EXPECT_EQ(q_max, q_hybrid->MaxShippablePackages(partial));
 
-    int partial2 = 14;
-    EXPECT_EQ(pq_max * 3, p->MaxShippablePackages(partial2));
-    EXPECT_EQ(partial2, q->MaxShippablePackages(partial2));
-    EXPECT_EQ(partial2, r->MaxShippablePackages(partial2));
+    int partial2 = 14; // all ship p_hybrid. q, others ship 12. q_equal and 
+    // q_hybrid can ship all
+    EXPECT_EQ(p_max * 3, p_first->MaxShippablePackages(partial2));
+    EXPECT_EQ(p_max * 3, p_equal->MaxShippablePackages(partial2));
+    EXPECT_EQ(partial2, p_hybrid->MaxShippablePackages(partial2));
+    EXPECT_EQ(q_max, q_first->MaxShippablePackages(partial2));
+    EXPECT_EQ(partial2, q_equal->MaxShippablePackages(partial2));
+    EXPECT_EQ(partial2, q_hybrid->MaxShippablePackages(partial2));
 
+    int partial3 = 15; // all ship in hybrid and p_equal
+    EXPECT_EQ(p_max * 3, p_first->MaxShippablePackages(partial3));
+    EXPECT_EQ(partial3, p_equal->MaxShippablePackages(partial3));
+    EXPECT_EQ(partial3, p_hybrid->MaxShippablePackages(partial3));
+    EXPECT_EQ(q_max, q_first->MaxShippablePackages(partial3));
+    EXPECT_EQ((q_max-1) * 2, q_equal->MaxShippablePackages(partial3));
+    EXPECT_EQ(partial3, q_hybrid->MaxShippablePackages(partial3));
 }

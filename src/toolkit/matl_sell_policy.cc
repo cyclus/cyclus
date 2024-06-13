@@ -48,10 +48,10 @@ void MatlSellPolicy::set_package(std::string x) {
     Package::Ptr pkg = manager()->context()->GetPackage(x);
     double pkg_fill = pkg->GetFillMass(quantize_);
     if ((pkg->name() != Package::unpackaged_name()) && (quantize_ > 0) &&
-    (std::fmod(quantize_, pkg_fill) > 0)) { 
+        (std::fmod(quantize_, pkg_fill) > 0)) { 
       std::stringstream ss;
       ss << "Quantize " << quantize_ << " is not fully packagable based on fill min/max values (" 
-        << pkg->fill_min() << ", " << pkg->fill_max() << ")";
+         << pkg->fill_min() << ", " << pkg->fill_max() << ")";
       throw ValueError(ss.str());
     }
     package_ = pkg;

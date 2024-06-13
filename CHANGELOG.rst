@@ -6,7 +6,7 @@ Since last release
 ====================
 
 **Added:**
-* Added TransportUnits (#1570)
+* Added TransportUnits (#1750)
 
 **Changed:**
 
@@ -16,7 +16,6 @@ Since last release
 * Consistently use hyphens in ``install.py`` flags (#1748)
 * Material sell policy can package materials (#1749)
 * Use miniforge for conda CI builds instead of miniconda (#1763)
-* Added TransportUnits (#1570)
 
 **Removed:**
 
