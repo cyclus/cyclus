@@ -66,7 +66,7 @@ void MatlSellPolicy::set_transport_unit(std::string x) {
     int max_shippable = tu->MaxShippablePackages(num_pkgs);
 
     if ((tu->name() != TransportUnit::unrestricted_name()) && quantize_ > 0 &&
-    (max_shippable != num_pkgs))  {
+        (max_shippable != num_pkgs))  {
       std::stringstream ss;
       ss << "Quantize " << quantize_ << " packages cannot be shipped according to transport unit fill min/max values (" << tu->fill_min() << ", "
        << tu->fill_max() << ")";
@@ -202,8 +202,8 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
         bids.assign(n_full_bids, bid_qty);
 
         remaining_qty = fmod(qty, bid_qty);
-        if (!excl && (remaining_qty > 0) && 
-        (remaining_qty >= package_->fill_min())) {
+        if ((!excl) && (remaining_qty > 0) && 
+            (remaining_qty >= package_->fill_min())) {
           // leftover material is enough to fill one more partial package. Add
           // to bids
           bids.push_back(remaining_qty);
