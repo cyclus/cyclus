@@ -87,7 +87,7 @@ TransportUnit::Ptr& TransportUnit::unrestricted() {
 
 int TransportUnit::GetTransportUnitFill(int qty) {
   if (qty < fill_min_) {
-    // less than one pkg of material available
+    // less than one TransportUnit of material available
     return 0;
   }
 

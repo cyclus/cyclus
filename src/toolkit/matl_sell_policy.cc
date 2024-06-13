@@ -213,9 +213,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       int shippable_pkgs = transport_unit_->MaxShippablePackages(bids.size());
       if (shippable_pkgs < bids.size()) {
         // can't ship all bids. Pop the extras.
-        for (int i=0; i<(bids.size() - shippable_pkgs); i++) {
-          bids.pop_back();
-        }
+        bids.erase(bids.begin() + shippable_pkgs, bids.end())
       }
 
       // Peek at resbuf to get current composition

@@ -9,7 +9,7 @@
 
 namespace cyclus {
 
-/// Packager is a class that packages materials into discrete items in ways 
+/// Package is a class that packages materials into discrete items in ways 
 // that mimic realistic nuclear material handling. Package is a parameter
 // of materials and products, with default unpackaged
 class Package {
