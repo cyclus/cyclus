@@ -9,7 +9,9 @@
 
 namespace cyclus {
 
-/// Packager is a class that packages materials into discrete items in ways that mimic realistic nuclear material handling. Packages will eventually be a required parameter of resources.
+/// Package is a class that packages materials into discrete items in ways 
+// that mimic realistic nuclear material handling. Package is a parameter
+// of materials and products, with default unpackaged
 class Package {
   public:
     typedef boost::shared_ptr<Package> Ptr;
@@ -65,6 +67,72 @@ class Package {
     std::string name_;
     double fill_min_;
     double fill_max_;
+    std::string strategy_;
+};
+
+/// TransportUnit is a class that can be used in conjunction with packages to
+/// restrict the amount of material that can be traded between facilities.
+/// Unlike Packages, TransportUnits are not a property of resources. They are
+/// simply applied at the response to request for bids phase and then the trade
+/// execution to determine whether the available number of packages is 
+/// allowable given the TransportUnit parameters. Default is unrestricted
+/// Strategy "first" simply fill transport units one by one to max fill
+/// Strategy "equal" tries to fill all transport units with the
+/// Strategy "hybrid" is iterative, recursively filling transport units
+/// with the max fill until the remaining quantity can be filled with the
+/// at least the min fill. This is the most efficient strategy
+class TransportUnit {
+  public:
+    typedef boost::shared_ptr<TransportUnit> Ptr;
+
+    /// create a new transport unit type. Should be called by the context only
+    /// (see Context::AddTransportUnit), unless you want an untracked transport
+    /// unit type (which you probably don't)
+    static Ptr Create(std::string name, int fill_min = 0,
+                      int fill_max = std::numeric_limits<int>::max(),
+                      std::string strategy = "first");
+
+    /// Returns number of packages for each transport unit.
+    /// same number of packages
+    int GetTransportUnitFill(int qty);
+
+    /// Returns the max number of transport units that can be shipped from the 
+    /// available quantity
+    int MaxShippablePackages(int pkgs);
+
+    // returns transport unit name
+    std::string name() const { return name_; }
+    // returns transport unit fill min
+    int fill_min() const { return fill_min_; }
+    // returns transport unit fill max
+    int fill_max() const { return fill_max_; }
+    // returns transport unit strategy
+    std::string strategy() const { return strategy_; }
+
+    // returns the unrestricted id (1)
+    static int unrestricted_id() { return unrestricted_id_; }
+
+    // returns the unrestricted transport unit name
+    static std::string unrestricted_name() { return unrestricted_name_; }
+
+    // returns the unrestricted singleton object
+    static Ptr& unrestricted();
+
+  private:
+    TransportUnit(std::string name, 
+            int fill_min = 0, 
+            int fill_max = std::numeric_limits<int>::max(), 
+            std::string strategy = "hybrid");
+
+    static const int unrestricted_id_ = 1;
+    static constexpr char unrestricted_name_[13] = "unrestricted";
+    static Ptr unrestricted_;
+    static int next_tranport_unit_id_;
+
+    std::string name_;
+    int id_;
+    int fill_min_;
+    int fill_max_;
     std::string strategy_;
 };
 
