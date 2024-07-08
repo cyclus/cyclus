@@ -112,7 +112,7 @@ RUN lcov -c -d /cyclus -o initial_coverage.info --initial ${LCOV_ARGS} && \
     lcov -c -d /cyclus -o test_coverage.info ${LCOV_ARGS} && \
     lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info -o temp_coverage.info && \
     lcov --remove temp_coverage.info -o total_coverage.info '/cyclus/build/_deps/**' && \
-    mkdir -p html && genhtml total_coverage.info --output-directory html
+    mkdir -p html && genhtml total_coverage.info --output-directory html --ignore-errors unmapped
 
 FROM scratch AS coverage-report
 COPY --from=cyclus-coverage /cyclus /
