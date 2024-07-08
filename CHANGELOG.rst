@@ -7,6 +7,7 @@ Since last release
 
 **Added:**
 * Added TransportUnits (#1750)
+* Added CI support for Ubuntu 24.04 (#1769)
 
 **Changed:**
 
