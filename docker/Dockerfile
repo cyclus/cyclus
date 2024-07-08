@@ -1,5 +1,5 @@
 ARG pkg_mgr=apt
-ARG ubuntu_version=22.04
+ARG ubuntu_version=24.04
 
 FROM ubuntu:${ubuntu_version} as common-base
 

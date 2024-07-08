@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         ubuntu_versions : [
-          22.04,
+          24.04,
         ]
         pkg_mgr : [
           apt,
