@@ -52,7 +52,7 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
     /bin/bash ~/miniforge.sh -b -p /opt/conda && \
     rm ~/miniforge.sh
 
-ENV PATH /opt/conda/bin:$PATH
+ENV PATH=/opt/conda/bin:$PATH
 RUN mamba update -n base conda mamba && \
     mamba update -y python --no-pin && \
     mamba update -y --all && \
@@ -84,17 +84,17 @@ RUN mamba update -n base conda mamba && \
                && \
     mamba clean -y --all
 RUN mkdir -p $(python3 -m site --user-site)
-ENV CC /opt/conda/bin/x86_64-conda-linux-gnu-gcc
-ENV CXX /opt/conda/bin/x86_64-conda-linux-gnu-g++
-ENV CPP /opt/conda/bin/x86_64-conda-linux-gnu-cpp
+ENV CC=/opt/conda/bin/x86_64-conda-linux-gnu-gcc
+ENV CXX=/opt/conda/bin/x86_64-conda-linux-gnu-g++
+ENV CPP=/opt/conda/bin/x86_64-conda-linux-gnu-cpp
 
 FROM apt-deps AS apt-coverage-deps
 RUN apt install -y lcov curl
-ENV GCOV /usr/bin/gcov
+ENV GCOV=/usr/bin/gcov
 
 FROM conda-deps AS conda-coverage-deps
 RUN mamba install -y lcov curl
-ENV GCOV /opt/conda/bin/x86_64-conda-linux-gnu-gcov
+ENV GCOV=/opt/conda/bin/x86_64-conda-linux-gnu-gcov
 
 FROM ${pkg_mgr}-coverage-deps AS cyclus-coverage
 ARG make_cores=2
@@ -104,7 +104,7 @@ WORKDIR /cyclus
 
 RUN python3 install.py -j ${make_cores} --allow-milps --code-coverage
 
-ENV PATH /root/.local/bin:$PATH
+ENV PATH=/root/.local/bin:$PATH
 RUN lcov -c -d /cyclus -o initial_coverage.info --gcov-tool ${GCOV} --initial --no-external && \
     cyclus_unit_tests && \
     cd tests && python3 -m pytest && cd .. && \
@@ -129,7 +129,7 @@ WORKDIR /cyclus
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
 RUN python3 install.py -j ${make_cores} --allow-milps
-ENV PATH /root/.local/bin:$PATH
+ENV PATH=/root/.local/bin:$PATH
 
 FROM cyclus AS deb-generation
 WORKDIR /cyclus/build
