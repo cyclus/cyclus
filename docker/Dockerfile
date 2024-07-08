@@ -1,12 +1,12 @@
 ARG pkg_mgr=apt
 ARG ubuntu_version=24.04
 
-FROM ubuntu:${ubuntu_version} as common-base
+FROM ubuntu:${ubuntu_version} AS common-base
 
 ENV TZ=America/Chicago
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-FROM common-base as apt-deps
+FROM common-base AS apt-deps
 
 RUN apt update -y && apt install -y \
         g++ \
@@ -39,7 +39,7 @@ RUN apt clean -y all
 
 RUN mkdir -p `python3 -m site --user-site`
 
-FROM common-base as conda-deps
+FROM common-base AS conda-deps
 
 RUN apt update -y && apt install -y \
         wget \
@@ -88,15 +88,15 @@ ENV CC /opt/conda/bin/x86_64-conda-linux-gnu-gcc
 ENV CXX /opt/conda/bin/x86_64-conda-linux-gnu-g++
 ENV CPP /opt/conda/bin/x86_64-conda-linux-gnu-cpp
 
-FROM apt-deps as apt-coverage-deps
+FROM apt-deps AS apt-coverage-deps
 RUN apt install -y lcov curl
 ENV GCOV /usr/bin/gcov
 
-FROM conda-deps as conda-coverage-deps
+FROM conda-deps AS conda-coverage-deps
 RUN mamba install -y lcov curl
 ENV GCOV /opt/conda/bin/x86_64-conda-linux-gnu-gcov
 
-FROM ${pkg_mgr}-coverage-deps as cyclus-coverage
+FROM ${pkg_mgr}-coverage-deps AS cyclus-coverage
 ARG make_cores=2
 
 COPY . /cyclus
@@ -113,10 +113,10 @@ RUN lcov -c -d /cyclus -o initial_coverage.info --gcov-tool ${GCOV} --initial --
     lcov --remove temp_coverage.info -o total_coverage.info '/cyclus/build/_deps/**' && \
     mkdir -p html && genhtml total_coverage.info --output-directory html
 
-FROM scratch as coverage-report
+FROM scratch AS coverage-report
 COPY --from=cyclus-coverage /cyclus /
 
-FROM ${pkg_mgr}-deps as cyclus
+FROM ${pkg_mgr}-deps AS cyclus
 ARG make_cores=2
 
 COPY . /cyclus
@@ -131,17 +131,17 @@ WORKDIR /cyclus
 RUN python3 install.py -j ${make_cores} --allow-milps
 ENV PATH /root/.local/bin:$PATH
 
-FROM cyclus as deb-generation
+FROM cyclus AS deb-generation
 WORKDIR /cyclus/build
 RUN make package
 
-FROM scratch as deb-package
+FROM scratch AS deb-package
 COPY --from=deb-generation /cyclus/build/cyclus*.deb /
 
-FROM cyclus as cyclus-test
+FROM cyclus AS cyclus-test
 
 RUN cyclus_unit_tests
 
-FROM cyclus-test as cyclus-pytest
+FROM cyclus-test AS cyclus-pytest
 
 RUN cd tests && python3 -m pytest
