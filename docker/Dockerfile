@@ -105,10 +105,11 @@ WORKDIR /cyclus
 RUN python3 install.py -j ${make_cores} --allow-milps --code-coverage
 
 ENV PATH=/root/.local/bin:$PATH
-RUN lcov -c -d /cyclus -o initial_coverage.info --gcov-tool ${GCOV} --initial --no-external && \
+ENV LCOV_ARGS="--gcov-tool ${GCOV} --ignore-errors mismatch --no-external"
+RUN lcov -c -d /cyclus/build -o initial_coverage.info --initial ${LCOV_ARGS} && \
     cyclus_unit_tests && \
     cd tests && python3 -m pytest && cd .. && \
-    lcov -c -d /cyclus -o test_coverage.info --gcov-tool ${GCOV} --no-external && \
+    lcov -c -d /cyclus/build -o test_coverage.info ${LCOV_ARGS} && \
     lcov --add-tracefile initial_coverage.info --add-tracefile test_coverage.info -o temp_coverage.info && \
     lcov --remove temp_coverage.info -o total_coverage.info '/cyclus/build/_deps/**' && \
     mkdir -p html && genhtml total_coverage.info --output-directory html
