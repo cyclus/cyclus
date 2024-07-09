@@ -36,7 +36,7 @@ else:
             from concurrent import futures as concurrent_futures
         except ImportError:
             concurrent_futures = None
-         
-CY_LARGE_DOUBLE = 1e299
-CY_LARGE_INT = (2 ** (ctypes.sizeof(ctypes.c_int) * 8 - 1)) - 1
-CY_NEAR_ZERO = 1e-08
+
+CY_LARGE_INT = @CYCLUS_PYTHON_LARGE_INT@    
+CY_LARGE_DOUBLE = @CYCLUS_PYTHON_LARGE_DOUBLE@
+CY_NEAR_ZERO = @CYCLUS_PYTHON_NEAR_ZERO@

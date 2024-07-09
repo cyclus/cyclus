@@ -13,6 +13,13 @@ ENDIF()
 # This project name is cyclus.
 PROJECT(CYCLUS VERSION 1.6.0)
 
+SET(CYCLUS_CXX_LARGE_INT "std::numeric_limits<int>::max()")
+SET(CYCLUS_CXX_LARGE_DOUBLE "1e299")
+SET(CYCLUS_CXX_NEAR_ZERO "1e-08")
+SET(CYCLUS_PYTHON_LARGE_INT "(2 ** (ctypes.sizeof(ctypes.c_int) * 8 - 1)) - 1")
+SET(CYCLUS_PYTHON_LARGE_DOUBLE "1e299")
+SET(CYCLUS_PYTHON_NEAR_ZERO "1e-08")
+
 # check for and enable c++17 support (required for cyclus)
 INCLUDE(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
@@ -397,11 +404,11 @@ IF(NOT CYCLUS_DOC_ONLY)
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_TEST_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
-    ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
-    ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
     if(Cython_FOUND)
         ADD_SUBDIRECTORY("${CYCLUS_PYSOURCE_DIR}")
     endif(Cython_FOUND)
+    ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
+    ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
     
     ##############################################################################################
     ####################################### end includes #########################################
