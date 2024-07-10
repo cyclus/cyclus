@@ -276,5 +276,38 @@ TEST_F(MatlSellPolicyTests, TransportUnit) {
   EXPECT_EQ(0, buf.quantity());
 }
 
+TEST_F(MatlSellPolicyTests, PackageLimit) {
+  using cyclus::QueryResult;
+
+  int dur = 2;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSink("commod").Finalize();
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> buf;
+
+  double qty = 1e299;
+  CompMap cm;
+  cm[922380000] = 1;
+  Composition::Ptr comp = Composition::CreateFromMass(cm);
+  mat = Material::Create(a, qty, comp, Package::unpackaged_name());
+
+  buf.Push(mat);
+
+  sim.context()->AddPackage("foo", 1, 2, "first");
+  Package::Ptr p = sim.context()->GetPackage("foo");
+
+  cyclus::toolkit::MatlSellPolicy sellpol;
+  sellpol.Init(fac, &buf, "buf", 1e299, false, 0, p->name())
+          .Set("commod").Start();
+
+  ASSERT_THROW(sim.Run(), cyclus::ValueError);
+}
+
 }
 }

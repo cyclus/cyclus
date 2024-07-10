@@ -55,6 +55,14 @@ class Package {
     // returns the unpackaged singleton object
     static Ptr& unpackaged();
 
+    // When a resource is split into individual items, warn when more than 
+    // one million items are trying to be created at once
+    static int SplitWarn() { return 1000000; }
+
+    // Numeric limits for splitting resources is based on vector limits and 
+    // memory constraints. Use unsigned int max / 10 to be safe
+    static int SplitLimit() { return std::numeric_limits<unsigned int>::max() / 10; }
+
   private:
     Package(std::string name, 
             double fill_min = 0, 

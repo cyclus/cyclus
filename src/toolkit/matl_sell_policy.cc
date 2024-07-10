@@ -180,7 +180,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
   Request<Material>* req;
   Material::Ptr m, offer;
   double qty;
-  int n_full_bids;
+  int n_full_bids = 0;
   double bid_qty;  
   double remaining_qty;
   std::vector<double> bids;
@@ -199,6 +199,14 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       bid_qty = excl ? quantize_ : package_->GetFillMass(qty);
       if (bid_qty != 0) {
         n_full_bids = static_cast<int>(std::floor(qty / bid_qty));
+        if (n_full_bids > Package::SplitLimit()) {
+          throw ValueError("splitting resource into more than " + 
+                           std::to_string(Package::SplitLimit()) + 
+                           " bids is not allowed due to vector limits");
+        } else if (n_full_bids > Package::SplitWarn()) {
+          LGH(WARN) << "splitting resource into " << n_full_bids << " bids for " 
+          << commod << ", is this intended?";
+        }
         bids.assign(n_full_bids, bid_qty);
 
         remaining_qty = fmod(qty, bid_qty);
