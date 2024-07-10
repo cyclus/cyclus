@@ -1,8 +1,6 @@
 #ifndef CYCLUS_SRC_PACKAGE_H_
 #define CYCLUS_SRC_PACKAGE_H_
 
-#include <iostream>
-
 #include <limits>
 #include <string>
 #include <vector>
