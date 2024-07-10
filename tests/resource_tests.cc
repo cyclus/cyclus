@@ -32,6 +32,14 @@ class ResourceTest : public ::testing::Test {
     m2 = Material::Create(dummy, 7, c);
     p1 = Product::Create(dummy, 3, "bananas");
     p2 = Product::Create(dummy, 7, "bananas");
+
+    mlimit = Material::Create(dummy, 1e5, c);
+
+    // above limit but not yet overflow
+    double mmax_qty = static_cast<double>(0.95*std::numeric_limits<int>::max());
+    mmax = Material::Create(dummy, mmax_qty, c);
+    // overflow limit
+    pmax = Product::Create(dummy, 1e299, "bananas");
   }
 
   virtual void TearDown() {
@@ -43,8 +51,11 @@ class ResourceTest : public ::testing::Test {
   cyclus::Context* ctx;
   Material::Ptr m1;
   Material::Ptr m2;
+  Material::Ptr mlimit;
+  Material::Ptr mmax;
   Product::Ptr p1;
   Product::Ptr p2;
+  Product::Ptr pmax;
 };
 
 TEST_F(ResourceTest, MaterialAbsorbTrackid) {
@@ -160,4 +171,17 @@ TEST_F(ResourceTest, PackageResource) {
   EXPECT_EQ(m3_pkgd.size(), 1);
   EXPECT_EQ(m3_pkgd[0]->package_name(), pkg_name);
   EXPECT_EQ(m3_pkgd[0]->quantity(), 5);
+}
+
+TEST_F(ResourceTest, RepackageLimit) {
+  ctx->AddPackage("foo", 0.5, 1, "first");
+  Package::Ptr pkg = ctx->GetPackage("foo");
+  std::string pkg_name = pkg->name();
+
+  // warn but no throw
+  EXPECT_NO_THROW(mlimit->Package<Material>(pkg));
+
+  // over limit, throw
+  EXPECT_THROW(mmax->Package<Material>(pkg), cyclus::ValueError);
+  EXPECT_THROW(pmax->Package<Product>(pkg), cyclus::ValueError);
 }

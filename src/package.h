@@ -57,7 +57,7 @@ class Package {
 
     // When a resource is split into individual items, warn when more than 
     // one million items are trying to be created at once
-    static int SplitWarn() { return 1000000; }
+    static int SplitWarn() { return 100000; }
 
     // Numeric limits for splitting resources is based on vector limits and 
     // memory constraints. Use unsigned int max / 100 to be safe

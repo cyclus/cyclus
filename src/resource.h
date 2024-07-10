@@ -140,7 +140,9 @@ std::vector<typename T::Ptr> Resource::Package(Package::Ptr pkg) {
   }
 
   int approx_num_pkgs = quantity() / fill_mass;
-  if (approx_num_pkgs > Package::SplitLimit()) {
+  // Check if the number of packages is within the limits, including if
+  // int overflow is reached
+  if (approx_num_pkgs > Package::SplitLimit() || approx_num_pkgs == std::numeric_limits<int>::min()) {
     throw ValueError("Resource::Package() cannot package into more than " + 
                      std::to_string(Package::SplitLimit()) + 
                      " items at once.");
