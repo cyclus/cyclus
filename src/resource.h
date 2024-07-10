@@ -138,6 +138,16 @@ std::vector<typename T::Ptr> Resource::Package(Package::Ptr pkg) {
     return ts_pkgd;
   }
 
+  int approx_num_pkgs = quantity() / fill_mass;
+  if (approx_num_pkgs > Package::SplitLimit()) {
+    throw ValueError("Resource::Package() cannot package into more than " + 
+                     std::to_string(Package::SplitLimit()) + 
+                     " items at once.");
+  } else if (approx_num_pkgs > Package::SplitWarn()) {
+    LOG(cyclus::LEV_INFO1) << "Resource::Package() is attempting to package into " 
+                           << approx_num_pkgs << " items at once, is this intended?";
+  }
+
   while (quantity() > 0 && quantity() >= pkg->fill_min()) {
     double pkg_fill = std::min(quantity(), fill_mass);
     t_pkgd = boost::dynamic_pointer_cast<T>(ExtractRes(pkg_fill));
