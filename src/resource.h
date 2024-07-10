@@ -6,6 +6,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "error.h"
+#include "logger.h"
 #include "package.h"
 
 class SimInitTest;
@@ -144,7 +145,7 @@ std::vector<typename T::Ptr> Resource::Package(Package::Ptr pkg) {
                      std::to_string(Package::SplitLimit()) + 
                      " items at once.");
   } else if (approx_num_pkgs > Package::SplitWarn()) {
-    LOG(cyclus::LEV_INFO1) << "Resource::Package() is attempting to package into " 
+    CLOG(cyclus::LEV_INFO1) << "Resource::Package() is attempting to package into " 
                            << approx_num_pkgs << " items at once, is this intended?";
   }
 

@@ -199,10 +199,20 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       bid_qty = excl ? quantize_ : package_->GetFillMass(qty);
       if (bid_qty != 0) {
         n_full_bids = static_cast<int>(std::floor(qty / bid_qty));
-        if (n_full_bids > Package::SplitLimit()) {
-          throw ValueError("splitting resource into more than " + 
-                           std::to_string(Package::SplitLimit()) + 
-                           " bids is not allowed due to vector limits");
+
+        // Throw if number of bids above limit or if casting to int caused
+        // overflow to negative int limit 
+        if (n_full_bids > Package::SplitLimit() || n_full_bids == std::numeric_limits<int>::min()) {
+          std::stringstream ss;
+          ss << "When calculating the number of bids for agent "
+             << Trader::manager()->prototype() << "-" \
+             << Trader::manager()->id()
+             << ", material on hand would result in more bids than the limit: " 
+             << Package::SplitLimit() << ". This is likely due to too much "
+             << "material (did you forget a throughput?) or small package "
+             << "limits relative to the quantity available. qty: " << qty 
+             << ", and each bid would be: " << bid_qty;
+          throw ValueError(ss.str());
         } else if (n_full_bids > Package::SplitWarn()) {
           LGH(WARN) << "splitting resource into " << n_full_bids << " bids for " 
           << commod << ", is this intended?";

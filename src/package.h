@@ -1,6 +1,8 @@
 #ifndef CYCLUS_SRC_PACKAGE_H_
 #define CYCLUS_SRC_PACKAGE_H_
 
+#include <iostream>
+
 #include <limits>
 #include <string>
 #include <vector>
@@ -60,8 +62,10 @@ class Package {
     static int SplitWarn() { return 1000000; }
 
     // Numeric limits for splitting resources is based on vector limits and 
-    // memory constraints. Use unsigned int max / 10 to be safe
-    static int SplitLimit() { return std::numeric_limits<unsigned int>::max() / 10; }
+    // memory constraints. Use unsigned int max / 100 to be safe
+    static int SplitLimit() { 
+      return (std::numeric_limits<unsigned int>::max() / 10); 
+    }
 
   private:
     Package(std::string name, 
