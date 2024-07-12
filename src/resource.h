@@ -5,8 +5,6 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
-#include "error.h"
-#include "logger.h"
 #include "package.h"
 
 class SimInitTest;
@@ -139,17 +137,10 @@ std::vector<typename T::Ptr> Resource::Package(Package::Ptr pkg) {
     return ts_pkgd;
   }
 
-  int approx_num_pkgs = quantity() / fill_mass;
   // Check if the number of packages is within the limits, including if
   // int overflow is reached
-  if (approx_num_pkgs > Package::SplitLimit() || approx_num_pkgs == std::numeric_limits<int>::min()) {
-    throw ValueError("Resource::Package() cannot package into more than " + 
-                     std::to_string(Package::SplitLimit()) + 
-                     " items at once.");
-  } else if (approx_num_pkgs > Package::SplitWarn()) {
-    CLOG(cyclus::LEV_INFO1) << "Resource::Package() is attempting to package into " 
-                           << approx_num_pkgs << " items at once, is this intended?";
-  }
+  int approx_num_pkgs = quantity() / fill_mass;
+  Package::ExceedsSplitLimits(approx_num_pkgs);
 
   while (quantity() > 0 && quantity() >= pkg->fill_min()) {
     double pkg_fill = std::min(quantity(), fill_mass);

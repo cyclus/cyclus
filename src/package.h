@@ -7,6 +7,9 @@
 #include <cmath>
 #include <boost/shared_ptr.hpp>
 
+#include "error.h"
+#include "logger.h"
+
 namespace cyclus {
 
 /// Package is a class that packages materials into discrete items in ways 
@@ -55,6 +58,21 @@ class Package {
     // returns the unpackaged singleton object
     static Ptr& unpackaged();
 
+    static void ExceedsSplitLimits(int pkgs, std::string ss_extra = "") {
+      if (pkgs > SplitLimit() || pkgs < (0.9*std::numeric_limits<int>::min())) {
+        throw ValueError("Resource::Package() cannot package into more than " + 
+                         std::to_string(SplitLimit()) + 
+                         " items at once." + ss_extra);
+      } else if (pkgs > SplitWarn()) {
+        // if pkgs is int min, overflow has occurred
+        CLOG(cyclus::LEV_INFO1) << "Resource::Package() is attempting to "
+                                << "package into " << pkgs 
+                                << " items at once, is this intended? "
+                                << ss_extra;
+      }
+      return;
+    }
+
     // When a resource is split into individual items, warn when more than 
     // one million items are trying to be created at once
     static int SplitWarn() { return 100000; }
@@ -62,7 +80,7 @@ class Package {
     // Numeric limits for splitting resources is based on vector limits and 
     // memory constraints. Use unsigned int max / 100 to be safe
     static int SplitLimit() { 
-      return (std::numeric_limits<unsigned int>::max() / 10); 
+      return (std::numeric_limits<int>::max() / 10); 
     }
 
   private:

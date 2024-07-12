@@ -202,21 +202,17 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
 
         // Throw if number of bids above limit or if casting to int caused
         // overflow to negative int limit 
-        if (n_full_bids > Package::SplitLimit() || n_full_bids == std::numeric_limits<int>::min()) {
-          std::stringstream ss;
-          ss << "When calculating the number of bids for agent "
-             << Trader::manager()->prototype() << "-" \
-             << Trader::manager()->id()
-             << ", material on hand would result in more bids than the limit: " 
-             << Package::SplitLimit() << ". This is likely due to too much "
-             << "material (did you forget a throughput?) or small package "
-             << "limits relative to the quantity available. qty: " << qty 
-             << ", and each bid would be: " << bid_qty;
-          throw ValueError(ss.str());
-        } else if (n_full_bids > Package::SplitWarn()) {
-          LGH(WARN) << "splitting resource into " << n_full_bids << " bids for " 
-          << commod << ", is this intended?";
-        }
+        std::string s;
+        if (manager() != NULL)
+          s + " Agent: "
+            + Trader::manager()->prototype() + "-"
+            + std::to_string(Trader::manager()->id()) + ". ";
+        s + "This is likely due to too much material (did you forget a "
+          + "throughput?) or small package limits relative to the "
+          + "quantity available. qty: " + std::to_string(qty) 
+          + ", and each bid would be: " + std::to_string(bid_qty);
+        Package::ExceedsSplitLimits(n_full_bids, s);
+
         bids.assign(n_full_bids, bid_qty);
 
         remaining_qty = fmod(qty, bid_qty);
