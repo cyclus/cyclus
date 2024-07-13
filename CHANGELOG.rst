@@ -16,6 +16,7 @@ Since last release
 * Consistently use hyphens in ``install.py`` flags (#1748)
 * Material sell policy can package materials (#1749)
 * Use miniforge for conda CI builds instead of miniconda (#1763)
+* Warning and limits on number of packages that can be created from a resource at once (#1771)
 
 **Removed:**
 
