@@ -85,6 +85,9 @@ class XMLFileLoader {
   /// Loads packages
   void LoadPackages();
 
+  /// Loads Transport Units
+  void LoadTransportUnits();
+
   /// Creates all initial agent instances from the input file.
   virtual void LoadInitialAgents();
 

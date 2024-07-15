@@ -136,3 +136,15 @@ TEST_F(ContextTests, DoublePackageNameThrow) {
   
   delete ctx;
   }
+
+TEST_F(ContextTests, DoubleTransportUnitNameThrow) {
+  Timer ti;
+  Recorder rec;
+  Context* ctx = new Context(&ti, &rec);
+
+  ctx->AddTransportUnit("foo");
+
+  ASSERT_THROW(ctx->AddTransportUnit("foo"), cyclus::KeyError);
+  
+  delete ctx;
+  }

@@ -224,6 +224,42 @@ Package::Ptr Context::GetPackage(std::string name) {
   return packages_[name];
 }
 
+void Context::AddTransportUnit(std::string name, int fill_min, int fill_max, 
+                      std::string strategy) {
+  if (transport_units_.count(name) == 0) {
+    TransportUnit::Ptr tu = TransportUnit::Create(name, fill_min, fill_max,
+                                                strategy);
+    transport_units_[name] = tu;
+    RecordTransportUnit(tu);
+  } else {
+    throw KeyError("TransportUnit " + name + " already exists!");
+  }
+}
+
+void Context::RecordTransportUnit(TransportUnit::Ptr tu) {
+  NewDatum("TransportUnit")
+    ->AddVal("TransportUnitName", tu->name())
+    ->AddVal("FillMin", tu->fill_min())
+    ->AddVal("FillMax", tu->fill_max())
+    ->AddVal("Strategy", tu->strategy())
+    ->Record();
+}
+
+/// Retrieve a registered transport unit
+TransportUnit::Ptr Context::GetTransportUnit(std::string name) {
+  if (name == TransportUnit::unrestricted_name()) {
+    return TransportUnit::unrestricted();
+  }
+  if (transport_units_.size() == 0 ) {
+    throw KeyError("No user-created transport units exist");
+  }
+  if (transport_units_.count(name) == 0) {
+    throw KeyError("Invalid transport unit name " + name);
+  }
+  return transport_units_[name];
+}
+
+
 void Context::InitSim(SimInfo si) {
   NewDatum("Info")
       ->AddVal("Handle", si.handle)
