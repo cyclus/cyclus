@@ -6,7 +6,7 @@ Since last release
 ====================
 
 **Added:**
-* Added TransportUnits (#1750)
+* Added TransportUnits (#1750, #1772)
 
 **Changed:**
 
