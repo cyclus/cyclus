@@ -215,7 +215,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
 
         bids.assign(n_full_bids, bid_qty);
 
-        remaining_qty = fmod(qty, bid_qty);
+        remaining_qty = qty - (n_full_bids * bid_qty);
         if ((!excl) && (remaining_qty > 0) && 
             (remaining_qty >= package_->fill_min())) {
           // leftover material is enough to fill one more partial package. Add
