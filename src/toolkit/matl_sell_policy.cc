@@ -285,7 +285,7 @@ void MatlSellPolicy::GetMatlTrades(
         trade_mat = mat;
       }
 
-      if (ignore_comp_) {
+      if (ignore_comp_ && it->request->target()->comp() != trade_mat->comp()) {
         trade_mat->Transmute(it->request->target()->comp());
       }
       responses.push_back(std::make_pair(*it, trade_mat));
