@@ -6,7 +6,8 @@ Since last release
 ====================
 
 **Added:**
-* Added TransportUnits (#1750)
+
+* Added TransportUnits (#1750, #1772)
 * Added CI support for Ubuntu 24.04 (#1770)
 
 **Changed:**
@@ -15,8 +16,9 @@ Since last release
 * Rely on ``python3`` in environment instead of ``python`` (#1747)
 * Remove ``pandas`` as build dependency (#1748)
 * Consistently use hyphens in ``install.py`` flags (#1748)
-* Material sell policy can package materials (#1749)
+* Material sell policy can package materials (#1749, #1774)
 * Use miniforge for conda CI builds instead of miniconda (#1763)
+* Warning and limits on number of packages that can be created from a resource at once (#1771)
 
 **Removed:**
 

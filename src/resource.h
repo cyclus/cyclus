@@ -5,7 +5,6 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
-#include "error.h"
 #include "package.h"
 
 class SimInitTest;
@@ -137,6 +136,11 @@ std::vector<typename T::Ptr> Resource::Package(Package::Ptr pkg) {
   if (fill_mass == 0) {
     return ts_pkgd;
   }
+
+  // Check if the number of packages is within the limits, including if
+  // int overflow is reached
+  int approx_num_pkgs = quantity() / fill_mass;
+  Package::ExceedsSplitLimits(approx_num_pkgs);
 
   while (quantity() > 0 && quantity() >= pkg->fill_min()) {
     double pkg_fill = std::min(quantity(), fill_mass);
