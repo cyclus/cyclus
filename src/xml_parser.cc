@@ -63,9 +63,7 @@ xmlpp::Document* XMLParser::Document() {
   // This adds the capability to have nice include semantics
   bool generate_xinclude_nodes = true;
   bool fixup_base_uris = false;
-  #if LIBXMLXX_MAJOR_VERSION < 2
-    doc->process_xinclude(generate_xinclude_nodes);
-  #elif LIBXMLXX_MAJOR_VERSION == 2
+  #if LIBXMLXX_MAJOR_VERSION == 2
     #if LIBXMLXX_MINOR_VERSION < 42
       doc->process_xinclude(generate_xinclude_nodes);
     #else
