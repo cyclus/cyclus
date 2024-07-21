@@ -39,7 +39,7 @@ class ResourceTest : public ::testing::Test {
     double mmax_qty = static_cast<double>(0.95*std::numeric_limits<int>::max());
     mmax = Material::Create(dummy, mmax_qty, c);
     // overflow limit
-    pmax = Product::Create(dummy, 1e299, "bananas");
+    pmax = Product::Create(dummy, cyclus::CY_LARGE_DOUBLE, "bananas");
   }
 
   virtual void TearDown() {
@@ -163,7 +163,7 @@ TEST_F(ResourceTest, PackageResource) {
   EXPECT_EQ(p2_pkgd[1]->quantity(), 2);
   EXPECT_EQ(p2_pkgd[0]->package_name(), pkg_name);
   EXPECT_EQ(p2_pkgd[1]->package_name(), pkg_name);
-  
+
   Material::Ptr m3 = m2->ExtractQty(5.5);
   std::vector<Material::Ptr> m3_pkgd = m3->Package<Material>(pkg);
   EXPECT_EQ(m3->package_name(), Package::unpackaged_name());

@@ -30,7 +30,7 @@ class MatlSellPolicyTests: public ::testing::Test {
   ResBuf<Material> buff;
   Composition::Ptr comp, comp1;
   Material::Ptr mat, mat1;
-  
+
   virtual void SetUp() {
     fac1 = new TestFacility(tc.get());
     cap = 5;
@@ -78,7 +78,7 @@ TEST_F(MatlSellPolicyTests, StartStop) {
 
 TEST_F(MatlSellPolicyTests, Bids) {
   MatlSellPolicy p;
-  std::string commod("commod");  
+  std::string commod("commod");
   CommodMap<Material>::type reqs;
   reqs[commod] = std::vector<Request<Material>*>();
   Request<Material>* req = Request<Material>::Create(mat1, fac1, commod);
@@ -113,7 +113,7 @@ TEST_F(MatlSellPolicyTests, Bids) {
   ASSERT_FLOAT_EQ((*(*obs.begin())->bids().begin())->offer()->quantity(),
                   2);
   ASSERT_EQ((*(*obs.begin())->bids().begin())->offer()->comp(), comp1);
-  
+
 
   // quantize bigger than the quantity in storage
    // Qty = 3, Throughput = 3, Quanta = 6 -> No transaction
@@ -125,21 +125,21 @@ TEST_F(MatlSellPolicyTests, Bids) {
 
 TEST_F(MatlSellPolicyTests, Trades) {
   MatlSellPolicy p;
-  std::string commod("commod");  
+  std::string commod("commod");
   std::vector<Trade<Material> > trades;
   std::vector<std::pair<Trade<Material>, Material::Ptr> > obs;
-  
+
   Request<Material>* req = Request<Material>::Create(mat1, fac1, commod);
   Bid<Material>* bid = Bid<Material>::Create(req, mat, fac1);
   Trade<Material> trade(req, bid, 1);
   trades.push_back(trade);
-  
+
   // basic
   p.Init(NULL, &buff, "").Set(commod);
   p.GetMatlTrades(trades, obs);
   ASSERT_EQ(obs.size(), 1);
   ASSERT_EQ(obs.begin()->second->comp(), comp);
-  
+
   // ignore comp
   obs.clear();
   p.Init(NULL, &buff, "", qty, true).Set(commod);
@@ -159,7 +159,7 @@ TEST_F(MatlSellPolicyTests, Package) {
 
   cyclus::MockSim sim(dur);
   cyclus::Agent* a = new TestFacility(sim.context());
-  
+
   sim.context()->AddPrototype(a->prototype(), a);
   sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
   sim.AddSink("commod").capacity(2).Finalize();
@@ -192,7 +192,7 @@ TEST_F(MatlSellPolicyTests, Package) {
   EXPECT_EQ(1, qr_trans.GetVal<int>("Time", 1));
   EXPECT_EQ(2, qr_trans.GetVal<int>("Time", 2));
 
-  // Resource 0 is the material of 5 that we first created. 
+  // Resource 0 is the material of 5 that we first created.
   QueryResult qr_all_res = sim.db().Query("Resources", NULL);
   EXPECT_EQ(5, qr_all_res.GetVal<double>("Quantity", 0));
 
@@ -223,7 +223,7 @@ TEST_F(MatlSellPolicyTests, TransportUnit) {
 
   cyclus::MockSim sim(dur);
   cyclus::Agent* a = new TestFacility(sim.context());
-  
+
   sim.context()->AddPrototype(a->prototype(), a);
   sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
   sim.AddSink("commod").Finalize();
@@ -283,7 +283,7 @@ TEST_F(MatlSellPolicyTests, PackageLimit) {
 
   cyclus::MockSim sim(dur);
   cyclus::Agent* a = new TestFacility(sim.context());
-  
+
   sim.context()->AddPrototype(a->prototype(), a);
   sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
   sim.AddSink("commod").Finalize();
@@ -291,7 +291,7 @@ TEST_F(MatlSellPolicyTests, PackageLimit) {
 
   cyclus::toolkit::ResBuf<cyclus::Material> buf;
 
-  double qty = 1e299;
+  double qty = cyclus::CY_LARGE_DOUBLE;
   CompMap cm;
   cm[922380000] = 1;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
@@ -303,7 +303,7 @@ TEST_F(MatlSellPolicyTests, PackageLimit) {
   Package::Ptr p = sim.context()->GetPackage("foo");
 
   cyclus::toolkit::MatlSellPolicy sellpol;
-  sellpol.Init(fac, &buf, "buf", 1e299, false, 0, p->name())
+  sellpol.Init(fac, &buf, "buf", cyclus::CY_LARGE_DOUBLE, false, 0, p->name())
           .Set("commod").Start();
 
   ASSERT_THROW(sim.Run(), cyclus::ValueError);

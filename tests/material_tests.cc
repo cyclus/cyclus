@@ -306,7 +306,7 @@ TEST_F(MaterialTest, DecayShortcut) {
   Material::Ptr m = Material::CreateUntracked(1.0, c);
 
   std::string u235 ("u235");
-  ASSERT_NEAR(3.11996e-17, pyne::decay_const(u235), 1e-20);
+  ASSERT_NEAR(3.11996e-17, pyne::decay_const(u235), cyclus::CY_NEAR_ZERO);
 
   double sec_per_month = 2629152;
   double u235_lambda = pyne::decay_const(u235) * sec_per_month;  // per month
@@ -345,7 +345,7 @@ TEST_F(MaterialTest, DecayCustomTimeStep) {
   cyclus::compmath::Normalize(&newv);
 
   // one half of atoms should have decayed away
-  double eps = 1e-6;
+  double eps = cyclus::CY_NEAR_ZERO;
   EXPECT_NEAR(0.5, newv[id("Cs137")], eps) << "one Cs137 half-life duration time step did not decay half of Cs atoms";
 }
 
