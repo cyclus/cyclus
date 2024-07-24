@@ -439,6 +439,10 @@ TEST_F(MaterialBufTest, BulkTest) {
 
 }
 
+TEST_F(MaterialBufTest, KeepPackaging) {
+  keep_pkg_store_.Push(mat4_pkgd_);
+  ASSERT_EQ(keep_pkg_store_.Pop()->package_name(), pkg_name_);
+}
 
 }  // namespace toolkit
 }  // namespace cyclus
