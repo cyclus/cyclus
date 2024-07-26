@@ -61,7 +61,9 @@ typedef std::vector<Product::Ptr> ProdVec;
 template <class T>
 class ResBuf {
  public:
-  ResBuf(bool is_bulk=false, bool keep_packaging=false) : cap_(INFINITY), qty_(0), is_bulk_(is_bulk), keep_packaging_(keep_packaging) {
+  ResBuf(bool is_bulk=false, bool keep_pkg=false) : qty_(0), is_bulk_(is_bulk) {
+    capacity(INFINITY);
+    keep_packaging(keep_pkg);
     if (is_bulk_ && keep_packaging_) {
       throw ValueError("bulk storage resbufs cannot keep packaging. Only one of the two options can be true.");
     }
@@ -80,6 +82,10 @@ class ResBuf {
   /// @throws ValueError the new capacity is lower (by eps_rsrc()) than the
   /// quantity of resources that exist in the buffer.
   void capacity(double cap) {
+    if (cap < 0) {
+      throw ValueError("capacity must not be negative");
+    }
+
     if (quantity() - cap > eps_rsrc()) {
       std::stringstream ss;
       ss << std::setprecision(17) << "new capacity " << cap
