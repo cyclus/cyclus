@@ -444,6 +444,15 @@ TEST_F(MaterialBufTest, KeepPackaging) {
   ASSERT_EQ(keep_pkg_store_.Pop()->package_name(), pkg_name_);
 }
 
+TEST_F(MaterialBufTest, ChangeKeepPackaging) {
+  keep_pkg_store_.Push(mat4_pkgd_);
+  ASSERT_EQ(keep_pkg_store_.Pop()->package_name(), pkg_name_);
+
+  keep_pkg_store_.keep_packaging(false);
+  keep_pkg_store_.Push(mat4_pkgd_);
+  ASSERT_EQ(keep_pkg_store_.Pop()->package_name(), cyclus::Package::unpackaged_name());
+}
+
 TEST_F(MaterialBufTest, BulkKeepPackaging) {
   EXPECT_THROW(ResBuf<Material>(true, true), ValueError);
 }
