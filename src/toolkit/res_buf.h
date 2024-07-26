@@ -61,7 +61,11 @@ typedef std::vector<Product::Ptr> ProdVec;
 template <class T>
 class ResBuf {
  public:
-  ResBuf(bool is_bulk=false, bool keep_packaging=false) : cap_(INFINITY), qty_(0), is_bulk_(is_bulk), keep_packaging_(keep_packaging) { }
+  ResBuf(bool is_bulk=false, bool keep_packaging=false) : cap_(INFINITY), qty_(0), is_bulk_(is_bulk), keep_packaging_(keep_packaging) {
+    if (is_bulk_ && keep_packaging_) {
+      throw ValueError("bulk storage resbufs cannot keep packaging. Only one of the two options can be true.");
+    }
+   }
 
   virtual ~ResBuf() {}
 

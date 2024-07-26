@@ -444,5 +444,10 @@ TEST_F(MaterialBufTest, KeepPackaging) {
   ASSERT_EQ(keep_pkg_store_.Pop()->package_name(), pkg_name_);
 }
 
+TEST_F(MaterialBufTest, BulkKeepPackaging) {
+  EXPECT_THROW(ResBuf<Material>(true, true), ValueError);
+}
+
+
 }  // namespace toolkit
 }  // namespace cyclus
