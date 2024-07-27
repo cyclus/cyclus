@@ -1,6 +1,5 @@
 """Some system-specific info for cyclus."""
 import sys
-import ctypes
 
 PY_VERSION_TUPLE = sys.version_info[:3]
 
