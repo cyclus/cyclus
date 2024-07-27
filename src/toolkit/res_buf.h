@@ -64,9 +64,6 @@ class ResBuf {
   ResBuf(bool is_bulk=false, bool keep_pkg=false) : qty_(0), is_bulk_(is_bulk) {
     capacity(INFINITY);
     keep_packaging(keep_pkg);
-    if (is_bulk_ && keep_packaging_) {
-      throw ValueError("bulk storage resbufs cannot keep packaging. Only one of the two options can be true.");
-    }
    }
 
   virtual ~ResBuf() {}
@@ -97,6 +94,9 @@ class ResBuf {
 
   /// Sets whether the buffer should keep packaged resources
   void keep_packaging(bool keep_packaging) {
+    if (is_bulk_ && keep_packaging) {
+      throw ValueError("bulk storage resbufs cannot keep packaging. Only one of the two options can be true.");
+    }
     keep_packaging_ = keep_packaging;
   }
 
