@@ -24,6 +24,7 @@ platform.h
 src/Core/Utility/Env.cpp
 src/cyclus_nuc_data.h5
 stubs/stub_version.h
+src/cyc_limits.h
 src/env.cc
 src/version.cc
 src/version.h
@@ -42,6 +43,7 @@ tests/db.h5
 cyclus/cpp_typesystem.pxd
 cyclus/typesystem.pxd
 cyclus/typesystem.pyx
+cyclus/system.py
 tests/libcyclus-orig.h5
 tests/libcyclus-orig.sqlite
 tests/libcyclus-test.h5

@@ -87,7 +87,7 @@ double MatQuery::Amount(Composition::Ptr c) {
   compmath::Normalize(&m_other);
 
   Nuc limiter;
-  double min_ratio = 1e300;
+  double min_ratio = cyclus::CY_LARGE_DOUBLE;
   CompMap::iterator it;
   for (it = m_other.begin(); it != m_other.end(); ++it) {
     Nuc nuc = it->first;

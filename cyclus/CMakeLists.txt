@@ -7,6 +7,7 @@ INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 #
 # First things first, code-generation
 #
+CONFIGURE_FILE(system.py.in "${CMAKE_CURRENT_SOURCE_DIR}/system.py" @ONLY)
 message(STATUS "Generating Type System API for Python")
 EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/gentypesystem.py
     "--src-dir=${CMAKE_CURRENT_SOURCE_DIR}"

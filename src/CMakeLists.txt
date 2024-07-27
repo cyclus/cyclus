@@ -7,9 +7,9 @@ else()
   set(cyclus_has_coin 0)
 endif()
 CONFIGURE_FILE(platform.h.in "${CMAKE_CURRENT_SOURCE_DIR}/platform.h" @ONLY)
-
 CONFIGURE_FILE(version.cc.in "${CMAKE_CURRENT_SOURCE_DIR}/version.cc" @ONLY)
 CONFIGURE_FILE(version.h.in "${CMAKE_CURRENT_SOURCE_DIR}/version.h" @ONLY)
+CONFIGURE_FILE(cyc_limits.h.in "${CMAKE_CURRENT_SOURCE_DIR}/cyc_limits.h" @ONLY)
 
 SET(cyclus_install_dir "${CMAKE_INSTALL_PREFIX}")
 SET(cyclus_build_dir "${CYCLUS_BINARY_DIR}")

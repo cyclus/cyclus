@@ -13,6 +13,18 @@ ENDIF()
 # This project name is cyclus.
 PROJECT(CYCLUS VERSION 1.6.0)
 
+INCLUDE(CheckTypeSize)
+CHECK_TYPE_SIZE("int" INT_SIZE_IN_BYTES LANGUAGE CXX)
+MATH(EXPR INT_MAX "(1 << (${INT_SIZE_IN_BYTES} * 8 - 1)) - 1")
+
+SET(CY_LARGE_INT "${INT_MAX}")
+SET(CY_LARGE_DOUBLE "1e299")
+SET(CY_NEAR_ZERO "1e-08")
+
+MESSAGE("CY_LARGE_INT: ${CY_LARGE_INT}")
+MESSAGE("CY_LARGE_DOUBLE: ${CY_LARGE_DOUBLE}")
+MESSAGE("CY_NEAR_ZERO: ${CY_NEAR_ZERO}")
+
 # check for and enable c++17 support (required for cyclus)
 INCLUDE(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
@@ -396,12 +408,12 @@ IF(NOT CYCLUS_DOC_ONLY)
     ADD_SUBDIRECTORY("${CYCLUS_SHARE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_TEST_DIR}")
-    ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
-    ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
-    ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
     if(Cython_FOUND)
         ADD_SUBDIRECTORY("${CYCLUS_PYSOURCE_DIR}")
     endif(Cython_FOUND)
+    ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
+    ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
+    ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
     
     ##############################################################################################
     ####################################### end includes #########################################
