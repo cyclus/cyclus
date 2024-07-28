@@ -17,7 +17,7 @@ bool PY_INTERP_INIT = false;
 void CallCythonHelper(std::string module_name, PyObject* spec = NULL, PyObject* spec_globals = NULL, PyObject* mod = NULL) {
     PyObject *maybe_mod = PyInit_pymodule();
     if (!maybe_mod) goto pyerror;
-    if (Py_IS_TYPE(maybe_mod, &PyModuleDef_Type)) {
+    if (Py_TYPE(maybe_mod) == &PyModuleDef_Type) {
         spec_globals = PyDict_New();
         if (!spec_globals) goto pyerror;
         std::string py_snippet = 
