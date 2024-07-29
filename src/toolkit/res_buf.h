@@ -61,7 +61,10 @@ typedef std::vector<Product::Ptr> ProdVec;
 template <class T>
 class ResBuf {
  public:
-  ResBuf(bool is_bulk=false, bool unpackaged=true) : cap_(INFINITY), qty_(0), is_bulk_(is_bulk), unpackaged_(unpackaged) { }
+  ResBuf(bool is_bulk=false, bool keep_pkg=false) : qty_(0), is_bulk_(is_bulk) {
+    capacity(INFINITY);
+    keep_packaging(keep_pkg);
+   }
 
   virtual ~ResBuf() {}
 
@@ -76,6 +79,10 @@ class ResBuf {
   /// @throws ValueError the new capacity is lower (by eps_rsrc()) than the
   /// quantity of resources that exist in the buffer.
   void capacity(double cap) {
+    if (cap < 0) {
+      throw ValueError("capacity must not be negative");
+    }
+
     if (quantity() - cap > eps_rsrc()) {
       std::stringstream ss;
       ss << std::setprecision(17) << "new capacity " << cap
@@ -84,6 +91,16 @@ class ResBuf {
     }
     cap_ = cap;
   }
+
+  /// Sets whether the buffer should keep packaged resources
+  void keep_packaging(bool keep_packaging) {
+    if (is_bulk_ && keep_packaging) {
+      throw ValueError("bulk storage resbufs cannot keep packaging. Only one of the two options can be true.");
+    }
+    keep_packaging_ = keep_packaging;
+  }
+
+  bool keep_packaging() const { return keep_packaging_; }
 
   /// Returns the total number of constituent resource objects
   /// in the buffer. Never throws.
@@ -267,7 +284,7 @@ class ResBuf {
 
     if (!is_bulk_  || rs_.size() == 0) {
       // strip package id and set as default
-      if (unpackaged_) {
+      if (!keep_packaging_) {
         m->ChangePackage();
       }
       rs_.push_back(m);
@@ -319,7 +336,7 @@ class ResBuf {
 
     for (int i = 0; i < rss.size(); i++) {
       if (!is_bulk_ || rs_.size() == 0) {
-        if (unpackaged_) {
+        if (!keep_packaging_) {
           rss[i]->ChangePackage();
         }
         rs_.push_back(rss[i]);
@@ -359,7 +376,7 @@ class ResBuf {
   bool is_bulk_;
   /// Whether materials should be stripped of their packaging before being
   /// pushed onto the resbuf. If res_buf is bulk, this is assumed true.
-  bool unpackaged_;
+  bool keep_packaging_;
 
   /// List of constituent resource objects forming the buffer's inventory
   std::list<typename T::Ptr> rs_;

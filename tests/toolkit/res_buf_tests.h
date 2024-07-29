@@ -10,9 +10,19 @@
 #include "composition.h"
 #include "material.h"
 #include "toolkit/res_buf.h"
+#include "context.h"
+#include "recorder.h"
+#include "timer.h"
+#include "region.h"
 
 namespace cyclus {
 namespace toolkit {
+
+class Dummy : public cyclus::Region {
+ public:
+  Dummy(cyclus::Context* ctx) : cyclus::Region(ctx) {}
+  Dummy* Clone() { return NULL; }
+};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class ProductBufTest : public ::testing::Test {
@@ -70,12 +80,20 @@ class MaterialBufTest : public ::testing::Test {
 
   ResBuf<Material> mat_store_;  // default constructed mat store
   ResBuf<Material> bulk_store_ = ResBuf<Material>(true);
+  ResBuf<Material> keep_pkg_store_ = ResBuf<Material>(false, true);
 
   Nuc sr89_, fe59_;
-  Material::Ptr mat1a_, mat1b_, mat2a_, mat2b_, mat3_;
+  Material::Ptr mat1a_, mat1b_, mat2a_, mat2b_, mat3_, mat4_pkgd_;
   Composition::Ptr test_comp1_, test_comp2_, test_comp3_;
 
+  std::string pkg_name_ = "keep";
+
   double cap_;
+
+  cyclus::Timer ti;
+  cyclus::Recorder rec;
+  cyclus::Context* ctx = new cyclus::Context(&ti, &rec);
+  cyclus::Agent* dummy = new Dummy(ctx);
 
   virtual void SetUp() {
     try {
@@ -94,12 +112,16 @@ class MaterialBufTest : public ::testing::Test {
       test_comp3_ = Composition::CreateFromMass(w);
 
       double mat_size = 5 * units::g;
-
       mat1a_ = Material::CreateUntracked(mat_size, test_comp1_);
       mat1b_ = Material::CreateUntracked(mat_size, test_comp1_);
       mat2a_ = Material::CreateUntracked(mat_size, test_comp2_);
       mat2b_ = Material::CreateUntracked(mat_size, test_comp2_);
       mat3_ = Material::CreateUntracked(mat_size, test_comp3_);
+
+      ctx->AddPackage(pkg_name_, mat_size, mat_size);
+      cyclus::Package::Ptr pkg = ctx->GetPackage(pkg_name_);
+      mat4_pkgd_ = Material::Create(dummy, mat_size, test_comp1_, pkg_name_);
+      mat4_pkgd_->ChangePackage(pkg_name_);
 
       cap_ = 10 * mat_size;
 
