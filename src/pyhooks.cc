@@ -3,6 +3,7 @@
 
 #ifdef CYCLUS_WITH_PYTHON
 #include <stdlib.h>
+#include <map>
 
 extern "C" {
 #include "eventhooks.h"
@@ -14,8 +15,24 @@ namespace cyclus {
 int PY_INTERP_COUNT = 0;
 bool PY_INTERP_INIT = false;
 
+typedef PyObject* (*InitFunc)(void);
+
+inline std::map<std::string, InitFunc> init_funcs = {
+    {"eventhooks", PyInit_eventhooks},
+    {"pyinfile", PyInit_pyinfile},
+    {"pymodule", PyInit_pymodule},
+};
+
+inline PyObject* init_module(const std::string& module_name) {
+    auto it = init_funcs.find(module_name);
+    if (it != init_funcs.end()) {
+        return it->second();
+    }
+    return nullptr;
+}
+
 void CallCythonHelper(std::string module_name, PyObject* spec = NULL, PyObject* spec_globals = NULL, PyObject* mod = NULL) {
-    PyObject *maybe_mod = PyInit_pymodule();
+    PyObject *maybe_mod = init_module(module_name);
     if (!maybe_mod) goto pyerror;
     if (Py_TYPE(maybe_mod) == &PyModuleDef_Type) {
         spec_globals = PyDict_New();
