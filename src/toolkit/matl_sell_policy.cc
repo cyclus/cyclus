@@ -1,6 +1,7 @@
 #include "matl_sell_policy.h"
 
 #include "error.h"
+#include "comp_math.h"
 
 #define LG(X) LOG(LEV_##X, "selpol")
 #define LGH(X)                                                    \
@@ -285,7 +286,7 @@ void MatlSellPolicy::GetMatlTrades(
         trade_mat = mat;
       }
 
-      if (ignore_comp_ && !AlmostEq(it->request->target()->comp(), trade_mat->comp())) {
+      if (ignore_comp_ && compmath::AlmostEq(it->request->target()->comp()->mass(), trade_mat->comp()->mass(), eps_rsrc())) {
         trade_mat->Transmute(it->request->target()->comp());
       }
       responses.push_back(std::make_pair(*it, trade_mat));
