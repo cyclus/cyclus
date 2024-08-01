@@ -93,7 +93,10 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
   // this material regardless of composition.
   other->prev_decay_time_ = prev_decay_time_;
 
-  tracker_.Extract(&other->tracker_);
+  if (qty_ > cyclus::eps()) {
+    tracker_.Extract(&other->tracker_);
+  } // else, this material is being fully extracted and nothing has effectively
+  // changed. Don't need to bump state, parent, etc.
 
   return other;
 }
