@@ -3,6 +3,7 @@
 
 #ifdef CYCLUS_WITH_PYTHON
 #include <stdlib.h>
+#include <map>
 
 extern "C" {
 #include "eventhooks.h"
@@ -13,6 +14,73 @@ extern "C" {
 namespace cyclus {
 int PY_INTERP_COUNT = 0;
 bool PY_INTERP_INIT = false;
+
+typedef PyObject* (*InitFunc)(void);
+
+inline std::map<std::string, InitFunc> init_funcs = {
+    {"eventhooks", PyInit_eventhooks},
+    {"pyinfile", PyInit_pyinfile},
+    {"pymodule", PyInit_pymodule},
+};
+
+inline PyObject* init_module(const std::string& module_name) {
+    auto it = init_funcs.find(module_name);
+    if (it != init_funcs.end()) {
+        return it->second();
+    }
+    return nullptr;
+}
+
+void CallCythonHelper(std::string module_name, PyObject* spec = NULL, PyObject* spec_globals = NULL, PyObject* mod = NULL) {
+    PyObject *maybe_mod = init_module(module_name);
+    if (!maybe_mod) goto pyerror;
+    if (Py_TYPE(maybe_mod) == &PyModuleDef_Type) {
+        spec_globals = PyDict_New();
+        if (!spec_globals) goto pyerror;
+        std::string py_snippet = 
+            "import importlib.machinery as im\n"
+            "spec = im.ModuleSpec('" + module_name + "', None)\n";
+        PyObject *res = PyRun_String(py_snippet.c_str(), Py_file_input, spec_globals, spec_globals);
+        Py_XDECREF(res); // don't use res whether or not it's set
+        if (!res) goto pyerror;
+        spec = PyDict_GetItemString(spec_globals, "spec");
+        if (!spec) goto pyerror;               
+        
+        mod = PyModule_FromDefAndSpec((PyModuleDef*) maybe_mod, spec);
+        if (!mod) goto pyerror;
+        int execRes = PyModule_ExecDef(mod, (PyModuleDef*) maybe_mod);
+        if (execRes) goto pyerror;
+    } else {
+        mod = maybe_mod;
+    }
+
+    if (false) {
+      pyerror:
+      PyErr_Print();
+    }
+}
+
+template<typename T, typename... Args> 
+T CallCythonNonVoid(std::string module_name, std::function<T(Args...)> module_method, Args... args) {
+  PyObject *spec = NULL, *spec_globals = NULL, *mod = NULL;
+  CallCythonHelper(module_name, spec, spec_globals, mod);
+  T result = module_method(args...);
+  Py_XDECREF(mod);
+  Py_XDECREF(spec);
+  Py_XDECREF(spec_globals);
+  return result;
+  
+}
+
+template<typename... Args>
+void CallCythonVoid(std::string module_name, std::function<void(Args...)> module_method, Args... args) {
+  PyObject *spec = NULL, *spec_globals = NULL, *mod = NULL;
+  CallCythonHelper(module_name, spec, spec_globals, mod);
+  module_method(args...);
+  Py_XDECREF(mod);
+  Py_XDECREF(spec);
+  Py_XDECREF(spec_globals);
+}
 
 
 void PyAppendInitTab(void) {
@@ -69,29 +137,51 @@ void PyStop(void) {
   };
 };
 
-void EventLoop(void) { CyclusEventLoopHook(); };
+void EventLoop(void) { 
+  std::function<void()> module_method = CyclusEventLoopHook;
+  CallCythonVoid("evenhooks", module_method);
+}
 
-std::string PyFindModule(std::string lib) { return CyclusPyFindModule(lib); };
+std::string PyFindModule(std::string lib) { 
+  std::function<std::string(std::string)> module_method = CyclusPyFindModule;
+  return CallCythonNonVoid("pymodule", module_method, lib); 
+}
 
 Agent* MakePyAgent(std::string lib, std::string agent, void* ctx) {
-  return CyclusMakePyAgent(lib, agent, ctx);
+  std::function<cyclus::Agent*(std::string, std::string, void*)> module_method = CyclusMakePyAgent;
+  return CallCythonNonVoid("pymodule", module_method, lib, agent, ctx); 
 };
 
 void InitFromPyAgent(Agent* src, Agent* dst, void* ctx) {
-  CyclusInitFromPyAgent(src, dst, ctx);
+  std::function<void(cyclus::Agent*, cyclus::Agent*, void*)> module_method = CyclusInitFromPyAgent;
+  CallCythonVoid("pymodule", module_method, src, dst, ctx);
 };
 
-void ClearPyAgentRefs(void) { CyclusClearPyAgentRefs(); };
+void ClearPyAgentRefs(void) { 
+  std::function<void()> module_method = CyclusClearPyAgentRefs;
+  CallCythonVoid("pymodule", module_method);
+};
 
-void PyDelAgent(int i) { CyclusPyDelAgent(i); };
+
+void PyDelAgent(int i) { 
+  std::function<void(int)> module_method = CyclusPyDelAgent;
+  CallCythonVoid("pymodule", module_method, i);
+};
 
 namespace toolkit {
-std::string PyToJson(std::string infile) { return CyclusPyToJson(infile); };
+std::string PyToJson(std::string infile) { 
+  std::function<std::string(std::string)> module_method = CyclusPyToJson;
+  return CallCythonNonVoid("pyinfile", module_method, infile);
+};
 
-std::string JsonToPy(std::string infile) { return CyclusJsonToPy(infile); };
+std::string JsonToPy(std::string infile) { 
+  std::function<std::string(std::string)> module_method = CyclusJsonToPy;
+  return CallCythonNonVoid("pyinfile", module_method, infile);
+};
 
 void PyCallListeners(std::string tstype, Agent* agent, void* cpp_ctx, int time, boost::spirit::hold_any value){
-    CyclusPyCallListeners(tstype, agent, cpp_ctx, time, value);
+    std::function<void(std::string, cyclus::Agent*, void*, int, boost::spirit::hold_any)> module_method = CyclusPyCallListeners;
+    CallCythonVoid("pymodule", module_method, tstype, agent, cpp_ctx, time, value);
 };
 
 }  // namespace toolkit

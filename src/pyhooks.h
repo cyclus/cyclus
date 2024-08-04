@@ -2,6 +2,7 @@
 #define CYCLUS_SRC_PYHOOKS_H_
 
 #include <string>
+#include <functional>
 
 #include "any.hpp"
 
@@ -15,6 +16,12 @@ extern int PY_INTERP_COUNT;
 
 /// Whether or not the Python interpreter has been initilized.
 extern bool PY_INTERP_INIT;
+
+template<typename T, typename... Args> 
+T CallCythonNonVoid(std::string module_name, std::function<T(Args...)> module_method, Args... args);
+
+template<typename... Args>
+void CallCythonVoid(std::string module_name, std::function<void(Args...)> module_method, Args... args);
 
 /// Convience function for appending to import table for initialization
 void PyAppendInitTab(void);
