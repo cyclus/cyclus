@@ -3,11 +3,11 @@
 #define CYCLUS_DECIMAL_SECOND_MULTIPLIER 3600
 
 #include <string>
-
 #include "cyclus.h"
 
 namespace cyclus {
 namespace toolkit {
+
 /// @class Position
 /// The Position class is a basic class that stores the geographic location of
 /// each
@@ -127,6 +127,8 @@ class Position {
   /// ISO6709 Annex H
   std::string ToString(
       Position::StringFormat format = StringFormat::DEGREES) const;
+
+  void RecordPosition(Agent* agent);
 
  private:
   /// Latitude is stored as seconds of degree. Explanation and example is
