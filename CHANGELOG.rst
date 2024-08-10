@@ -9,6 +9,7 @@ Since last release
 
 * Added TransportUnits (#1750, #1772, #1784)
 * Added CI support for Ubuntu 24.04 (#1770)
+* Added ``doxygen`` to list of dependencies installed in the Dockerfile (#1782)
 
 **Changed:**
 
