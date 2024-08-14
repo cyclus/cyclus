@@ -59,6 +59,7 @@ void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
   LoadInfo();
   LoadRecipes();
   LoadPackages();
+  LoadTransportUnits();
   LoadSolverInfo();
   LoadPrototypes();
   LoadInitialAgents();
@@ -210,6 +211,29 @@ void SimInit::LoadPackages() {
     }
     else {
       ctx_->RecordPackage(Package::unpackaged());
+    }
+  }
+}
+
+void SimInit::LoadTransportUnits() {
+  QueryResult qr;
+  try {
+    qr = b_->Query("TransportUnits", NULL);
+  } catch (std::exception err) {
+    return;
+  }  // table doesn't exist (okay)
+
+  for (int i = 0; i < qr.rows.size(); ++i) {
+    std::string name = qr.GetVal<std::string>("TransportUnitName", i);
+    int fill_min = qr.GetVal<int>("FillMin", i);
+    int fill_max = qr.GetVal<int>("FillMax", i);
+    std::string strategy = qr.GetVal<std::string>("Strategy", i);
+
+    if (name != TransportUnit::unrestricted_name()) {
+      ctx_->AddTransportUnit(name, fill_min, fill_max, strategy);
+    }
+    else {
+      ctx_->RecordTransportUnit(TransportUnit::unrestricted());
     }
   }
 }
