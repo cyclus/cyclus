@@ -11,6 +11,7 @@ Since last release
 * Added CI support for Ubuntu 24.04 (#1770)
 * Added ``doxygen`` to list of dependencies installed in the Dockerfile (#1782)
 * Added macros in ``cmake/CyclusBuildSetup.cmake`` for common CMake boilerplate (#1793)
+* Added ``doxygen-awesome-css`` to doxygen docs for style (#1787)
 
 **Changed:**
 
