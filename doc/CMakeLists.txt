@@ -17,6 +17,24 @@ IF(DOXYGEN_FOUND)
         SET(DOXYGEN_HTMLHELP NO)
     ENDIF(HTML_HELP_COMPILER)
 
+    # -----------------------------------------------------------------------------
+    # Fetch doxygen stylesheet from https://github.com/jothepro/doxygen-awesome-css
+    # -----------------------------------------------------------------------------
+    SET(AWESOME_CSS_URL "https://raw.githubusercontent.com/jothepro/doxygen-awesome-css/main/doxygen-awesome.css")
+    SET(AWESOME_CSS_DESTINATION "${DOC_INPUT_DIR}/doxygen-awesome.css")
+    FILE(DOWNLOAD ${AWESOME_CSS_URL} ${AWESOME_CSS_DESTINATION}
+        STATUS DOWNLOAD_STATUS
+        LOG DOWNLOAD_LOG
+    )
+
+    LIST(GET DOWNLOAD_STATUS 0 AWESOME_CSS_STATUS_CODE)
+    LIST(GET DOWNLOAD_STATUS 1 ERROR_MESSAGE)
+
+    IF(NOT AWESOME_CSS_STATUS_CODE EQUAL 0)
+        MESSAGE(WARNING "Error downloading CSS file: ${ERROR_MESSAGE}\n${DOWNLOAD_LOG}")
+    ENDIF()
+
+
     # ----------------------------------------------------------------------
     # Some doxyfile settings to be configured into the template doxy.conf.in
     # ----------------------------------------------------------------------
@@ -28,7 +46,12 @@ IF(DOXYGEN_FOUND)
     SET(DOXYGEN_EXTRACT_LOCAL YES)
     SET(DOXYGEN_EXTRACT_INTERNAL YES)
     SET(DOXYGEN_LAYOUT_FILE "${DOC_INPUT_DIR}/DoxygenLayout.xml")
-    SET(DOXYGEN_STYLESHEET_FILE "${DOC_INPUT_DIR}/customdoxygen.css")
+    SET(PROJECT_LOGO "${DOC_INPUT_DIR}/logo.png")
+    IF(AWESOME_CSS_STATUS_CODE EQUAL 0)
+        SET(DOXYGEN_STYLESHEET_FILE ${AWESOME_CSS_DESTINATION})
+    ELSE()
+        SET(DOXYGEN_STYLESHEET_FILE "${DOC_INPUT_DIR}/customdoxygen.css")
+    ENDIF()
 
     IF(DOT)
         SET(HAVE_DOT YES)
@@ -40,6 +63,8 @@ IF(DOXYGEN_FOUND)
     MARK_AS_ADVANCED(DOXYGEN_LANGUAGE)
 
     STRING(REGEX REPLACE ";" " " DOXYGEN_INPUT_LIST "${DOXYGEN_SOURCE_DIR}")
+
+    MESSAGE("DOXYGEN_INPUT_LIST: ${DOXYGEN_INPUT_LIST}")
 
     CONFIGURE_FILE("${DOC_INPUT_DIR}/doxy.conf.in" "${DOXYGEN_INPUT}")
 

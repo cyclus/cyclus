@@ -1,5 +1,16 @@
 #ifndef CYCLUS_SRC_CYCLUS_H_
 #define CYCLUS_SRC_CYCLUS_H_
+
+// For Doxygen Mainpage
+/*!
+ * \mainpage Cyclus API Reference
+ *
+ * Welcome to the Cyclus API reference! To learn more about contributing
+ * please visit https://github.com/cyclus/cyclus.
+ * 
+ */
+
+
 // platform needs to be before all other includes
 #include "platform.h"
 
