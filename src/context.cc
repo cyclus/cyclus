@@ -237,7 +237,7 @@ void Context::AddTransportUnit(std::string name, int fill_min, int fill_max,
 }
 
 void Context::RecordTransportUnit(TransportUnit::Ptr tu) {
-  NewDatum("TransportUnit")
+  NewDatum("TransportUnits")
     ->AddVal("TransportUnitName", tu->name())
     ->AddVal("FillMin", tu->fill_min())
     ->AddVal("FillMax", tu->fill_max())
