@@ -280,6 +280,9 @@ void MatlSellPolicy::GetMatlTrades(
           // packaging successful
           trade_mat = mat_pkgd[0];
           shippable_pkgs-=1;
+        } else {
+          // packaging failed. Will need to ship empty trade
+          trade_mat = Material::CreateUntracked(0, mat->comp());
         }
 
       } else { // no packaging needed
