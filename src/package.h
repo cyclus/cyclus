@@ -26,9 +26,12 @@ class Package {
                       double fill_max = std::numeric_limits<double>::max(),
                       std::string strategy = "first");
 
-    /// Returns optimal fill mass for a resource to be packaged. Can be used
-    /// to determine how to respond to requests for material, and to actually
-    /// package and send off trades.
+    /// Returns optimal fill mass for a resource to be packaged, and number of
+    /// packages that can be crated at that fill mass (note that up to one
+    /// additional package may be possible to create with a lower fill mass,
+    /// which much be checked separately). 
+    /// Can be used to determine how to respond to requests for material, and 
+    /// to actually package and send off trades.
     /// Packaging strategy "first" simply fills the packages one by one to the
     /// maximum fill. Therefore, it should always try to max fill.
     /// Packaging strategy "equal" tries to fill all packages to the same mass.
@@ -41,7 +44,7 @@ class Package {
     /// quantity = 5, fill_min = 3, fill_max = 4. num_min_fill = floor(5/3) = 1,
     /// num_max_fill = ceil(5/4) = 2. num_min_fill < num_max_fill, so fill to
     /// the max.
-    double GetFillMass(double qty);
+    std::pair<double, int> GetFillMass(double qty);
 
     // returns package name
     std::string name() const { return name_; }

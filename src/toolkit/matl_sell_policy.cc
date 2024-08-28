@@ -47,7 +47,8 @@ void MatlSellPolicy::set_package(std::string x) {
   // if no real context, only unpackaged can be used (keep default)
   if (manager() != NULL) {
     Package::Ptr pkg = manager()->context()->GetPackage(x);
-    double pkg_fill = pkg->GetFillMass(quantize_);
+    std::pair<double, int> fill = pkg->GetFillMass(quantize_);
+    double pkg_fill = fill.first;
     if ((pkg->name() != Package::unpackaged_name()) && (quantize_ > 0) &&
         (std::fmod(quantize_, pkg_fill) > 0)) { 
       std::stringstream ss;
@@ -63,7 +64,8 @@ void MatlSellPolicy::set_transport_unit(std::string x) {
   if (manager() != NULL) {
     TransportUnit::Ptr tu = manager()->context()->GetTransportUnit(x);
 
-    int num_pkgs = quantize_ / (package_->GetFillMass(quantize_));
+    std::pair<double, int> fill = package_->GetFillMass(quantize_);
+    int num_pkgs = fill.second;
     int max_shippable = tu->MaxShippablePackages(num_pkgs);
 
     if ((tu->name() != TransportUnit::unrestricted_name()) && quantize_ > 0 &&
@@ -197,9 +199,12 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
     for (rit = requests.begin(); rit != requests.end(); ++rit) {
       req = *rit;
       qty = std::min(req->target()->quantity(), limit);
-      bid_qty = excl ? quantize_ : package_->GetFillMass(qty);
+      std::pair<double, int> fill = package_->GetFillMass(qty);
+      bid_qty = excl ? quantize_ : fill.first;
       if (bid_qty != 0) {
-        n_full_bids = static_cast<int>(std::floor(qty / bid_qty));
+        std::cerr << "bid_qty: " << bid_qty << std::endl;
+        std::cerr << "full bids: " << fill.second << std::endl;
+        n_full_bids = excl ? std::floor(qty / quantize_) : fill.second;
 
         // Throw if number of bids above limit or if casting to int caused
         // overflow to negative int limit 

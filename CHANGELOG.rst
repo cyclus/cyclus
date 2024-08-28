@@ -24,6 +24,7 @@ Since last release
 * Warning and limits on number of packages that can be created from a resource at once (#1771)
 * Use keep_packaging instead of unpackaged in ResBuf (#1778)
 * Temporarily pin Boost libraries to <1.86.0 (#1796)
+* Package GetFillMass returns fill mass and number of packages filled at that mass (#1790)
 
 **Removed:**
 

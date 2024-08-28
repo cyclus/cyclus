@@ -29,13 +29,15 @@ Package::Ptr& Package::unpackaged() {
   return unpackaged_;
 }
 
-double Package::GetFillMass(double qty) {
+std::pair<double, int> Package::GetFillMass(double qty) {
   if (qty < fill_min_) {
     // less than one pkg of material available
-    return 0;
+    return std::pair<double, int> (0, 0);
   }
 
   double fill_mass;
+  int num_at_fill_mass;
+  
   if (strategy_ == "first") {
     fill_mass = fill_max_;
   } else if (strategy_ == "equal") {
@@ -49,7 +51,13 @@ double Package::GetFillMass(double qty) {
       fill_mass = fill_max_;
     }
   }
-  return std::min(qty, fill_mass);
+  fill_mass = std::min(qty, fill_mass);
+  if (fill_mass >= fill_min_) {
+    num_at_fill_mass = static_cast<int>(std::floor(qty / fill_mass));
+    return std::pair<double, int>(fill_mass, num_at_fill_mass);
+  } else {
+    return std::pair<double, int>(0, 0);
+  }
 }
   
 Package::Package(std::string name, double fill_min, double fill_max,
