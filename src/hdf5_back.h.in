@@ -240,7 +240,16 @@ class Hdf5Back : public FullBackend {
   std::map<DbTypes, std::set<Digest> > vlkeys_;
 };
 
-const hsize_t Hdf5Back::vlchunk_[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
+#if BOOST_VERSION_MINOR < 86
+  const hsize_t Hdf5Back::vlchunk_[CYCLUS_SHA1_NINT] = {
+    1, 1, 1, 1, 1
+  };
+#else
+  const hsize_t Hdf5Back::vlchunk_[CYCLUS_SHA1_NINT] = {
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+  };
+#endif
+
 
 }  // namespace cyclus
 
