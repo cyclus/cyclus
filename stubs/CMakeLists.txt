@@ -1,6 +1,6 @@
 # DO NOT DELETE THIS LINE:: @archetype_spec@
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
 # taken from http://geant4.cern.ch/support/source/geant4/CMakeLists.txt
 IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     message(STATUS "Stub requires an out-of-source build.")
@@ -14,20 +14,20 @@ ENDIF()
 
 PROJECT(@lib_name@)
 
-# check for and enable c++11 support
+# check for and enable c++17 support
 INCLUDE(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX11)
 IF(COMPILER_SUPPORTS_CXX11)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 ELSE()
-  MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11
+  MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no c++17
   support. Please use a different C++ compiler.")
 ENDIF()
 
 # quiets fortify_source warnings when not compiling with optimizations
 # in linux distros where compilers were compiled with fortify_source enabled by
 # default (e.g. Arch linux).
-MESSAGE("${CMAKE_BUILD_TYPE}")
+MESSAGE("-- CMake Build Type: ${CMAKE_BUILD_TYPE}")
 STRING(TOLOWER "${CMAKE_BUILD_TYPE}" BUILD_TYPE)
 IF(NOT ${BUILD_TYPE} STREQUAL "release")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0")
@@ -81,6 +81,7 @@ IF("${isSystemDir}" STREQUAL "-1")
     ENDIF (NOT "${CMAKE_INSTALL_RPATH}" STREQUAL "${cxxCompilerRoot}")
     SET(CMAKE_BUILD_RPATH "${CMAKE_INSTALL_RPATH}")
 ENDIF("${isSystemDir}" STREQUAL "-1")
+MESSAGE("-- CMAKE_INSTALL_RPATH: ${CMAKE_INSTALL_RPATH}")
 
 # Tell CMake where the modules are
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_INSTALL_PREFIX}/share/cyclus/cmake")
@@ -115,10 +116,17 @@ MESSAGE("--    HDF5 Include directory: ${HDF5_INCLUDE_DIR}")
 MESSAGE("--    HDF5 Library directories: ${HDF5_LIBRARY_DIRS}")
 MESSAGE("--    HDF5 Libraries: ${HDF5_LIBRARIES}")
 
-# find Coin
-FIND_PACKAGE(COIN REQUIRED)
-SET(STUB_INCLUDE_DIRS ${STUB_INCLUDE_DIRS} ${COIN_INCLUDE_DIR})
-set(LIBS ${LIBS} ${COIN_LIBRARIES})
+# find coin and link to it
+if(DEFAULT_ALLOW_MILPS)
+    FIND_PACKAGE(COIN REQUIRED)
+    if(COIN_FOUND)
+        SET(STUB_INCLUDE_DIRS ${STUB_INCLUDE_DIRS} ${COIN_INCLUDE_DIR})
+        SET(LIBS ${LIBS} ${COIN_LIBRARIES})
+    endif()
+    MESSAGE("--    COIN Root: ${COIN_ROOT}")
+    MESSAGE("--    COIN Include directories: ${COIN_INCLUDE_DIRS}")
+    MESSAGE("--    COIN Libraries: ${COIN_LIBRARIES}")
+endif()
 
 
 # include all the directories we just found
