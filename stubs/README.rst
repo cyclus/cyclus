@@ -4,7 +4,7 @@ Hello, Cyclus!
 ==============
 This pages walks you through a very simple hello world example using
 |cyclus| agents.  First make sure that you have the dependencies installed,
-namely |Cyclus|, CMake, and a recent version of Python (2.7 or 3.3+).
+namely |Cyclus|, CMake, and a recent version of Python (3.8+).
 
 First, you need to get the ``cycstub`` code.  Cycstub is a skeleton code base
 that you can use to quick-start new |cyclus| module development projects.
@@ -53,7 +53,7 @@ The install script puts the project into your cyclus userspace,
 
 .. code-block:: bash
 
-    tutorial $ python install.py
+    tutorial $ python3 install.py
 
 ------------
 
