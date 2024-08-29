@@ -52,12 +52,8 @@ std::pair<double, int> Package::GetFillMass(double qty) {
     }
   }
   fill_mass = std::min(qty, fill_mass);
-  if (fill_mass >= fill_min_) {
-    num_at_fill_mass = static_cast<int>(std::floor(qty / fill_mass));
-    return std::pair<double, int>(fill_mass, num_at_fill_mass);
-  } else {
-    return std::pair<double, int>(0, 0);
-  }
+  num_at_fill_mass = static_cast<int>(std::floor(qty / fill_mass));
+  return std::pair<double, int>(fill_mass, num_at_fill_mass);
 }
   
 Package::Package(std::string name, double fill_min, double fill_max,

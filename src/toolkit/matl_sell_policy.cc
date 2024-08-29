@@ -202,8 +202,6 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       std::pair<double, int> fill = package_->GetFillMass(qty);
       bid_qty = excl ? quantize_ : fill.first;
       if (bid_qty != 0) {
-        std::cerr << "bid_qty: " << bid_qty << std::endl;
-        std::cerr << "full bids: " << fill.second << std::endl;
         n_full_bids = excl ? std::floor(qty / quantize_) : fill.second;
 
         // Throw if number of bids above limit or if casting to int caused
