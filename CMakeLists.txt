@@ -1,8 +1,8 @@
 #taken from http://geant4.cern.ch/support/source/geant4/CMakeLists.txt
 # Tell CMake where the modules are
-# MESSAGE("-- CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+MESSAGE("-- CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 
 INCLUDE(CyclusBuildSetup)
 cyclus_minimum_cmake_version(MINIMUM_CMAKE_VERSION)
