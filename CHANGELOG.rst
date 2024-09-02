@@ -9,6 +9,7 @@ Since last release
 
 * Added TransportUnits (#1750, #1772, #1784)
 * Added CI support for Ubuntu 24.04 (#1770)
+* Added macros in ``cmake/CyclusBuildSetup.cmake`` for common CMake boilerplate (#1793)
 
 **Changed:**
 
