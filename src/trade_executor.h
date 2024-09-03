@@ -89,14 +89,16 @@ class TradeExecutor {
       for (v_it = trades.begin(); v_it != trades.end(); ++v_it) {
         Trade<T>& trade = v_it->first;
         typename T::Ptr rsrc =  v_it->second;
-        ctx->NewDatum("Transactions")
-            ->AddVal("TransactionId", ctx->NextTransactionID())
-            ->AddVal("SenderId", supplier->id())
-            ->AddVal("ReceiverId", requester->id())
-            ->AddVal("ResourceId", rsrc->state_id())
-            ->AddVal("Commodity", trade.request->commodity())
-            ->AddVal("Time", ctx->time())
-            ->Record();
+        if (rsrc->quantity() > cyclus::eps_rsrc()) {
+          ctx->NewDatum("Transactions")
+              ->AddVal("TransactionId", ctx->NextTransactionID())
+              ->AddVal("SenderId", supplier->id())
+              ->AddVal("ReceiverId", requester->id())
+              ->AddVal("ResourceId", rsrc->state_id())
+              ->AddVal("Commodity", trade.request->commodity())
+              ->AddVal("Time", ctx->time())
+              ->Record();
+        }
       }
     }
   }

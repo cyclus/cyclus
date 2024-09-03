@@ -309,5 +309,58 @@ TEST_F(MatlSellPolicyTests, PackageLimit) {
   ASSERT_THROW(sim.Run(), cyclus::ValueError);
 }
 
+TEST_F(MatlSellPolicyTests, PackageFailedTrade) {
+  using cyclus::QueryResult;
+
+  int dur = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  // Add two sinks that both want commod
+  sim.AddSink("commod").capacity(5).Finalize();
+  sim.AddSink("commod").capacity(5).Finalize();
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> buf;
+
+  double qty = 7;
+  CompMap cm;
+  cm[922380000] = 1;
+  Composition::Ptr comp = Composition::CreateFromMass(cm);
+  mat = Material::Create(a, qty, comp, Package::unpackaged_name());
+
+  buf.Push(mat);
+
+  sim.context()->AddPackage("foo", 5, 5, "first");
+  Package::Ptr p = sim.context()->GetPackage("foo");
+
+  cyclus::toolkit::MatlSellPolicy sellpol;
+  sellpol.Init(fac, &buf, "buf", cyclus::CY_LARGE_DOUBLE, false, 0, p->name())
+          .Set("commod").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  // One of the sinks is given 5 (their request), and the other is given 2.
+  // Two kg can't be packaged, so the trade fails and the material traded
+  // is an untracked zero quantity. Therefore, only one transaction shows up
+  QueryResult qr_trans = sim.db().Query("Transactions", NULL);
+  EXPECT_EQ(1, qr_trans.rows.size());
+  EXPECT_EQ(0, qr_trans.GetVal<int>("Time", 0));
+
+  std::vector<cyclus::Cond> conds;
+  conds.push_back(cyclus::Cond("PackageName", "==", std::string("foo")));
+  QueryResult qr_res = sim.db().Query("Resources", &conds);
+  EXPECT_EQ(1, qr_res.rows.size());
+  EXPECT_EQ(5, qr_res.GetVal<double>("Quantity", 0));
+
+  // Not all material should have been transacted, one trade of 5 is the only 
+  // non-zero trade
+  EXPECT_EQ(2, buf.quantity());
+
+}
+
 }
 }
