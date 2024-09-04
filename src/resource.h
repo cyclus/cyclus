@@ -94,6 +94,8 @@ class Resource {
   /// Returns the package id.
   virtual std::string package_name() { return Package::unpackaged_name(); };
 
+  virtual Ptr PackageExtract(double qty, std::string new_package_name = Package::unpackaged_name()) = 0;
+
   /// Changes the product's package id
   virtual void ChangePackage(std::string new_package_name = Package::unpackaged_name()) {};
 
@@ -107,6 +109,12 @@ class Resource {
   static int nextstate_id_;
   static int nextobj_id_;
   int state_id_;
+  // Setting the state id should only be done when extracting one resource
+  void state_id(int st_id) {
+    state_id_ = st_id;
+  }
+
+
   int obj_id_;
 };
 
@@ -145,8 +153,7 @@ std::vector<typename T::Ptr> Resource::Package(Package::Ptr pkg) {
 
   while (quantity() > 0 && quantity() >= pkg->fill_min()) {
     double pkg_fill = std::min(quantity(), fill_mass);
-    t_pkgd = boost::dynamic_pointer_cast<T>(ExtractRes(pkg_fill));
-    t_pkgd->ChangePackage(pkg->name());
+    t_pkgd = boost::dynamic_pointer_cast<T>(PackageExtract(pkg_fill, pkg->name()));
     ts_pkgd.push_back(t_pkgd); 
   }
   return ts_pkgd;

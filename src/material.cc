@@ -140,15 +140,30 @@ void Material::Transmute(Composition::Ptr c) {
   }
 }
 
+Resource::Ptr Material::PackageExtract(double qty, std::string new_package_name) {
+  if (qty > qty_) {
+    throw ValueError("Attempted to extract more quantity than exists.");
+  }
+  
+  qty_ -= qty;
+  Material::Ptr other(new Material(ctx_, qty, comp_, new_package_name));
+
+  // Decay called on the extracted material should have the same dt as for
+  // this material regardless of composition.
+  other->prev_decay_time_ = prev_decay_time_;
+
+  tracker_.Extract(&other->tracker_);
+  return boost::static_pointer_cast<Resource>(other);
+}
+
 void Material::ChangePackage(std::string new_package_name) {
-  if (new_package_name == package_name_ || ctx_ == NULL) {
+  if (ctx_ == NULL) {
     // no change needed
     return;
   }
   else if (new_package_name == Package::unpackaged_name()) {
     // unpackaged has functionally no restrictions
     package_name_ = new_package_name;
-    tracker_.Package();
     return;
   }
  
@@ -157,10 +172,10 @@ void Material::ChangePackage(std::string new_package_name) {
   double max = p->fill_max();
   if (qty_ >= min && qty_ <= max) {
     package_name_ = new_package_name;
-    tracker_.Package();
   } else {
     throw ValueError("Material quantity is outside of package fill limits.");
   }
+  tracker_.Package();
 }
 
 void Material::Decay(int curr_time) {

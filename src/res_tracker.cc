@@ -50,15 +50,11 @@ void ResTracker::Extract(ResTracker* removed) {
     parent2_ = 0;
     
     Record();
+  }
 
     removed->parent1_ = res_->state_id();
     removed->parent2_ = 0;
     removed->tracked_ = tracked_;
-  } else {
-    removed->parent1_ = parent1_;
-    removed->parent2_ = parent2_;
-    removed->tracked_ = tracked_;
-  }
 
   removed->Record();
 }
@@ -82,8 +78,7 @@ void ResTracker::Package() {
   Record();
 }
 
-void ResTracker::Record(bool no_bump) {
-  if (!no_bump) {
+void ResTracker::Record() {
   res_->BumpStateId();
   ctx_->NewDatum("Resources")
       ->AddVal("ResourceId", res_->state_id())
@@ -97,7 +92,6 @@ void ResTracker::Record(bool no_bump) {
       ->AddVal("Parent1", parent1_)
       ->AddVal("Parent2", parent2_)
       ->Record();
-  }
   res_->Record(ctx_);
 }
 

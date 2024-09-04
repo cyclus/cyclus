@@ -76,6 +76,18 @@ std::string Product::package_name() {
   return package_name_;
 }
 
+Resource::Ptr Product::PackageExtract(double qty, std::string new_package_name) {
+  if (qty > quantity_) {
+    throw ValueError("Attempted to extract more quantity than exists.");
+  }
+
+  quantity_ -= qty;
+  Product::Ptr other(new Product(ctx_, qty, quality_, new_package_name));
+
+  tracker_.Extract(&other->tracker_);
+  return boost::static_pointer_cast<Resource>(other);
+}
+
 void Product::ChangePackage(std::string new_package_name) {
   if (new_package_name == package_name_ || ctx_ == NULL) {
     // no change needed
