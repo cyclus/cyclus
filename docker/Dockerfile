@@ -53,12 +53,12 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
     rm ~/miniforge.sh
 
 ENV PATH=/opt/conda/bin:$PATH
-RUN mamba update -n base conda mamba && \
-    mamba update -y python --no-pin && \
+RUN mamba update -n base conda mamba && mamba init bash
+SHELL ["mamba", "run", "-n", "base", "/bin/bash", "-c"]
+RUN mamba update -y python --no-pin && \
     mamba update -y --all && \
     mamba install -y \
-               gxx_linux-64 \
-               gcc_linux-64 \
+               compilers \
                cmake \
                make \
                git \
@@ -68,7 +68,7 @@ RUN mamba update -n base conda mamba && \
                liblapack \
                pkg-config \
                coincbc \
-               libboost-devel \
+               "boost-cpp<1.86.0" \
                hdf5 \
                sqlite \
                pcre \
@@ -84,9 +84,6 @@ RUN mamba update -n base conda mamba && \
                && \
     mamba clean -y --all
 RUN mkdir -p $(python3 -m site --user-site)
-ENV CC=/opt/conda/bin/x86_64-conda-linux-gnu-gcc
-ENV CXX=/opt/conda/bin/x86_64-conda-linux-gnu-g++
-ENV CPP=/opt/conda/bin/x86_64-conda-linux-gnu-cpp
 
 FROM apt-deps AS apt-coverage-deps
 RUN apt install -y lcov curl
