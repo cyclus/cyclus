@@ -152,7 +152,12 @@ Resource::Ptr Material::PackageExtract(double qty, std::string new_package_name)
   // this material regardless of composition.
   other->prev_decay_time_ = prev_decay_time_;
 
-  tracker_.Extract(&other->tracker_);
+  // this call to res_tracker must come first before the parent resource 
+  // state id gets modified
+  other->tracker_.Package(&tracker_);
+  if (qty_ > cyclus::eps_rsrc()) {
+    tracker_.Modify();
+  }
   return boost::static_pointer_cast<Resource>(other);
 }
 

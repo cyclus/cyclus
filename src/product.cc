@@ -2,6 +2,7 @@
 
 #include "error.h"
 #include "logger.h"
+#include "cyc_limits.h"
 
 namespace cyclus {
 
@@ -84,7 +85,12 @@ Resource::Ptr Product::PackageExtract(double qty, std::string new_package_name) 
   quantity_ -= qty;
   Product::Ptr other(new Product(ctx_, qty, quality_, new_package_name));
 
-  tracker_.Extract(&other->tracker_);
+  // this call to res_tracker must come first before the parent resource 
+  // state id gets modified
+  other->tracker_.Package(&tracker_);
+  if (quantity_ > cyclus::eps_rsrc()) {
+    tracker_.Modify();
+  }
   return boost::static_pointer_cast<Resource>(other);
 }
 
