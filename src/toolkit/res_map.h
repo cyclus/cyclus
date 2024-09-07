@@ -233,7 +233,7 @@ class ResMap {
   }
 
   /// Whether quantity_ should be recomputed or not.
-  mutable bool dirty_quantity_;
+  bool dirty_quantity_;
 
   /// Current total quantity of all resources in the mapping.
   double quantity_;
