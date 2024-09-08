@@ -68,8 +68,3 @@ def test_stubs():
             print(msg)
             raise e
 
-if __name__ == '__main__':
-    test_stubs()
-
-
-

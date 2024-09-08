@@ -1,28 +1,24 @@
 # DO NOT DELETE THIS LINE:: @archetype_spec@
+SET(STUB_SOURCE_DIR ${CMAKE_SOURCE_DIR})
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-# taken from http://geant4.cern.ch/support/source/geant4/CMakeLists.txt
-IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
-    message(STATUS "Stub requires an out-of-source build.")
-    message(STATUS "Please remove these files from ${CMAKE_BINARY_DIR} first:")
-    message(STATUS "CMakeCache.txt")
-    message(STATUS "CMakeFiles")
-    message(STATUS "Once these files are removed, create a separate directory")
-    message(STATUS "and run CMake from there")
-    message(FATAL_ERROR "in-source build detected")
-ENDIF()
+EXECUTE_PROCESS(COMMAND cyclus --install-path 
+    OUTPUT_VARIABLE CYCLUS_INSTALL_PATH 
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+MESSAGE("CYCLUS_INSTALL_PATH: ${CYCLUS_INSTALL_PATH}")
+
+# Tell CMake where the modules are
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CYCLUS_INSTALL_PATH}/share/cyclus/cmake")
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${STUB_SOURCE_DIR}/cmake)
+MESSAGE("--CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}")
+
+INCLUDE(CyclusBuildSetup)
+cyclus_minimum_cmake_version(MINIMUM_CMAKE_VERSION)
+CMAKE_MINIMUM_REQUIRED(VERSION ${MINIMUM_CMAKE_VERSION})
 
 PROJECT(@lib_name@)
 
-# check for and enable c++11 support
-INCLUDE(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-IF(COMPILER_SUPPORTS_CXX11)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-ELSE()
-  MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11
-  support. Please use a different C++ compiler.")
-ENDIF()
+cyclus_require_out_of_source_build()
+cyclus_require_cxx_support()
 
 # quiets fortify_source warnings when not compiling with optimizations
 # in linux distros where compilers were compiled with fortify_source enabled by
@@ -35,9 +31,6 @@ ENDIF()
 # no overflow warnings because of silly coin-ness
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-overflow")
 
-# Direct any out-of-source builds to this directory
-SET(STUB_SOURCE_DIR ${CMAKE_SOURCE_DIR})
-
 # Direct any binary installation paths to this directory
 SET(STUB_BINARY_DIR ${CMAKE_BINARY_DIR})
 
@@ -45,47 +38,11 @@ SET(STUB_BINARY_DIR ${CMAKE_BINARY_DIR})
 SET(BUILD_SHARED_LIBS true)
 
 # Setup build locations.
-IF(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-    SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${STUB_BINARY_DIR}/bin)
-endif()
-IF(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-    SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${STUB_BINARY_DIR}/lib)
-endif()
-IF(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-    SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${STUB_BINARY_DIR}/lib)
-ENDIF()
+cyclus_setup_build_locations(${STUB_BINARY_DIR})
 
 SET(STUB_EXECUTABLE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
-# use, i.e. don't skip the full RPATH for the build tree
-SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
-
-# when building, don't use the install RPATH already
-# (but later on when installing)
-SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-
-# add the automatically determined parts of the RPATH
-# which point to directories outside the build tree to the install RPATH
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-# the RPATH to be used when installing, but only if it's not a system directory
-LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-IF("${isSystemDir}" STREQUAL "-1")
-    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib/cyclus")
-    GET_FILENAME_COMPONENT(cxxCompilerRoot ${CMAKE_CXX_COMPILER} DIRECTORY)
-    GET_FILENAME_COMPONENT(cxxCompilerRoot ${cxxCompilerRoot} DIRECTORY)
-    IF (NOT "${CMAKE_INSTALL_RPATH}" STREQUAL "${cxxCompilerRoot}")
-        SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:${cxxCompilerRoot}/lib:${cxxCompilerRoot}/lib/cyclus")
-    ENDIF (NOT "${CMAKE_INSTALL_RPATH}" STREQUAL "${cxxCompilerRoot}")
-    SET(CMAKE_BUILD_RPATH "${CMAKE_INSTALL_RPATH}")
-ENDIF("${isSystemDir}" STREQUAL "-1")
-
-# Tell CMake where the modules are
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_INSTALL_PREFIX}/share/cyclus/cmake")
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${STUB_SOURCE_DIR}/cmake)
-MESSAGE("--CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}")
+cyclus_set_rpath()
 
 # Find cyclus
 FIND_PACKAGE(Cyclus REQUIRED)
