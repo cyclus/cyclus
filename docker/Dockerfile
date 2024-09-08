@@ -32,7 +32,8 @@ RUN apt update -y && apt install -y \
         python3-jinja2 \
         python3-pip \
         cython3 \
-        libwebsockets-dev
+        libwebsockets-dev \
+        doxygen
 
 RUN apt install -y python3-pprintpp; exit 0
 RUN apt clean -y all
@@ -83,6 +84,7 @@ RUN mamba update -y python --no-pin && \
                websockets \
                pprintpp \
                pip \
+               doxygen \
                && \
     mamba clean -y --all
 RUN mkdir -p $(python3 -m site --user-site)
