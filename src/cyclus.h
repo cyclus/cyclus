@@ -1,12 +1,14 @@
 #ifndef CYCLUS_SRC_CYCLUS_H_
 #define CYCLUS_SRC_CYCLUS_H_
 
-// For Doxygen Mainpage
+// For Doxygen mainpage
 /*!
  * \mainpage Cyclus API Reference
  *
- * Welcome to the Cyclus API reference! To learn more about contributing
- * please visit https://github.com/cyclus/cyclus.
+ * Welcome to the Cyclus API reference! Below are some helpful links for learning more:
+ *   - GitHub repository: https://github.com/cyclus/cyclus
+ *   - Kernel developer guide: https://fuelcycle.org/kernel
+ *   - Archetype developer guide: https://fuelcycle.org/arche
  * 
  */
 
