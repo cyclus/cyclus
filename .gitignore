@@ -3,7 +3,6 @@
 build
 debug
 doxygen.conf
-doc/doxygen-awesome.css
 platform.h
 *.pdf
 *.pyc
