@@ -132,14 +132,15 @@ std::vector<typename T::Ptr> Resource::Package(Package::Ptr pkg) {
   std::vector<typename T::Ptr> ts_pkgd;
   typename T::Ptr t_pkgd;
 
-  double fill_mass = pkg->GetFillMass(quantity());
+  std::pair<double, int> fill = pkg->GetFillMass(quantity());
+  double fill_mass = fill.first;
   if (fill_mass == 0) {
     return ts_pkgd;
   }
 
   // Check if the number of packages is within the limits, including if
   // int overflow is reached
-  int approx_num_pkgs = quantity() / fill_mass;
+  int approx_num_pkgs = fill.second;
   Package::ExceedsSplitLimits(approx_num_pkgs);
 
   while (quantity() > 0 && quantity() >= pkg->fill_min()) {

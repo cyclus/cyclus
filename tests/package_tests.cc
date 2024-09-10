@@ -56,26 +56,56 @@ TEST(PackageTests, GetPackageFillMass) {
     Package::Ptr q = Package::Create("bar", min, max, "equal");
     Package::Ptr r = Package::Create("baz", tight_min, max, "equal");
 
+    std::pair<double, int> p_fill, q_fill, r_fill;
+
     double exp;
 
+    // no fit
     double no_fit = 0.05;
-    EXPECT_EQ(0, p->GetFillMass(no_fit));
-    EXPECT_EQ(0, q->GetFillMass(no_fit));
+    p_fill = p->GetFillMass(no_fit);;
+    EXPECT_EQ(0, p_fill.first);
+    EXPECT_EQ(0, p_fill.second);
 
+    q_fill = q->GetFillMass(no_fit);
+    EXPECT_EQ(0, q_fill.first);
+    EXPECT_EQ(0, q_fill.second);
+
+    // perfect fit
     double perfect_fit = 0.9;
-    EXPECT_EQ(perfect_fit, p->GetFillMass(perfect_fit));
-    EXPECT_EQ(perfect_fit, q->GetFillMass(perfect_fit));
+    p_fill = p->GetFillMass(perfect_fit);
+    EXPECT_EQ(perfect_fit, p_fill.first);
+    EXPECT_EQ(1, p_fill.second);
 
+    q_fill = q->GetFillMass(perfect_fit);
+    EXPECT_EQ(perfect_fit, q_fill.first);
+    EXPECT_EQ(1, q_fill.second);
+
+    // partial fit 
     double partial_fit = 1;
-    EXPECT_EQ(max, p->GetFillMass(partial_fit));
-    exp = partial_fit / 2;
-    EXPECT_EQ(exp, q->GetFillMass(partial_fit));
-    EXPECT_EQ(max, r->GetFillMass(partial_fit));
 
+    p_fill = p->GetFillMass(partial_fit);
+    EXPECT_EQ(max, p_fill.first);
+    EXPECT_EQ(1, p_fill.second);
+
+    q_fill = q->GetFillMass(partial_fit);
+    exp = partial_fit / 2;
+    EXPECT_EQ(exp, q_fill.first);
+    EXPECT_EQ(2, q_fill.second);
+
+    r_fill = r->GetFillMass(partial_fit);
+    EXPECT_EQ(max, r_fill.first);
+    EXPECT_EQ(1, r_fill.second);
+
+    // two full packages for equal, only one for 
     double two_packages = 1.4;
-    EXPECT_EQ(max, p->GetFillMass(two_packages));
+
+    p_fill = p->GetFillMass(two_packages);
+    EXPECT_EQ(max, p_fill.first);
+    EXPECT_EQ(1, p_fill.second);
+
+    q_fill = q->GetFillMass(two_packages);
     exp = two_packages / 2;
-    EXPECT_EQ(exp, q->GetFillMass(two_packages));
+    EXPECT_EQ(exp, q_fill.first);
 }
 
 TEST(PackageTests, CreateTransportUnit) {
