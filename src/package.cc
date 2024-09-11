@@ -1,5 +1,6 @@
 #include "package.h"
 #include "error.h"
+#include "cyc_limits.h"
 
 namespace cyclus {
 
@@ -30,7 +31,7 @@ Package::Ptr& Package::unpackaged() {
 }
 
 std::pair<double, int> Package::GetFillMass(double qty) {
-  if (qty < fill_min_) {
+  if ((qty - fill_min_) < -eps_rsrc()) {
     // less than one pkg of material available
     return std::pair<double, int> (0, 0);
   }

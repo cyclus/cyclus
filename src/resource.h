@@ -6,6 +6,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "package.h"
+#include "cyc_limits.h"
 
 class SimInitTest;
 
@@ -151,7 +152,7 @@ std::vector<typename T::Ptr> Resource::Package(Package::Ptr pkg) {
   int approx_num_pkgs = fill.second;
   Package::ExceedsSplitLimits(approx_num_pkgs);
 
-  while (quantity() > 0 && quantity() >= pkg->fill_min()) {
+  while (quantity() > 0 && (quantity() - pkg->fill_min()) >= -eps_rsrc()) {
     double pkg_fill = std::min(quantity(), fill_mass);
     t_pkgd = boost::dynamic_pointer_cast<T>(PackageExtract(pkg_fill, pkg->name()));
     ts_pkgd.push_back(t_pkgd); 

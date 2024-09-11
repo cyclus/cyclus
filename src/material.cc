@@ -141,7 +141,7 @@ void Material::Transmute(Composition::Ptr c) {
 }
 
 Resource::Ptr Material::PackageExtract(double qty, std::string new_package_name) {
-  if (qty > qty_) {
+  if ((qty - qty_) > eps_rsrc()) {
     throw ValueError("Attempted to extract more quantity than exists.");
   }
   
@@ -155,7 +155,7 @@ Resource::Ptr Material::PackageExtract(double qty, std::string new_package_name)
   // this call to res_tracker must come first before the parent resource 
   // state id gets modified
   other->tracker_.Package(&tracker_);
-  if (qty_ > cyclus::eps_rsrc()) {
+  if (qty_ > eps_rsrc()) {
     tracker_.Modify();
   }
   return boost::static_pointer_cast<Resource>(other);

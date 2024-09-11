@@ -265,7 +265,7 @@ void MatlSellPolicy::GetMatlTrades(
     if (shippable_pkgs > 0){
       qty = it->amt;
       LGH(INFO3) << " sending " << qty << " kg of " << it->request->commodity();
-      Material::Ptr mat = buf_->Pop(qty, cyclus::eps_rsrc());
+      Material::Ptr mat = buf_->Pop(qty, eps_rsrc());
       Material::Ptr trade_mat;
 
       // don't go through packaging if you don't need to. packaging always bumps
@@ -274,7 +274,7 @@ void MatlSellPolicy::GetMatlTrades(
       if (package_->name() != mat->package_name()) { // packaging needed
         std::vector<Material::Ptr> mat_pkgd = mat->Package<Material>(package_);
 
-        if (mat->quantity() > eps()) {
+        if (mat->quantity() > eps_rsrc()) {
           // push any extra material that couldn't be packaged back onto buffer
           // don't push unless there's leftover material
           buf_->Push(mat);
