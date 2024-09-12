@@ -53,9 +53,9 @@ void ResTracker::Extract(ResTracker* removed) {
     Record();
   }
 
-    removed->parent1_ = res_->state_id();
-    removed->parent2_ = 0;
-    removed->tracked_ = tracked_;
+  removed->parent1_ = res_->state_id();
+  removed->parent2_ = 0;
+  removed->tracked_ = tracked_;
 
   removed->Record();
 }

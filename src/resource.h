@@ -95,7 +95,7 @@ class Resource {
   /// Returns the package id.
   virtual std::string package_name() { return Package::unpackaged_name(); };
 
-  virtual Ptr PackageExtract(double qty, std::string new_package_name = Package::unpackaged_name()) = 0;
+  virtual Ptr PackageExtract(double qty, std::string new_package_name) = 0;
 
   /// Changes the product's package id
   virtual void ChangePackage(std::string new_package_name = Package::unpackaged_name()) {};

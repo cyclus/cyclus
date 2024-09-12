@@ -49,7 +49,7 @@ class ResTracker {
   void Package(ResTracker* parent = NULL);
 
  private:
-  void Record(bool no_bump = false);
+  void Record(bool bumpId = true);
 
   int parent1_;
   int parent2_;
