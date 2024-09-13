@@ -35,6 +35,7 @@ Since last release
 
 * Removed unnecessary records being added to the Resource database by packaging process (#1761)
 * Removed GTest source code from code coverage reports (#1759)
+* Updated action versions to avoid node.js deprectation ()
 
 
 v1.6.0
