@@ -318,7 +318,7 @@ void MatlBuyPolicy::AcceptMatlTrades(
   // check if cumulative cap has been reached. If yes, then sample for dormant
   // length and reset cycle_total_inv
   if (use_cumulative_capacity() && (
-    (cumulative_cap_ - cycle_total_inv_) < eps())) {
+    (cumulative_cap_ - cycle_total_inv_) < eps_rsrc())) {
       SetNextDormantTime();
       LGH(INFO3) << "cycle cumulative inventory has been reached. Dormant period will end at " << next_dormant_end_ << std::endl;
       cycle_total_inv_ = 0;

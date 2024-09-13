@@ -42,11 +42,14 @@ class ResTracker {
   /// decay).
   void Modify();
 
-  /// Should be called when a resource's package gets modified
-  void Package();
+  /// Should be called when a resource's package gets modified. If the resource
+  /// was just created from a parent resource, the parent should be passed in.
+  /// If the resource is just being repackaged (e.g. to unpackaged), the parent
+  /// should be NULL.
+  void Package(ResTracker* parent = NULL);
 
  private:
-  void Record();
+  void Record(bool bumpId = true);
 
   int parent1_;
   int parent2_;

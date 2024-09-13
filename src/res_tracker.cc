@@ -23,7 +23,8 @@ void ResTracker::Create(Agent* creator) {
 
   parent1_ = 0;
   parent2_ = 0;
-  Record();
+  bool bumpId = false;
+  Record(bumpId);
   ctx_->NewDatum("ResCreators")
       ->AddVal("ResourceId", res_->state_id())
       ->AddVal("AgentId", creator->id())
@@ -51,7 +52,7 @@ void ResTracker::Extract(ResTracker* removed) {
     
     Record();
   }
-  
+
   removed->parent1_ = res_->state_id();
   removed->parent2_ = 0;
   removed->tracked_ = tracked_;
@@ -69,17 +70,36 @@ void ResTracker::Absorb(ResTracker* absorbed) {
   Record();
 }
 
-void ResTracker::Package() {
+void ResTracker::Package(ResTracker* parent) {
   if (!tracked_) {
     return;
   }
-
+  parent2_ = 0;
+  tracked_ = tracked_;
   package_name_ = res_->package_name();
-  Record();
+
+  if (parent != NULL) {
+    parent1_ = parent->res_->state_id();
+    
+    // Resource was just created, with packaging info, and assigned a state id. 
+    // Do not need to bump again
+    bool bumpId = false;
+    Record(bumpId);
+  } else {
+    // Resource was not just created. It is being re-packaged. It needs to be
+    // bumped to get a new state id.
+    parent1_ = res_->state_id();
+    Record();
+  }
+
+  
+  
 }
 
-void ResTracker::Record() {
-  res_->BumpStateId();
+void ResTracker::Record(bool bumpId) {
+  if (bumpId) {
+    res_->BumpStateId();
+  }
   ctx_->NewDatum("Resources")
       ->AddVal("ResourceId", res_->state_id())
       ->AddVal("ObjId", res_->obj_id())
@@ -92,7 +112,6 @@ void ResTracker::Record() {
       ->AddVal("Parent1", parent1_)
       ->AddVal("Parent2", parent2_)
       ->Record();
-
   res_->Record(ctx_);
 }
 

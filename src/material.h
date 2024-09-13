@@ -158,6 +158,9 @@ class Material: public Resource {
 
   virtual std::string package_name();
 
+  virtual Resource::Ptr PackageExtract(double qty,
+    std::string new_package_name = Package::unpackaged_name());
+
   /// Changes the package id. Checks that the resource fits the package 
   /// type minimum and maximum mass criteria.
   virtual void ChangePackage(std::string new_package_name = Package::unpackaged_name());

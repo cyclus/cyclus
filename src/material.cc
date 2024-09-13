@@ -93,10 +93,7 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
   // this material regardless of composition.
   other->prev_decay_time_ = prev_decay_time_;
 
-  if (qty_ > cyclus::eps()) {
-    tracker_.Extract(&other->tracker_);
-  } // else, this material is being fully extracted and nothing has effectively
-  // changed. Don't need to bump state, parent, etc.
+  tracker_.Extract(&other->tracker_);
 
   return other;
 }
@@ -143,15 +140,35 @@ void Material::Transmute(Composition::Ptr c) {
   }
 }
 
+Resource::Ptr Material::PackageExtract(double qty, std::string new_package_name) {
+  if ((qty - qty_) > eps_rsrc()) {
+    throw ValueError("Attempted to extract more quantity than exists.");
+  }
+  
+  qty_ -= qty;
+  Material::Ptr other(new Material(ctx_, qty, comp_, new_package_name));
+
+  // Decay called on the extracted material should have the same dt as for
+  // this material regardless of composition.
+  other->prev_decay_time_ = prev_decay_time_;
+
+  // this call to res_tracker must come first before the parent resource 
+  // state id gets modified
+  other->tracker_.Package(&tracker_);
+  if (qty_ > eps_rsrc()) {
+    tracker_.Modify();
+  }
+  return boost::static_pointer_cast<Resource>(other);
+}
+
 void Material::ChangePackage(std::string new_package_name) {
-  if (new_package_name == package_name_ || ctx_ == NULL) {
+  if (ctx_ == NULL) {
     // no change needed
     return;
   }
   else if (new_package_name == Package::unpackaged_name()) {
     // unpackaged has functionally no restrictions
     package_name_ = new_package_name;
-    tracker_.Package();
     return;
   }
  
@@ -160,10 +177,10 @@ void Material::ChangePackage(std::string new_package_name) {
   double max = p->fill_max();
   if (qty_ >= min && qty_ <= max) {
     package_name_ = new_package_name;
-    tracker_.Package();
   } else {
     throw ValueError("Material quantity is outside of package fill limits.");
   }
+  tracker_.Package();
 }
 
 void Material::Decay(int curr_time) {

@@ -2,6 +2,7 @@
 
 #include "error.h"
 #include "logger.h"
+#include "cyc_limits.h"
 
 namespace cyclus {
 
@@ -74,6 +75,23 @@ Resource::Ptr Product::ExtractRes(double qty) {
 
 std::string Product::package_name() {
   return package_name_;
+}
+
+Resource::Ptr Product::PackageExtract(double qty, std::string new_package_name) {
+  if (qty > quantity_) {
+    throw ValueError("Attempted to extract more quantity than exists.");
+  }
+
+  quantity_ -= qty;
+  Product::Ptr other(new Product(ctx_, qty, quality_, new_package_name));
+
+  // this call to res_tracker must come first before the parent resource 
+  // state id gets modified
+  other->tracker_.Package(&tracker_);
+  if (quantity_ > cyclus::eps_rsrc()) {
+    tracker_.Modify();
+  }
+  return boost::static_pointer_cast<Resource>(other);
 }
 
 void Product::ChangePackage(std::string new_package_name) {
