@@ -12,6 +12,7 @@ Since last release
 * Added ``doxygen`` to list of dependencies installed in the Dockerfile (#1782)
 * Added macros in ``cmake/CyclusBuildSetup.cmake`` for common CMake boilerplate (#1793)
 * Added ``doxygen-awesome-css`` to doxygen docs for style (#1787)
+* Added installation of files for building docs to share/cyclus/doc (#1807)
 
 **Changed:**
 
