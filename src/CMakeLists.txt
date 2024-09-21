@@ -142,8 +142,7 @@ if(Cython_FOUND)
         EXECUTE_PROCESS(COMMAND ${CYTHON_EXECUTABLE} --cplus
             ${include_directory_arg} ${version_arg}
             ${cython_debug_arg} ${CYTHON_FLAGS}
-            --output-file  ${_generated_cc} 
-            ${file}
+            --output-file  ${_generated_cc} ${file}
             RESULT_VARIABLE res_var_c)
         IF(NOT "${res_var_c}" STREQUAL "0")
             message(FATAL_ERROR "Cython compilation of ${file} failed!")

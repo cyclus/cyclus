@@ -4,11 +4,9 @@
 #ifdef CYCLUS_WITH_PYTHON
 #include <stdlib.h>
 
-// extern "C" {
 #include "eventhooks_api.h"
 #include "pyinfile_api.h"
 #include "pymodule_api.h"
-// }
 
 namespace cyclus {
 int PY_INTERP_COUNT = 0;
