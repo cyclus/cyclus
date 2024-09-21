@@ -157,7 +157,6 @@ if(Cython_FOUND)
           INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
           INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
           )
-        SET(LIBS ${LIBS} ${name})
 
         TARGET_LINK_LIBRARIES(${name} dl ${NoCythonLibs})
 
@@ -170,15 +169,9 @@ if(Cython_FOUND)
           LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES}
           )
 
-        # IF (EXISTS ${_generated_h})
-          copy_when_diff(${_generated_h} ${_h_file})
-        # ENDIF()
-        # IF (EXISTS ${_generated_api})
-          copy_when_diff(${_generated_api} ${_api_file})
-        # ENDIF()
-        # IF (EXISTS ${_generated_cc})
-          copy_when_diff(${_generated_cc} ${_cc_file})
-        # ENDIF()
+        copy_when_diff(${_generated_h} ${_h_file})
+        copy_when_diff(${_generated_api} ${_api_file})
+        copy_when_diff(${_generated_cc} ${_cc_file})
     endforeach()
 endif(Cython_FOUND)
 ###########################################################
