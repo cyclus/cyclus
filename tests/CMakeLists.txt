@@ -13,6 +13,7 @@ FetchContent_Declare(
   BUILD_GMOCK FALSE # do not build googlemock subproject
   INSTALL_GTEST FALSE # do not install googletest, we will do this ourselves
   URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP ON
 )
 FetchContent_MakeAvailable(googletest)
 
