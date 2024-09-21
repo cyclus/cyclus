@@ -272,12 +272,6 @@ cdef extern from "error.h" namespace "cyclus":
     cdef cpp_bool warn_as_error
 
 
-cdef extern from "pyhooks.h" namespace "cyclus":
-
-   cdef void PyAppendInitTab() except +
-   cdef void PyImportInit() except +
-
-
 cdef extern from "pyhooks.h" namespace "cyclus::toolkit":
 
     cdef std_string PyToJson(std_string) except +
