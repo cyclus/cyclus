@@ -215,6 +215,10 @@ function( compile_pyx _name generated_file )
     set( version_arg )
   endif()
 
+  if(CYTHON_VERSION_MAJOR GREATER_EQUAL 3)
+    set(CYTHON_FLAGS ${CYTHON_FLAGS} "-E NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION")
+  endif()
+
   # Include directory arguments.
   list( REMOVE_DUPLICATES cython_include_directories )
   set( include_directory_arg "" )

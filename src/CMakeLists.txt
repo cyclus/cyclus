@@ -124,6 +124,10 @@ if(Cython_FOUND)
         set( cython_debug_arg "--gdb" )
     endif()
 
+    if(CYTHON_VERSION_MAJOR GREATER_EQUAL 3)
+        set(CYTHON_FLAGS ${CYTHON_FLAGS} "-E NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION")
+    endif()
+
     # OK compile everything
     file(GLOB CYCLUS_CORE_CYTHON_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.pyx")
     set_source_files_properties(${CYCLUS_CORE_CYTHON_FILES}
