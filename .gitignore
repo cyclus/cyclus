@@ -65,13 +65,17 @@ Debug/
 # generated cython ignores
 *.cc.gen
 *.cc.h
+*.cc_api.h
 *.h.gen
 src/eventhooks.cc
 src/eventhooks.h
+src/eventhooks_api.h
 src/pyinfile.cc
 src/pyinfile.h
+src/pyinfile_api.h
 src/pymodule.cc
 src/pymodule.h
+src/pymodule_api.h
 
 # this is copied over by the installer
 cyclus/cycpp.py

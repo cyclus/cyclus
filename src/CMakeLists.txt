@@ -132,15 +132,18 @@ if(Cython_FOUND)
         message(STATUS "Cython Compiling ${file}")
         get_filename_component(name ${file} NAME_WE)
         set(_generated_h "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc.h")
+        set(_generated_api "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc_api.h")
         set(_generated_cc "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc.gen")
         set(_h_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.h")
+        set(_api_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}_api.h")
         set(_cc_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc")
         set_source_files_properties(${_cc_file} PROPERTIES GENERATED TRUE)
 
         EXECUTE_PROCESS(COMMAND ${CYTHON_EXECUTABLE} --cplus
             ${include_directory_arg} ${version_arg}
             ${cython_debug_arg} ${CYTHON_FLAGS}
-            --output-file  ${_generated_cc} ${file}
+            --output-file  ${_generated_cc} 
+            ${file}
             RESULT_VARIABLE res_var_c)
         IF(NOT "${res_var_c}" STREQUAL "0")
             message(FATAL_ERROR "Cython compilation of ${file} failed!")
@@ -167,8 +170,15 @@ if(Cython_FOUND)
           LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES}
           )
 
-        copy_when_diff(${_generated_h} ${_h_file})
-        copy_when_diff(${_generated_cc} ${_cc_file})
+        # IF (EXISTS ${_generated_h})
+          copy_when_diff(${_generated_h} ${_h_file})
+        # ENDIF()
+        # IF (EXISTS ${_generated_api})
+          copy_when_diff(${_generated_api} ${_api_file})
+        # ENDIF()
+        # IF (EXISTS ${_generated_cc})
+          copy_when_diff(${_generated_cc} ${_cc_file})
+        # ENDIF()
     endforeach()
 endif(Cython_FOUND)
 ###########################################################
