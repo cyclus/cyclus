@@ -7,13 +7,15 @@ SET(GENERATED_TEST_LIST "" CACHE INTERNAL "")
 SET(GENERATED_FILTER_LIST "" CACHE INTERNAL "")
 SET(GENERATED_TEST_SOURCE_LIST "" CACHE INTERNAL "")
 
-include(FetchContent)
+INCLUDE(FetchContent)
+IF (CMAKE_VERSION GREATER_EQUAL 3.24)
+    CMAKE_POLICY(SET CMP0135 NEW)
+ENDIF()
 FetchContent_Declare(
   googletest
   BUILD_GMOCK FALSE # do not build googlemock subproject
   INSTALL_GTEST FALSE # do not install googletest, we will do this ourselves
   URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-  DOWNLOAD_EXTRACT_TIMESTAMP ON
 )
 FetchContent_MakeAvailable(googletest)
 
