@@ -46,19 +46,19 @@ void ResTracker::Extract(ResTracker* removed) {
     return;
   }
 
+  if (res_->quantity() > eps_rsrc()) {
+    parent1_ = res_->state_id();
+    parent2_ = 0;
+  }
+
   // removed parent must be set before the resource is recorded, otherwise
   // removed ends up with parent1 of the other child (which is this resource
   // after being bumped)
   removed->parent1_ = res_->state_id();
   removed->parent2_ = 0;
   removed->tracked_ = tracked_;
-
-  if (res_->quantity() > eps_rsrc()) {
-    parent1_ = res_->state_id();
-    parent2_ = 0;
-  }
-
   removed->Record();
+
   if (res_->quantity() > eps_rsrc()) {
     Record();
   }
