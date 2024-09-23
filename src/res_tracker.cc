@@ -52,12 +52,14 @@ void ResTracker::Extract(ResTracker* removed) {
   removed->parent1_ = res_->state_id();
   removed->parent2_ = 0;
   removed->tracked_ = tracked_;
-  removed->Record();
 
   if (res_->quantity() > eps_rsrc()) {
     parent1_ = res_->state_id();
     parent2_ = 0;
-    
+  }
+
+  removed->Record();
+  if (res_->quantity() > eps_rsrc()) {
     Record();
   }
 }
