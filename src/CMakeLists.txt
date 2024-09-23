@@ -132,8 +132,10 @@ if(Cython_FOUND)
         message(STATUS "Cython Compiling ${file}")
         get_filename_component(name ${file} NAME_WE)
         set(_generated_h "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc.h")
+        set(_generated_api "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc_api.h")
         set(_generated_cc "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc.gen")
         set(_h_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.h")
+        set(_api_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}_api.h")
         set(_cc_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc")
         set_source_files_properties(${_cc_file} PROPERTIES GENERATED TRUE)
 
@@ -154,7 +156,6 @@ if(Cython_FOUND)
           INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
           INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
           )
-        SET(LIBS ${LIBS} ${name})
 
         TARGET_LINK_LIBRARIES(${name} dl ${NoCythonLibs})
 
@@ -168,6 +169,7 @@ if(Cython_FOUND)
           )
 
         copy_when_diff(${_generated_h} ${_h_file})
+        copy_when_diff(${_generated_api} ${_api_file})
         copy_when_diff(${_generated_cc} ${_cc_file})
     endforeach()
 endif(Cython_FOUND)

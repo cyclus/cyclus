@@ -797,25 +797,6 @@ def set_warn_as_error(bint wae):
     """Sets whether warnings should be treated as errors."""
     cpp_cyclus.warn_as_error = wae
 
-
-#
-# PyHooks
-#
-def py_append_init_tab():
-    """Initializes Cyclus-internal Python import table. This is called
-    automatically when cyclus is imported. Users should not need to call
-    this function.
-    """
-    cpp_cyclus.PyAppendInitTab()
-
-
-def py_import_init():
-    """Initializes Cyclus-internal Python imports. This is called
-    automatically when cyclus is imported. Users should not need to call
-    this function.
-    """
-    cpp_cyclus.PyImportInit()
-
 #
 # XML
 #

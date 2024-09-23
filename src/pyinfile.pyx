@@ -22,7 +22,7 @@ cdef std_string str_py_to_cpp(object x):
     return s
 
 
-cdef public std_string py_to_json "CyclusPyToJson" (std_string cpp_infile) except *:
+cdef public api std_string py_to_json "CyclusPyToJson" (std_string cpp_infile) except *:
     """Converts a Python file to JSON"""
     infile = std_string_to_py(cpp_infile)
     if not infile.endswith('\n'):
@@ -53,7 +53,7 @@ cdef public std_string py_to_json "CyclusPyToJson" (std_string cpp_infile) excep
     return cpp_rtn
 
 
-cdef public std_string json_to_py "CyclusJsonToPy" (std_string cpp_infile) except *:
+cdef public api std_string json_to_py "CyclusJsonToPy" (std_string cpp_infile) except *:
     """Converts a JSON file to Python"""
     infile = std_string_to_py(cpp_infile)
     import json
