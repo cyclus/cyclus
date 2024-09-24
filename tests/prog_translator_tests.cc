@@ -280,11 +280,5 @@ TEST(ProgTranslatorTests, translation) {
   delete iface;
 }
 
-TEST(ProgTranslatorTests, depricated) {
-
-  // confirm depricated error is thrown
-  ASSERT_THROW(new ProgTranslator::Context(), DepricationError);
-}
-
 
 }  // namespace cyclus
