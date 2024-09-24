@@ -38,6 +38,7 @@ Since last release
 * Removed GTest source code from code coverage reports (#1759)
 * Updated action versions to avoid node.js deprecation (#1802)
 * Removed the module imports in `cyclus/__init__.py` and removed the need for multi-phase initialization of Cython modules (#1809)
+* ResTracker Extract gave the wrong parent_id to one of the child resources (#1806)
 
 
 v1.6.0
