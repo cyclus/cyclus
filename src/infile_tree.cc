@@ -10,7 +10,7 @@
 
 namespace cyclus {
 
-#if LIBXMLXX_MAJOR_VERSION == 2 
+#if LIBXMLXX_MAJOR_VERSION == 2
   typedef xmlpp::NodeSet NodeSet;
   typedef xmlpp::Node::NodeList const_NodeList;
 #else
@@ -76,7 +76,7 @@ std::string InfileTree::GetString(std::string query, int index) {
     dynamic_cast<const Element*>(nodeset.at(index));
 
   if (!element) {
-    throw CastError("Node: " + element->get_name() +
+    throw CastError("Node: " + nodeset.at(index)->get_name() +
                     " is not an Element node.");
   }
 
