@@ -198,8 +198,14 @@ class Context {
     }
 
     Agent* m = protos_[proto_name];
+    if (m == NULL) {
+        throw KeyError("Null prototype for " + proto_name);
+    }
     T* casted(NULL);
     Agent* clone = m->Clone();
+    if (clone == NULL) {
+        throw StateError("Clone operation failed for " + proto_name);
+    }
     casted = dynamic_cast<T*>(clone);
     if (casted == NULL) {
       PyDelAgent(clone->id());
