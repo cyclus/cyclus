@@ -3,7 +3,6 @@
 #include "prog_translator.h"
 #include "CoinPackedVector.hpp"
 
-// Headers in this file below this pragma have all warnings shushed.
 #include "OsiCbcSolverInterface.hpp"
 
 namespace cyclus {
