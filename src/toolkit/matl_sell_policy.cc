@@ -47,14 +47,22 @@ void MatlSellPolicy::set_package(std::string x) {
   // if no real context, only unpackaged can be used (keep default)
   if (manager() != NULL) {
     Package::Ptr pkg = manager()->context()->GetPackage(x);
-    std::pair<double, int> fill = pkg->GetFillMass(quantize_);
-    double pkg_fill = fill.first;
-    if ((pkg->name() != Package::unpackaged_name()) && (quantize_ > 0) &&
-        (std::fmod(quantize_, pkg_fill) > 0)) { 
-      std::stringstream ss;
-      ss << "Quantize " << quantize_ << " is not fully packagable based on fill min/max values (" 
-         << pkg->fill_min() << ", " << pkg->fill_max() << ")";
-      throw ValueError(ss.str());
+    std::stringstream ss;
+
+    if (quantize_ > 0 && pkg->name() != Package::unpackaged_name()) {
+      if (pkg->strategy() == "first" || pkg->strategy() == "equal") {
+        std::vector<double> fill = pkg->GetFillMass(quantize_);
+        if (fill.size() > 1 ||  std::fmod(fill.front(), quantize_) > 0) {
+          ss << "Quantize " << quantize_ 
+             << " is not fully packagable based on fill min/max values (" 
+             << pkg->fill_min() << ", " << pkg->fill_max() << ")";
+          throw ValueError(ss.str());
+        }
+      } else {
+        ss << "Package strategy " << pkg->strategy() 
+            << " is not allowed for sell policies with quantize.";
+        throw ValueError(ss.str());
+      }
     }
     package_ = pkg;
   }
@@ -64,16 +72,19 @@ void MatlSellPolicy::set_transport_unit(std::string x) {
   if (manager() != NULL) {
     TransportUnit::Ptr tu = manager()->context()->GetTransportUnit(x);
 
-    std::pair<double, int> fill = package_->GetFillMass(quantize_);
-    int num_pkgs = fill.second;
-    int max_shippable = tu->MaxShippablePackages(num_pkgs);
+    if ((quantize_ > 0) && (tu->name() != TransportUnit::unrestricted_name())) {
+      std::vector<double> fill = package_->GetFillMass(quantize_);
+      int num_pkgs = fill.size();
+      int max_shippable = tu->MaxShippablePackages(num_pkgs);
 
-    if ((tu->name() != TransportUnit::unrestricted_name()) && quantize_ > 0 &&
-        (max_shippable != num_pkgs))  {
-      std::stringstream ss;
-      ss << "Quantize " << quantize_ << " packages cannot be shipped according to transport unit fill min/max values (" << tu->fill_min() << ", "
-       << tu->fill_max() << ")";
-      throw ValueError(ss.str());
+      if (max_shippable != num_pkgs)  {
+        std::stringstream ss;
+        ss << "Quantize " << quantize_ 
+           << " packages cannot be shipped according to transport unit fill "
+           << "min/max values (" 
+           << tu->fill_min() << ", " << tu->fill_max() << ")";
+        throw ValueError(ss.str());
+      }
     }
     transport_unit_ = tu;
   }
@@ -199,34 +210,15 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
     for (rit = requests.begin(); rit != requests.end(); ++rit) {
       req = *rit;
       qty = std::min(req->target()->quantity(), limit);
-      std::pair<double, int> fill = package_->GetFillMass(qty);
-      bid_qty = excl ? quantize_ : fill.first;
-      if (bid_qty != 0) {
-        n_full_bids = excl ? std::floor(qty / quantize_) : fill.second;
 
-        // Throw if number of bids above limit or if casting to int caused
-        // overflow to negative int limit 
-        std::string s;
-        if (manager() != NULL)
-          s += " Agent: "
-            + Trader::manager()->prototype() + "-"
-            + std::to_string(Trader::manager()->id()) + ". ";
-        s += "This is likely due to too much material (did you forget a ";
-        s += "throughput?) or small package limits relative to the ";
-        s += "quantity available. qty: " + std::to_string(qty);
-        s += ", and each bid would be: " + std::to_string(bid_qty);
-        Package::ExceedsSplitLimits(n_full_bids, s);
-
-        bids.assign(n_full_bids, bid_qty);
-
-        remaining_qty = qty - (n_full_bids * bid_qty);
-        if ((!excl) && (remaining_qty > 0) && 
-            (remaining_qty >= package_->fill_min())) {
-          // leftover material is enough to fill one more partial package. Add
-          // to bids
-          bids.push_back(remaining_qty);
-        }
+      std::vector<double> bids;
+      if (excl) {
+        int n_full_bids = static_cast<int>(std::floor(qty / quantize_));
+        bids.assign(n_full_bids, quantize_);
+      } else {
+        bids = package_->GetFillMass(qty);
       }
+
       // check transportability
       int shippable_pkgs = transport_unit_->MaxShippablePackages(bids.size());
       if (shippable_pkgs < bids.size()) {

@@ -9,6 +9,7 @@
 
 #include "error.h"
 #include "logger.h"
+#include "random_number_generator.h"
 
 namespace cyclus {
 
@@ -38,13 +39,21 @@ class Package {
     /// This tries to find the optimal number and fill mass of packages given
     /// the packaging limitations. It does this by calculating bounding fills, 
     /// floor(quantity/fill_min) and ceiling(quantity/fill_max). 
+    /// Packaging strategy "uniform" fills packages with a random mass between
+    /// fill_min and fill_max, if at least fill_max is available. If less than
+    /// fill_max is available, a partial package is filled with the total mass.
+    /// Packaging strategy "normal" fills packages with a random mass between
+    /// fill_min and fill_max, with a normal distribution. Mean is the middle
+    /// of fill_min and fill_max, standard deviation is 1/6 of the range such
+    /// that 3 sigma is the range. If less than fill_max is available, a 
+    /// partial package is filled with the total mass (no dist sampling).
     /// There might be a scenario where there is no solution, i.e. an integer
     /// number of packages cannot be filled with no remainder. In this case,
     /// the most effective fill strategy is to fill to the max. Numeric example:
     /// quantity = 5, fill_min = 3, fill_max = 4. num_min_fill = floor(5/3) = 1,
     /// num_max_fill = ceil(5/4) = 2. num_min_fill < num_max_fill, so fill to
     /// the max.
-    std::pair<double, int> GetFillMass(double qty);
+    std::vector<double> GetFillMass(double qty);
 
     // returns package name
     std::string name() const { return name_; }
@@ -86,6 +95,15 @@ class Package {
       return (std::numeric_limits<int>::max() / 10); 
     }
 
+    bool IsValidStrategy(std::string strategy) {
+      return strategy == "first"
+          || strategy == "equal"
+          || strategy == "uniform"
+          || strategy == "normal";
+    }
+
+    void SetDistribution();
+
   private:
     Package(std::string name, 
             double fill_min = 0, 
@@ -99,6 +117,7 @@ class Package {
     double fill_min_;
     double fill_max_;
     std::string strategy_;
+    DoubleDistribution::Ptr dist_ = NULL;
 };
 
 /// TransportUnit is a class that can be used in conjunction with packages to

@@ -13,6 +13,7 @@ Since last release
 * Added macros in ``cmake/CyclusBuildSetup.cmake`` for common CMake boilerplate (#1793)
 * Added ``doxygen-awesome-css`` to doxygen docs for style (#1787)
 * Added installation of files for building docs to share/cyclus/doc (#1807)
+* New packaging strategies uniform and normal (#1813)
 
 **Changed:**
 
@@ -26,7 +27,7 @@ Since last release
 * Warning and limits on number of packages that can be created from a resource at once (#1771)
 * Use keep_packaging instead of unpackaged in ResBuf (#1778)
 * Temporarily pin Boost libraries to <1.86.0 (#1796)
-* Package GetFillMass returns fill mass and number of packages filled at that mass (#1790)
+* Package GetFillMass returns vector of masses (#1790, #1813)
 
 **Removed:**
 

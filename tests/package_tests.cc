@@ -47,7 +47,7 @@ TEST(PackageTests, InvalidPackage) {
     EXPECT_THROW(Package::Create("foo", 100, 1, "first"), cyclus::ValueError);
 }
 
-TEST(PackageTests, GetPackageFillMass) {
+TEST(PackageTests, GetPackageFillMassFirstEqual) {
     double min = 0.3;
     double max = 0.9;
     double tight_min = 0.85;
@@ -56,56 +56,112 @@ TEST(PackageTests, GetPackageFillMass) {
     Package::Ptr q = Package::Create("bar", min, max, "equal");
     Package::Ptr r = Package::Create("baz", tight_min, max, "equal");
 
-    std::pair<double, int> p_fill, q_fill, r_fill;
+    std::vector<double> p_fill, q_fill, r_fill;
 
     double exp;
 
     // no fit
     double no_fit = 0.05;
-    p_fill = p->GetFillMass(no_fit);;
-    EXPECT_EQ(0, p_fill.first);
-    EXPECT_EQ(0, p_fill.second);
+    p_fill = p->GetFillMass(no_fit);
+    EXPECT_EQ(0, p_fill.size());
 
     q_fill = q->GetFillMass(no_fit);
-    EXPECT_EQ(0, q_fill.first);
-    EXPECT_EQ(0, q_fill.second);
+    EXPECT_EQ(0, q_fill.size());
 
     // perfect fit
     double perfect_fit = 0.9;
     p_fill = p->GetFillMass(perfect_fit);
-    EXPECT_EQ(perfect_fit, p_fill.first);
-    EXPECT_EQ(1, p_fill.second);
+    EXPECT_EQ(1, p_fill.size());
+    EXPECT_EQ(perfect_fit, p_fill[0]);
 
     q_fill = q->GetFillMass(perfect_fit);
-    EXPECT_EQ(perfect_fit, q_fill.first);
-    EXPECT_EQ(1, q_fill.second);
+    EXPECT_EQ(1, q_fill.size());
+    EXPECT_EQ(perfect_fit, q_fill[0]);
 
     // partial fit 
     double partial_fit = 1;
 
     p_fill = p->GetFillMass(partial_fit);
-    EXPECT_EQ(max, p_fill.first);
-    EXPECT_EQ(1, p_fill.second);
+    EXPECT_EQ(1, p_fill.size());
+    EXPECT_EQ(max, p_fill[0]);
 
     q_fill = q->GetFillMass(partial_fit);
+    EXPECT_EQ(2, q_fill.size());
     exp = partial_fit / 2;
-    EXPECT_EQ(exp, q_fill.first);
-    EXPECT_EQ(2, q_fill.second);
+    EXPECT_EQ(exp, q_fill[0]);
+    EXPECT_EQ(exp, q_fill[1]);
 
     r_fill = r->GetFillMass(partial_fit);
-    EXPECT_EQ(max, r_fill.first);
-    EXPECT_EQ(1, r_fill.second);
+    EXPECT_EQ(1, r_fill.size());
+    EXPECT_EQ(max, r_fill[0]);
 
-    // two full packages for equal, only one for 
+    // two full packages for equal, one full and one partial for first
     double two_packages = 1.4;
 
     p_fill = p->GetFillMass(two_packages);
-    EXPECT_EQ(max, p_fill.first);
-    EXPECT_EQ(1, p_fill.second);
+    EXPECT_EQ(2, p_fill.size());
+    EXPECT_EQ(max, p_fill[0]);
+    EXPECT_EQ(two_packages - max, p_fill[1]);
 
     q_fill = q->GetFillMass(two_packages);
+    EXPECT_EQ(2, q_fill.size());
     exp = two_packages / 2;
-    EXPECT_EQ(exp, q_fill.first);
+    EXPECT_EQ(exp, q_fill[0]);
+    EXPECT_EQ(exp, q_fill[1]);
+}
+
+TEST(PackageTests, GetPackageFillMassRandom) {
+    double min = 0.3;
+    double max = 0.9;
+
+    Package::Ptr p = Package::Create("foo", min, max, "uniform");
+    Package::Ptr q = Package::Create("bar", min, max, "normal");
+
+    std::vector<double> p_fill, q_fill, r_fill;
+
+    double exp;
+
+    // no fit
+    double no_fit = 0.05;
+    p_fill = p->GetFillMass(no_fit);
+    EXPECT_EQ(0, p_fill.size());
+
+    q_fill = q->GetFillMass(no_fit);
+    EXPECT_EQ(0, q_fill.size());
+
+    // less than max fit (no randomness)
+    double less_than_max = 0.8;
+    p_fill = p->GetFillMass(less_than_max);
+    EXPECT_EQ(1, p_fill.size());
+    EXPECT_EQ(less_than_max, p_fill[0]);
+
+    q_fill = q->GetFillMass(less_than_max);
+    EXPECT_EQ(1, q_fill.size());
+    EXPECT_EQ(less_than_max, q_fill[0]);
+
+    // just enough to sample from distribution
+    double fit = 0.9;
+    p_fill = p->GetFillMass(fit);
+    EXPECT_EQ(2, p_fill.size());
+    EXPECT_NEAR(0.49181, p_fill[0], 1e-5);
+    EXPECT_NEAR(fit - 0.49181, p_fill[1], 1e-5);
+
+    q_fill = q->GetFillMass(fit);
+    EXPECT_EQ(1, q_fill.size());
+    EXPECT_NEAR(0.74673, q_fill[0], 1e-5);
+
+    // partial fit 
+    double partial_fit = 1.1;
+
+    p_fill = p->GetFillMass(partial_fit);
+    EXPECT_EQ(2, p_fill.size());
+    EXPECT_NEAR(0.51783, p_fill[0], 1e-5);
+    EXPECT_NEAR(partial_fit - 0.51783, p_fill[1], 1e-5);
+
+    q_fill = q->GetFillMass(partial_fit);
+    EXPECT_EQ(2, q_fill.size());
+    EXPECT_NEAR(0.56092, q_fill[0], 1e-5);
+    EXPECT_NEAR(partial_fit - 0.56092, q_fill[1], 1e-5);
 }
 
 TEST(PackageTests, CreateTransportUnit) {
