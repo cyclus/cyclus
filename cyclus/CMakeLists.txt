@@ -38,6 +38,9 @@ foreach(file ${CYCLUS_CYTHON_FILES})
     set_target_properties(${targ} PROPERTIES LINKER_LANGUAGE CXX
                                              OUTPUT_NAME ${name}
                                              LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+    if (CYTHON_VERSION_MAJOR GREATER_EQUAL 3)
+        target_compile_definitions(${targ} PRIVATE NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION)
+    endif()
     # the following install is needed so that CMake sets the correct RPATH for the
     # python extension modules, even though they are installed (with the wrong RPATH)
     # by setup.py, along with the pure python files.

@@ -146,6 +146,7 @@ int TransportUnit::MaxShippablePackages(int pkgs) {
     }
     return shippable;
   }
+  return 0;
 }
   
 TransportUnit::TransportUnit(std::string name, int fill_min, int fill_max, std::string strategy) : 

@@ -10,7 +10,7 @@
 
 namespace cyclus {
 
-#if LIBXMLXX_MAJOR_VERSION == 2 
+#if LIBXMLXX_MAJOR_VERSION == 2
   typedef xmlpp::NodeSet NodeSet;
   typedef xmlpp::Node::NodeList const_NodeList;
 #else
@@ -76,7 +76,7 @@ std::string InfileTree::GetString(std::string query, int index) {
     dynamic_cast<const Element*>(nodeset.at(index));
 
   if (!element) {
-    throw CastError("Node: " + element->get_name() +
+    throw CastError("Node: " + nodeset.at(index)->get_name() +
                     " is not an Element node.");
   }
 
@@ -90,7 +90,7 @@ std::string InfileTree::GetString(std::string query, int index) {
     dynamic_cast<const xmlpp::TextNode*>(element->get_children().front());
 
   if (!text) {
-    throw CastError("Node: " + text->get_name() + " is not a Text node.");
+    throw CastError("Node: " + element->get_name() + " is not a Text node.");
   }
 
   return text->get_content();
@@ -129,7 +129,7 @@ InfileTree* InfileTree::GetEngineFromQuery(std::string query, int index) {
   xmlpp::Element* element = dynamic_cast<xmlpp::Element*>(nodeset.at(index));
 
   if (!element) {
-    throw CastError("Node: " + element->get_name() +
+    throw CastError("Node: " + nodeset.at(index)->get_name() +
                     " is not an Element node.");
   }
 

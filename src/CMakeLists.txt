@@ -150,12 +150,15 @@ if(Cython_FOUND)
 
         ADD_LIBRARY(${name} ${_cc_file})
         SET(CythonModuleSrc ${CythonModuleSrc} ${_cc_file})
-        SET_TARGET_PROPERTIES(${name} PROPERTIES 
+        SET_TARGET_PROPERTIES(${name} PROPERTIES
           OUTPUT_NAME "${name}"
           PREFIX ""
           INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/lib"
           INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib"
           )
+        IF (CYTHON_VERSION_MAJOR GREATER_EQUAL 3)
+            TARGET_COMPILE_DEFINITIONS(${name} PRIVATE NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION)
+        ENDIF()
 
         TARGET_LINK_LIBRARIES(${name} dl ${NoCythonLibs})
 
