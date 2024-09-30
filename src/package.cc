@@ -81,14 +81,14 @@ std::vector<double> Package::GetFillMass(double qty) {
   if (strategy_ == "uniform" || strategy_ == "normal") {
     // only use random if a full package amount is available. if less than one
     // full amount is available, below will fill a partial package (no random).
-    while ((qty > 0) && (qty >= fill_max_)) {
+    while ( qty > std::max(0,fill_max_) ) {
       fill_mass = dist_->sample();
       packages.push_back(fill_mass);
       qty -= fill_mass;
     }
   }
 
-  if (qty > eps_rsrc() && qty >= fill_min_) {
+  if (qty > std::max(eps_rsrc(),fill_min_) ) {
     // leftover material is enough to fill one more partial package. 
     packages.push_back(qty);
   }
