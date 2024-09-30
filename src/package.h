@@ -9,8 +9,7 @@
 
 #include "error.h"
 #include "logger.h"
-class DoubleDistribution;
-class DoubleDistribution::Ptr;
+#include "random_number_generator.h"
 
 namespace cyclus {
 
