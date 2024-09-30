@@ -30,11 +30,27 @@ Package::Ptr& Package::unpackaged() {
   return unpackaged_;
 }
 
-std::pair<double, int> Package::GetFillMass(double qty) {
+void Package::SetDistribution() {
+  if (strategy_ == "uniform") {
+    dist_ = UniformDoubleDist::Ptr (new UniformDoubleDist(fill_min_, fill_max_));
+  } else if (strategy_ == "normal") {
+    dist_ = NormalDoubleDist::Ptr (new NormalDoubleDist(
+      (fill_min_ + fill_max_) / 2,
+      (fill_max_ - fill_min_) / 6,
+      fill_min_,
+      fill_max_));
+  }
+}
+
+std::vector<double> Package::GetFillMass(double qty) {
+  std::vector<double> packages;
   if ((qty - fill_min_) < -eps_rsrc()) {
     // less than one pkg of material available
-    return std::pair<double, int> (0, 0);
+    return packages;
   }
+
+  // simple check for whether vector limits *might* be exceeded
+  ExceedsSplitLimits(qty / fill_max_);
 
   double fill_mass;
   int num_at_fill_mass;
@@ -52,9 +68,34 @@ std::pair<double, int> Package::GetFillMass(double qty) {
       fill_mass = fill_max_;
     }
   }
-  fill_mass = std::min(qty, fill_mass);
-  num_at_fill_mass = static_cast<int>(std::floor(qty / fill_mass));
-  return std::pair<double, int>(fill_mass, num_at_fill_mass);
+
+  if (strategy_ == "first" || strategy_ == "equal") {
+    fill_mass = std::min(qty, fill_mass);
+    num_at_fill_mass = static_cast<int>(std::floor(qty / fill_mass));
+    ExceedsSplitLimits(num_at_fill_mass);
+    packages.assign(num_at_fill_mass, fill_mass);
+
+    qty -= num_at_fill_mass * fill_mass;
+  }
+
+  if (strategy_ == "uniform" || strategy_ == "normal") {
+    // only use random if a full package amount is available. if less than one
+    // full amount is available, below will fill a partial package (no random).
+    while ( qty >= std::max(eps_rsrc(), fill_max_) ) {
+      fill_mass = dist_->sample();
+      packages.push_back(fill_mass);
+      qty -= fill_mass;
+    }
+  }
+
+  if (qty >= std::max(eps_rsrc(),fill_min_) ) {
+    // leftover material is enough to fill one more partial package. 
+    packages.push_back(qty);
+  }
+    
+  Package::ExceedsSplitLimits(packages.size());
+
+  return packages;
 }
   
 Package::Package(std::string name, double fill_min, double fill_max,
@@ -65,9 +106,10 @@ Package::Package(std::string name, double fill_min, double fill_max,
         throw ValueError("can't create a new package with name 'unpackaged'");
       }
   }
-    if (strategy != "first" && strategy != "equal") {
+    if (!IsValidStrategy(strategy_)) {
       throw ValueError("Invalid strategy for package: " + strategy_);
     }
+    SetDistribution();
 }
 
 TransportUnit::Ptr TransportUnit::unrestricted_ = NULL;

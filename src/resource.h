@@ -141,22 +141,17 @@ std::vector<typename T::Ptr> Resource::Package(Package::Ptr pkg) {
   std::vector<typename T::Ptr> ts_pkgd;
   typename T::Ptr t_pkgd;
 
-  std::pair<double, int> fill = pkg->GetFillMass(quantity());
-  double fill_mass = fill.first;
-  if (fill_mass == 0) {
+  std::vector<double> packages = pkg->GetFillMass(quantity());
+  if (packages.size() == 0) {
     return ts_pkgd;
   }
 
-  // Check if the number of packages is within the limits, including if
-  // int overflow is reached
-  int approx_num_pkgs = fill.second;
-  Package::ExceedsSplitLimits(approx_num_pkgs);
-
-  while (quantity() > 0 && (quantity() - pkg->fill_min()) >= -eps_rsrc()) {
-    double pkg_fill = std::min(quantity(), fill_mass);
+  for (int i = 0; i < packages.size(); ++i) {
+    double pkg_fill = packages[i];
     t_pkgd = boost::dynamic_pointer_cast<T>(PackageExtract(pkg_fill, pkg->name()));
-    ts_pkgd.push_back(t_pkgd); 
+    ts_pkgd.push_back(t_pkgd);
   }
+
   return ts_pkgd;
 }
 
