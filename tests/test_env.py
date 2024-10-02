@@ -1,7 +1,7 @@
 """Tests Python wrapping on Env object."""
 from __future__ import print_function, unicode_literals
 
-
+import sys
 from cyclus import lib
 
 ENV = lib.Env()
@@ -22,7 +22,13 @@ def test_paths():
         assert  isinstance(path, str)
     assert  len(ENV.env_delimiter) > 0
     assert  len(ENV.path_delimiter) > 0
-    assert  len(ENV.find_module('libagents.so')) > 0
+    if sys.platform.startswith('darwin'):
+        ext = '.dylib'
+    elif sys.platform.startswith('linux'):
+        ext = '.so'
+    else: # we are not on a supported platform, make failing assertion
+        assert "platform" == "darwin or linux"
+    assert  len(ENV.find_module(f'libagents{ext}')) > 0
 
 
 def test_nuc_data():
