@@ -1,0 +1,94 @@
+name: MacOS Build/Test Cyclus
+
+on:
+  # allows us to run workflows manually
+  workflow_dispatch:
+  pull_request:
+    paths-ignore:
+      - ".github/workflows/build_test.yml"
+      - ".github/workflows/publish_latest.yml"
+      - ".github/workflows/publish_release.yml"
+      - ".github/workflows/changelog_test.yml"
+      - ".github/workflows/code_coverage.yml"
+      - ".github/workflows/rocky_build_test.yml"
+      - "doc/**"
+      - "CHANGELOG.rst"
+  push:
+    paths-ignore:
+      - ".github/workflows/build_test.yml"
+      - ".github/workflows/publish_latest.yml"
+      - ".github/workflows/publish_release.yml"
+      - ".github/workflows/changelog_test.yml"
+      - ".github/workflows/code_coverage.yml"
+      - ".github/workflows/rocky_build_test.yml"
+      - "doc/**"
+      - "CHANGELOG.rst"
+
+jobs:
+  build-test-conda:
+    strategy:
+      fail-fast: false
+      matrix:
+        macos_versions: [
+            macos-12,
+            macos-13,
+            macos-14,
+        ]
+
+    runs-on: ["${{ matrix.macos_versions }}"]
+
+    steps:
+      - name: Setup XCode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest
+
+      - name: Checkout Cyclus
+        uses: actions/checkout@v4
+
+      - name: --slow flag if on ARM
+        if: ${{ matrix.macos_versions == 'macos-14' }}
+        run: |
+          echo "SLOW_FLAG=--slow" >> "$GITHUB_ENV"
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: "latest"
+          conda-solver: "libmamba"
+          auto-update-conda: true
+          channels: conda-forge
+
+      - name: Build and Test Cyclus
+        id: build-cyclus
+        shell: bash -el {0}
+        run: |
+          mamba install -y \
+            compilers \
+            cmake \
+            make \
+            git \
+            glib \
+            libxml2 \
+            libxmlpp-4.0 \
+            liblapack \
+            pkg-config \
+            coincbc \
+            boost-cpp \
+            hdf5 \
+            sqlite \
+            pcre \
+            setuptools \
+            pytest \
+            pytables \
+            pandas \
+            jinja2 \
+            cython \
+            websockets \
+            pprintpp \
+            pip
+          mkdir -p $(python3 -m site --user-site)
+          python3 install.py -j 3 --allow-milps ${SLOW_FLAG}
+          export PATH=$HOME/.local/bin:$PATH
+          cyclus_unit_tests
+          cd tests && python3 -m pytest
