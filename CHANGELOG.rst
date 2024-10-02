@@ -14,6 +14,7 @@ Since last release
 * Added ``doxygen-awesome-css`` to doxygen docs for style (#1787)
 * Added installation of files for building docs to share/cyclus/doc (#1807)
 * New packaging strategies uniform and normal (#1813)
+* Add CI support for MacOS 12, 13, and 14 (#1814)
 
 **Changed:**
 
