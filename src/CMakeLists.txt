@@ -166,9 +166,15 @@ if(Cython_FOUND)
           TARGETS ${name}
           LIBRARY DESTINATION lib
           )
-        INSTALL(
-          TARGETS ${name}
-          LIBRARY DESTINATION ${PYTHON_SITE_PACKAGES}
+        # Add symlinks to PYTHON_SITE_PACKAGES so python can find our cython modules
+        # Python will only import libraries with .so extensions
+        # so we hardcode the symlink with .so even on APPLE
+        INSTALL(CODE "
+            EXECUTE_PROCESS(
+                COMMAND ${CMAKE_COMMAND} -E create_symlink
+                ${CMAKE_INSTALL_PREFIX}/lib/${name}${suffix}
+                ${PYTHON_SITE_PACKAGES}/${name}.so
+            )"
           )
 
         copy_when_diff(${_generated_h} ${_h_file})
