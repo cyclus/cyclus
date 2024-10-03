@@ -116,8 +116,21 @@ flags:
     - the cmake prefix path for use with FIND_PACKAGE, FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros 
 
   * - ``--build-type BUILD_TYPE``                 
-    - change the CMAKE_BUILD_TYPE                                                                      
+    - change the CMAKE_BUILD_TYPE     
 
+  * - ``--data-model-version``        
+    - sets the data model version number
+
+  * - ``--code_coverage``
+    - Enable code coverage analysis using gcov/lcov
+
+  * - ``--fast``
+    - Will try to compile from assembly, if possible (default). This is faster than compiling from source.
+
+  * - ``--slow``
+    - Will NOT try to compile from assembly, if possible. This is slower as it must compile from source. 
+      **This is required to build on Apple Silicon**
+          
   * - ``-D VAR``                                  
     - set environment variable(s).                                                                    
 

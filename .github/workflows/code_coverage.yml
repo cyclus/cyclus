@@ -10,6 +10,7 @@ on:
       - '.github/workflows/publish_release.yml'
       - '.github/workflows/changelog_test.yml'
       - '.github/workflows/rocky_build_test.yml'
+      - '.github/workflows/macos_build_test.yml'
       - 'doc/**'
       - 'CHANGELOG.rst'
   push:
