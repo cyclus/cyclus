@@ -29,6 +29,7 @@ Since last release
 * Use keep_packaging instead of unpackaged in ResBuf (#1778)
 * Temporarily pin Boost libraries to <1.86.0 (#1796)
 * Package GetFillMass returns vector of masses (#1790, #1813)
+* Modified Doxygen homepage (#1815)
 
 **Removed:**
 
