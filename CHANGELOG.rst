@@ -38,6 +38,7 @@ Since last release
 
 * Removed the ResourceBuff class and replaced its instances with ResBuf (#1755)
 * Removed reference to deprecated ``ProgTranslator::Context`` class (#1811)
+* Removed ``exclusive_orders_only`` from schema (#1816)
 
 **Fixed:**
 
