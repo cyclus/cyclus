@@ -70,6 +70,7 @@ extern "C" {
 #include "toolkit/commodity_recipe_context.h"
 #include "toolkit/enrichment.h"
 #include "toolkit/infile_converters.h"
+#include "toolkit/metadata.h"
 #include "toolkit/mat_query.h"
 #include "toolkit/position.h"
 #include "toolkit/res_buf.h"
