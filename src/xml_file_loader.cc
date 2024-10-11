@@ -244,14 +244,6 @@ void XMLFileLoader::LoadSolver() {
     exclusive = cyclus::OptionalQuery<bool>(qe, "allow_exclusive_orders",
                                             exclusive);
 
-    // @TODO remove this after release 1.5
-    // check for deprecated input values
-    if (qe->NMatches(std::string("exclusive_orders_only")) != 0) {
-      std::stringstream ss;
-      ss << "Use of 'exclusive_orders_only' is deprecated."
-         << " Please see http://fuelcycle.org/user/input_specs/control.html";
-      Warn<DEPRECATION_WARNING>(ss.str());
-    }
   }
 
   if (!exclusive) {
