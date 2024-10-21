@@ -30,7 +30,6 @@ jobs:
       fail-fast: false
       matrix:
         macos_versions: [
-            macos-12,
             macos-13,
             macos-14,
         ]
