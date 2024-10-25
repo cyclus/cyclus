@@ -34,6 +34,19 @@ MatlBuyPolicy::~MatlBuyPolicy() {
     manager()->context()->UnregisterTrader(this);
 }
 
+MatlBuyPolicy& MatlBuyPolicy::ResetBehavior() {
+  throughput_ = std::numeric_limits<double>::max();
+  quantize_ = 1;
+  fill_to_ = std::numeric_limits<double>::max();
+  req_at_ = std::numeric_limits<double>::max();
+  cumulative_cap_ = -1;
+  cycle_total_inv_ = 0;
+  active_dist_ = NULL;
+  dormant_dist_ = NULL;
+  size_dist_ = NULL;
+  return *this;
+}
+
 void MatlBuyPolicy::set_manager(Agent* m) {
   if (m != NULL) {
     Trader::manager_ = m;
@@ -235,6 +248,12 @@ MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod, Composition::Ptr c,
   d.comp = c;
   d.pref = pref;
   commod_details_[commod] = d;
+  return *this;
+}
+
+MatlBuyPolicy& MatlBuyPolicy::Unset(std::string commod){
+
+  commod_details_.erase(commod);
   return *this;
 }
 

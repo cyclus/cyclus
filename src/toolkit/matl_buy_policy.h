@@ -141,6 +141,13 @@ class MatlBuyPolicy : public Trader {
                       IntDistribution::Ptr);
   /// @}
 
+  /// Reset a material buy policy parameters that govern its behavior 
+  /// to the default state.  Preserve the Trader that manages the policy.
+  /// The primary use case of this method is when there is a desire to
+  /// change the behavior of a policy. This reset can be called prior
+  /// to calling a new `Init()` to establish the new behavior.
+  MatlBuyPolicy& ResetBehavior();
+
   /// Instructs the policy to fill its buffer with requests on the given
   /// commodity of composition c and the given preference.  This must be called
   /// at least once or the policy will do nothing.  The policy can request on an
@@ -155,6 +162,9 @@ class MatlBuyPolicy : public Trader {
   MatlBuyPolicy& Set(std::string commod, Composition::Ptr c);
   MatlBuyPolicy& Set(std::string commod, Composition::Ptr c, double pref);
   /// @}
+
+  /// Instructs the policy to stop requesting a speific commodity
+  MatlBuyPolicy& Unset(std::string commod);
 
   /// Registers this policy as a trader in the current simulation.  This
   /// function must be called for the policy to begin participating in resource
