@@ -15,6 +15,7 @@ Since last release
 * Added installation of files for building docs to share/cyclus/doc (#1807)
 * New packaging strategies uniform and normal (#1813)
 * Add CI support for MacOS 12, 13, and 14 (#1814)
+* Methods to reset behavaiors of MaterialBuyPolicy (#1822)
 
 **Changed:**
 
