@@ -25,9 +25,15 @@ class RandomNumberGenerator {
     friend class FixedDoubleDist;
     friend class UniformDoubleDist;
     friend class NormalDoubleDist;
+    friend class PoissonDoubleDist;
+    friend class ExpontentialDoubleDist;
     friend class FixedIntDist;
     friend class UniformIntDist;
     friend class NormalIntDist;
+    friend class BinomialIntDist;
+    friend class NegativeBinomialIntDist;
+    friend class PoissonIntDist;
+    friend class ExponentialIntDist;
 
   private:
     /// Returns a random number for use in a distribution
@@ -65,7 +71,7 @@ class RandomNumberGenerator {
 
     /// wrappers for boost::random distributions
 
-    /// geenerate a random number between [0, 1)
+    /// generate a random number between [0, 1)
     double random_01();
     
     /// generate a random integer between [low, high)
@@ -136,6 +142,40 @@ class NormalDoubleDist : public DoubleDistribution {
     virtual double max() { return max_; }
 };
 
+/// Poisson distribution requires a mean
+class PoissonDoubleDist : public DoubleDistribution {
+  private:
+    boost::random::poisson_distribution<> dist;
+    double mean_;
+  public:
+    typedef boost::shared_ptr<PoissonDoubleDist> Ptr;
+
+    PoissonDoubleDist(double mean) : dist(mean_) {
+      if (mean_ < 0) {
+        throw ValueError("Mean must be positive");
+      }
+    };
+    virtual double sample() { return dist(RandomNumberGenerator::gen_); }
+    virtual double mean() { return dist.mean(); }
+};
+
+/// Exponential distribution requires lambda
+class ExpontentialDoubleDist : public DoubleDistribution {
+  private:
+    boost::random::exponential_distribution<> dist;
+    double lambda_;
+  public:
+    typedef boost::shared_ptr<ExpontentialDoubleDist> Ptr;
+
+    ExpontentialDoubleDist(double lambda) : dist(lambda), lambda_(lambda) {
+      if (lambda_ < 0) {
+        throw ValueError("Lambda must be positive");
+      }
+    };
+    virtual double sample() { return dist(RandomNumberGenerator::gen_); }
+    virtual double lambda() { return lambda_; }
+};
+
 class IntDistribution {
   public:
     typedef boost::shared_ptr<IntDistribution> Ptr;
@@ -181,6 +221,89 @@ class NormalIntDist : public IntDistribution {
     };
     virtual int sample();
     virtual int max() { return max_; }
+};
+
+/// Binomial distribution requries an integer number of trials and a
+/// probability of success for each trial. Sampling returns the number of 
+/// successes. When trials is one, this is equivalent to a Bernoulli dist
+class BinomialIntDist : public IntDistribution {
+  private:
+    boost::random::binomial_distribution<int> dist;
+    int trials_;
+    double p_success_;
+  public:
+    typedef boost::shared_ptr<BinomialIntDist> Ptr;
+
+    BinomialIntDist(int trials, double p_success) : dist(trials, p_success), trials_(trials), p_success_(p_success) {
+      if (trials_ < 1) {
+        throw ValueError("Max must be positive and greater than zero");
+      }
+      if (p_success_ > 1 || p_success_ < 0) {
+        throw ValueError("Probability must be between zero and one");
+      }
+    };
+    virtual int sample() { return dist(RandomNumberGenerator::gen_); }
+    virtual int trials() { return trials_; }
+    virtual int p() { return p_success_; }
+};
+
+/// NegativeBinomialIntDist takes the number of successes desired and a 
+/// probability of success on a single trial and returns the number of trials 
+/// needed to reach the desired successes. When successes is one, this is
+/// equivalent to a Geometric distribution.
+class NegativeBinomialIntDist : public IntDistribution {
+  private:
+    boost::random::negative_binomial_distribution<> dist;
+    int successes_;
+    double p_success_;
+  public:
+    typedef boost::shared_ptr<NegativeBinomialIntDist> Ptr;
+
+    NegativeBinomialIntDist(int successes, double p_success) : dist(successes, p_success), successes_(successes), p_success_(p_success) {
+      if (successes < 1) {
+        throw ValueError("Successes must be positive and greater than zero");
+      }
+      if (p_success > 1 || p_success < 0) {
+        throw ValueError("Probability must be between zero and one");
+      }
+    };
+    virtual int sample() { return dist(RandomNumberGenerator::gen_); }
+    virtual int successes() { return successes_; }
+    virtual int p() { return p_success_; }
+};
+
+/// Poisson distribution requires a mean 
+class PoissonIntDist : public IntDistribution {
+  private:
+    boost::random::poisson_distribution<> dist;
+    double mean_;
+  public:
+    typedef boost::shared_ptr<PoissonIntDist> Ptr;
+
+    PoissonIntDist(double mean) : dist(mean_) {
+      if (mean_ < 0) {
+        throw ValueError("Mean must be positive");
+      }
+    };
+    virtual int sample() { return dist(RandomNumberGenerator::gen_); }
+    virtual double mean() { return dist.mean(); }
+};
+
+/// Exponential distribution requires lambda
+class ExponentialIntDist : public IntDistribution {
+  private:
+    boost::random::exponential_distribution<> dist;
+    double lambda_;
+  public:
+    typedef boost::shared_ptr<ExponentialIntDist> Ptr;
+
+    ExponentialIntDist(double lambda) : dist(lambda), lambda_(lambda) {
+      if (lambda_ < 0) {
+        throw ValueError("Lambda must be positive");
+      }
+    };
+    virtual int sample() { return dist(RandomNumberGenerator::gen_); }
+    virtual double lambda() { return lambda_; }
 };
 
 }
