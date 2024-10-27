@@ -36,7 +36,7 @@ MatlBuyPolicy::~MatlBuyPolicy() {
 
 MatlBuyPolicy& MatlBuyPolicy::ResetBehavior() {
   throughput_ = std::numeric_limits<double>::max();
-  quantize_ = 1;
+  quantize_ = -1;
   fill_to_ = std::numeric_limits<double>::max();
   req_at_ = std::numeric_limits<double>::max();
   cumulative_cap_ = -1;
