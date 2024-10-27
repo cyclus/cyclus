@@ -7,6 +7,7 @@
 #include "cyc_limits.h"
 #include "toolkit/mat_query.h"
 #include "error.h"
+#include "toolkit/res_buf.h"
 
 using pyne::nucname::id;
 
@@ -206,6 +207,28 @@ TEST_F(MaterialTest, ExtractInGrams) {
   // and it should be okay to extract part of the original composiiton IN GRAMS
   EXPECT_NO_THROW(default_mat_->ExtractComp(g_to_rem * units::g, comp_to_rem));
   EXPECT_DOUBLE_EQ(test_size_ - kg_to_rem, default_mat_->quantity());
+}
+
+TEST_F(MaterialTest, DecayResBuf) {
+  // prequeries
+  cyclus::toolkit::MatQuery orig(tracked_mat_);
+  double u235_qty = orig.mass(u235_);
+  double pb208_qty = orig.mass(pb208_);
+  double am241_qty = orig.mass(am241_);
+  double orig_mass = tracked_mat_->quantity();
+
+  cyclus::toolkit::ResBuf<cyclus::Material> res_buf;
+  res_buf.Push(tracked_mat_);
+  res_buf.Decay(100);
+  cyclus::Material::Ptr pop_mat = res_buf.Pop();
+
+  // postquery
+  cyclus::toolkit::MatQuery mq(pop_mat);
+
+  // postchecks
+  EXPECT_NE(u235_qty, mq.mass(u235_));
+  EXPECT_NE(pb208_qty, mq.mass(pb208_));
+  EXPECT_NE(am241_qty, mq.mass(am241_));
 }
 
 TEST_F(MaterialTest, DecayManual) {
