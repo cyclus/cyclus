@@ -54,6 +54,7 @@ jobs:
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
+          python-version: "3.12"
           miniforge-version: "latest"
           conda-solver: "libmamba"
           auto-update-conda: true
