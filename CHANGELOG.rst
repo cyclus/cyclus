@@ -30,6 +30,7 @@ Since last release
 * Temporarily pin Boost libraries to <1.86.0 (#1796)
 * Package GetFillMass returns vector of masses (#1790, #1813)
 * Modified Doxygen homepage (#1815)
+* Pin ``python<3.13`` in CI workflows (#1826)
 
 **Removed:**
 
