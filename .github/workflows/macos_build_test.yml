@@ -45,11 +45,6 @@ jobs:
       - name: Checkout Cyclus
         uses: actions/checkout@v4
 
-      - name: --slow flag if on ARM
-        if: ${{ matrix.macos_versions == 'macos-14' }}
-        run: |
-          echo "SLOW_FLAG=--slow" >> "$GITHUB_ENV"
-
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
         with:
@@ -91,7 +86,7 @@ jobs:
           export CXX=$CONDA_PREFIX/bin/clang++
           export CPP=$CONDA_PREFIX/bin/clang-cpp
           mkdir -p $(python3 -m site --user-site)
-          python3 install.py -j 3 --allow-milps ${SLOW_FLAG}
+          python3 install.py -j 3 --allow-milps
           export PATH=$HOME/.local/bin:$PATH
           cyclus_unit_tests
           cd tests && python3 -m pytest
