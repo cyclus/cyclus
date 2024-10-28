@@ -215,11 +215,13 @@ TEST_F(MaterialTest, DecayResBuf) {
   double u235_qty = orig.mass(u235_);
   double pb208_qty = orig.mass(pb208_);
   double am241_qty = orig.mass(am241_);
+  double sr89_qty = orig.mass(sr89_);
   double orig_mass = tracked_mat_->quantity();
 
   cyclus::toolkit::ResBuf<cyclus::Material> res_buf;
   res_buf.Push(tracked_mat_);
-  res_buf.Decay(100);
+  // decay for 2 months which is just over 1 Sr-89 half-life
+  res_buf.Decay(2);
   cyclus::Material::Ptr pop_mat = res_buf.Pop();
 
   // postquery
@@ -229,6 +231,7 @@ TEST_F(MaterialTest, DecayResBuf) {
   EXPECT_NE(u235_qty, mq.mass(u235_));
   EXPECT_NE(pb208_qty, mq.mass(pb208_));
   EXPECT_NE(am241_qty, mq.mass(am241_));
+  EXPECT_NE(sr89_qty, mq.mass(sr89_));
 }
 
 TEST_F(MaterialTest, DecayManual) {
@@ -237,6 +240,7 @@ TEST_F(MaterialTest, DecayManual) {
   double u235_qty = orig.mass(u235_);
   double pb208_qty = orig.mass(pb208_);
   double am241_qty = orig.mass(am241_);
+  double sr89_qty = orig.mass(sr89_);
   double orig_mass = tracked_mat_->quantity();
 
   tracked_mat_->Decay(100);
@@ -248,6 +252,7 @@ TEST_F(MaterialTest, DecayManual) {
   EXPECT_NE(u235_qty, mq.mass(u235_));
   EXPECT_NE(pb208_qty, mq.mass(pb208_));
   EXPECT_NE(am241_qty, mq.mass(am241_));
+  EXPECT_NE(sr89_qty, mq.mass(sr89_));
 }
 
 TEST_F(MaterialTest, DecayLazy) {
