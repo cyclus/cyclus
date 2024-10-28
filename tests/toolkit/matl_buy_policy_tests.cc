@@ -553,6 +553,50 @@ TEST_F(MatlBuyPolicyTests, BinomialActiveDormant) {
   delete a;
 }
 
+TEST_F(MatlBuyPolicyTests, BinaryActiveDormant) {
+  using cyclus::QueryResult;
+
+  boost::shared_ptr<BinaryIntDist> a_dist = boost::shared_ptr<BinaryIntDist>(new BinaryIntDist(0.5, 4, 1));
+  boost::shared_ptr<BinaryIntDist> d_dist = boost::shared_ptr<BinaryIntDist>(new BinaryIntDist(0.5, 1, 6));
+  
+  int dur = 100;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  TotalInvTracker buf_tracker({&inbuf});
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput, a_dist, d_dist, NULL)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  // sampled cycles: 
+  // * active for 1 step, dormant for 6
+  // * active for 1 step, dormant for 1
+  // * active for 4 steps, dormant for 1 step
+  // therefore first 7 trades occur on time steps:
+  //  0, 7, 9, 10, 11, 12, 14
+  // first trade at time 0, next trade at time 7
+  EXPECT_EQ(0, qr.GetVal<int>("Time", 0));
+  EXPECT_EQ(7, qr.GetVal<int>("Time", 1));
+  EXPECT_EQ(9, qr.GetVal<int>("Time", 2));
+  EXPECT_EQ(10, qr.GetVal<int>("Time", 3));
+  EXPECT_EQ(11, qr.GetVal<int>("Time", 4));
+  EXPECT_EQ(12, qr.GetVal<int>("Time", 5));
+  EXPECT_EQ(14, qr.GetVal<int>("Time", 6));
+
+  delete a;
+}
+
 TEST_F(MatlBuyPolicyTests, MixedActiveDormant) {
   using cyclus::QueryResult;
   
