@@ -140,6 +140,39 @@ TEST_F(MatlBuyPolicyTests, Init_RQ) {
   p.Init(fac1, &buff, "", &buff_tracker, "RQ", Q, R);  
   ASSERT_FALSE(p.MakeReq());
 }
+TEST_F(MatlBuyPolicyTests, ResetBehavior) {
+  double cap = 10;
+  ResBuf<Material> buff;
+  buff.capacity(cap);
+  TotalInvTracker buff_tracker({&buff});
+  MatlBuyPolicy p;
+
+  double amt;
+
+  // Setup up initially with sS policy
+  double S = 4, s = 2;
+  p.Init(fac1, &buff, "", &buff_tracker, "sS", S, s);
+  ASSERT_TRUE(p.MakeReq());
+  amt = p.TotalAvailable();
+  ASSERT_FLOAT_EQ(amt, S);
+  ASSERT_FLOAT_EQ(p.ReqQty(amt), S);
+  ASSERT_EQ(p.NReq(amt), 1);
+
+  // Attempt to reinitialize with no strategy WITHOUT reset
+  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max()); 
+  amt = p.TotalAvailable();
+  ASSERT_NE(amt, cap);
+  ASSERT_NE(p.ReqQty(amt), cap);
+
+  // reset and initialize with no strategy
+  p.ResetBehavior();
+  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max()); 
+  amt = p.TotalAvailable();
+  ASSERT_FLOAT_EQ(amt, cap);
+  ASSERT_FLOAT_EQ(p.ReqQty(amt), cap);
+  ASSERT_EQ(p.NReq(amt), 1);
+
+}
 
 TEST_F(MatlBuyPolicyTests, StartStop) {
   double cap = 5;
