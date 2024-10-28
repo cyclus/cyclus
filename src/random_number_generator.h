@@ -187,7 +187,7 @@ class BinaryDoubleDist : public DoubleDistribution {
     double choice_a_, choice_b_;
   public:
 
-    BinaryDoubleDist(double p_success, doublle choice_a, double choice_b) : 
+    BinaryDoubleDist(double p_success, double choice_a, double choice_b) : 
       dist(1, p_success),choice_a_(choice_a), choice_b_(choice_b) {
       if (p_success < 0) {
         throw ValueError("Probability of choice A must be positive");
@@ -336,7 +336,7 @@ class BinaryIntDist : public IntDistribution {
     int choice_a_, choice_b_;
   public:
 
-    BinaryDoubleDist(double p_success, int choice_a, int choice_b) : 
+    BinaryIntDist(double p_success, int choice_a, int choice_b) : 
       dist(1, p_success),choice_a_(choice_a), choice_b_(choice_b) {
       if (p_success < 0) {
         throw ValueError("Probability of choice A must be positive");
