@@ -182,20 +182,21 @@ class ExponentialDoubleDist : public DoubleDistribution {
 /// Binary distribution requires twp options and a probability
 class BinaryDoubleDist : public DoubleDistribution {
   private:
-    double choice_a_, choice_b_, prob_a_;
+    boost::random::binomial_distribution<int> dist;
+    double p_success_;
+    double choice_a_, choice_b_;
   public:
 
-    BinaryDoubleDist(double choice_a, double choice_b, double prob_a) : 
-      choice_a_(choice_a), choice_b_(choice_b), prob_a_(prob_a) {
-      if (prob_a_ < 0) {
+    BinaryDoubleDist(double p_success, doublle choice_a, double choice_b) : 
+      dist(1, p_success),choice_a_(choice_a), choice_b_(choice_b) {
+      if (p_success < 0) {
         throw ValueError("Probability of choice A must be positive");
       }
     };
     virtual double sample() { 
-      return RandomNumberGenerator::random_01() <= prob_a_ ? choice_a_ : choice_b_; }
-    virtual double prob() { return prob_a_; }
+      return dist(RandomNumberGenerator::gen_) ? choice_a_ : choice_b_; }
+    virtual double p() { return p_success_; }
 };
-
 
 class IntDistribution {
   public:
@@ -328,21 +329,22 @@ class ExponentialIntDist : public IntDistribution {
 };
 
 /// Binary distribution requires twp options and a probability
-class BinaryInteDist : public IntDistribution {
+class BinaryIntDist : public IntDistribution {
   private:
+    boost::random::binomial_distribution<int> dist;
+    double p_success_;
     int choice_a_, choice_b_;
-    double prob_a_;
   public:
 
-    BinaryDoubleDist(int choice_a, int choice_b, double prob_a) : 
-      choice_a_(choice_a), choice_b_(choice_b), prob_a_(prob_a) {
-      if (prob_a_ < 0) {
+    BinaryDoubleDist(double p_success, int choice_a, int choice_b) : 
+      dist(1, p_success),choice_a_(choice_a), choice_b_(choice_b) {
+      if (p_success < 0) {
         throw ValueError("Probability of choice A must be positive");
       }
     };
     virtual int sample() { 
-      return RandomNumberGenerator::random_01() <= prob_a_ ? choice_a_ : choice_b_; }
-    virtual double prob() { return prob_a_; }
+      return dist(RandomNumberGenerator::gen_) ? choice_a_ : choice_b_; }
+    virtual double p() { return p_success_; }
 };
 
 
