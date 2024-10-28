@@ -26,7 +26,7 @@ class RandomNumberGenerator {
     friend class UniformDoubleDist;
     friend class NormalDoubleDist;
     friend class PoissonDoubleDist;
-    friend class ExpontentialDoubleDist;
+    friend class ExponentialDoubleDist;
     friend class FixedIntDist;
     friend class UniformIntDist;
     friend class NormalIntDist;
@@ -160,14 +160,14 @@ class PoissonDoubleDist : public DoubleDistribution {
 };
 
 /// Exponential distribution requires lambda
-class ExpontentialDoubleDist : public DoubleDistribution {
+class ExponentialDoubleDist : public DoubleDistribution {
   private:
     boost::random::exponential_distribution<> dist;
     double lambda_;
   public:
-    typedef boost::shared_ptr<ExpontentialDoubleDist> Ptr;
+    typedef boost::shared_ptr<ExponentialDoubleDist> Ptr;
 
-    ExpontentialDoubleDist(double lambda) : dist(lambda), lambda_(lambda) {
+    ExponentialDoubleDist(double lambda) : dist(lambda), lambda_(lambda) {
       if (lambda_ < 0) {
         throw ValueError("Lambda must be positive");
       }
