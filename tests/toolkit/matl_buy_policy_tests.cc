@@ -515,6 +515,44 @@ TEST_F(MatlBuyPolicyTests, NormalActiveDormant) {
   delete a;
 }
 
+TEST_F(MatlBuyPolicyTests, BinomialActiveDormant) {
+  using cyclus::QueryResult;
+
+  boost::shared_ptr<NegativeBinomialIntDist> a_dist = boost::shared_ptr<NegativeBinomialIntDist>(new NegativeBinomialIntDist(1, 0.2));
+  boost::shared_ptr<NegativeBinomialIntDist> d_dist = boost::shared_ptr<NegativeBinomialIntDist>(new NegativeBinomialIntDist(1, 0.5));
+  
+  int dur = 12;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  TotalInvTracker buf_tracker({&inbuf});
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput, a_dist, d_dist, NULL)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  // Sampled active period is 6
+  EXPECT_EQ(0, qr.GetVal<int>("Time", 0));
+  EXPECT_EQ(1, qr.GetVal<int>("Time", 1));
+  // ...
+  EXPECT_EQ(6, qr.GetVal<int>("Time", 6));
+  // second cycle should start on time 8 (dormant length 1)
+  int second_cycle = qr.GetVal<int>("Time", 7);
+  EXPECT_EQ(8, second_cycle);
+
+  delete a;
+}
+
 TEST_F(MatlBuyPolicyTests, MixedActiveDormant) {
   using cyclus::QueryResult;
   

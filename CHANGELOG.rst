@@ -16,6 +16,7 @@ Since last release
 * New packaging strategies uniform and normal (#1813)
 * Add CI support for MacOS 12, 13, and 14 (#1814)
 * Methods to reset behavaiors of MaterialBuyPolicy (#1822)
+* More random distributions for the random number generator (#1821)
 
 **Changed:**
 
