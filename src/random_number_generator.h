@@ -27,6 +27,7 @@ class RandomNumberGenerator {
     friend class NormalDoubleDist;
     friend class PoissonDoubleDist;
     friend class ExponentialDoubleDist;
+    friend class BinaryDoubleDist;
     friend class FixedIntDist;
     friend class UniformIntDist;
     friend class NormalIntDist;
@@ -34,6 +35,7 @@ class RandomNumberGenerator {
     friend class NegativeBinomialIntDist;
     friend class PoissonIntDist;
     friend class ExponentialIntDist;
+    friend class BinaryIntDist;
 
   private:
     /// Returns a random number for use in a distribution
@@ -176,6 +178,25 @@ class ExponentialDoubleDist : public DoubleDistribution {
     virtual double lambda() { return lambda_; }
 };
 
+
+/// Binary distribution requires twp options and a probability
+class BinaryDoubleDist : public DoubleDistribution {
+  private:
+    double choice_a_, choice_b_, prob_a_;
+  public:
+
+    BinaryDoubleDist(double choice_a, double choice_b, double prob_a) : 
+      choice_a_(choice_a), choice_b_(choice_b), prob_a_(prob_a) {
+      if (prob_a_ < 0) {
+        throw ValueError("Probability of choice A must be positive");
+      }
+    };
+    virtual double sample() { 
+      return RandomNumberGenerator::random_01() <= prob_a_ ? choice_a_ : choice_b_; }
+    virtual double prob() { return prob_a_; }
+};
+
+
 class IntDistribution {
   public:
     typedef boost::shared_ptr<IntDistribution> Ptr;
@@ -305,6 +326,25 @@ class ExponentialIntDist : public IntDistribution {
     virtual int sample() { return dist(RandomNumberGenerator::gen_); }
     virtual double lambda() { return lambda_; }
 };
+
+/// Binary distribution requires twp options and a probability
+class BinaryInteDist : public IntDistribution {
+  private:
+    int choice_a_, choice_b_;
+    double prob_a_;
+  public:
+
+    BinaryDoubleDist(int choice_a, int choice_b, double prob_a) : 
+      choice_a_(choice_a), choice_b_(choice_b), prob_a_(prob_a) {
+      if (prob_a_ < 0) {
+        throw ValueError("Probability of choice A must be positive");
+      }
+    };
+    virtual int sample() { 
+      return RandomNumberGenerator::random_01() <= prob_a_ ? choice_a_ : choice_b_; }
+    virtual double prob() { return prob_a_; }
+};
+
 
 }
 
