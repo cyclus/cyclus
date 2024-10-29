@@ -128,8 +128,7 @@ flags:
     - Will try to compile from assembly, if possible (default). This is faster than compiling from source.
 
   * - ``--slow``
-    - Will NOT try to compile from assembly, if possible. This is slower as it must compile from source. 
-      **This is required to build on Apple Silicon**
+    - Will NOT try to compile from assembly, if possible. This is slower as it must compile from source.
           
   * - ``-D VAR``                                  
     - set environment variable(s).                                                                    
