@@ -352,8 +352,8 @@ class ResBuf {
   /// @param curr_time time to calculate decay inventory
   ///        (default: -1 uses the current time of the context)
   void Decay(int curr_time = -1) {
-    for (int i = 0; i < rs_.size(); i++) {
-      rs_.at(i)->Decay(curr_time);
+    for (auto rs : rs_) {
+      rs->Decay(curr_time);
     }
   }
 
