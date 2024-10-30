@@ -14,6 +14,8 @@
 #include "query_backend.h"
 #include "resource.h"
 #include "state_wrangler.h"
+#include "toolkit/metadata.h"
+
 
 // Undefines isnan from pyne
 #ifdef isnan
@@ -485,7 +487,13 @@ class Agent : public StateWrangler, virtual public Ider {
   /// an instance-unique ID for the agent
   int id_;
 
+
   Context* ctx_;
+  
+// Additional data that are not required for a Cyclus run
+ protected :
+  /// agent Metadata
+  cyclus::toolkit::Metadata metadata;
 };
 
 }  // namespace cyclus
