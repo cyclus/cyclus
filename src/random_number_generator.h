@@ -26,7 +26,8 @@ class RandomNumberGenerator {
     friend class UniformDoubleDist;
     friend class NormalDoubleDist;
     friend class PoissonDoubleDist;
-    friend class ExpontentialDoubleDist;
+    friend class ExponentialDoubleDist;
+    friend class BinaryDoubleDist;
     friend class FixedIntDist;
     friend class UniformIntDist;
     friend class NormalIntDist;
@@ -34,6 +35,7 @@ class RandomNumberGenerator {
     friend class NegativeBinomialIntDist;
     friend class PoissonIntDist;
     friend class ExponentialIntDist;
+    friend class BinaryIntDist;
 
   private:
     /// Returns a random number for use in a distribution
@@ -160,20 +162,40 @@ class PoissonDoubleDist : public DoubleDistribution {
 };
 
 /// Exponential distribution requires lambda
-class ExpontentialDoubleDist : public DoubleDistribution {
+class ExponentialDoubleDist : public DoubleDistribution {
   private:
     boost::random::exponential_distribution<> dist;
     double lambda_;
   public:
-    typedef boost::shared_ptr<ExpontentialDoubleDist> Ptr;
+    typedef boost::shared_ptr<ExponentialDoubleDist> Ptr;
 
-    ExpontentialDoubleDist(double lambda) : dist(lambda), lambda_(lambda) {
+    ExponentialDoubleDist(double lambda) : dist(lambda), lambda_(lambda) {
       if (lambda_ < 0) {
         throw ValueError("Lambda must be positive");
       }
     };
     virtual double sample() { return dist(RandomNumberGenerator::gen_); }
     virtual double lambda() { return lambda_; }
+};
+
+
+/// Binary distribution requires twp options and a probability
+class BinaryDoubleDist : public DoubleDistribution {
+  private:
+    boost::random::binomial_distribution<int> dist;
+    double p_success_;
+    double choice_a_, choice_b_;
+  public:
+
+    BinaryDoubleDist(double p_success, double choice_a, double choice_b) : 
+      dist(1, p_success),choice_a_(choice_a), choice_b_(choice_b) {
+      if (p_success < 0) {
+        throw ValueError("Probability of choice A must be positive");
+      }
+    };
+    virtual double sample() { 
+      return dist(RandomNumberGenerator::gen_) ? choice_a_ : choice_b_; }
+    virtual double p() { return p_success_; }
 };
 
 class IntDistribution {
@@ -305,6 +327,26 @@ class ExponentialIntDist : public IntDistribution {
     virtual int sample() { return dist(RandomNumberGenerator::gen_); }
     virtual double lambda() { return lambda_; }
 };
+
+/// Binary distribution requires twp options and a probability
+class BinaryIntDist : public IntDistribution {
+  private:
+    boost::random::binomial_distribution<int> dist;
+    double p_success_;
+    int choice_a_, choice_b_;
+  public:
+
+    BinaryIntDist(double p_success, int choice_a, int choice_b) : 
+      dist(1, p_success),choice_a_(choice_a), choice_b_(choice_b) {
+      if (p_success < 0) {
+        throw ValueError("Probability of choice A must be positive");
+      }
+    };
+    virtual int sample() { 
+      return dist(RandomNumberGenerator::gen_) ? choice_a_ : choice_b_; }
+    virtual double p() { return p_success_; }
+};
+
 
 }
 
