@@ -17,8 +17,11 @@ FacilityCost::FacilityCost(double capital_cost) {
 
 FacilityCost::~FacilityCost() {}
 
-void FacilityCost::EnumerateCosts(){
-    std::cout<<capital_cost_<<std::endl;
+std::string FacilityCost::EnumerateCosts(){
+    std::ostringstream strs;
+    strs << capital_cost_;
+    std::string costs = strs.str();
+    return costs;
 }
 
 }  // namespace toolkit

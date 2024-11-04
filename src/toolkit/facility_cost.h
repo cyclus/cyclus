@@ -29,7 +29,7 @@ class FacilityCost {
   /// The default destructor for FacilityCost
   ~FacilityCost();
 
-  void EnumerateCosts();
+  std::string EnumerateCosts();
 
  private:
   /// Capital cost of the facility

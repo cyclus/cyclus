@@ -2,6 +2,8 @@
 /// One should only need to:
 /// - '#include "toolkit/facility_cost.cycpp.h"' in the header of the 
 ///    archetype class (as private)
+/// - '#include "toolkit/facility_cost.h"' in the main include section
+///    of the header of the archetype class.
 
 cyclus::toolkit::FacilityCost cost;
 
