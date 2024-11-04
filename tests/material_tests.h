@@ -18,7 +18,7 @@ namespace cyclus {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class MaterialTest : public ::testing::Test {
  protected:
-  Nuc u235_, am241_, th228_, pb208_, pu239_;
+  Nuc u235_, am241_, th228_, pb208_, pu239_, sr89_;
   int one_g_;  // grams
   Composition::Ptr test_comp_, diff_comp_;
   double test_size_, fraction;
@@ -56,6 +56,7 @@ class MaterialTest : public ::testing::Test {
     am241_ = 952410000;
     th228_ = 902280000;
     pb208_ = 822080000;
+    sr89_ = 380890000;
     test_size_ = 10 * units::g;
     fraction = 2.0 / 3.0;
 
@@ -67,6 +68,7 @@ class MaterialTest : public ::testing::Test {
     v[u235_] = 1;
     v[pb208_] = 1;
     v[am241_] = 1;
+    v[sr89_] = 1;
     diff_comp_ = Composition::CreateFromMass(v);
 
     default_mat_ = Material::CreateUntracked(0 * units::g, test_comp_);

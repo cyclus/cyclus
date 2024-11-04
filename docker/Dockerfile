@@ -58,7 +58,7 @@ RUN mamba init bash
 SHELL ["/bin/bash", "--login",  "-c"]
 RUN mamba create -n cyclus
 SHELL ["mamba", "run", "--no-capture-output", "-n", "cyclus", "/bin/bash", "-c"]
-RUN mamba update -y python --no-pin && \
+RUN mamba install -y "python<3.13" --no-pin && \
     mamba update -y --all && \
     mamba install -y \
                compilers \

@@ -14,7 +14,9 @@ Since last release
 * Added ``doxygen-awesome-css`` to doxygen docs for style (#1787)
 * Added installation of files for building docs to share/cyclus/doc (#1807)
 * New packaging strategies uniform and normal (#1813)
-* Add CI support for MacOS 12, 13, and 14 (#1814)
+* Add CI support for MacOS 13, and 14 (#1814, #1819)
+* Methods to reset behavaiors of MaterialBuyPolicy (#1822)
+* More random distributions for the random number generator (#1821, #1827)
 
 **Changed:**
 
@@ -29,11 +31,14 @@ Since last release
 * Use keep_packaging instead of unpackaged in ResBuf (#1778)
 * Temporarily pin Boost libraries to <1.86.0 (#1796)
 * Package GetFillMass returns vector of masses (#1790, #1813)
+* Modified Doxygen homepage (#1815)
+* Pin ``python<3.13`` in CI workflows (#1826)
 
 **Removed:**
 
 * Removed the ResourceBuff class and replaced its instances with ResBuf (#1755)
 * Removed reference to deprecated ``ProgTranslator::Context`` class (#1811)
+* Removed ``exclusive_orders_only`` from schema (#1816)
 
 **Fixed:**
 
@@ -109,6 +114,7 @@ v1.6.0
 * Resolve pytest and compilation warnings related to invalid escape sequences (#1684, #1698)
 * Fix how Env::GetInstallPath() finds the location of the cyclus installation (#1689)
 * Fix Debian package generation (#1676)
+* Fixed ResBuf.Decay() and added test (#1825)
 
 
 

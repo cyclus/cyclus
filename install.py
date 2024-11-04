@@ -210,8 +210,7 @@ def main():
     parser.add_argument('--slow', dest='fast',
                         action='store_false', help="Will NOT try to compile "
                         "from assembly, if possible. This is slower as it "
-                        "must compile from source. **This is required to "
-                        "build on Apple Silicon**")
+                        "must compile from source.")
 
     args = parser.parse_args()
     # modify roots as needed
