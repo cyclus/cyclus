@@ -345,19 +345,44 @@ void MatlBuyPolicy::AcceptMatlTrades(
 }
 
 void MatlBuyPolicy::SetNextActiveTime() {
-  next_active_end_ = active_dist_->sample() + manager()->context()->time();
+  int active_length = active_dist_->sample();
+  next_active_end_ = active_length + manager()->context()->time();
+  if (manager() != NULL) {
+    std::string adtype;
+    if (use_cumulative_capacity()) {
+      adtype = "CumulativeCap";
+    } else {
+      adtype = "Active";
+    }
+    manager()->context()->NewDatum("BuyPolActiveDormant")
+                        ->AddVal("Agent", manager()->id())
+                        ->AddVal("Time", manager()->context()->time())
+                        ->AddVal("Type", adtype)
+                        ->AddVal("Length", active_length)
+                        ->Record();
+  }
   return;
 };
 
 void MatlBuyPolicy::SetNextDormantTime() {
+  int dormant_length;
   if (use_cumulative_capacity()) {
     // need the +1 when not using next_active_end_ 
-    next_dormant_end_ = (
-      dormant_dist_->sample() + manager()->context()->time() + 1);
+    dormant_length = dormant_dist_->sample();
+    next_dormant_end_ = dormant_length + manager()->context()->time() + 1;
   }
   else if (next_dormant_end_ >= 0) {
-    next_dormant_end_ = dormant_dist_->sample() + 
-                        std::max(next_active_end_, 1);
+    dormant_length = dormant_dist_->sample();
+    next_dormant_end_ = dormant_length + std::max(next_active_end_, 1);
+  }
+  if (manager() != NULL) {
+    std::string adtype = "Dormant";
+    manager()->context()->NewDatum("BuyPolActiveDormant")
+                        ->AddVal("Agent", manager()->id())
+                        ->AddVal("Time", manager()->context()->time())
+                        ->AddVal("Type", adtype)
+                        ->AddVal("Length", dormant_length)
+                        ->Record();
   }
   return;
 }
