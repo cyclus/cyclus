@@ -8,15 +8,6 @@
 namespace cyclus {
 namespace toolkit {
 
-// Interested in thoughts on the member initializer list
-FacilityCost::FacilityCost() : capital_cost_(0) {}
-
-FacilityCost::FacilityCost(double capital_cost) {
-  capital_cost_ = capital_cost;
-}
-
-FacilityCost::~FacilityCost() {}
-
 std::string FacilityCost::EnumerateCosts(){
     std::ostringstream strs;
     strs << capital_cost_;

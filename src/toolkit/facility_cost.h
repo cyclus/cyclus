@@ -20,16 +20,18 @@ class FacilityCost {
 
   /// The default constructor for FacilityCost. This creates an object
   /// with all costs set to 0.0.
-  FacilityCost();
-
-  /// FacilityCost constructor with capital_cost as a double
-  /// @param capital_cost Capital cost of the facility.
-  FacilityCost(double capital_cost);
+  FacilityCost() : capital_cost_(0) {}
 
   /// The default destructor for FacilityCost
-  ~FacilityCost();
+  ~FacilityCost() = default;
 
+  // A function to list all costs as strings
   std::string EnumerateCosts();
+
+  // Setter for capital_cost_
+  void setCapitalCost(double capital_cost) {
+    capital_cost_ = capital_cost;
+  }
 
  private:
   /// Capital cost of the facility
