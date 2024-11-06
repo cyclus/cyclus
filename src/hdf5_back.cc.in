@@ -26,11 +26,7 @@ Hdf5Back::Hdf5Back(std::string path) : path_(path) {
   opened_types_.insert(uuid_type_);
 
   hsize_t sha1_len = CYCLUS_SHA1_NINT;  // 160 bits == 32 bits / int  * 5 ints
-  #if BOOST_VERSION_MINOR < 86
-    sha1_type_ = H5Tarray_create2(H5T_NATIVE_UINT, 1, &sha1_len);
-  #else
-    sha1_type_ = H5Tarray_create2(H5T_NATIVE_UCHAR, 1, &sha1_len);
-  #endif
+  sha1_type_ = H5Tarray_create2(H5T_NATIVE_UINT, 1, &sha1_len);
   opened_types_.insert(sha1_type_);
 
   vlstr_type_ = H5Tcopy(H5T_C_S1);
@@ -758,11 +754,7 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
       throw IOError("could not create HDF5 array " + name);
   } else {
     hsize_t dims[CYCLUS_SHA1_NINT];
-    #if BOOST_VERSION_MINOR < 86
-      std::fill(std::begin(dims), std::end(dims), UINT_MAX);
-    #else
-      std::fill(std::begin(dims), std::end(dims), UCHAR_MAX);
-    #endif
+    std::fill(std::begin(dims), std::end(dims), UINT_MAX);
     hsize_t chunkdims[CYCLUS_SHA1_NINT];  // this is a single element
     std::fill(std::begin(chunkdims), std::end(chunkdims), 1);
     dt = vldts_[dbtype];

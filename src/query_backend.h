@@ -13,15 +13,14 @@
 #include "rec_backend.h"
 #include "any.hpp"
 
+#define CYCLUS_SHA1_NINT 5 // always treat the digest as if it were uint[5]
+#define CYCLUS_SHA1_SIZE 20
+#define CYCLUS_UUID_SIZE 16
 #if BOOST_VERSION_MINOR < 86
-  #define CYCLUS_UUID_SIZE 16
-  #define CYCLUS_SHA1_SIZE 20 // 5 * sizeof(unsigned int)
-  #define CYCLUS_SHA1_NINT 5
+  #define DIGEST_NINT 5
   using DIGEST_VAL_TYPE = unsigned int;
 #else
-  #define CYCLUS_UUID_SIZE 16
-  #define CYCLUS_SHA1_SIZE 20 // 20 * sizeof(unsigned char)
-  #define CYCLUS_SHA1_NINT 20
+  #define DIGEST_NINT 20
   using DIGEST_VAL_TYPE = unsigned char;
 #endif
 
@@ -647,7 +646,7 @@ inline bool CmpConds(T* x, std::vector<Cond*>* conds) {
 /// The reason why this is public is that it needs to be directly writable
 /// from buffers coming from HDF5. In the future, this really should just be
 /// a std::array.
-using Digest = std::array<DIGEST_VAL_TYPE, CYCLUS_SHA1_NINT>;
+using Digest = std::array<DIGEST_VAL_TYPE, DIGEST_NINT>;
 
 class Sha1 {
  public:
@@ -1031,7 +1030,7 @@ class Sha1 {
 
   Digest digest() {
     Digest d;
-    DIGEST_VAL_TYPE tmp[CYCLUS_SHA1_NINT];
+    DIGEST_VAL_TYPE tmp[DIGEST_NINT];
     hash_.get_digest(tmp);
     std::copy(std::begin(tmp), std::end(tmp), d.begin());
     return d;
