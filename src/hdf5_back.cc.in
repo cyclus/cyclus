@@ -806,16 +806,8 @@ void Hdf5Back::InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key,
     throw IOError("could not select hyperslab of value array "
                   "in the database '" + path_ + "'.");
   const char* buf[1] = {val.c_str()};
-
-  std::cout << "dset: " << dset << std::endl;
-  std::cout << "dbtype: " << dbtype << std::endl;
-  std::cout << "vldts[dbtype]: " << vldts_[dbtype] << std::endl;
-  std::cout << "mspace: " << mspace << std::endl;
-  std::cout << "dspace: " << dspace << std::endl;
-  std::cout << "buf: " << buf << std::endl;
   status = H5Dwrite(dset, vldts_[dbtype], mspace, dspace, H5P_DEFAULT, buf);
   if (status < 0) {
-    std::cout << "status: " << status << std::endl;
     throw IOError("could not write string to value array "
                   "in the database '" + path_ + "'.");
   }
