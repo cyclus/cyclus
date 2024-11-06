@@ -19,8 +19,9 @@ class FacilityCost {
  public:
 
   /// The default constructor for FacilityCost. This creates an object
-  /// with all costs set to 0.0.
-  FacilityCost() : capital_cost_(0) {}
+  /// with all costs set to 0.0 as default, but with the option to set
+  /// them manually.
+  FacilityCost(double capital_cost = 0) : capital_cost_(capital_cost) {}
 
   /// The default destructor for FacilityCost
   ~FacilityCost() = default;
