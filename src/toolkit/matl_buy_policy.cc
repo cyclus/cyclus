@@ -366,20 +366,23 @@ void MatlBuyPolicy::SetNextActiveTime() {
 
 void MatlBuyPolicy::SetNextDormantTime() {
   int dormant_length;
+  int dormant_start;
   if (use_cumulative_capacity()) {
     // need the +1 when not using next_active_end_ 
     dormant_length = dormant_dist_->sample();
-    next_dormant_end_ = dormant_length + manager()->context()->time() + 1;
+    dormant_start = manager()->context()->time() + 1;
   }
   else if (next_dormant_end_ >= 0) {
     dormant_length = dormant_dist_->sample();
-    next_dormant_end_ = dormant_length + std::max(next_active_end_, 1);
+    dormant_start = std::max(next_active_end_, 1);
+    
   }
+  next_dormant_end_ = dormant_length + dormant_start;
   if (manager() != NULL) {
     std::string adtype = "Dormant";
     manager()->context()->NewDatum("BuyPolActiveDormant")
                         ->AddVal("Agent", manager()->id())
-                        ->AddVal("Time", manager()->context()->time())
+                        ->AddVal("Time", dormant_start)
                         ->AddVal("Type", adtype)
                         ->AddVal("Length", dormant_length)
                         ->Record();
