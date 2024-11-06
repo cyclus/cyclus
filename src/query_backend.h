@@ -13,16 +13,9 @@
 #include "rec_backend.h"
 #include "any.hpp"
 
-#define CYCLUS_SHA1_NINT 5 // always treat the digest as if it were uint[5]
+#define CYCLUS_SHA1_NINT 5
 #define CYCLUS_SHA1_SIZE 20
 #define CYCLUS_UUID_SIZE 16
-#if BOOST_VERSION_MINOR < 86
-  #define BOOST_DIGEST_NINT 5
-  using BOOST_DIGEST_TYPE = unsigned int;
-#else
-  #define BOOST_DIGEST_NINT 20
-  using BOOST_DIGEST_TYPE = unsigned char;
-#endif
 
 namespace cyclus {
 
@@ -631,81 +624,7 @@ inline bool CmpConds(T* x, std::vector<Cond*>* conds) {
 }
 
 /// The digest type for SHA1s.
-///
-/// This class is a hack around a language deficiency in C++. You cannot pass
-/// around an array (unsinged int[5]) between function calls. You can only
-/// pass pointers, which would involve lost of new/free and heap shenanigans
-/// that are not needed for a dumb container. Therefore Sha1::Digest() cannot
-/// return what would be most natural. The second most natural thing would be
-/// a std::array<unsigned int, 5>. However, std::array is a C++11 feature and
-/// we are not yet ready to go down that road.
-///
-/// To pass an array into and out of a function it has to be inside of struct
-/// or a class. I chose a class here since there are many member functions.
-///
-/// The reason why this is public is that it needs to be directly writable
-/// from buffers coming from HDF5. In the future, this really should just be
-/// a std::array.
-class Digest {
- public:
-  unsigned int val[CYCLUS_SHA1_NINT];
-
-  /// Casts the value of this digest to a vector of the templated type.
-  template <typename T>
-  inline std::vector<T> cast() const {
-    std::vector<T> rtn = std::vector<T>(CYCLUS_SHA1_NINT);
-    for (unsigned int i = 0; i < CYCLUS_SHA1_NINT; ++i)
-      rtn[i] = static_cast<T>(val[i]);
-    return rtn;
-  }
-
-  // operators
-  inline std::ostream& operator<<(std::ostream& out) const {
-    return out << "[" << val[0] << ", " << val[1] << ", " <<  val[2] << \
-                  ", " << val[3] << ", " << val[4] << "]";
-  }
-
-  inline bool operator< (const cyclus::Digest& rhs) const {
-    bool rtn = false;
-    for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
-      if (val[i] < rhs.val[i]) {
-        rtn = true;
-        break;
-      } else if (val[i] > rhs.val[i]) {
-        rtn = false;
-        break;
-      }  // else they are equal and we need to check the next index
-    }
-    return rtn;
-  }
-
-  inline bool operator> (const cyclus::Digest& rhs) const {
-    return !operator<(rhs) && !operator==(rhs);
-  }
-
-  inline bool operator<=(const cyclus::Digest& rhs) const {
-    return !operator>(rhs);
-  }
-
-  inline bool operator>=(const cyclus::Digest& rhs) const {
-    return !operator<(rhs);
-  }
-
-  inline bool operator==(const cyclus::Digest& rhs) const {
-    bool rtn = true;
-    for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
-      if (val[i] != rhs.val[i]) {
-        rtn = false;
-        break;
-      }  // else they are equal and we need to check the next index.
-    }
-    return rtn;
-  }
-
-  inline bool operator!=(const cyclus::Digest& rhs) const {
-    return !operator==(rhs);
-  }
-};
+using Digest = std::array<unsigned int, CYCLUS_SHA1_NINT>;
 
 class Sha1 {
  public:
@@ -1085,21 +1004,24 @@ class Sha1 {
     }
   }
 
-  /// \}
 
   Digest digest() {
     Digest d;
-    BOOST_DIGEST_TYPE tmp[BOOST_DIGEST_NINT];
+    #if BOOST_VERSION_MINOR < 86
+        unsigned int tmp[5];
+    #else
+        unsigned char tmp[20];
+    #endif
     hash_.get_digest(tmp);
 
     for (int i = 0; i < CYCLUS_SHA1_NINT; i++) {
         #if BOOST_VERSION_MINOR < 86
-            d.val[i] = tmp[i];
+            d[i] = tmp[i];
         #else
-            d.val[i] = (static_cast<uint>(tmp[i*4]) << 24) |
-                    (static_cast<uint>(tmp[i*4 + 1]) << 16) |
-                    (static_cast<uint>(tmp[i*4 + 2]) << 8) |
-                    (static_cast<uint>(tmp[i*4 + 3]));
+            d[i] = (static_cast<uint>(tmp[i*sizeof(unsigned int)]) << 24) |
+                    (static_cast<uint>(tmp[i*sizeof(unsigned int) + 1]) << 16) |
+                    (static_cast<uint>(tmp[i*sizeof(unsigned int) + 2]) << 8) |
+                    (static_cast<uint>(tmp[i*sizeof(unsigned int) + 3]));
         #endif
     }
     return d;
