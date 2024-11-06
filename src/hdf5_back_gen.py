@@ -2197,7 +2197,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
         result.nodes.append(vl_write(t, variable, depth=depth, prefix=prefix,
                                      pointer=pointer))
         key = get_variable("key", depth=depth, prefix=prefix)
-        result.nodes.append(memcpy(offset, key + ".data()", "CYCLUS_SHA1_SIZE"))
+        result.nodes.append(memcpy(offset, key + ".val", "CYCLUS_SHA1_SIZE"))
         return result
     # Handle primitive bodies
     if is_primitive(t):
@@ -2242,7 +2242,7 @@ def get_write_body(t, shape_array, depth=0, prefix="", variable="a",
             result.nodes.append(vl_write(t, fixed_val, depth=depth,
                                          prefix=prefix))
             key = get_variable("key", depth=depth, prefix=prefix)
-            result.nodes.append(memcpy(offset, key + ".data()", "CYCLUS_SHA1_SIZE"))
+            result.nodes.append(memcpy(offset, key + ".val", "CYCLUS_SHA1_SIZE"))
         # Handle fixed length containers
         else:
             new_variable = variable
@@ -2519,7 +2519,7 @@ def to_buf_body(t, vl_list, depth=0, prefix="", variable=None,
             loop_block.nodes.append(vl_write(ORIGIN_TO_VL[child], child_var,
                                              depth=depth+1, prefix=prefix+part))
             key_var = get_variable("key", depth=depth+1, prefix=prefix+part)
-            loop_block.nodes.append(memcpy(new_offset, key_var+".data()",
+            loop_block.nodes.append(memcpy(new_offset, key_var+".val",
                                            item_size))
         # Other primitives can be copied
         elif vl == 0:

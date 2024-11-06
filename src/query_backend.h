@@ -17,11 +17,11 @@
 #define CYCLUS_SHA1_SIZE 20
 #define CYCLUS_UUID_SIZE 16
 #if BOOST_VERSION_MINOR < 86
-  #define DIGEST_NINT 5
-  using DIGEST_VAL_TYPE = unsigned int;
+  #define BOOST_DIGEST_NINT 5
+  using BOOST_DIGEST_TYPE = unsigned int;
 #else
-  #define DIGEST_NINT 20
-  using DIGEST_VAL_TYPE = unsigned char;
+  #define BOOST_DIGEST_NINT 20
+  using BOOST_DIGEST_TYPE = unsigned char;
 #endif
 
 namespace cyclus {
@@ -646,7 +646,66 @@ inline bool CmpConds(T* x, std::vector<Cond*>* conds) {
 /// The reason why this is public is that it needs to be directly writable
 /// from buffers coming from HDF5. In the future, this really should just be
 /// a std::array.
-using Digest = std::array<DIGEST_VAL_TYPE, DIGEST_NINT>;
+class Digest {
+ public:
+  unsigned int val[CYCLUS_SHA1_NINT];
+
+  /// Casts the value of this digest to a vector of the templated type.
+  template <typename T>
+  inline std::vector<T> cast() const {
+    std::vector<T> rtn = std::vector<T>(CYCLUS_SHA1_NINT);
+    for (unsigned int i = 0; i < CYCLUS_SHA1_NINT; ++i)
+      rtn[i] = static_cast<T>(val[i]);
+    return rtn;
+  }
+
+  // operators
+  inline std::ostream& operator<<(std::ostream& out) const {
+    return out << "[" << val[0] << ", " << val[1] << ", " <<  val[2] << \
+                  ", " << val[3] << ", " << val[4] << "]";
+  }
+
+  inline bool operator< (const cyclus::Digest& rhs) const {
+    bool rtn = false;
+    for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
+      if (val[i] < rhs.val[i]) {
+        rtn = true;
+        break;
+      } else if (val[i] > rhs.val[i]) {
+        rtn = false;
+        break;
+      }  // else they are equal and we need to check the next index
+    }
+    return rtn;
+  }
+
+  inline bool operator> (const cyclus::Digest& rhs) const {
+    return !operator<(rhs) && !operator==(rhs);
+  }
+
+  inline bool operator<=(const cyclus::Digest& rhs) const {
+    return !operator>(rhs);
+  }
+
+  inline bool operator>=(const cyclus::Digest& rhs) const {
+    return !operator<(rhs);
+  }
+
+  inline bool operator==(const cyclus::Digest& rhs) const {
+    bool rtn = true;
+    for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
+      if (val[i] != rhs.val[i]) {
+        rtn = false;
+        break;
+      }  // else they are equal and we need to check the next index.
+    }
+    return rtn;
+  }
+
+  inline bool operator!=(const cyclus::Digest& rhs) const {
+    return !operator==(rhs);
+  }
+};
 
 class Sha1 {
  public:
@@ -1030,9 +1089,19 @@ class Sha1 {
 
   Digest digest() {
     Digest d;
-    DIGEST_VAL_TYPE tmp[DIGEST_NINT];
+    BOOST_DIGEST_TYPE tmp[BOOST_DIGEST_NINT];
     hash_.get_digest(tmp);
-    std::copy(std::begin(tmp), std::end(tmp), d.begin());
+
+    for (int i = 0; i < CYCLUS_SHA1_NINT; i++) {
+        #if BOOST_VERSION_MINOR < 86
+            d.val[i] = tmp[i];
+        #else
+            d.val[i] = (static_cast<uint>(tmp[i*4]) << 24) |
+                    (static_cast<uint>(tmp[i*4 + 1]) << 16) |
+                    (static_cast<uint>(tmp[i*4 + 2]) << 8) |
+                    (static_cast<uint>(tmp[i*4 + 3]));
+        #endif
+    }
     return d;
   }
 
