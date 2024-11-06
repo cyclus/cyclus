@@ -17,6 +17,7 @@ Since last release
 * Add CI support for MacOS 13, and 14 (#1814, #1819)
 * Methods to reset behavaiors of MaterialBuyPolicy (#1822)
 * More random distributions for the random number generator (#1821, #1827)
+* Added example of header code injection for facility cost (#1829)
 
 **Changed:**
 
