@@ -1007,10 +1007,11 @@ class Sha1 {
 
   Digest digest() {
     Digest d;
+    const unsigned int block_size = sizeof(unsigned int);
     #if BOOST_VERSION_MINOR < 86
-        unsigned int tmp[5];
+        unsigned int tmp[CYCLUS_SHA1_NINT];
     #else
-        unsigned char tmp[20];
+        unsigned char tmp[CYCLUS_SHA1_NINT * block_size];
     #endif
     hash_.get_digest(tmp);
 
@@ -1018,10 +1019,7 @@ class Sha1 {
         #if BOOST_VERSION_MINOR < 86
             d[i] = tmp[i];
         #else
-            d[i] = (static_cast<uint>(tmp[i*sizeof(unsigned int)]) << 24) |
-                    (static_cast<uint>(tmp[i*sizeof(unsigned int) + 1]) << 16) |
-                    (static_cast<uint>(tmp[i*sizeof(unsigned int) + 2]) << 8) |
-                    (static_cast<uint>(tmp[i*sizeof(unsigned int) + 3]));
+            d[i] = static_cast<unsigned int>(*(tmp + i * block_size));
         #endif
     }
     return d;
