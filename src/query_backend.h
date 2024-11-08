@@ -1,7 +1,7 @@
 #ifndef CYCLUS_SRC_QUERY_BACKEND_H_
 #define CYCLUS_SRC_QUERY_BACKEND_H_
 
-#include <climits>
+#include <limits>
 #include <list>
 #include <map>
 #include <set>
