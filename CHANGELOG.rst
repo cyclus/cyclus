@@ -49,6 +49,7 @@ Since last release
 * Removed the module imports in `cyclus/__init__.py` and removed the need for multi-phase initialization of Cython modules (#1809)
 * No longer use deprecated Numpy Cython api when Cython>=3 (#1811)
 * ResTracker Extract gave the wrong parent_id to one of the child resources (#1806)
+* Support Boost v1.86 (#1792)
 
 
 v1.6.0
