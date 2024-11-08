@@ -14,7 +14,8 @@
 #include "any.hpp"
 
 #define CYCLUS_SHA1_NINT 5
-#define CYCLUS_SHA1_SIZE (sizeof(unsigned int) * CYCLUS_SHA1_NINT)
+using CYCLUS_SHA1_ELEM_TYPE = unsigned int;
+#define CYCLUS_SHA1_SIZE (sizeof(CYCLUS_SHA1_ELEM_TYPE) * CYCLUS_SHA1_NINT)
 #define CYCLUS_UUID_SIZE 16
 
 namespace cyclus {
@@ -624,7 +625,7 @@ inline bool CmpConds(T* x, std::vector<Cond*>* conds) {
 }
 
 /// The digest type for SHA1s.
-using Digest = std::array<unsigned int, CYCLUS_SHA1_NINT>;
+using Digest = std::array<CYCLUS_SHA1_ELEM_TYPE, CYCLUS_SHA1_NINT>;
 
 class Sha1 {
  public:
@@ -1007,7 +1008,7 @@ class Sha1 {
 
   Digest digest() {
     Digest d;
-    const unsigned int block_size = CYCLUS_SHA1_SIZE / CYCLUS_SHA1_NINT;
+    const unsigned int block_size = sizeof(CYCLUS_SHA1_ELEM_TYPE);
     const unsigned int bits_per_byte = std::numeric_limits<unsigned char>::digits;
     #if BOOST_VERSION_MINOR < 86
         unsigned int tmp[CYCLUS_SHA1_NINT];
@@ -1020,7 +1021,7 @@ class Sha1 {
         #if BOOST_VERSION_MINOR < 86
             d[i] = tmp[i];
         #else
-            unsigned int elem_bytes = 0;
+            CYCLUS_SHA1_ELEM_TYPE elem = 0;
             unsigned int shift_amount;
             for (size_t byte = 0; byte < block_size; ++byte) {
                 #if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -1028,9 +1029,9 @@ class Sha1 {
                 #else
                     shift_amount = (block_size - byte - 1) * bits_per_byte;
                 #endif
-                elem_bytes |= tmp[i*block_size + byte] << shift_amount;
+                elem |= tmp[i*block_size + byte] << shift_amount;
             }
-            d[i] = elem_bytes;
+            d[i] = elem;
         #endif
     }
     return d;
