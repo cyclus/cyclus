@@ -130,7 +130,7 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
-RUN python install.py -j ${make_cores} --allow-milps --parallel
+RUN python3 install.py -j ${make_cores} --allow-milps --parallel
 ENV PATH /root/.local/bin:$PATH
 
 FROM cyclus AS deb-generation
