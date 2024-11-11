@@ -127,8 +127,7 @@ void Timer::DoTock() {
   }
 
   #pragma omp parallel for
-  for (int i = 0; i < cpp_agents.size(); i++) {
-    TimeListener* agent = cpp_agents[i];
+  for (TimeListener* agent : cpp_agents) {
     agent->Tock();
   }
 
