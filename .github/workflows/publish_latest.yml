@@ -155,3 +155,31 @@ jobs:
           tags: ghcr.io/cyclus/cyclus_rocky_${{ matrix.rocky_versions }}/cyclus:${{ env.tag }}
           build-args: |
             rocky_version=${{ matrix.rocky_versions }}
+
+
+  trigger-feedstock-ci:
+    if: github.event.workflow == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install GitHub CLI
+        run: |
+          (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
+          && sudo mkdir -p -m 755 /etc/apt/keyrings \
+          && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+          && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
+
+      - name: Checkout cyclus-feedstock
+        uses: actions/checkout@v4
+        with:
+          repository: bennnibbelink/cyclus-feedstock
+          ref: dev
+
+      - name: PR cyclus-feedstock
+        run: |
+          git checkout -b cyclus-${{ github.sha }}
+          git commit --allow-empty -m "Trigger build for Cyclus commit ${{ github.sha }}"
+          git push
+          gh pr create --repo conda-forge/cyclus-feedstock --base dev --draft --label automerge --title "Cyclus `main - ${{ github.sha }}`"
