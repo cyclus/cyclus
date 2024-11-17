@@ -215,4 +215,4 @@ jobs:
           git add .
           git commit -m "Trigger build for Cyclus commit ${SHORT_SHA}"
           git push --set-upstream origin ${NEW_BRANCH}
-          gh pr create --repo conda-forge/cyclus-feedstock --base dev --draft --label automerge --title "Cyclus `main - ${SHORT_SHA}`"
+          gh pr create --repo conda-forge/cyclus-feedstock --base dev --draft --label automerge --title "Cyclus `main - ${SHORT_SHA}`" --fill
