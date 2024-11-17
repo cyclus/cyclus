@@ -179,11 +179,13 @@ jobs:
 
       - name: PR cyclus-feedstock
         run: |
-          pwd
-          ls -l
+          SHORT_SHA=$(echo ${{github.sha}} | cut -c1-7)
+          NEW_BRANCH=cyclus-${SHORT_SHA}
+          echo ${SHORT_SHA}
+          echo ${NEW_BRANCH}
           git config user.email "cyclus-bot@email.com"
           git config user.name "cyclus-bot"
-          git checkout -b cyclus-${{ github.sha }}
-          git commit --allow-empty -m "Trigger build for Cyclus commit ${{ github.sha }}"
-          git push
-          gh pr create --repo conda-forge/cyclus-feedstock --base dev --draft --label automerge --title "Cyclus `main - ${{ github.sha }}`"
+          git checkout -b ${NEW_BRANCH}
+          git commit --allow-empty -m "Trigger build for Cyclus commit ${SHORT_SHA}"
+          git push --set-upstream origin ${NEW_BRANCH}
+          gh pr create --repo conda-forge/cyclus-feedstock --base dev --draft --label automerge --title "Cyclus `main - ${SHORT_SHA}`"
