@@ -227,4 +227,4 @@ jobs:
             --draft \
             --label automerge \
             --title "Cyclus commit \`main - ${SHORT_SHA}\`" \
-            --body "Auto-triggered PR from push to Cyclus `main` branch.  If CI passes this will be merged automatically."
+            --body "Auto-triggered PR from push to Cyclus \`main\` branch.  If CI passes this will be merged automatically."
