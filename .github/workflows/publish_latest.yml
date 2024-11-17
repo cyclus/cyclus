@@ -158,6 +158,9 @@ jobs:
 
 
   trigger-feedstock-ci:
+    permissions:
+      contents: write
+      pull-requests: write
     # if: github.event.workflow == 'push'
     runs-on: ubuntu-latest
     steps:
@@ -176,6 +179,7 @@ jobs:
         with:
           repository: bennibbelink/cyclus-feedstock
           ref: dev
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: PR cyclus-feedstock
         run: |
@@ -183,8 +187,8 @@ jobs:
           NEW_BRANCH=cyclus-${SHORT_SHA}
           echo ${SHORT_SHA}
           echo ${NEW_BRANCH}
-          git config user.email "cyclus-bot@email.com"
-          git config user.name "cyclus-bot"
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
           git checkout -b ${NEW_BRANCH}
           git commit --allow-empty -m "Trigger build for Cyclus commit ${SHORT_SHA}"
           git push --set-upstream origin ${NEW_BRANCH}
