@@ -179,7 +179,7 @@ jobs:
         with:
           repository: bennibbelink/cyclus-feedstock
           ref: dev
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.FEEDSTOCK_TOKEN }}
 
       - name: PR cyclus-feedstock
         run: |
