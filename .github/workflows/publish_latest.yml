@@ -178,8 +178,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: bennibbelink/cyclus-feedstock
-          ref: dev
           token: ${{ secrets.FEEDSTOCK_TOKEN }}
+
+      - name: Sync fork
+        env:
+          GH_TOKEN: ${{ secrets.FEEDSTOCK_TOKEN }}
+        run: |
+          gh repo sync bennibbelink/cyclus-feedstock -b main
+          gh repo sync bennibbelink/cyclus-feedstock -b dev
 
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
@@ -215,4 +221,10 @@ jobs:
           git add .
           git commit -m "Trigger build for Cyclus commit ${SHORT_SHA}"
           git push --set-upstream origin ${NEW_BRANCH}
-          gh pr create --repo conda-forge/cyclus-feedstock --base dev --draft --label automerge --title "Cyclus `main - ${SHORT_SHA}`" --fill
+          gh pr create \
+            --repo conda-forge/cyclus-feedstock \
+            --base dev \
+            --draft \
+            --label automerge \
+            --title "Cyclus commit `main - ${SHORT_SHA}`" \
+            --body "Auto-triggered PR from push to Cyclus `main` branch.  If CI passes this will be merged automatically."
