@@ -181,7 +181,28 @@ jobs:
           ref: dev
           token: ${{ secrets.FEEDSTOCK_TOKEN }}
 
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: "3.12"
+          miniforge-version: "latest"
+          conda-solver: "libmamba"
+          auto-update-conda: true
+          channels: conda-forge
+
+      - name: Increment build number and rerender
+        shell: bash -el {0}
+        run: |
+          mamba install -y yq conda-smithy
+          BUILD_NUMBER=$(yq eval '.build.number' recipe/meta.yaml)
+          NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
+          yq eval ".build.number = ${NEW_BUILD_NUMBER}" -i recipe/meta.yaml
+          conda-smithy rerender
+
       - name: PR cyclus-feedstock
+        env:
+          GH_TOKEN: ${{ secrets.FEEDSTOCK_TOKEN }}
+        shell: bash -el {0}
         run: |
           SHORT_SHA=$(echo ${{github.sha}} | cut -c1-7)
           NEW_BRANCH=cyclus-${SHORT_SHA}
@@ -190,6 +211,7 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git checkout -b ${NEW_BRANCH}
-          git commit --allow-empty -m "Trigger build for Cyclus commit ${SHORT_SHA}"
+          git add .
+          git commit -m "Trigger build for Cyclus commit ${SHORT_SHA}"
           git push --set-upstream origin ${NEW_BRANCH}
           gh pr create --repo conda-forge/cyclus-feedstock --base dev --draft --label automerge --title "Cyclus `main - ${SHORT_SHA}`"
