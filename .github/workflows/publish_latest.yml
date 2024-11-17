@@ -193,10 +193,11 @@ jobs:
       - name: Increment build number and rerender
         shell: bash -el {0}
         run: |
-          mamba install -y yq conda-smithy
-          BUILD_NUMBER=$(yq eval '.build.number' recipe/meta.yaml)
+          mamba install -y conda-smithy
+          BUILD_NUMBER=$(sed -n 's/^[[:space:]]*number:[[:space:]]*\([0-9][0-9]*\).*/\1/p' recipe/meta.yaml)
           NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
-          yq eval ".build.number = ${NEW_BUILD_NUMBER}" -i recipe/meta.yaml
+          echo "NEW_BUILD_NUMBER=${NEW_BUILD_NUMBER}"
+          sed -i "s/^\([[:space:]]*number:[[:space:]]*\)[0-9][0-9]*/\1$NEW_BUILD_NUMBER/" recipe/meta.yaml
           conda-smithy rerender
 
       - name: PR cyclus-feedstock
