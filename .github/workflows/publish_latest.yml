@@ -181,7 +181,8 @@ jobs:
         run: |
           pwd
           ls -l
-          cd ${{ github.workspace }}/cyclus-feedstock
+          git config user.email "cyclus-bot@email.com"
+          git config user.name "cyclus-bot"
           git checkout -b cyclus-${{ github.sha }}
           git commit --allow-empty -m "Trigger build for Cyclus commit ${{ github.sha }}"
           git push
