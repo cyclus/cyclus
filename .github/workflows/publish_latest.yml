@@ -186,6 +186,7 @@ jobs:
         run: |
           gh repo sync bennibbelink/cyclus-feedstock -b main
           gh repo sync bennibbelink/cyclus-feedstock -b dev
+          git checkout dev
 
       - name: Set up Miniconda
         uses: conda-incubator/setup-miniconda@v3
@@ -226,5 +227,5 @@ jobs:
             --base dev \
             --draft \
             --label automerge \
-            --title "Cyclus commit `main - ${SHORT_SHA}`" \
+            --title "Cyclus commit \`main - ${SHORT_SHA}\`" \
             --body "Auto-triggered PR from push to Cyclus `main` branch.  If CI passes this will be merged automatically."
