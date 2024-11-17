@@ -161,7 +161,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    # if: github.event.workflow == 'push'
+    if: github.event.workflow == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Install GitHub CLI
