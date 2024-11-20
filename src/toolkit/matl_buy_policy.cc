@@ -368,14 +368,20 @@ void MatlBuyPolicy::SetNextDormantTime() {
   int dormant_length;
   int dormant_start;
   if (use_cumulative_capacity()) {
-    // need the +1 when not using next_active_end_ 
+    // cumulative_cap dormant portion is updated only after the active cycle
+    // ends, because it's based on actual material recieved and not a dist
+    // that can be sampled at any time. Therefore, need the +1 when 
+    // because next_active_end_ is not useful
     dormant_length = dormant_dist_->sample();
     dormant_start = manager()->context()->time() + 1;
   }
-  else if (next_dormant_end_ >= 0) {
+  else if (next_dormant_end_ >= 0) { 
+    // dormant dist is used, and so is active dist. Just need to sample for
+    // length and add to active cycle
     dormant_length = dormant_dist_->sample();
     dormant_start = std::max(next_active_end_, 1);
-    
+  } else { // always active. Do not enter dormant
+    return;
   }
   next_dormant_end_ = dormant_length + dormant_start;
   if (manager() != NULL) {
