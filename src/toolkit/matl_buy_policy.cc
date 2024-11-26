@@ -380,7 +380,7 @@ void MatlBuyPolicy::SetNextDormantTime() {
     // length and add to active cycle
     dormant_length = dormant_dist_->sample();
     dormant_start = std::max(next_active_end_, 1);
-  } else { // always active. Do not enter dormant
+  } else { // next_active_end_ < 0 used to indicate always active. Do not enter dormant
     return;
   }
   next_dormant_end_ = dormant_length + dormant_start;
