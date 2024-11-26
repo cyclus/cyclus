@@ -348,18 +348,11 @@ void MatlBuyPolicy::SetNextActiveTime() {
   int active_length = active_dist_->sample();
   next_active_end_ = active_length + manager()->context()->time();
   if (manager() != NULL) {
-    std::string adtype;
     if (use_cumulative_capacity()) {
-      adtype = "CumulativeCap";
+      RecordActiveDormantTime(manager()->context()->time(), "CumulativeCap", active_length);
     } else {
-      adtype = "Active";
+      RecordActiveDormantTime(manager()->context()->time(), "Active", active_length);
     }
-    manager()->context()->NewDatum("BuyPolActiveDormant")
-                        ->AddVal("Agent", manager()->id())
-                        ->AddVal("Time", manager()->context()->time())
-                        ->AddVal("Type", adtype)
-                        ->AddVal("Length", active_length)
-                        ->Record();
   }
   return;
 };
@@ -385,13 +378,7 @@ void MatlBuyPolicy::SetNextDormantTime() {
   }
   next_dormant_end_ = dormant_length + dormant_start;
   if (manager() != NULL) {
-    std::string adtype = "Dormant";
-    manager()->context()->NewDatum("BuyPolActiveDormant")
-                        ->AddVal("Agent", manager()->id())
-                        ->AddVal("Time", dormant_start)
-                        ->AddVal("Type", adtype)
-                        ->AddVal("Length", dormant_length)
-                        ->Record();
+    RecordActiveDormantTime(dormant_start, "Dormant", dormant_length);
   }
   return;
 }
@@ -410,6 +397,16 @@ void MatlBuyPolicy::CheckActiveDormantCumulativeTimes() {
       LGH(INFO4) << "end of dormant period, next active time end: " << next_active_end_ << ", and next dormant time end: " << next_dormant_end_ << std::endl;
       }
   }
+  return;
+}
+
+void MatlBuyPolicy::RecordActiveDormantTime(int time, std::string type, int length) {
+  manager()->context()->NewDatum("BuyPolActiveDormant")
+                      ->AddVal("Agent", manager()->id())
+                      ->AddVal("Time", time)
+                      ->AddVal("Type", type)
+                      ->AddVal("Length", length)
+                      ->Record();
   return;
 }
 

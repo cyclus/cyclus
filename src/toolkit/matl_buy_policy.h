@@ -231,6 +231,7 @@ class MatlBuyPolicy : public Trader {
   void SetNextDormantTime();
   double SampleRequestSize();
   void CheckActiveDormantCumulativeTimes();
+  void RecordActiveDormantTime(int time, std::string type, int length);
 
  private:
   struct CommodDetail {
