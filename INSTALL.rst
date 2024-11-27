@@ -131,7 +131,10 @@ flags:
     - Will NOT try to compile from assembly, if possible. This is slower as it must compile from source.
           
   * - ``-D VAR``                                  
-    - set environment variable(s).                                                                    
+    - set environment variable(s).
+
+  * - ``--parallel``
+    - enable support for OpenMP directives                                                          
 
 
 For example, if you have installed coin-Cbc from source or otherwise have it

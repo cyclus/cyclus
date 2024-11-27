@@ -18,32 +18,35 @@ def idx(h):
 
 sha1array = lambda x: np.array(idx(hasher(x)), np.uint32)
 
-h5out = "output_temp.h5"
-sqliteout = "output_temp.sqlite"
+h5_suffix = ".h5"
+sqlite_suffix = ".sqlite"
+outfile_name = "cyclus_temp"
 
 def clean_outs():
     """Removes output files if they exist."""
-    if os.path.exists(h5out):
-        os.remove(h5out)
-    if os.path.exists(sqliteout):
-        os.remove(sqliteout)
+    for filename in os.listdir(os.getcwd()):
+        if os.path.isfile(filename):
+            if filename.startswith(outfile_name) and (filename.endswith(h5_suffix) or filename.endswith(sqlite_suffix)):
+                os.remove(filename)
 
 
-def which_outfile():
+def which_outfile(thread_count=1):
     """Uses sqlite if platform is Mac or on CI, otherwise uses hdf5
     """
     if 'CI' in os.environ or 'CIRCLECI' in os.environ:
-        return sqliteout
+        ext = sqlite_suffix
     elif platform.system() == 'Linux':
-        return h5out
+        ext = h5_suffix
     else:
-        return sqliteout
+        ext = sqlite_suffix
+    outfile = outfile_name + f'_{thread_count}' + ext
+    return outfile
 
 
 def tables_exist(outfile, table_names):
     """Checks if output database contains the specified tables.
     """
-    if outfile == h5out:
+    if outfile.endswith(h5_suffix):
         f = tables.open_file(outfile, mode = "r")
         res = all([t in f.root for t in table_names])
         f.close()
@@ -77,7 +80,7 @@ def find_ids(data, data_table, id_table):
 
 
 def to_ary(a, k):
-    if which_outfile() == sqliteout:
+    if which_outfile().endswith(sqlite_suffix):
         return np.array([x[k] for x in a])
     else:
         return a[k]
@@ -95,7 +98,7 @@ def exit_times(agent_id, exit_table):
 
     return exit_times
 
-def agent_time_series(names):
+def agent_time_series(names, outfile):
     """Return a list of timeseries corresponding to the number of agents in a
     Cyclus simulation
 
@@ -105,8 +108,8 @@ def agent_time_series(names):
     names : list
         the list of agent names
     """
-    if which_outfile() == h5out :
-        f = tables.open_file(h5out, mode = "r")
+    if outfile.endswith(h5_suffix):
+        f = tables.open_file(outfile, mode = "r")
         nsteps = f.root.Info.cols.Duration[:][0]
         entries = {name: [0] * nsteps for name in names}
         exits = {name: [0] * nsteps for name in names}
@@ -119,7 +122,7 @@ def agent_time_series(names):
         f.close()
 
     else :
-        conn = sqlite3.connect(sqliteout)
+        conn = sqlite3.connect(outfile)
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         exc = cur.execute
