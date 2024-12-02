@@ -46,6 +46,7 @@ Since last release
 
 * Removed unnecessary records being added to the Resource database by packaging process (#1761)
 * Removed GTest source code from code coverage reports (#1759)
+* Extended new GTest handling to Institutions as they were done in Regions (#)
 * Updated action versions to avoid node.js deprecation (#1802)
 * Removed the module imports in `cyclus/__init__.py` and removed the need for multi-phase initialization of Cython modules (#1809)
 * No longer use deprecated Numpy Cython api when Cython>=3 (#1811)
