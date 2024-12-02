@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(InstitutionTests);
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(InstitutionTests, Tick) {
   int time = 1;
