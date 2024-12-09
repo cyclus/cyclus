@@ -155,3 +155,76 @@ jobs:
           tags: ghcr.io/cyclus/cyclus_rocky_${{ matrix.rocky_versions }}/cyclus:${{ env.tag }}
           build-args: |
             rocky_version=${{ matrix.rocky_versions }}
+
+
+  trigger-feedstock-ci:
+    permissions:
+      contents: write
+      pull-requests: write
+    if: github.event.workflow == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install GitHub CLI
+        run: |
+          (type -p wget >/dev/null || (sudo apt update && sudo apt-get install wget -y)) \
+          && sudo mkdir -p -m 755 /etc/apt/keyrings \
+          && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+          && sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+          && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+          && sudo apt update \
+          && sudo apt install gh -y
+
+      - name: Checkout cyclus-feedstock
+        uses: actions/checkout@v4
+        with:
+          repository: bennibbelink/cyclus-feedstock
+          ref: dev
+          token: ${{ secrets.FEEDSTOCK_TOKEN }}
+
+      - name: Sync fork
+        env:
+          GH_TOKEN: ${{ secrets.FEEDSTOCK_TOKEN }}
+        run: |
+          gh repo sync bennibbelink/cyclus-feedstock -b main
+          gh repo sync bennibbelink/cyclus-feedstock -b dev
+
+      - name: Set up Miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: "latest"
+          conda-solver: "libmamba"
+          auto-update-conda: true
+          channels: conda-forge
+
+      - name: Increment build number and rerender
+        shell: bash -el {0}
+        run: |
+          mamba install -y conda-smithy
+          BUILD_NUMBER=$(sed -n 's/^[[:space:]]*number:[[:space:]]*\([0-9][0-9]*\).*/\1/p' recipe/meta.yaml)
+          NEW_BUILD_NUMBER=$((BUILD_NUMBER + 1))
+          echo "NEW_BUILD_NUMBER=${NEW_BUILD_NUMBER}"
+          sed -i "s/^\([[:space:]]*number:[[:space:]]*\)[0-9][0-9]*/\1$NEW_BUILD_NUMBER/" recipe/meta.yaml
+          conda-smithy rerender
+
+      - name: PR cyclus-feedstock
+        env:
+          GH_TOKEN: ${{ secrets.FEEDSTOCK_TOKEN }}
+        shell: bash -el {0}
+        run: |
+          SHORT_SHA=$(echo ${{github.sha}} | cut -c1-7)
+          NEW_BRANCH=cyclus-${SHORT_SHA}
+          echo ${SHORT_SHA}
+          echo ${NEW_BRANCH}
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git checkout -b ${NEW_BRANCH}
+          git add .
+          git commit -m "Trigger build for Cyclus commit ${SHORT_SHA}"
+          git push --set-upstream origin ${NEW_BRANCH}
+          gh pr create \
+            --repo conda-forge/cyclus-feedstock \
+            --base dev \
+            --draft \
+            --label automerge \
+            --title "Cyclus commit \`main - ${SHORT_SHA}\`" \
+            --body "Auto-triggered PR from a push to Cyclus \`main\` branch.  If CI passes this will be merged automatically."
