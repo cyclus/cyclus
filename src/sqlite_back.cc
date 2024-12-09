@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <locale>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
@@ -258,6 +259,7 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr
     case D: { \
     T vect = v.cast<T>(); \
     std::stringstream ss; \
+    ss.imbue(std::locale("")); \
     { \
       boost::archive::xml_oarchive ar(ss); \
       ar & BOOST_SERIALIZATION_NVP(vect); \
@@ -376,6 +378,7 @@ boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
       case D: { \
       char* data =  stmt->GetText(col, NULL); \
       std::stringstream ss; \
+      ss.imbue(std::locale("")); \
       ss << data; \
       boost::archive::xml_iarchive ar(ss); \
       T vect; \
