@@ -91,6 +91,7 @@ void Timer::PartitionTickers(std::vector<TimeListener*>& cpp_agents, std::vector
 }
 
 void Timer::DoTick() {
+  using cyclus::TimeListener;
   // partition our tickers_ map into C++ agents and python agents.
   // Python agents segfault when Tick'ed in parallel so we need to 
   // run them serially
@@ -115,6 +116,7 @@ void Timer::DoResEx(ExchangeManager<Material>* matmgr,
 }
 
 void Timer::DoTock() {
+  using cyclus::TimeListener;
   // partition our tickers_ map into C++ agents and python agents.
   // Python agents segfault when Tock'ed in parallel so we need to 
   // run them serially
