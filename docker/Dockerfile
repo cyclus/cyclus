@@ -55,8 +55,6 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
 
 ENV PATH=/opt/conda/bin:$PATH
 ENV MAMBA_ROOT_PREFIX=/opt/conda
-RUN mamba shell init --shell bash
-SHELL ["/bin/bash", "--login",  "-c"]
 RUN mamba create -n cyclus
 SHELL ["mamba", "run", "-n", "cyclus", "/bin/bash", "-c"]
 RUN mamba install -y "python<3.13" --no-pin && \
