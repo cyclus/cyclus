@@ -54,10 +54,11 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
     rm ~/miniforge.sh
 
 ENV PATH=/opt/conda/bin:$PATH
-RUN mamba init bash
+ENV MAMBA_ROOT_PREFIX=/opt/conda
+RUN mamba shell init --shell bash
 SHELL ["/bin/bash", "--login",  "-c"]
 RUN mamba create -n cyclus
-SHELL ["mamba", "run", "--no-capture-output", "-n", "cyclus", "/bin/bash", "-c"]
+SHELL ["mamba", "run", "-n", "cyclus", "/bin/bash", "-c"]
 RUN mamba install -y "python<3.13" --no-pin && \
     mamba update -y --all && \
     mamba install -y \
