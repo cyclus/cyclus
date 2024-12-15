@@ -91,7 +91,6 @@ void Timer::PartitionTickers(std::vector<TimeListener*>& cpp_agents, std::vector
 }
 
 void Timer::DoTick() {
-  using cyclus::TimeListener;
   // partition our tickers_ map into C++ agents and python agents.
   // Python agents segfault when Tick'ed in parallel so we need to 
   // run them serially
@@ -104,8 +103,8 @@ void Timer::DoTick() {
   }
 
   #pragma omp parallel for
-  for (TimeListener* agent : cpp_agents) {
-    agent->Tick();
+  for (size_t i = 0; i < cpp_agents.size(); ++i) {
+    cpp_agents[i]->Tick();
   }
 }
 
@@ -116,7 +115,6 @@ void Timer::DoResEx(ExchangeManager<Material>* matmgr,
 }
 
 void Timer::DoTock() {
-  using cyclus::TimeListener;
   // partition our tickers_ map into C++ agents and python agents.
   // Python agents segfault when Tock'ed in parallel so we need to 
   // run them serially
@@ -129,8 +127,8 @@ void Timer::DoTock() {
   }
 
   #pragma omp parallel for
-  for (TimeListener* agent : cpp_agents) {
-    agent->Tock();
+  for (size_t i = 0; i < cpp_agents.size(); ++i) {
+    cpp_agents[i]->Tock();
   }
 
   if (si_.explicit_inventory || si_.explicit_inventory_compact) {
