@@ -53,6 +53,7 @@ Since last release
 * ResTracker Extract gave the wrong parent_id to one of the child resources (#1806)
 * Support Boost v1.86 (#1792)
 * Set locale when writing/reading from serialized SQLite data (#1837)
+* Support mamba v2 CLI in Dockerfile (#1839)
 
 
 v1.6.0
