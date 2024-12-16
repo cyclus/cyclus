@@ -54,10 +54,9 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
     rm ~/miniforge.sh
 
 ENV PATH=/opt/conda/bin:$PATH
-RUN mamba init bash
-SHELL ["/bin/bash", "--login",  "-c"]
+ENV MAMBA_ROOT_PREFIX=/opt/conda
 RUN mamba create -n cyclus
-SHELL ["mamba", "run", "--no-capture-output", "-n", "cyclus", "/bin/bash", "-c"]
+SHELL ["mamba", "run", "-n", "cyclus", "/bin/bash", "-c"]
 RUN mamba install -y "python<3.13" --no-pin && \
     mamba update -y --all && \
     mamba install -y \
@@ -130,7 +129,7 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
-RUN python3 install.py -j ${make_cores} --allow-milps
+RUN python3 install.py -j ${make_cores} --allow-milps --parallel
 ENV PATH=/root/.local/bin:$PATH
 
 FROM cyclus AS deb-generation

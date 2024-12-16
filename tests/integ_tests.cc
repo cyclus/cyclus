@@ -1,10 +1,13 @@
+#include "platform.h"
+#if CYCLUS_IS_PARALLEL
+#include <omp.h>
+#endif // CYCLUS_IS_PARALLEL
 #include <cmath>
 
 #include <gtest/gtest.h>
 #include <boost/shared_ptr.hpp>
 
 #include "cyclus.h"
-#include "platform.h"
 #include "pyhooks.h"
 #include "sim_init.h"
 #include "xml_file_loader.h"
@@ -63,7 +66,21 @@ void RunSim(std::string infile, SqliteBack* back) {
   PyStop();
 }
 
-TEST(IntegTests, RunAllInfiles) {
+class IntegTestsFixture : public ::testing::TestWithParam<int> {
+  protected:
+    #if CYCLUS_IS_PARALLEL
+    virtual void SetUp() {
+      int nthreads = GetParam();
+      omp_set_num_threads(nthreads);
+    }
+
+    virtual void TearDown() {
+      omp_set_num_threads(1);
+    }
+    #endif // CYCLUS_IS_PARALLEL
+};
+
+TEST_P(IntegTestsFixture, RunAllInfiles) {
   std::vector<std::string> infiles;
   infiles.push_back("custom_dt.xml");
   infiles.push_back("custom_seed.xml");
@@ -89,7 +106,7 @@ TEST(IntegTests, RunAllInfiles) {
   }
 }
 
-TEST(IntegTests, CustomTimestepDur) {
+TEST_P(IntegTestsFixture, CustomTimestepDur) {
   {
     SqliteBack back(":memory:");
     RunSim("custom_dt.xml", &back);
@@ -98,7 +115,7 @@ TEST(IntegTests, CustomTimestepDur) {
   }
 }
 
-TEST(IntegTests, CustomTimestepDurFlat) {
+TEST_P(IntegTestsFixture, CustomTimestepDurFlat) {
   {
     SqliteBack back(":memory:");
     RunSim("custom_dt_flat.xml", &back);
@@ -107,12 +124,18 @@ TEST(IntegTests, CustomTimestepDurFlat) {
   }
 }
 
-TEST(IntegTests, CustomSeed) {
+TEST_P(IntegTestsFixture, CustomSeed) {
   SqliteBack back(":memory:");
     RunSim("custom_seed.xml", &back);
     QueryResult qr = back.Query("Info", NULL);
     EXPECT_EQ(20240101, qr.GetVal<int>("Seed"));
     EXPECT_EQ(1234, qr.GetVal<int>("Stride"));
 }
+
+#if CYCLUS_IS_PARALLEL
+INSTANTIATE_TEST_CASE_P(IntegTestsParallel, IntegTestsFixture, ::testing::Values(1, 2, 3, 4));
+#else
+INSTANTIATE_TEST_CASE_P(IntegTests, IntegTestsFixture, ::testing::Values(1));
+#endif // CYCLUS_IS_PARALLEL
 
 }  // namespace cyclus

@@ -1,9 +1,12 @@
+#include "platform.h"
 #include <iostream>
 #include <string>
 #include <stdio.h>
 
 #include <gtest/gtest.h>
-
+#if CYCLUS_IS_PARALLEL
+#include <omp.h>
+#endif // CYCLUS_IS_PARALLEL
 #include "env.h"
 #include "logger.h"
 
@@ -21,6 +24,10 @@ int main(int argc, char* argv[]) {
     test_env += ":" + curr_var;
   }
   putenv(const_cast<char *>(test_env.c_str()));
+
+  #if CYCLUS_IS_PARALLEL
+  omp_set_num_threads(1);
+  #endif // CYCLUS_IS_PARALLEL
 
   for ( int i = 0; i < argc; i++ ) {
     std::string arg = argv[i];
