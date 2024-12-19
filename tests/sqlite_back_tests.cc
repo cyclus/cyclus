@@ -41,6 +41,50 @@ class SqliteBackTests : public ::testing::Test {
 //       EXPECT_NO_THROW(f = qr.GetVal<Foo>("python"));
 //     }
 
+TEST_F(SqliteBackTests, Locale_HU) {
+  typedef int Foo;
+  Foo f;
+  r.NewDatum("nukleáris")
+      ->AddVal("jó", f)
+      ->Record();
+  r.Close();
+  cyclus::QueryResult qr = b->Query("nukleáris", NULL);
+  EXPECT_NO_THROW(f = qr.GetVal<Foo>("jó"));
+}
+
+TEST_F(SqliteBackTests, Locale_AR) {
+  typedef int Foo;
+  Foo f;
+  r.NewDatum("نووي")
+      ->AddVal("جيد", f)
+      ->Record();
+  r.Close();
+  cyclus::QueryResult qr = b->Query("نووي", NULL);
+  EXPECT_NO_THROW(f = qr.GetVal<Foo>("جيد"));
+}
+
+TEST_F(SqliteBackTests, Locale_JP) {
+  typedef int Foo;
+  Foo f;
+  r.NewDatum("原子力")
+      ->AddVal("良い", f)
+      ->Record();
+  r.Close();
+  cyclus::QueryResult qr = b->Query("原子力", NULL);
+  EXPECT_NO_THROW(f = qr.GetVal<Foo>("良い"));
+}
+
+TEST_F(SqliteBackTests, Locale_Emoji) {
+  typedef int Foo;
+  Foo f;
+  r.NewDatum("☢️")
+      ->AddVal("👍", f)
+      ->Record();
+  r.Close();
+  cyclus::QueryResult qr = b->Query("☢️", NULL);
+  EXPECT_NO_THROW(f = qr.GetVal<Foo>("👍"));
+}
+
 TEST_F(SqliteBackTests, VecPairPairDoubleDoubleMapStringDouble) {
   typedef std::vector<std::pair<std::pair<double, double>, std::map<std::string, double> > > Foo;
   
