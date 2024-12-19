@@ -161,8 +161,6 @@ class Facility : public TimeListener, public Agent, public Trader {
       const std::vector<std::pair<Trade<Product>,
       Product::Ptr> >& responses) {}
 
-  virtual bool IsShim() { return false; }
-
 };
 
 }  // namespace cyclus

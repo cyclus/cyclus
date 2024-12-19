@@ -64,8 +64,6 @@ class Institution : public Agent, public TimeListener {
 
   virtual void Tock();
 
-  virtual bool IsShim() { return false; }
-
  protected:
   void InitFrom(Institution* m);
 };
