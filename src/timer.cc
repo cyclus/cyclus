@@ -90,7 +90,7 @@ void Timer::PartitionTickers(std::vector<TimeListener*>& cpp_agents, std::vector
   }
 }
 
-void Timer::DoTick() {
+void Timer::DoTick() {  
   // partition our tickers_ map into C++ agents and python agents.
   // Python agents segfault when Tick'ed in parallel so we need to 
   // run them serially
@@ -217,10 +217,26 @@ void Timer::DoDecom() {
 
 void Timer::RegisterTimeListener(TimeListener* agent) {
   tickers_[agent->id()] = agent;
+  if (agent->IsShim()) {
+    py_tickers_.push_back(agent);
+  } else {
+    cpp_tickers_.push_back(agent);
+  }
 }
 
 void Timer::UnregisterTimeListener(TimeListener* tl) {
   tickers_.erase(tl->id());
+  if (tl->IsShim()) {
+    py_tickers_.erase(
+      std::remove(py_tickers_.begin(), py_tickers_.end(), tl),
+      py_tickers_.end()
+    );
+  } else {
+    cpp_tickers_.erase(
+      std::remove(cpp_tickers_.begin(), cpp_tickers_.end(), tl),
+      cpp_tickers_.end()
+    );
+  }
 }
 
 void Timer::SchedBuild(Agent* parent, std::string proto_name, int t) {
@@ -267,6 +283,8 @@ int Timer::time() {
 
 void Timer::Reset() {
   tickers_.clear();
+  cpp_tickers_.clear();
+  py_tickers_.clear();
   build_queue_.clear();
   decom_queue_.clear();
   si_ = SimInfo(0);
