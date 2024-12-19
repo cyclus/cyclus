@@ -27,7 +27,7 @@ def test_predator_only(thread_count):
 
     holdsrtn = [1]  # needed because nose does not send() to test generator
     outfile = which_outfile(thread_count)
-    print(outfile)
+
     cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim_input]
     check_cmd(cmd, '.', holdsrtn)
     rtn = holdsrtn[0]
