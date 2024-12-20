@@ -40,6 +40,14 @@ jobs:
           apt,
           conda,
         ]
+        parallel_flag : [
+          "",
+          "--parallel",
+        ]
+        coin_flag : [
+          "",
+          "--allow-milps",
+        ]
 
     services:
       registry:
@@ -67,6 +75,7 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
+            build_flags="${{ matrix.parallel_flag }} ${{ matrix.coin_flag }}"
 
       - name: Checkout Cycamore
         if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}

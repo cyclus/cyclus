@@ -33,6 +33,14 @@ jobs:
             macos-13,
             macos-14,
         ]
+        parallel_flag : [
+          "",
+          "--parallel",
+        ]
+        coin_flag : [
+          "",
+          "--allow-milps",
+        ]
 
     runs-on: ["${{ matrix.macos_versions }}"]
 
@@ -86,7 +94,7 @@ jobs:
           export CXX=$CONDA_PREFIX/bin/clang++
           export CPP=$CONDA_PREFIX/bin/clang-cpp
           mkdir -p $(python3 -m site --user-site)
-          python3 install.py -j 3 --allow-milps --parallel
+          python3 install.py -j 3 ${{ matrix.parallel_flag }} ${{ matrix.coin_flag }}
           export PATH=$HOME/.local/bin:$PATH
           cyclus_unit_tests
           cd tests && python3 -m pytest
