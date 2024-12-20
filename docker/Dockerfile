@@ -97,11 +97,11 @@ ENV GCOV=/opt/conda/bin/x86_64-conda-linux-gnu-gcov
 
 FROM ${pkg_mgr}-coverage-deps AS cyclus-coverage
 ARG make_cores=2
-ARG build_flags="--allow-milps --parallel"
+ARG build_flags="--parallel"
 COPY . /cyclus
 WORKDIR /cyclus
 
-RUN python3 install.py -j ${make_cores} ${build_flags}
+RUN python3 install.py -j ${make_cores} --allow-milps ${build_flags}
 ENV PATH=/root/.local/bin:$PATH
 ENV LCOV_ARGS="--gcov-tool=${GCOV} --no-external"
 RUN lcov -c -d /cyclus -o initial_coverage.info --initial ${LCOV_ARGS} && \
@@ -117,7 +117,7 @@ COPY --from=cyclus-coverage /cyclus /
 
 FROM ${pkg_mgr}-deps AS cyclus
 ARG make_cores=2
-ARG build_flags="--allow-milps --parallel"
+ARG build_flags="--parallel"
 COPY . /cyclus
 WORKDIR /cyclus
 
@@ -127,7 +127,7 @@ WORKDIR /cyclus
 
 # You may add the option "--cmake-debug" to the following command
 # for further CMake debugging.
-RUN python3 install.py -j ${make_cores} ${build_flags}
+RUN python3 install.py -j ${make_cores} --allow-milps ${build_flags}
 ENV PATH=/root/.local/bin:$PATH
 
 FROM cyclus AS deb-generation
