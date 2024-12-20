@@ -104,14 +104,14 @@ void Timer::DoTock() {
   }
 
   #pragma omp parallel for
-  for (size_t i = 0; i < py_tickers_.size(); ++i) {
-    py_tickers_[i]->Tock();
+  for (size_t i = 0; i < cpp_tickers_.size(); ++i) {
+    cpp_tickers_[i]->Tock();
   }
 
   if (si_.explicit_inventory || si_.explicit_inventory_compact) {
     std::set<Agent*> ags = ctx_->agent_list_;
     std::vector<Agent*> agent_vec(ags.begin(), ags.end());
-    #pragma omp parallel for schedule(dynamic)
+    #pragma omp parallel for
     for (int i = 0; i < agent_vec.size(); i++) {
         Agent* a = agent_vec[i];
         if (a->enter_time() != -1) {
