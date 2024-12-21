@@ -1,7 +1,7 @@
 #include "symbolic_functions.h"
 
 #include <limits>
-#include <cmath>
+#include <math.h>
 #include <sstream>
 #include <string>
 
@@ -22,7 +22,7 @@ std::string LinearFunction::Print() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double ExponentialFunction::value(double x) {
-  return constant_ * std::exp(exponent_ * x) + intercept_;
+  return constant_ * exp(exponent_ * x) + intercept_;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

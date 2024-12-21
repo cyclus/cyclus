@@ -46,10 +46,10 @@ class LinearFunction : public SymFunction {
 
  private:
   /// The slope
-  double slope_;
+  double slope_ = 0;
 
   /// The intercept
-  double intercept_;
+  double intercept_ = 0;
 };
 
 /// Exponential functions
