@@ -101,7 +101,7 @@ ARG build_flags="--parallel"
 COPY . /cyclus
 WORKDIR /cyclus
 
-RUN python3 install.py -j ${make_cores} --allow-milps ${build_flags}
+RUN python3 install.py -j ${make_cores} --allow-milps --code-coverage ${build_flags}
 ENV PATH=/root/.local/bin:$PATH
 ENV LCOV_ARGS="--gcov-tool=${GCOV} --no-external"
 RUN lcov -c -d /cyclus -o initial_coverage.info --initial ${LCOV_ARGS} && \
