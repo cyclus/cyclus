@@ -1,15 +1,18 @@
+#include "platform.h"
 // Implements the Timer class
 #include "timer.h"
 
 #include <iostream>
 #include <string>
+#if CYCLUS_IS_PARALLEL
+#include <omp.h>
+#endif // CYCLUS_IS_PARALLEL
 
 #include "agent.h"
 #include "error.h"
 #include "logger.h"
 #include "pyhooks.h"
 #include "sim_init.h"
-
 
 namespace cyclus {
 
@@ -76,11 +79,16 @@ void Timer::DoBuild() {
   }
 }
 
+
 void Timer::DoTick() {
-  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
-       agent != tickers_.end();
-       agent++) {
-    agent->second->Tick();
+  
+  for (TimeListener* agent : py_tickers_) {
+    agent->Tick();
+  }
+
+  #pragma omp parallel for
+  for (size_t i = 0; i < cpp_tickers_.size(); ++i) {
+    cpp_tickers_[i]->Tick();
   }
 }
 
@@ -91,21 +99,24 @@ void Timer::DoResEx(ExchangeManager<Material>* matmgr,
 }
 
 void Timer::DoTock() {
-  for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
-       agent != tickers_.end();
-       agent++) {
-    agent->second->Tock();
+  for (TimeListener* agent : py_tickers_) {
+    agent->Tock();
+  }
+
+  #pragma omp parallel for
+  for (size_t i = 0; i < cpp_tickers_.size(); ++i) {
+    cpp_tickers_[i]->Tock();
   }
 
   if (si_.explicit_inventory || si_.explicit_inventory_compact) {
     std::set<Agent*> ags = ctx_->agent_list_;
-    std::set<Agent*>::iterator it;
-    for (it = ags.begin(); it != ags.end(); ++it) {
-      Agent* a = *it;
-      if (a->enter_time() == -1) {
-        continue; // skip agents that aren't alive
-      }
-      RecordInventories(a);
+    std::vector<Agent*> agent_vec(ags.begin(), ags.end());
+    #pragma omp parallel for
+    for (int i = 0; i < agent_vec.size(); i++) {
+        Agent* a = agent_vec[i];
+        if (a->enter_time() != -1) {
+            RecordInventories(a);
+        }
     }
   }
 }
@@ -181,10 +192,26 @@ void Timer::DoDecom() {
 
 void Timer::RegisterTimeListener(TimeListener* agent) {
   tickers_[agent->id()] = agent;
+  if (agent->IsShim()) {
+    py_tickers_.push_back(agent);
+  } else {
+    cpp_tickers_.push_back(agent);
+  }
 }
 
 void Timer::UnregisterTimeListener(TimeListener* tl) {
   tickers_.erase(tl->id());
+  if (tl->IsShim()) {
+    py_tickers_.erase(
+      std::remove(py_tickers_.begin(), py_tickers_.end(), tl),
+      py_tickers_.end()
+    );
+  } else {
+    cpp_tickers_.erase(
+      std::remove(cpp_tickers_.begin(), cpp_tickers_.end(), tl),
+      cpp_tickers_.end()
+    );
+  }
 }
 
 void Timer::SchedBuild(Agent* parent, std::string proto_name, int t) {
@@ -231,6 +258,8 @@ int Timer::time() {
 
 void Timer::Reset() {
   tickers_.clear();
+  cpp_tickers_.clear();
+  py_tickers_.clear();
   build_queue_.clear();
   decom_queue_.clear();
   si_ = SimInfo(0);

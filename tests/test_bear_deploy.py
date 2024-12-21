@@ -2,6 +2,7 @@ import os
 import re
 import json
 import subprocess
+from tools import thread_count
 
 
 inputfile = {
@@ -44,14 +45,14 @@ inputfile = {
 }
 
 
-def test_bear_deploy():
+def test_bear_deploy(thread_count):
     if os.path.exists('bears.h5'):
         os.remove('bears.h5')
     with open('bears.json', 'w') as f:
         json.dump(inputfile, f)
     env = dict(os.environ)
     env['PYTHONPATH'] = "."
-    s = subprocess.check_output(['cyclus', '-o', 'bears.h5', 'bears.json'],
+    s = subprocess.check_output(['cyclus', '-j', thread_count, '-o', 'bears.h5', 'bears.json'],
                                 universal_newlines=True, env=env)
     # test that the institution deploys a BearStore
     assert ("New fac: BearStore" in  s)

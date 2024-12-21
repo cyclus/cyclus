@@ -108,6 +108,10 @@ class Timer {
 
   /// Concrete agents that desire to receive tick and tock notifications
   std::map<int, TimeListener*> tickers_;
+  /// The union of these two vectors should produce tickers_.
+  /// Keeping C++ and Python agents separate helps support parallelization.
+  std::vector<TimeListener*> cpp_tickers_;
+  std::vector<TimeListener*> py_tickers_;
 
   // std::map<time,std::vector<std::pair<prototype, parent> > >
   std::map<int, std::vector<std::pair<std::string, Agent*> > > build_queue_;
