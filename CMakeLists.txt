@@ -320,7 +320,7 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     
     IF(PARALLEL) 
-        FIND_PACKAGE(OpenMP)
+        FIND_PACKAGE(OpenMP REQUIRED)
         IF (OpenMP_CXX_FOUND)
             MESSAGE("-- OpenMP Version: ${OpenMP_CXX_VERSION}")
             MESSAGE("-- OpenMP Flags: ${OpenMP_CXX_FLAGS}")
