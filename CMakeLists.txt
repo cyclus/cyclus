@@ -31,6 +31,7 @@ IF(CODE_COVERAGE)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 ENDIF()
 
+
 # enable assembly
 enable_language(ASM)
 
@@ -317,6 +318,19 @@ IF(NOT CYCLUS_DOC_ONLY)
         SET(LIBS ${LIBS} ${Tcmalloc_LIBRARIES})
     endif(Cython_FOUND)
 
+    
+    IF(PARALLEL) 
+        FIND_PACKAGE(OpenMP REQUIRED)
+        IF (OpenMP_CXX_FOUND)
+            MESSAGE("-- OpenMP Version: ${OpenMP_CXX_VERSION}")
+            MESSAGE("-- OpenMP Flags: ${OpenMP_CXX_FLAGS}")
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+        ENDIF(OpenMP_CXX_FOUND)
+        IF(OpenMP_CXX_LIBRARIES)
+            set(LIBS ${LIBS} ${OpenMP_CXX_LIBRARIES})
+        ENDIF(OpenMP_CXX_LIBRARIES)
+    ENDIF(PARALLEL)
+
     ##############################################################################################
     #################################### end find libraries ######################################
     ##############################################################################################
@@ -337,7 +351,8 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${SQLite3_INCLUDE_DIR}"
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
-        "${COIN_INCLUDE_DIRS}")
+        "${COIN_INCLUDE_DIRS}"
+        "${OpenMP_CXX_INCLUDE_DIRS}")
     IF(NOT inc_dirs STREQUAL "")
       INCLUDE_DIRECTORIES(${inc_dirs})
     ENDIF()

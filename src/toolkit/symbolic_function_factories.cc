@@ -23,8 +23,11 @@ SymFunction::Ptr LinFunctionFactory::GetFunctionPtr(std::string params) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 SymFunction::Ptr ExpFunctionFactory::GetFunctionPtr(std::string params) {
   std::stringstream ss(params);
-  double constant, exponent, intercept;
-  ss >> constant >> exponent >> intercept;
+  double constant, exponent, intercept = 0.0;
+  ss >> constant >> exponent;
+  if (!ss.eof()) {
+    ss >> intercept;
+  }
 
   LOG(LEV_DEBUG2, "Funct") <<
       "Exponential function created in the form y = a*exp(b*x) + c, with";

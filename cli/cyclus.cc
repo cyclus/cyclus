@@ -1,3 +1,4 @@
+#include "platform.h"
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
@@ -9,7 +10,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/string_generator.hpp>
-
+#if CYCLUS_IS_PARALLEL
+#include <omp.h>
+#endif // CYCLUS_IS_PARALLEL
 #include "cyclus.h"
 #include "hdf5_back.h"
 #include "pyhooks.h"
@@ -280,6 +283,7 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("py-to-json", po::value<std::string>(), "*.py input file")
       ("py-to-xml", po::value<std::string>(), "*.py input file")
       ("xml-to-py", po::value<std::string>(), "*.xml input file")
+      ("nthreads,j", po::value<int>(), "number of threads to use, available if built with --parallel")
       ;
 
   po::variables_map vm;
@@ -529,4 +533,13 @@ void GetSimInfo(ArgInfo* ai) {
   if (ai->vm.count("output-path")) {
     ai->output_path = ai->vm["output-path"].as<std::string>();
   }
+
+  // Thread param
+  #if CYCLUS_IS_PARALLEL
+  int nthreads = 1;
+  if (ai->vm.count("nthreads")) {
+    nthreads = ai->vm["nthreads"].as<int>();
+  }
+  omp_set_num_threads(nthreads);
+  #endif // CYCLUS_IS_PARALLEL
 }

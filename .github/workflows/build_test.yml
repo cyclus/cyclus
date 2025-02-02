@@ -40,6 +40,10 @@ jobs:
           apt,
           conda,
         ]
+        parallel_flag : [
+          "",
+          "--parallel",
+        ]
 
     services:
       registry:
@@ -67,6 +71,7 @@ jobs:
           build-args: |
             pkg_mgr=${{ matrix.pkg_mgr }}
             ubuntu_version=${{ matrix.ubuntu_versions }}
+            build_flags=${{ matrix.parallel_flag }}
 
       - name: Checkout Cycamore
         if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
@@ -125,13 +130,13 @@ jobs:
           steps.build-cymetric.outcome == 'failure' && '**Failure** :x:' || 
           '**Skipped due to upstream failure** :warning:'}}" >> "$GITHUB_ENV"
 
-          echo "ARTIFACT_NAME=${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}" >> "$GITHUB_ENV"
+          echo "ARTIFACT_NAME=${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}${{ matrix.parallel_flag != '' && '_parallel' || '' }}" >> "$GITHUB_ENV"
 
       - name: Construct Artifact
         if: github.event_name == 'pull_request'
         run: |
           echo "
-          ##### Build \`FROM cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus\`
+          ##### Build \`FROM cyclus_${{ matrix.ubuntu_versions }}_${{ matrix.pkg_mgr }}/cyclus\` ${{ matrix.parallel_flag }}
             - Cycamore: ${{ env.CYCAMORE_BUILD_STATUS }}
             - Cymetric: ${{ env.CYMETRIC_BUILD_STATUS }}" > ${{ env.ARTIFACT_NAME }}.txt
       

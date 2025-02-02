@@ -8,9 +8,9 @@ import tables
 import numpy as np
 import pytest
 
-from tools import check_cmd, cyclus_has_coin
-from helper import tables_exist, find_ids, exit_times, \
-    h5out, sqliteout, clean_outs, to_ary, which_outfile
+from tools import check_cmd, cyclus_has_coin, thread_count
+from helper import tables_exist, find_ids, \
+    h5_suffix, clean_outs, to_ary, which_outfile
 
 INPUT = os.path.join(os.path.dirname(__file__), "input")
 
@@ -20,7 +20,7 @@ INPUT = os.path.join(os.path.dirname(__file__), "input")
 def source_to_sink_case(request):
     yield request.param
 
-def test_source_to_sink(source_to_sink_case):
+def test_source_to_sink(source_to_sink_case, thread_count):
     """Tests linear growth of sink inventory by checking if the transactions
     were of equal quantities and only between sink and source facilities.
     """
@@ -36,8 +36,8 @@ def test_source_to_sink(source_to_sink_case):
 
     for sim_input in sim_inputs:
         holdsrtn = [1]  # needed because nose does not send() to test generator
-        outfile = which_outfile()
-        cmd = ["cyclus", "-o", outfile, "--input-file", sim_input]
+        outfile = which_outfile(thread_count)
+        cmd = ["cyclus", "-j", thread_count, "-o", outfile, "--input-file", sim_input]
         check_cmd(cmd, '.', holdsrtn)
         rtn = holdsrtn[0]
         if rtn != 0:
@@ -52,8 +52,8 @@ def test_source_to_sink(source_to_sink_case):
             return  # don't execute further commands
 
        # Get specific tables and columns
-        if outfile == h5out:
-            output = tables.open_file(h5out, mode = "r")
+        if outfile.endswith(h5_suffix):
+            output = tables.open_file(outfile, mode = "r")
 
             agent_entry = output.get_node("/AgentEntry")[:]
             info = output.get_node("/Info")[:]
