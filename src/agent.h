@@ -60,6 +60,24 @@ class Agent : public StateWrangler, virtual public Ider {
   /// etc. All subclass destructors should also be virtual.
   virtual ~Agent();
 
+  /// Defines the Economics Manager (EconManager) class within Agent to allow
+  /// the communication of Economics Parameters (EconParams) between members of
+  /// the Region-Institution-Facility heirarchy
+  class EconManager {
+    public:
+      void SetParameter(const std::string& key, double value);
+      double GetParameter(const std::string& key) const;
+      
+    private:
+      std::unordered_map<std::string, double> financial_data_; 
+  };
+
+  /// Functions for an Agent to interact with its EconManger. These are used
+  /// instead of simply getting the EconManger itself to simplify the
+  /// interaction between the Agent and its EconManager. 
+  double GetEconParameter(const std::string& key) const;
+  void SetEconParameter(const std::string& key, double value);
+
   virtual std::string version() { return "unspecified"; }
 
   /// Returns a newly created/allocated prototype that is an exact copy of this.
@@ -486,6 +504,9 @@ class Agent : public StateWrangler, virtual public Ider {
   int id_;
 
   Context* ctx_;
+
+  /// The EconManger object belonging to this Agnet
+  EconManager econ_manager_;
 };
 
 }  // namespace cyclus

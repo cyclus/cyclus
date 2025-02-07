@@ -235,4 +235,25 @@ void Agent::AddToTable() {
       ->Record();
 }
 
+double Agent::GetEconParameter(const std::string& key) const {
+  return econ_manager_.GetParameter(key); 
+}
+
+void Agent::SetEconParameter(const std::string& key, double value) {
+  econ_manager_.SetParameter(key, value);
+}
+
+double Agent::EconManager::GetParameter(const std::string& key) const {
+  auto it = financial_data_.find(key);
+  if (it != financial_data_.end()) {
+    return it->second; 
+  } else {
+    throw std::runtime_error("Key '" + key + "' not found in financial_data_");
+  }
+}
+
+void Agent::EconManager::SetParameter(const std::string& key, double value) {
+  financial_data_[key] = value; 
+}
+
 }  // namespace cyclus
