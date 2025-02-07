@@ -4,6 +4,8 @@
 ///    of the header of the archetype class.
 /// - '#include "toolkit/facility_cost.cycpp.h"' in the header of the 
 ///    archetype class (as private)
+/// - Add `InitializeCosts()` to `EnterNotify()` in the cc file of the
+///   archetype class.
 
 
 
