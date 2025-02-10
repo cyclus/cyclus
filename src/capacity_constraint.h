@@ -68,7 +68,7 @@ class CapacityConstraint {
       : capacity_(capacity),
         converter_(converter),
         id_(next_id_++) {
-    if (capacity_ <= 0)
+    if (capacity_ < 0)
       throw ValueError("Capacity is not positive, no trades will be executed");
   }
 
