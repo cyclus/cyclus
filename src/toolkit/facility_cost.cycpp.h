@@ -19,27 +19,64 @@
 ///    file with the other ones, reaplcing <param_name> with the name you put
 ///    in the econ_params array (again, must match exactly).
 
-//cyclus::toolkit::FacilityCost cost;
-
 #pragma cyclus var { \
 "default": 0.0, \
 "uilabel": "Capital cost required to build facility", \
-"doc": "Capital cost required to build facility" \
+"doc": "Capital cost required to build facility", \
+"units": "$USD" \
 }
 double capital_cost;
 
 #pragma cyclus var { \
 "default": 0.0, \
-"uilabel": "O&M Cost", \
-"doc": "monthly O&M Cost required to run facility" \
+"uilabel": "Annual O&M Cost in dollars", \
+"doc": "Annual O&M Cost required to run facility in dollars", \
+"units": "$USD" \
 }
 double operations_and_management;
+
+#pragma cyclus var { \
+    "default": 1.0, \
+    "uilabel": "Estimated Useful lifetime of facility for economic purposes in years", \
+    "doc": "Estimate on how long the facility will be active for economic purposes", \
+    "units": "years" \
+    }
+double facility_lifetime;
+
+#pragma cyclus var { \
+    "default": 1.0, \
+    "uilabel": "Annual fractional increase of initial facility capacity", \
+    "doc": "Fraction of initial capacity by which facility capacity increases/decreases each year", \
+    "units": "Dimensionless" \
+    }
+double capacity_decline_factor;
+
+#pragma cyclus var { \
+    "default": 0.0, \
+    "uilabel": "Cost in dollars of labor required to produce one unit of production", \
+    "doc": "Cost in dollars of labor required to produce one unit of production", \
+    "units": "$USD" \
+    }
+double per_unit_labor_cost;
+
+#pragma cyclus var { \
+    "default": 0.04, \
+    "uilabel": "Compounding fractional annual increase in the cost of labor as a decimal", \
+    "doc": "Cost in dollars of labor required to produce one unit of production", \
+    "units": "Dimensionless" \
+    }
+double annual_labor_cost_increase_factor;
+
+
 
 // Must be done in a function so that we can access the user-defined values
 std::unordered_map<std::string, double> InitializeParmList() {
     std::unordered_map<std::string, double> econ_params {
         {"capital_cost", capital_cost},
-        {"operations_and_management", operations_and_management}
+        {"operations_and_management", operations_and_management},
+        {"facility_lifetime", facility_lifetime},
+        {"capacity_decline_factor", capacity_decline_factor},
+        {"per_unit_labor_cost", per_unit_labor_cost}
     };
 
     return econ_params;
@@ -54,6 +91,9 @@ void InitializeCosts() {
 }
 
 // Required for compilation but not added by the cycpp preprocessor. Do not
-// remove.
- std::vector<int> cycpp_shape_capital_cost = {0};
- std::vector<int> cycpp_shape_operations_and_management = {0};
+// remove. Must be one for each variable.
+std::vector<int> cycpp_shape_capital_cost = {0};
+std::vector<int> cycpp_shape_operations_and_management = {0};
+std::vector<int> cycpp_shape_facility_lifetime = {0};
+std::vector<int> cycpp_shape_capacity_decline_factor = {0};
+std::vector<int> cycpp_shape_per_unit_labor_cost = {0};
