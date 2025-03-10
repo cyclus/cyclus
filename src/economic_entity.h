@@ -7,6 +7,10 @@
 
 class EconomicEntity {
  public:
+ virtual double GetEconParameter(const std::string& key) const = 0;
+ virtual void SetEconParameter(const std::string& key, double value) = 0;
+
+ protected:
   void SetParameter(const std::string& key, double value) {
     financial_data_[key] = value;
   }

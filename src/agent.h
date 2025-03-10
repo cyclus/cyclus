@@ -61,12 +61,6 @@ class Agent : public StateWrangler, virtual public Ider, public EconomicEntity {
   /// etc. All subclass destructors should also be virtual.
   virtual ~Agent();
 
-  /// Functions for an Agent to interact with its economic data. These are used
-  /// instead of simply getting the data directly to simplify the
-  /// interaction between the Agent and the data in future implementations. 
-  double GetEconParameter(const std::string& key) const;
-  void SetEconParameter(const std::string& key, double value);
-
   virtual std::string version() { return "unspecified"; }
 
   /// Returns a newly created/allocated prototype that is an exact copy of this.
