@@ -412,6 +412,10 @@ class Agent : public StateWrangler, virtual public Ider, public EconomicEntity {
   /// Returns a list of children this agent has
   inline const std::set<Agent*>& children() const { return children_; }
 
+  /// Override for the economic_entity functions (required for implementation)
+  double GetEconParameter(const std::string& key) const override;
+  void SetEconParameter(const std::string& key, double value) override;
+
  protected:
   /// Initializes a agent by copying parameters from the passed agent m. This
   /// function must be implemented by all agents.  This function must call the
