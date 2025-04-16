@@ -1,7 +1,5 @@
 /// This includes the required header to add institution costs to archetypes.
 /// One should only need to:
-/// - '#include "toolkit/institution_cost.h"' in the main include section
-///    of the header of the archetype class.
 /// - '#include "toolkit/institution_cost.cycpp.h"' in the header of the 
 ///    archetype class (as private)
 /// - Add `InitializeCosts()` to `EnterNotify()` in the cc file of the

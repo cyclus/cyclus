@@ -1,11 +1,9 @@
 /// This includes the required header to add facility costs to archetypes.
 /// One should only need to:
-/// - '#include "toolkit/facility_cost.h"' in the main include section
-///    of the header of the archetype class.
 /// - '#include "toolkit/facility_cost.cycpp.h"' in the header of the
 ///    archetype class (as private)
 /// - Add `InitializeCosts()` to `EnterNotify()` in the cc file of the
-///   archetype class.
+///   archetype class, and then `GetCost()` should become available.
 
 /// How to add parameters to this file:
 /// 1. Add the pragma. A default value MUST be added to ensure backwards
@@ -100,10 +98,10 @@ double DiscountedFixedCostSum(double F, double gamma, int T) const {
   return sum;
 }
 
-double DiscountedLaborCostSum(double labor_cost, double xt, double gamma, int T, double k) const {
+double DiscountedVariableCostSum(double variable_costs, double xt, double gamma, int T, double k) const {
   double sum = 0.0;
   for (int t = 1; t <= T; ++t) {
-    sum += labor_cost * k * std::pow(xt, t) * std::pow(gamma, t);
+    sum += variable_costs * k * std::pow(xt, t) * std::pow(gamma, t);
   }
   return sum;
 }
@@ -140,7 +138,8 @@ double GetCost() {
   double depreciation_constant = parent()->GetEconParameter("depreciation_constant");
   int T_hat = T; // May become user-specified later
 
-  double k = throughput * context()->dt();  // production scale factor
+  double seconds_per_year = kDefaultTimeStepDur * 12;
+  double k = throughput * seconds_per_year / context()->dt();  // production scale factor
   double discount_factor = 1.0 / (1.0 + r);
 
   double property_tax = p * v;
@@ -149,10 +148,9 @@ double GetCost() {
 
   double c = v / L;
   double f = DiscountedFixedCostSum(F, discount_factor, T) / L;
-  double w = DiscountedLaborCostSum(labor_cost, xt, discount_factor, T, k);
+  double w = DiscountedVariableCostSum(labor_cost, xt, discount_factor, T, k) / L;
   double delta = ComputeDelta(depreciation_constant, static_cast<int>(v), T_hat, discount_factor, alpha);
 
-  std::cout << w + f + c * delta << std::endl;
   return w + f + c * delta;
 }
 
