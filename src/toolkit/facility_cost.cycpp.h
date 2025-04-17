@@ -125,22 +125,45 @@ double ComputeDelta(double depreciation_constant, int initial_book_value,
   return (1 - alpha * delta_partial_sum) / (1 - alpha);
 }
 
-double GetCost() {
-  // Economic Parameters
-  double r = parent()->GetEconParameter("minimum_acceptable_return_rate");
-  double xt = GetEconParameter("capacity_decline_factor");
-  double v = GetEconParameter("capital_cost");
-  int T = static_cast<int>(GetEconParameter("facility_lifetime"));
-  double OM = GetEconParameter("operations_and_maintenance");
-  double labor_cost = GetEconParameter("per_unit_labor_cost");
-  double alpha = parent()->GetEconParameter("corporate_income_tax_rate");
-  double p = parent()->parent()->GetEconParameter("property_tax_rate");
-  double depreciation_constant = parent()->GetEconParameter("depreciation_constant");
-  int T_hat = T; // May become user-specified later
+double GetCost(double units_of_production, double input_cost) {
+  // Economic Parameters (declared like this because of scoping with try{})
+  double r;
+  double xt;
+  double v;
+  int T;
+  double OM;
+  double labor_cost;
+  double alpha;
+  double p;
+  double depreciation_constant;
+  int T_hat;
+
+  // This allows GetCost() to exit gracefully if it can't find parameters
+  try {
+    r = parent()->GetEconParameter("minimum_acceptable_return_rate");
+    xt = GetEconParameter("capacity_decline_factor");
+    v = GetEconParameter("capital_cost");
+    T = static_cast<int>(GetEconParameter("facility_lifetime"));
+    OM = GetEconParameter("operations_and_maintenance");
+    labor_cost = GetEconParameter("per_unit_labor_cost");
+    alpha = parent()->GetEconParameter("corporate_income_tax_rate");
+    p = parent()->parent()->GetEconParameter("property_tax_rate");
+    depreciation_constant = parent()->GetEconParameter("depreciation_constant");
+    T_hat = T; // May become user-specified later
+  } 
+  catch (const std::exception& e) {
+    // If any of the above functions fail to get their parameters, return 1
+    // to default to old pref logic
+    LOG(cyclus::LEV_INFO1, "GetCost") << prototype() 
+                                      << "failed to get financial_data_: "
+                                      << e.what();
+    return 1;
+  }
 
   double seconds_per_year = kDefaultTimeStepDur * 12;
-  double k = throughput * seconds_per_year / context()->dt();  // production scale factor
+  double k = units_of_production * seconds_per_year / context()->dt();
   double discount_factor = 1.0 / (1.0 + r);
+  double variable_cost = labor_cost + input_cost;
 
   double property_tax = p * v;
   double F = OM + property_tax;
@@ -148,10 +171,13 @@ double GetCost() {
 
   double c = v / L;
   double f = DiscountedFixedCostSum(F, discount_factor, T) / L;
-  double w = DiscountedVariableCostSum(labor_cost, xt, discount_factor, T, k) / L;
+  double w = DiscountedVariableCostSum(variable_cost, xt, discount_factor, T, k) / L;
   double delta = ComputeDelta(depreciation_constant, static_cast<int>(v), T_hat, discount_factor, alpha);
 
-  return w + f + c * delta;
+  double cost = w + f + c * delta; 
+
+  // Since pref = 1/cost (for now) we CANNOT return 0
+  return cost != 0 ? cost : 1;
 }
 
 // Required for compilation but not added by the cycpp preprocessor. Do not
