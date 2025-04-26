@@ -44,7 +44,7 @@ std::string BuildFlatMasterSchema(std::string schema_path, std::string infile) {
 
   std::vector<AgentSpec> specs = ParseSpecs(infile);
 
-  return BuildMasterSchema(schema_path, specs);
+  return BuildFlatMasterSchema(schema_path, specs);
 
 }
 
@@ -52,7 +52,7 @@ std::string BuildFlatMasterSchema(std::string schema_path) {
 
   std::vector<AgentSpec> specs = ParseSpecs(cyclus::DiscoverSpecsInCyclusPath());
 
-  return BuildMasterSchema(schema_path, specs);
+  return BuildFlatMasterSchema(schema_path, specs);
 
 }
 
