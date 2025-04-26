@@ -4,184 +4,200 @@
 <start>
 <element name="simulation">
   <a:documentation>A complete Cyclus simulation</a:documentation>
-  <optional><element name="schematype"><text/></element></optional>
-<interleave>
+  <optional><element name="schematype">
+    <a:documentation>Select between a hierarchical schema (default) and a flat schema.</a:documentation>
+    <text/></element></optional>
 
-  <optional><element name="ui"><text/></element></optional>
+  <interleave>
 
-  <element name ="control">
-    <a:documentation>Block to define control parameters of simulation.</a:documentation>
-    <interleave>
-      <optional>
-        <element name="simhandle"> <data type="string"/></element>
-      </optional>
-      <element name="duration"> 
-          <a:documentation>Simulation duration in units of time steps. Default time steps
-            are 1 month. See `dt` to change default time step length.</a:documentation>
-          <data type="nonNegativeInteger"/> </element>
-      <element name="startyear"> 
-          <a:documentation>First year of simulation, e.g. 2015 (integer)</a:documentation>
-          <data type="nonNegativeInteger"/> </element>
-      <element name="startmonth">
-        <a:documentation>First month of the simulation, e.g. 3 for March (integer)</a:documentation>
-        <data type="nonNegativeInteger"/> </element>
-      <optional> 
-        <element name="decay"> 
-          <a:documentation>Mode for when radioactive decay occurs. Choose from "never", "manual", "lazy".</a:documentation>
-          <text/> </element> 
-      </optional>
-      <optional> 
-        <element name="dt">
-            <a:documentation>Length of a time step in seconds. Default: 1 month = 1 year/12.</a:documentation>
-          <data type="nonNegativeInteger"/></element> 
-      </optional>
-      <optional>
-        <element name="explicit_inventory">
-          <a:documentation>A Boolean flag to indicate whether the database should include tables that explicitly
-            record the inventory of each resource buffer in each agent at each time step.</a:documentation>
-          <data type="boolean"/> </element>
-      </optional>
-      <optional>
-        <element name="explicit_inventory_compact"> <data type="boolean"/> </element>
-      </optional>
-      <optional>
-          <element name="tolerance_generic"><data type="double"/></element>
-      </optional>
-      <optional>
-          <element name="tolerance_resource"><data type="double"/></element>
-      </optional>
-      <optional>
-          <element name="seed"><data type="positiveInteger" /></element>
-      </optional>
-      <optional>
-          <element name="stride"><data type="positiveInteger" /></element>
-      </optional>
-      <optional>
-        <element name="solver"> 
-          <interleave>
-            <optional><element name="config">
-            <choice>
-              <element name="greedy">
-                <interleave>
-                  <optional>
-                    <element name="preconditioner"> <text/> </element>
-                  </optional>
-                </interleave>
-              </element>
-              <element name="coin-or">
-                <interleave>
-                  <optional>
-                    <element name="timeout">  <data type="positiveInteger"/>  </element>
-                  </optional>
-                  <optional><element name="verbose"><data type="boolean"/></element></optional>
-                  <optional><element name="mps"><data type="boolean"/></element></optional>
-                </interleave>
-              </element>
-            </choice>
-            </element></optional>
-            <optional>
-              <element name="allow_exclusive_orders">
-                <data type="boolean" />
-              </element>
-            </optional>
-          </interleave>
-        </element>
-      </optional>
-    </interleave>
-  </element>
+    <optional><element name="ui"><text/></element></optional>
 
-  <zeroOrMore>
-    <element name="commodity">
+    <element name ="control">
+      <a:documentation>Block to define control parameters of simulation.</a:documentation>
       <interleave>
-        <element name="name"><text/></element>
-        <element name="solution_priority"><data type="double"/></element>
-      </interleave>
-    </element>
-  </zeroOrMore>
-
-  <element name="archetypes"> 
-    <oneOrMore>
-      <element name="spec">
-        <interleave>
-          <optional><element name="path"><text/></element></optional>
-          <optional><element name="lib"><text/></element></optional>
-          <element name="name"><text/></element>
-          <optional><element name="alias"><text/></element></optional>
-        </interleave>
-      </element>
-    </oneOrMore>
-  </element>
-
-  <oneOrMore>
-    <element name="prototype">
-    <interleave>
-      <element name="name"><text/></element>
-      <optional>
-        <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
-      </optional>
-
-      <element name="config">
-        <choice>
-          @MODEL_SCHEMAS@
-        </choice>
-      </element>
-
-    </interleave>
-    </element>
-  </oneOrMore>
-
-  <oneOrMore>
-    <element name="agent">
-      <interleave>
-        <element name="name"><text/></element>
-        <element name="prototype"><text/></element>
         <optional>
-          <element name="parent"><text/></element>
+          <element name="simhandle">
+              <a:documentation>A user-defined simulation handle. Default is to generate a long random UUID.</a:documentation>
+              <data type="string"/></element>
+        </optional>
+        <element name="duration"> 
+            <a:documentation>Simulation duration in units of time steps. Default time steps
+              are 1 month. See `dt` to change default time step length.</a:documentation>
+            <data type="nonNegativeInteger"/> </element>
+        <element name="startyear"> 
+            <a:documentation>First year of simulation, e.g. 2015 (integer)</a:documentation>
+            <data type="nonNegativeInteger"/> </element>
+        <element name="startmonth">
+          <a:documentation>First month of the simulation, e.g. 3 for March (integer)</a:documentation>
+          <data type="nonNegativeInteger"/> </element>
+        <optional> 
+          <element name="decay"> 
+            <a:documentation>Mode for when radioactive decay occurs. Choose from "never", "manual", "lazy".</a:documentation>
+            <text/> </element> 
+        </optional>
+        <optional> 
+          <element name="dt">
+            <a:documentation>Length of a time step in seconds. Default: 1 month = 1 year/12.</a:documentation>
+            <data type="nonNegativeInteger"/></element> 
+        </optional>
+        <optional>
+          <element name="explicit_inventory">
+            <a:documentation>A Boolean flag to indicate whether the database should include tables that explicitly
+              record the inventory of each resource buffer in each agent at each time step. (Default: False)</a:documentation>
+            <data type="boolean"/> </element>
+        </optional>
+        <optional>
+          <element name="explicit_inventory_compact">
+            <a:documentation>A Boolean flag to indicate whether the database should include compact tables that explicitly
+              record the inventory of each resource buffer in each agent at each time step. (Default: False)</a:documentation>
+            <data type="boolean"/> </element>
+        </optional>
+        <optional>
+            <element name="tolerance_generic">
+              <a:documentation>Value used as tolerance when comparing two generic floating point numbers. (Default: 1e-06)</a:documentation>
+              <<data type="double"/></element>
+        </optional>
+        <optional>
+            <element name="tolerance_resource">
+              <a:documentation>Value used as tolerance when comparing two resource quantities. (Default: 1e-06)</a:documentation>              
+              <data type="double"/></element>
+        </optional>
+        <optional>
+            <element name="seed">
+              <a:documentation>Value used for seed in built in random number generator. (Default: 20160212)</a:documentation>              
+              <data type="positiveInteger" /></element>
+        </optional>
+        <optional>
+            <element name="stride">
+              <a:documentation>Value used for stride in built in random number generator. (Default: 10000)</a:documentation>              
+              <data type="positiveInteger" /></element>
+        </optional>
+        <optional>
+          <element name="solver"> 
+            <interleave>
+              <optional><element name="config">
+              <choice>
+                <element name="greedy">
+                  <interleave>
+                    <optional>
+                      <element name="preconditioner"> <text/> </element>
+                    </optional>
+                  </interleave>
+                </element>
+                <element name="coin-or">
+                  <interleave>
+                    <optional>
+                      <element name="timeout">  <data type="positiveInteger"/>  </element>
+                    </optional>
+                    <optional><element name="verbose"><data type="boolean"/></element></optional>
+                    <optional><element name="mps"><data type="boolean"/></element></optional>
+                  </interleave>
+                </element>
+              </choice>
+              </element></optional>
+              <optional>
+                <element name="allow_exclusive_orders">
+                  <data type="boolean" />
+                </element>
+              </optional>
+            </interleave>
+          </element>
         </optional>
       </interleave>
     </element>
-  </oneOrMore>
 
-  <zeroOrMore>
-    <element name="recipe">
+    <zeroOrMore>
+      <element name="commodity">
+        <interleave>
+          <element name="name"><text/></element>
+          <element name="solution_priority"><data type="double"/></element>
+        </interleave>
+      </element>
+    </zeroOrMore>
+
+    <element name="archetypes"> 
+      <oneOrMore>
+        <element name="spec">
+          <interleave>
+            <optional><element name="path"><text/></element></optional>
+            <optional><element name="lib"><text/></element></optional>
+            <element name="name"><text/></element>
+            <optional><element name="alias"><text/></element></optional>
+          </interleave>
+        </element>
+      </oneOrMore>
+    </element>
+
+    <oneOrMore>
+      <element name="prototype">
       <interleave>
         <element name="name"><text/></element>
-        <element name="basis"><text/></element>
-        <oneOrMore>
-          <element name="nuclide">
-            <interleave>
-              <element name="id"><data type="string"/></element>
-              <element name="comp"><data type="double"/></element>
-            </interleave>
-          </element>
-        </oneOrMore>
-      </interleave>
-    </element>
-  </zeroOrMore>
+        <optional>
+          <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
+        </optional>
 
-  <zeroOrMore>
-    <element name="package">
-      <interleave>
-        <element name="name"><text/></element>
-        <optional><element name="fill_min"><data type="double"/></element></optional>
-        <optional><element name="fill_max"><data type="double"/></element></optional>
-        <optional><element name="strategy"><text/></element></optional>
-      </interleave>
-    </element>
-  </zeroOrMore>
+        <element name="config">
+          <choice>
+            @MODEL_SCHEMAS@
+          </choice>
+        </element>
 
-  <zeroOrMore>
-    <element name="transportunit">
-      <interleave>
-        <element name="name"><text/></element>
-        <optional><element name="fill_min"><data type="nonNegativeInteger"/></element></optional>
-        <optional><element name="fill_max"><data type="nonNegativeInteger"/></element></optional>
-        <optional><element name="strategy"><text/></element></optional>
       </interleave>
-    </element>
-  </zeroOrMore>
+      </element>
+    </oneOrMore>
 
-</interleave>
+    <oneOrMore>
+      <element name="agent">
+        <interleave>
+          <element name="name"><text/></element>
+          <element name="prototype"><text/></element>
+          <optional>
+            <element name="parent"><text/></element>
+          </optional>
+        </interleave>
+      </element>
+    </oneOrMore>
+
+    <zeroOrMore>
+      <element name="recipe">
+        <interleave>
+          <element name="name"><text/></element>
+          <element name="basis"><text/></element>
+          <oneOrMore>
+            <element name="nuclide">
+              <interleave>
+                <element name="id"><data type="string"/></element>
+                <element name="comp"><data type="double"/></element>
+              </interleave>
+            </element>
+          </oneOrMore>
+        </interleave>
+      </element>
+    </zeroOrMore>
+
+    <zeroOrMore>
+      <element name="package">
+        <interleave>
+          <element name="name"><text/></element>
+          <optional><element name="fill_min"><data type="double"/></element></optional>
+          <optional><element name="fill_max"><data type="double"/></element></optional>
+          <optional><element name="strategy"><text/></element></optional>
+        </interleave>
+      </element>
+    </zeroOrMore>
+
+    <zeroOrMore>
+      <element name="transportunit">
+        <interleave>
+          <element name="name"><text/></element>
+          <optional><element name="fill_min"><data type="nonNegativeInteger"/></element></optional>
+          <optional><element name="fill_max"><data type="nonNegativeInteger"/></element></optional>
+          <optional><element name="strategy"><text/></element></optional>
+        </interleave>
+      </element>
+    </zeroOrMore>
+
+  </interleave>
 </element><!-- end of simulation -->
 </start>
 </grammar>

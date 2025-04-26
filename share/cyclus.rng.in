@@ -6,6 +6,7 @@
 <element name="simulation">
   <a:documentation>A complete Cyclus simulation</a:documentation>
   <optional><element name="schematype">
+    <a:documentation>Select between a hierarchical schema (default) and a flat schema.</a:documentation>
     <text/></element></optional>
 
   <interleave>
@@ -16,7 +17,9 @@
       <a:documentation>Block to define control parameters of simulation.</a:documentation>
       <interleave>
         <optional>
-          <element name="simhandle"> <data type="string"/> </element>
+          <element name="simhandle">
+            <a:documentation>A user-defined simulation handle. Default is to generate a long random UUID.</a:documentation>
+            <data type="string"/> </element>
         </optional>
         <element name="duration"> 
           <a:documentation>Simulation duration in units of time steps. Default time steps
@@ -36,28 +39,39 @@
         <optional> 
           <element name="dt">
             <a:documentation>Length of a time step in seconds. Default: 1 month = 1 year/12.</a:documentation>
-          <data type="nonNegativeInteger"/></element> 
+            <data type="nonNegativeInteger"/></element> 
         </optional>
         <optional>
           <element name="explicit_inventory">
-          <a:documentation>A Boolean flag to indicate whether the database should include tables that explicitly
-            record the inventory of each resource buffer in each agent at each time step.</a:documentation>
-          <data type="boolean"/> </element>
+            <a:documentation>A Boolean flag to indicate whether the database should include tables that explicitly
+              record the inventory of each resource buffer in each agent at each time step. (Default: False)</a:documentation>
+            <data type="boolean"/> </element>
         </optional>
         <optional>
-          <element name="explicit_inventory_compact"> <data type="boolean"/> </element>
+          <element name="explicit_inventory_compact">
+            <a:documentation>A Boolean flag to indicate whether the database should include compact tables that explicitly
+            record the inventory of each resource buffer in each agent at each time step. (Default: False)</a:documentation>
+            <data type="boolean"/> </element>
         </optional>
         <optional>
-            <element name="tolerance_generic"><data type="double"/></element>
+            <element name="tolerance_generic">
+              <a:documentation>Value used as tolerance when comparing two generic floating point numbers. (Default: 1e-06)</a:documentation>
+              <data type="double"/></element>
         </optional>
         <optional>
-            <element name="tolerance_resource"><data type="double"/></element>
+            <element name="tolerance_resource">
+              <a:documentation>Value used as tolerance when comparing two resource quantities. (Default: 1e-06)</a:documentation>              
+              <data type="double"/></element>
         </optional>
         <optional>
-            <element name="seed"><data type="positiveInteger" /></element>
+            <element name="seed">
+              <a:documentation>Value used for seed in built in random number generator. (Default: 20160212)</a:documentation>              
+              <data type="positiveInteger" /></element>
         </optional>
         <optional>
-            <element name="stride"><data type="positiveInteger" /></element>
+            <element name="stride">
+              <a:documentation>Value used for stride in built in random number generator. (Default: 10000)</a:documentation>              
+              <data type="positiveInteger" /></element>
         </optional>
         <optional>
           <element name="solver"> 
