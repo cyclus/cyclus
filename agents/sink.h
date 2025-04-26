@@ -86,7 +86,7 @@ class Sink : public cyclus::Facility  {
 
   #pragma cyclus var { \
     "tooltip": "input/request recipe name", \
-    "doc": "Name of recipe to request." \
+    "doc": "Name of recipe to request. " \
            "If empty, sink requests material no particular composition.", \
     "default": "", \
     "uilabel": "Input Recipe",			\
