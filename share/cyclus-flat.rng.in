@@ -1,28 +1,45 @@
 <grammar xmlns="http://relaxng.org/ns/structure/1.0"
-datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  xmlns:a="http://relaxng.org/ns/annotation/1.0"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 <start>
 <element name="simulation">
+  <a:documentation>A complete Cyclus simulation</a:documentation>
   <optional><element name="schematype"><text/></element></optional>
 <interleave>
 
   <optional><element name="ui"><text/></element></optional>
 
   <element name ="control">
+    <a:documentation>Block to define control parameters of simulation.</a:documentation>
     <interleave>
       <optional>
-        <element name="simhandle"><data type="string"/></element>
+        <element name="simhandle"> <data type="string"/></element>
       </optional>
-      <element name="duration"><data type="nonNegativeInteger"/></element>
-      <element name="startmonth"><data type="nonNegativeInteger"/></element>
-      <element name="startyear"><data type="nonNegativeInteger"/></element>
+      <element name="duration"> 
+          <a:documentation>Simulation duration in units of time steps. Default time steps
+            are 1 month. See `dt` to change default time step length.</a:documentation>
+          <data type="nonNegativeInteger"/> </element>
+      <element name="startyear"> 
+          <a:documentation>First year of simulation, e.g. 2015 (integer)</a:documentation>
+          <data type="nonNegativeInteger"/> </element>
+      <element name="startmonth">
+        <a:documentation>First month of the simulation, e.g. 3 for March (integer)</a:documentation>
+        <data type="nonNegativeInteger"/> </element>
       <optional> 
-        <element name="decay"><text/></element> 
+        <element name="decay"> 
+          <a:documentation>Mode for when radioactive decay occurs. Choose from "never", "manual", "lazy".</a:documentation>
+          <text/> </element> 
       </optional>
       <optional> 
-        <element name="dt"><data type="nonNegativeInteger"/></element> 
+        <element name="dt">
+            <a:documentation>Length of a time step in seconds. Default: 1 month = 1 year/12.</a:documentation>
+          <data type="nonNegativeInteger"/></element> 
       </optional>
       <optional>
-        <element name="explicit_inventory"> <data type="boolean"/> </element>
+        <element name="explicit_inventory">
+          <a:documentation>A Boolean flag to indicate whether the database should include tables that explicitly
+            record the inventory of each resource buffer in each agent at each time step.</a:documentation>
+          <data type="boolean"/> </element>
       </optional>
       <optional>
         <element name="explicit_inventory_compact"> <data type="boolean"/> </element>
