@@ -57,7 +57,7 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pprint import pprint, pformat
 import textwrap
 import difflib
-import xml.dom.minidom
+import xml.dom.expatbuilder
 
 try:
     import simplejson as json
@@ -124,7 +124,7 @@ ENTITIES = [('cyclus::Region', 'region'), ('cyclus::Institution', 'institution')
 def escape_xml(s, ind='    '):
     """Escapes xml string s, prettifies it and puts in c++ string lit form."""
 
-    s = xml.dom.minidom.parseString(s)
+    s = xml.dom.expatbuilder.parseString(s, False)
     s = s.toprettyxml(indent='    ')
     s = s.replace('"', '\\"')
 
@@ -1704,7 +1704,7 @@ class SchemaFilter(CodeGeneratorFilter):
             raise TypeError(msg.format(cs, given))
         return self.default_types[cpp]
 
-    def _buildschema(self, cpptype, schematype=None, uitype=None, names=None):
+    def _buildschema(self, cpptype, schematype=None, uitype=None, names=None, docs=None):
         schematype = prepare_type(cpptype, schematype)
         uitype = prepare_type(cpptype, uitype)
         names = prepare_type(cpptype, names)
@@ -1717,6 +1717,8 @@ class SchemaFilter(CodeGeneratorFilter):
                 name = names
             d_type = self._type(t, schematype or uitype)
             impl += '<element name="{0}">'.format(name)
+            if docs:
+                impl += '<a:documentation>' + docs + '</a:documentation>'
             impl += '<data type="{0}" />'.format(d_type)
             impl += '</element>'
         elif t in ['std::list', 'std::set', 'std::vector']:
@@ -1807,8 +1809,8 @@ class SchemaFilter(CodeGeneratorFilter):
             opt = info.get('default', None) is not None
             if opt:
                 xml += '<optional>'
-
-            xml += self._buildschema(t, schematype, uitype, labels)
+            docs = info.get('doc', None)
+            xml += self._buildschema(t, schematype, uitype, labels, docs)
 
             if opt:
                 xml += '</optional>'
