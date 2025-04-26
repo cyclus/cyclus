@@ -38,7 +38,7 @@ following handy table!
        namespace from the classes.  Since this gives you direct access to the
        Python interpreter, try to be a little careful.
 :note: Merges the argument (which like with var must evaluate to a dict) with the
-       current class level annotations. Enrties here overwrite previous entries.
+       current class level annotations. Entries here overwrite previous entries.
 
 cycpp is implemented entirely in this file and with tools from the Python standard
 library. It requires Python 2.7+ or Python 3.3+ to run.
