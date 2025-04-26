@@ -31,12 +31,25 @@ void LoadStringstreamFromFile(std::stringstream& stream, std::string file,
 std::string LoadStringFromFile(std::string file, std::string format="none");
 
 /// Returns a list of the full module+agent spec for all agents in the given
+/// set of agent names.
+std::vector<AgentSpec> ParseSpecs(std::set<std::string> agent_set);
+
+/// Returns a list of the full module+agent spec for all agents in the given
 /// input file.
 std::vector<AgentSpec> ParseSpecs(std::string infile, std::string format="none");
 
 /// Builds and returns a master cyclus input xml schema that includes the
-/// sub-schemas defined by all installed cyclus modules (e.g. facility agents).
-/// This is used to validate simulation input files.
+/// sub-schemas defined by the provided list of agent specifications.
+/// This is used but other versions of BuildMasterSchema.
+std::string BuildMasterSchema(std::string schema_path, std::vector<AgentSpec> specs);
+
+/// Builds and returns a master cyclus input xml schema that includes the
+/// sub-schemas from all the installed modules.
+std::string BuildMasterSchema(std::string schema_path);
+
+/// Builds and returns a master cyclus input xml schema that includes the
+/// sub-schemas defined by all cyclus modules (e.g. facility agents) referenced
+/// in the input file. This is used to validate simulation input files.
 std::string BuildMasterSchema(std::string schema_path, std::string infile,
                               std::string format="none");
 

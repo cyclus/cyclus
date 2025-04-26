@@ -7,8 +7,19 @@ namespace cyclus {
 
 /// Builds and returns a master cyclus input xml schema defining a flat
 /// prototype and instance structure that includes the sub-schemas defined by
+/// the vector of specs.
+/// This is used internally by other BuildFlatMasterSchema.
+std::string BuildFlatMasterSchema(std::string schema_path, std::vector<AgentSpec> specs);
+
+/// Builds and returns a master cyclus input xml schema defining a flat
+/// prototype and instance structure that includes the sub-schemas defined by
 /// all installed cyclus modules (e.g. facility agents).  This is used to
-/// validate simulation input files.
+/// share all valid gammar.
+std::string BuildFlatMasterSchema(std::string schema_path);
+
+/// Builds and returns a master cyclus input xml schema defining a flat
+/// prototype and instance structure that includes the sub-schemas defined by
+/// the input file.  This is used to validate simulation input files.
 std::string BuildFlatMasterSchema(std::string schema_path, std::string infile);
 
 /// a class that encapsulates the methods needed to load input to
