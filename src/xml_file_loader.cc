@@ -84,7 +84,8 @@ std::vector<AgentSpec> ParseSpecs(std::string infile, std::string format) {
   std::string p = "/simulation/archetypes/spec";
   int n = xqe.NMatches(p);
   for (int i = 0; i < n; ++i) {
-    unique.insert(xqe.SubTree(p, i)->GetString("name"));
+    AgentSpec spec(xqe.SubTree(p, i));
+    unique.insert(spec.str());
   }
 
   if (unique.size() == 0) {
