@@ -37,7 +37,7 @@ following handy table!
        is great for. Any variables defined here are kept in a separate
        namespace from the classes.  Since this gives you direct access to the
        Python interpreter, try to be a little careful.
-:note: Merges the argument (which like with var must evalutae to a dict) with the
+:note: Merges the argument (which like with var must evaluate to a dict) with the
        current class level annotations. Enrties here overwrite previous entries.
 
 cycpp is implemented entirely in this file and with tools from the Python standard
