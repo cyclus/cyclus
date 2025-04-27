@@ -190,68 +190,69 @@
     </oneOrMore>
 
     <oneOrMore>
-      <element name="region"> <interleave>
+      <element name="region"> 
         <a:documentation>A region that represents a geopolitical division of the world and contains one or more institutions.</a:documentation>
-        <element name="name">
-          <a:documentation>The name of the region</a:documentation>
-          <text/> </element>
-        <optional>
-          <element name="lifetime">
-            <a:documentation>The number of time steps that this region participates in the simulation once it begins.</a:documentation>
-            <data type="nonNegativeInteger"/> </element>
-        </optional>
+        <interleave>
+          <element name="name">
+            <a:documentation>The name of the region</a:documentation>
+            <text/> </element>
+          <optional>
+            <element name="lifetime">
+              <a:documentation>The number of time steps that this region participates in the simulation once it begins.</a:documentation>
+              <data type="nonNegativeInteger"/> </element>
+          </optional>
 
-        <element name="config">
-          <a:documentation>Configuration to specify which archetype is being used for this region, and then 
-            provide parameters to specify a particular prototype.</a:documentation>
-          <choice>
-          @Region_REFS@
-          </choice>
-        </element>
+          <element name="config">
+            <a:documentation>Configuration to specify which archetype is being used for this region, and then 
+              provide parameters to specify a particular prototype.</a:documentation>
+            <choice>
+            @Region_REFS@
+            </choice>
+          </element>
 
-        <oneOrMore>
-          <element name="institution"> 
-            <a:documentation>An institution that represents an entity that can own/operate facilities within a region.</a:documentation>
-            <interleave>
-              <element name="name">
-                <a:documentation>The name of the institution</a:documentation>
-                <text/> </element>
-              <optional>
-                <element name="lifetime"> 
-                  <a:documentation>The number of time steps that this institution participates in the simulation once it begins.</a:documentation>
-                  <data type="nonNegativeInteger"/> </element>
-              </optional>
+          <oneOrMore>
+            <element name="institution"> 
+              <a:documentation>An institution that represents an entity that can own/operate facilities within a region.</a:documentation>
+              <interleave>
+                <element name="name">
+                  <a:documentation>The name of the institution</a:documentation>
+                  <text/> </element>
+                <optional>
+                  <element name="lifetime"> 
+                    <a:documentation>The number of time steps that this institution participates in the simulation once it begins.</a:documentation>
+                    <data type="nonNegativeInteger"/> </element>
+                </optional>
 
-              <optional>
-                <element name="initialfacilitylist">
-                  <a:documentation>A list of facility prototypes that are operating when this institution begins participating in the simulation.</a:documentation>
-                  <oneOrMore>
-                    <element name="entry">
-                      <a:documentation>An entry for each prototype that has some number of initial facilities.</a:documentation>
-                      <interleave>
-                        <element name="prototype"> 
-                          <a:documentation>The name of the prototype that has at least one initial facility.</a:documentation>
-                          <text/> </element>
-                        <element name="number"> 
-                          <a:documentation>The number of this prototype that are operating initially.</a:documentation>
-                          <data type="nonNegativeInteger"/> </element>
-                      </interleave>
-                    </element>
-                  </oneOrMore>
+                <optional>
+                  <element name="initialfacilitylist">
+                    <a:documentation>A list of facility prototypes that are operating when this institution begins participating in the simulation.</a:documentation>
+                    <oneOrMore>
+                      <element name="entry">
+                        <a:documentation>An entry for each prototype that has some number of initial facilities.</a:documentation>
+                        <interleave>
+                          <element name="prototype"> 
+                            <a:documentation>The name of the prototype that has at least one initial facility.</a:documentation>
+                            <text/> </element>
+                          <element name="number"> 
+                            <a:documentation>The number of this prototype that are operating initially.</a:documentation>
+                            <data type="nonNegativeInteger"/> </element>
+                        </interleave>
+                      </element>
+                    </oneOrMore>
+                  </element>
+                </optional>
+
+                <element name="config">
+                  <a:documentation>Configuration to specify which archetype is being used for this institution, and then 
+                    provide parameters to specify a particular prototype.</a:documentation>
+                  <choice>
+                  @Inst_REFS@
+                  </choice>
                 </element>
-              </optional>
+            </interleave> </element>
+          </oneOrMore>
 
-              <element name="config">
-                <a:documentation>Configuration to specify which archetype is being used for this institution, and then 
-                  provide parameters to specify a particular prototype.</a:documentation>
-                <choice>
-                @Inst_REFS@
-                </choice>
-              </element>
-          </interleave> </element>
-        </oneOrMore>
-
-      </interleave> </element>
+        </interleave> </element>
     </oneOrMore>
 
     <zeroOrMore>
