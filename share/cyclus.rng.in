@@ -75,29 +75,45 @@
         </optional>
         <optional>
           <element name="solver"> 
+            <a:documentation>Input block to select the solver mode and provide solver parameters.</a:documentation>
             <interleave>
               <optional><element name="config">
+              <a:documentation>Provide a solver configuration</a:documentation>
               <choice>
                 <element name="greedy">
+                  <a:documentation>Choose the greedy solver</a:documentation>
                   <interleave>
                     <optional>
-                      <element name="preconditioner"> <text/> </element>
+                      <element name="preconditioner"> 
+                        <a:documentation>Select a preconditioner for the greedy solver</a:documentation>
+                        <text/> </element>
                     </optional>
                   </interleave>
                 </element>
                 <element name="coin-or">
+                  <a:documentation>Select the COIN-OR mixed integer linear programming library solver</a:documentation>
                   <interleave>
                     <optional>
-                      <element name="timeout">  <data type="positiveInteger"/>  </element>
+                      <element name="timeout">
+                        <a:documentation>Select a time limit for how long you are willing to let the solver find a solution</a:documentation>
+                        <data type="positiveInteger"/>  </element>
                     </optional>
-                    <optional><element name="verbose"><data type="boolean"/></element></optional>
-                    <optional><element name="mps"><data type="boolean"/></element></optional>
+                    <optional>
+                      <element name="verbose">
+                        <a:documentation>A Boolean variable to determine whether there is verbose output from the COIN-OR solver.</a:documentation>
+                        <data type="boolean"/></element>
+                      </optional>
+                    <optional>
+                      <element name="mps">
+                        <a:documentation>A Boolean variable to determine whether an MPS file is written for each exchange.</a:documentation>
+                        <data type="boolean"/></element></optional>
                   </interleave>
                 </element>
               </choice>
               </element></optional>
               <optional>
                 <element name="allow_exclusive_orders">
+                  <a:documentation>A Boolean variable to determine whether exclusive orders are allowed (default: True)</a:documentation>
                   <data type="boolean" />
                 </element>
               </optional>
@@ -109,21 +125,39 @@
 
     <zeroOrMore>
       <element name="commodity">
+        <a:documentation>Commodities can be listed in order to provide a priority ordering for solving them in the DRE.</a:documentation>
         <interleave>
-          <element name="name"> <text/> </element>
-          <element name="solution_priority"> <data type="double"/> </element>
+          <element name="name"> 
+            <a:documentation>The name of a commodity being given priority treatment.</a:documentation>
+            <text/> </element>
+          <element name="solution_priority"> 
+            <a:documentation>The relative solution priority of this commodity. Higher values have higher priorit. (Default: -1)</a:documentation>
+            <data type="double"/> </element>
         </interleave>
       </element>
     </zeroOrMore>
       
     <element name="archetypes"> 
+      <a:documentation>A list of archetypes that will be dynamically loaded for use in Regions, Insitutions, and Facilities.</a:documentation>
       <oneOrMore>
         <element name="spec">
+          <a:documentation>A complete archetype specification</a:documentation>
           <interleave>
-            <optional><element name="path"><text/></element></optional>
-            <optional><element name="lib"><text/></element></optional>
-            <element name="name"><text/></element>
-            <optional><element name="alias"><text/></element></optional>
+            <optional>
+              <element name="path">
+                <a:documentation>An optional path to find this archetype; only needed if not discoverable in the standard locations.</a:documentation>
+                <text/></element></optional>
+            <optional>
+              <element name="lib">
+                <a:documentation>An optional name for the library that contains this archetype.</a:documentation>
+                <text/></element></optional>
+            <element name="name">
+              <a:documentation>The name that will be used to refer to this archetype.</a:documentation>
+              <text/></element>
+            <optional>
+              <element name="alias">
+                <a:documentation>An optional alias to refer to this archetype by a different name.</a:documentation>
+                <text/></element></optional>
           </interleave>
         </element>
       </oneOrMore>
@@ -131,13 +165,22 @@
 
     <oneOrMore>
       <element name="facility">
+        <a:documentation>A Facility prototype specification, with archetype,
+          archetype-specific parameters, and general facility parameters. Must
+          occur once, but may occur many times.</a:documentation> 
         <interleave>
-          <element name="name"> <text/> </element>
+          <element name="name">
+            <a:documentation>Prototype name</a:documentation>
+            <text/> </element>
           <optional>
-            <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
+            <element name="lifetime"> 
+              <a:documentation>Number of time steps that this archetypes is participating after it is deployed.</a:documentation>
+              <data type="nonNegativeInteger"/> </element>
           </optional>
 
           <element name="config">
+            <a:documentation>Configuration to specify which archetype is being used for this facility, and then 
+              provide parameters to specify a particular prototype.</a:documentation>
             <choice>
             @Facility_REFS@
             </choice>
@@ -148,42 +191,63 @@
 
     <oneOrMore>
       <element name="region"> <interleave>
-        <element name="name"> <text/> </element>
+        <a:documentation>A region that represents a geopolitical division of the world and contains one or more institutions.</a:documentation>
+        <element name="name">
+          <a:documentation>The name of the region</a:documentation>
+          <text/> </element>
         <optional>
-          <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
+          <element name="lifetime">
+            <a:documentation>The number of time steps that this region participates in the simulation once it begins.</a:documentation>
+            <data type="nonNegativeInteger"/> </element>
         </optional>
 
         <element name="config">
+          <a:documentation>Configuration to specify which archetype is being used for this region, and then 
+            provide parameters to specify a particular prototype.</a:documentation>
           <choice>
           @Region_REFS@
           </choice>
         </element>
 
         <oneOrMore>
-          <element name="institution"> <interleave>
-            <element name="name"> <text/> </element>
-            <optional>
-              <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
-            </optional>
+          <element name="institution"> 
+            <a:documentation>An institution that represents an entity that can own/operate facilities within a region.</a:documentation>
+            <interleave>
+              <element name="name">
+                <a:documentation>The name of the institution</a:documentation>
+                <text/> </element>
+              <optional>
+                <element name="lifetime"> 
+                  <a:documentation>The number of time steps that this institution participates in the simulation once it begins.</a:documentation>
+                  <data type="nonNegativeInteger"/> </element>
+              </optional>
 
-            <optional>
-              <element name="initialfacilitylist">
-                <oneOrMore>
-                  <element name="entry">
-                    <interleave>
-                      <element name="prototype"> <text/> </element>
-                      <element name="number"> <data type="nonNegativeInteger"/> </element>
-                    </interleave>
-                  </element>
-                </oneOrMore>
+              <optional>
+                <element name="initialfacilitylist">
+                  <a:documentation>A list of facility prototypes that are operating when this institution begins participating in the simulation.</a:documentation>
+                  <oneOrMore>
+                    <element name="entry">
+                      <a:documentation>An entry for each prototype that has some number of initial facilities.</a:documentation>
+                      <interleave>
+                        <element name="prototype"> 
+                          <a:documentation>The name of the prototype that has at least one initial facility.</a:documentation>
+                          <text/> </element>
+                        <element name="number"> 
+                          <a:documentation>The number of this prototype that are operating initially.</a:documentation>
+                          <data type="nonNegativeInteger"/> </element>
+                      </interleave>
+                    </element>
+                  </oneOrMore>
+                </element>
+              </optional>
+
+              <element name="config">
+                <a:documentation>Configuration to specify which archetype is being used for this institution, and then 
+                  provide parameters to specify a particular prototype.</a:documentation>
+                <choice>
+                @Inst_REFS@
+                </choice>
               </element>
-            </optional>
-
-            <element name="config">
-              <choice>
-              @Inst_REFS@
-              </choice>
-            </element>
           </interleave> </element>
         </oneOrMore>
 
@@ -192,14 +256,24 @@
 
     <zeroOrMore>
       <element name="recipe">
+        <a:documentation>A material composition recipe that can be reused in other places in the simulation.</a:documentation>
         <interleave>
-          <element name="name"><text/></element>
-          <element name="basis"><text/></element>
+          <element name="name">
+            <a:documentation>The name of the recipe used to refer to it elsewhere.</a:documentation>
+            <text/></element>
+          <element name="basis">
+            <a:documentation>Indicating whether this recipe is defined by mass or atom fraction. Valid values: `mass` or `atom`.</a:documentation>
+            <text/></element>
           <oneOrMore>
             <element name="nuclide">
+              <a:documentation>Information about each nuclde in this composition.</a:documentation>
               <interleave>
-                <element name="id"><data type="string"/></element>
-                <element name="comp"><data type="double"/></element>
+                <element name="id">
+                  <a:documentation>A nuclide identifier in any form allowed by PyNE</a:documentation>
+                  <data type="string"/></element>
+                <element name="comp">
+                  <a:documentation>The relative concentration of this nuclide in the basis defined above.</a:documentation>
+                  <data type="double"/></element>
               </interleave>
             </element>
           </oneOrMore>
@@ -209,22 +283,46 @@
 
     <zeroOrMore>
       <element name="package">
+        <a:documentation>A package that defines how bulk quantities are shipped between facilities.</a:documentation>
         <interleave>
-          <element name="name"><text/></element>
-          <optional><element name="fill_min"><data type="double"/></element></optional>
-          <optional><element name="fill_max"><data type="double"/></element></optional>
-          <optional><element name="strategy"><text/></element></optional>
+          <element name="name">
+            <a:documentation>The name of this package.</a:documentation>
+            <text/></element>
+          <optional>
+            <element name="fill_min">
+              <a:documentation>The minimum amount of material that is allowed to be shipped in this package.</a:documentation>
+              <data type="double"/></element></optional>
+          <optional>
+            <element name="fill_max">
+              <a:documentation>The maximums amount of material that is allowed to be shipped in this package.</a:documentation>            
+              <data type="double"/></element></optional>
+          <optional>
+            <element name="strategy">
+              <a:documentation>The strategy for filling a set of packages.</a:documentation>
+              <text/></element></optional>
         </interleave>
       </element>
     </zeroOrMore>
 
     <zeroOrMore>
       <element name="transportunit">
+        <a:documentation>A transport unit that describes how multiple packages may be shipped in some collection.</a:documentation>
         <interleave>
-          <element name="name"><text/></element>
-          <optional><element name="fill_min"><data type="nonNegativeInteger"/></element></optional>
-          <optional><element name="fill_max"><data type="nonNegativeInteger"/></element></optional>
-          <optional><element name="strategy"><text/></element></optional>
+          <element name="name">
+            <a:documentation>The name of this transport unit.</a:documentation>
+            <text/></element>
+          <optional>
+            <element name="fill_min">
+              <a:documentation>The minimum number of packages allowed to be shipped in this transport unit.</a:documentation>
+              <data type="nonNegativeInteger"/></element></optional>
+          <optional>
+            <element name="fill_max">
+              <a:documentation>The maximum number of packages allowed to be shipped in this transport unit.</a:documentation>
+              <data type="nonNegativeInteger"/></element></optional>
+          <optional>
+            <element name="strategy">
+              <a:documentation>The strategy for filling multiple transport units</a:documentation>
+              <text/></element></optional>
         </interleave>
       </element>
     </zeroOrMore>
