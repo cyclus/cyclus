@@ -38,7 +38,7 @@
         </optional>
         <optional> 
           <element name="dt">
-            <a:documentation>Length of a time step in seconds. Default: 1 month = 1 year/12.</a:documentation>
+            <a:documentation>Length of a time step in seconds. Default: 1 month = 1 year/12 (i.e. 2,629,846 seconds).</a:documentation>
             <data type="nonNegativeInteger"/></element> 
         </optional>
         <optional>
