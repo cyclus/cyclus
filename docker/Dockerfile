@@ -78,7 +78,7 @@ RUN mamba install -y "python<3.13" --no-pin && \
                pytables \
                pandas \
                jinja2 \
-               cython \
+               cython<3.1.0 \
                websockets \
                pprintpp \
                pip \
