@@ -234,13 +234,4 @@ void Agent::AddToTable() {
       ->AddVal("EnterTime", enter_time_)
       ->Record();
 }
-
-double Agent::GetEconParameter(const std::string& key) const {
-  return GetParameter(key); 
-}
-
-void Agent::SetEconParameter(const std::string& key, double value) {
-  SetParameter(key, value);
-}
-
 }  // namespace cyclus

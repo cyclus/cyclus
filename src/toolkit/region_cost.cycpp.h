@@ -27,20 +27,12 @@ double property_tax_rate;
     
     
 // Must be done in a function so that we can access the user-defined values
-std::unordered_map<std::string, double> InitializeParmList() {
+std::unordered_map<std::string, double> InitializeParamList() const override {
     std::unordered_map<std::string, double> econ_params {
         {"property_tax_rate", property_tax_rate}
     };
 
     return econ_params;
-}
-
-// Add the financial parameters to the class
-void InitializeCosts() { 
-    std::unordered_map<std::string, double> econ_params = InitializeParmList();
-    for (const auto& parameter : econ_params) {
-        this->SetEconParameter(parameter.first, parameter.second);
-    }
 }
 
 // Required for compilation but not added by the cycpp preprocessor. Do not

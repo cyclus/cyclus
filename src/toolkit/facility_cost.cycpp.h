@@ -62,73 +62,43 @@ double annual_labor_cost_increase_factor;
 
 
 // Must be done in a function so that we can access the user-defined values
-std::unordered_map<std::string, double> InitializeParmList() {
+std::unordered_map<std::string, double> InitializeParamList() const override {
   std::unordered_map<std::string, double> econ_params{
       {"capital_cost", capital_cost},
       {"operations_and_maintenance", operations_and_maintenance},
       {"facility_lifetime", facility_lifetime},
       {"capacity_decline_factor", capacity_decline_factor},
-      {"per_unit_labor_cost", per_unit_labor_cost}};
+      {"per_unit_labor_cost", per_unit_labor_cost},
+      {"annual_labor_cost_increase_factor", annual_labor_cost_increase_factor}};
 
   return econ_params;
 }
 
-// Add the financial parameters to the class
-void InitializeCosts() {
-  std::unordered_map<std::string, double> econ_params = InitializeParmList();
-  for (const auto& parameter : econ_params) {
-    this->SetEconParameter(parameter.first, parameter.second);
-  }
-}
-
-// Helper functions for GetCost
-double DiscountedThroughputSum(double xt, double gamma, int T, double k) const {
-  double sum = 0.0;
-  for (int t = 1; t <= T; ++t) {
-    sum += std::pow(xt, t) * std::pow(gamma, t);
-  }
-  return k * sum;
-}
-
-double DiscountedFixedCostSum(double F, double gamma, int T) const {
-  double sum = 0.0;
-  for (int t = 1; t <= T; ++t) {
-    sum += F * std::pow(gamma, t);
-  }
-  return sum;
-}
-
-double DiscountedVariableCostSum(double variable_costs, double xt, double gamma, int T, double k) const {
-  double sum = 0.0;
-  for (int t = 1; t <= T; ++t) {
-    sum += variable_costs * k * std::pow(xt, t) * std::pow(gamma, t);
-  }
-  return sum;
-}
-
-double ComputeDelta(double depreciation_constant, int initial_book_value,
-                              int T_hat, double gamma, double alpha) const {
-  std::vector<int> book_value = {initial_book_value};
+double ComputeDelta(double depreciation_constant, double initial_book_value,
+                              int T_hat, double r, double alpha) const {
+  std::vector<double> book_value = {initial_book_value};
   std::vector<double> dt;
 
-  for (int i = 0; i < T_hat - 1; ++i) {
-    int current_depreciation = static_cast<int>(-depreciation_constant * book_value[i]);
-    book_value.push_back(book_value[i] + current_depreciation);
-    dt.push_back(-static_cast<double>(current_depreciation) / book_value[0]);
-  }
+  double discount_factor = 1.0 / (1.0 + r);
 
+  for (int i = 0; i < T_hat - 1; ++i) {
+    int current_depreciation = -depreciation_constant * book_value[i];
+    book_value.push_back(book_value[i] + current_depreciation);
+    dt.push_back(current_depreciation / book_value[0]);
+  }
+  
   double delta_partial_sum = 0.0;
   for (int t = 1; t < T_hat; ++t) {
-    delta_partial_sum += dt[t - 1] * std::pow(gamma, t); 
+    delta_partial_sum += dt[t - 1] * std::pow(discount_factor, t); 
   }
 
-  return (1 - alpha * delta_partial_sum) / (1 - alpha);
+  return (1 - alpha * -delta_partial_sum) / (1 - alpha);
 }
 
 double GetCost(double units_of_production, double input_cost) {
   // Economic Parameters (declared like this because of scoping with try{})
   double r;
-  double xt;
+  double cdf;
   double v;
   int T;
   double OM;
@@ -141,7 +111,7 @@ double GetCost(double units_of_production, double input_cost) {
   // This allows GetCost() to exit gracefully if it can't find parameters
   try {
     r = parent()->GetEconParameter("minimum_acceptable_return_rate");
-    xt = GetEconParameter("capacity_decline_factor");
+    cdf = GetEconParameter("capacity_decline_factor");
     v = GetEconParameter("capital_cost");
     T = static_cast<int>(GetEconParameter("facility_lifetime"));
     OM = GetEconParameter("operations_and_maintenance");
@@ -149,7 +119,7 @@ double GetCost(double units_of_production, double input_cost) {
     alpha = parent()->GetEconParameter("corporate_income_tax_rate");
     p = parent()->parent()->GetEconParameter("property_tax_rate");
     depreciation_constant = parent()->GetEconParameter("depreciation_constant");
-    T_hat = T; // May become user-specified later
+    T_hat = 11; // CHANGE THIS TO USER INPUT
   } 
   catch (const std::exception& e) {
     // If any of the above functions fail to get their parameters, return 1
@@ -162,17 +132,16 @@ double GetCost(double units_of_production, double input_cost) {
 
   double seconds_per_year = kDefaultTimeStepDur * 12;
   double k = units_of_production * seconds_per_year / context()->dt();
-  double discount_factor = 1.0 / (1.0 + r);
   double variable_cost = labor_cost + input_cost;
 
   double property_tax = p * v;
   double F = OM + property_tax;
-  double L = DiscountedThroughputSum(xt, discount_factor, T, k);
+  double L = ComputePresentValue(r, T, cdf) * k;
 
   double c = v / L;
-  double f = DiscountedFixedCostSum(F, discount_factor, T) / L;
-  double w = DiscountedVariableCostSum(variable_cost, xt, discount_factor, T, k) / L;
-  double delta = ComputeDelta(depreciation_constant, static_cast<int>(v), T_hat, discount_factor, alpha);
+  double f = F * ComputePresentValue(r, T) / L;
+  double w = variable_cost * k * ComputePresentValue(r, T, cdf) / L;
+  double delta = ComputeDelta(depreciation_constant, v, T_hat, r, alpha);
 
   double cost = w + f + c * delta; 
 

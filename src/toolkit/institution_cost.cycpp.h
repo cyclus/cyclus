@@ -47,7 +47,7 @@ double depreciation_constant;
     
     
 // Must be done in a function so that we can access the user-defined values
-std::unordered_map<std::string, double> InitializeParmList() {
+std::unordered_map<std::string, double> InitializeParamList() const override {
     std::unordered_map<std::string, double> econ_params {
         {"minimum_acceptable_return_rate", minimum_acceptable_return_rate},
         {"corporate_income_tax_rate", corporate_income_tax_rate},
@@ -57,13 +57,6 @@ std::unordered_map<std::string, double> InitializeParmList() {
     return econ_params;
 }
     
-// Add the financial parameters to the class
-void InitializeCosts() { 
-    std::unordered_map<std::string, double> econ_params = InitializeParmList();
-    for (const auto& parameter : econ_params) {
-        this->SetEconParameter(parameter.first, parameter.second);
-    }
-}
     
 // Required for compilation but not added by the cycpp preprocessor. Do not
 // remove. Must be one for each variable.
