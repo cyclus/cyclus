@@ -33,7 +33,15 @@ double operations_and_maintenance;
     "doc": "Estimate on how long the facility will be active for economic purposes", \
     "units": "years" \
     }
-double facility_lifetime;
+double facility_operational_lifetime;
+
+#pragma cyclus var { \
+    "default": 1.0, \
+    "uilabel": "Taxable lifetime of facility for economic purposes in years", \
+    "doc": "How long the facility will be depreciating their initial investment", \
+    "units": "years" \
+    }
+double facility_taxable_lifetime;
 
 #pragma cyclus var { \
     "default": 1.0, \
@@ -60,13 +68,22 @@ double per_unit_labor_cost;
     }
 double annual_labor_cost_increase_factor;
 
+#pragma cyclus var { \
+    "default": -1.0, \
+    "uilabel": "Cost in dollars of one unit of production", \
+    "doc": "(optional) Hook to bypass LCP calculation and provide a cost in dollars", \
+    "units": "Dimensionless" \
+    }
+double cost_override;
+
 
 // Must be done in a function so that we can access the user-defined values
 std::unordered_map<std::string, double> InitializeParamList() const override {
   std::unordered_map<std::string, double> econ_params{
       {"capital_cost", capital_cost},
       {"operations_and_maintenance", operations_and_maintenance},
-      {"facility_lifetime", facility_lifetime},
+      {"facility_operational_lifetime", facility_operational_lifetime},
+      {"facility_taxable_lifetime", facility_taxable_lifetime},
       {"capacity_decline_factor", capacity_decline_factor},
       {"per_unit_labor_cost", per_unit_labor_cost},
       {"annual_labor_cost_increase_factor", annual_labor_cost_increase_factor}};
@@ -74,28 +91,12 @@ std::unordered_map<std::string, double> InitializeParamList() const override {
   return econ_params;
 }
 
-double ComputeDelta(double depreciation_constant, double initial_book_value,
-                              int T_hat, double r, double alpha) const {
-  std::vector<double> book_value = {initial_book_value};
-  std::vector<double> dt;
-
-  double discount_factor = 1.0 / (1.0 + r);
-
-  for (int i = 0; i < T_hat - 1; ++i) {
-    int current_depreciation = -depreciation_constant * book_value[i];
-    book_value.push_back(book_value[i] + current_depreciation);
-    dt.push_back(current_depreciation / book_value[0]);
-  }
-  
-  double delta_partial_sum = 0.0;
-  for (int t = 1; t < T_hat; ++t) {
-    delta_partial_sum += dt[t - 1] * std::pow(discount_factor, t); 
-  }
-
-  return (1 - alpha * -delta_partial_sum) / (1 - alpha);
-}
-
 double GetCost(double units_of_production, double input_cost) {
+
+  if (cost_override > 0) {
+    return cost_override;
+  }
+
   // Economic Parameters (declared like this because of scoping with try{})
   double r;
   double cdf;
@@ -113,13 +114,13 @@ double GetCost(double units_of_production, double input_cost) {
     r = parent()->GetEconParameter("minimum_acceptable_return_rate");
     cdf = GetEconParameter("capacity_decline_factor");
     v = GetEconParameter("capital_cost");
-    T = static_cast<int>(GetEconParameter("facility_lifetime"));
+    T = static_cast<int>(GetEconParameter("facility_operational_lifetime"));
     OM = GetEconParameter("operations_and_maintenance");
     labor_cost = GetEconParameter("per_unit_labor_cost");
     alpha = parent()->GetEconParameter("corporate_income_tax_rate");
     p = parent()->parent()->GetEconParameter("property_tax_rate");
     depreciation_constant = parent()->GetEconParameter("depreciation_constant");
-    T_hat = 11; // CHANGE THIS TO USER INPUT
+    T_hat = static_cast<int>(GetEconParameter("facility_taxable_lifetime"));
   } 
   catch (const std::exception& e) {
     // If any of the above functions fail to get their parameters, return 1
@@ -130,8 +131,8 @@ double GetCost(double units_of_production, double input_cost) {
     return 1;
   }
 
-  double seconds_per_year = kDefaultTimeStepDur * 12;
-  double k = units_of_production * seconds_per_year / context()->dt();
+  double timesteps_per_year = kDefaultTimeStepDur * 12 / context()->dt();
+  double k = units_of_production * timesteps_per_year;
   double variable_cost = labor_cost + input_cost;
 
   double property_tax = p * v;
@@ -153,7 +154,9 @@ double GetCost(double units_of_production, double input_cost) {
 // remove. Must be one for each variable.
 std::vector<int> cycpp_shape_capital_cost = {0};
 std::vector<int> cycpp_shape_operations_and_maintenance = {0};
-std::vector<int> cycpp_shape_facility_lifetime = {0};
+std::vector<int> cycpp_shape_facility_operational_lifetime = {0};
+std::vector<int> cycpp_shape_facility_taxable_lifetime = {0};
 std::vector<int> cycpp_shape_capacity_decline_factor = {0};
 std::vector<int> cycpp_shape_per_unit_labor_cost = {0};
 std::vector<int> cycpp_shape_annual_labor_cost_increase_factor = {0};
+std::vector<int> cycpp_shape_cost_override = {0};

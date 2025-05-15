@@ -33,7 +33,7 @@ class EconomicEntity {
 
     // Protects against divide by zero in discount factor
     if (std::abs(r + 1.0) < 1e-12) {
-      return static_cast<double>(T);
+      return std::numeric_limits<double>::infinity();
     }
 
     double discount_factor = 1.0 / (1.0 + r);
@@ -49,6 +49,28 @@ class EconomicEntity {
            (1.0 - std::pow(modified_discount_factor, T)) /
            (1.0 - modified_discount_factor);
   }
+
+  // Needs to be renamed and generalized
+  double ComputeDelta(double depreciation_constant, double initial_book_value,
+                              int T_hat, double r, double alpha) const {
+  std::vector<double> book_value = {initial_book_value};
+  std::vector<double> dt;
+
+  double discount_factor = 1.0 / (1.0 + r);
+
+  for (int i = 0; i < T_hat - 1; ++i) {
+    int current_depreciation = depreciation_constant * book_value[i];
+    book_value.push_back(book_value[i] - current_depreciation);
+    dt.push_back(current_depreciation / book_value[0]);
+  }
+  
+  double delta_partial_sum = 0.0;
+  for (int t = 1; t < T_hat; ++t) {
+    delta_partial_sum += dt[t - 1] * std::pow(discount_factor, t); 
+  }
+
+  return (1 - alpha * delta_partial_sum) / (1 - alpha);
+}
 
  protected:
   void SetParameter(const std::string& key, double value) {
