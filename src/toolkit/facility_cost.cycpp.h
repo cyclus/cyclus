@@ -136,15 +136,15 @@ double GetCost(double units_of_production, double input_cost) {
   double variable_cost = labor_cost + input_cost;
 
   double property_tax = p * v;
-  double F = OM + property_tax;
-  double L = ComputePresentValue(r, T, cdf) * k;
+  double F = OM;
+  double L = PresentWorthGrowingAnnuity(r, T, cdf) * k;
 
   double c = v / L;
-  double f = F * ComputePresentValue(r, T) / L;
-  double w = variable_cost * k * ComputePresentValue(r, T, cdf) / L;
-  double delta = ComputeDelta(depreciation_constant, v, T_hat, r, alpha);
+  double f = F * PresentWorthGrowingAnnuity(r, T) / L;
+  double w = variable_cost * k * PresentWorthGrowingAnnuity(r, T, cdf) / L;
+  double delta = ComputeTaxFactor(depreciation_constant, v, T_hat, r, alpha);
 
-  double cost = w + f + c * delta; 
+  double cost = w + f + c * (property_tax + delta); 
 
   // Since pref = 1/cost (for now) we CANNOT return 0
   return cost != 0 ? cost : 1;

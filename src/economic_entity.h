@@ -26,7 +26,7 @@ class EconomicEntity {
     }
   }
 
-  double ComputePresentValue(double r, int T, double cdf = 1.0) const {
+  double PresentWorthGrowingAnnuity(double r, int T, double cdf = 1.0) const {
     if (T <= 0) {
       return 0.0;
     }
@@ -51,7 +51,7 @@ class EconomicEntity {
   }
 
   // Needs to be renamed and generalized
-  double ComputeDelta(double depreciation_constant, double initial_book_value,
+  double ComputeTaxFactor(double depreciation_constant, double initial_book_value,
                               int T_hat, double r, double alpha) const {
   std::vector<double> book_value = {initial_book_value};
   std::vector<double> dt;
