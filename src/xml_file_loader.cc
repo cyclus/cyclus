@@ -13,6 +13,7 @@
 #include "blob.h"
 #include "context.h"
 #include "cyc_std.h"
+#include "discovery.h"
 #include "env.h"
 #include "error.h"
 #include "exchange_solver.h"
@@ -60,6 +61,17 @@ std::string LoadStringFromFile(std::string file, std::string format) {
   return input.str();
 }
 
+std::vector<AgentSpec> ParseSpecs(std::set<std::string> agent_set) {
+
+  std::vector<AgentSpec> specs;
+
+  for (const std::string& spec_str : agent_set) {
+    specs.push_back(AgentSpec(spec_str));
+  }
+
+  return specs;
+}
+
 std::vector<AgentSpec> ParseSpecs(std::string infile, std::string format) {
   std::stringstream input;
   LoadStringstreamFromFile(input, infile, format);
@@ -67,27 +79,26 @@ std::vector<AgentSpec> ParseSpecs(std::string infile, std::string format) {
   parser_.Init(input);
   InfileTree xqe(parser_);
 
-  std::vector<AgentSpec> specs;
   std::set<std::string> unique;
 
   std::string p = "/simulation/archetypes/spec";
   int n = xqe.NMatches(p);
   for (int i = 0; i < n; ++i) {
     AgentSpec spec(xqe.SubTree(p, i));
-    if (unique.count(spec.str()) == 0) {
-      specs.push_back(spec);
-      unique.insert(spec.str());
-    }
+    unique.insert(spec.str());
   }
 
-  if (specs.size() == 0) {
+  if (unique.size() == 0) {
     throw ValidationError("failed to parse archetype specs from input file");
   }
+
+  std::vector<AgentSpec> specs = ParseSpecs(unique);
 
   return specs;
 }
 
-std::string BuildMasterSchema(std::string schema_path, std::string infile, std::string format) {
+std::string BuildMasterSchema(std::string schema_path, std::vector<AgentSpec> specs) {
+
   Timer ti;
   Recorder rec;
   Context ctx(&ti, &rec);
@@ -95,8 +106,6 @@ std::string BuildMasterSchema(std::string schema_path, std::string infile, std::
   std::stringstream schema("");
   LoadStringstreamFromFile(schema, schema_path);
   std::string master = schema.str();
-
-  std::vector<AgentSpec> specs = ParseSpecs(infile, format);
 
   std::map<std::string, std::string> subschemas;
 
@@ -124,6 +133,22 @@ std::string BuildMasterSchema(std::string schema_path, std::string infile, std::
   }
 
   return master;
+}
+
+std::string BuildMasterSchema(std::string schema_path) {
+
+  std::vector<AgentSpec> specs = ParseSpecs(cyclus::DiscoverSpecsInCyclusPath());
+
+  return BuildMasterSchema(schema_path, specs);
+
+}
+
+std::string BuildMasterSchema(std::string schema_path, std::string infile, std::string format) {
+
+  std::vector<AgentSpec> specs = ParseSpecs(infile, format);
+
+  return BuildMasterSchema(schema_path, specs);
+
 }
 
 Composition::Ptr ReadRecipe(InfileTree* qe) {

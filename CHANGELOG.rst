@@ -55,7 +55,7 @@ Since last release
 * Support Boost v1.86 (#1792)
 * Set locale when writing/reading from serialized SQLite data (#1837)
 * Support mamba v2 CLI in Dockerfile (#1839)
-
+* Allow master schema be to reported with all discoverable archetypes (#1846)
 
 v1.6.0
 ====================

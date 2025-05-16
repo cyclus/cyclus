@@ -350,9 +350,7 @@ int EarlyExitArgs(const ArgInfo& ai) {
     std::cout << Env::nuc_data() << "\n";
     return 0;
   } else if (ai.vm.count("schema")) {
-    std::stringstream f;
-    LoadStringstreamFromFile(f, ai.schema_path);
-    std::cout << f.str() << "\n";
+    std::cout << cyclus::BuildMasterSchema(ai.schema_path) << "\n";
     return 0;
   } else if (ai.vm.count("agent-schema")) {
     std::string name(ai.vm["agent-schema"].as<std::string>());

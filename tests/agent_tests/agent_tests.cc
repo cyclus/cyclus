@@ -28,9 +28,11 @@ TEST_P(AgentTests, Print) {
 
 TEST_P(AgentTests, Schema) {
   std::stringstream schema;
-  schema << ("<element name=\"foo\">\n");
+  schema << "<grammar xmlns:a=\"http://relaxng.org/ns/annotation/1.0\">\n";
+  schema << "<element name=\"foo\">\n";
   schema << agent_->schema();
-  schema << "</element>\n";
+  schema << "</element>\n</grammar>\n";
+  std::cout << schema.str();
   cyclus::XMLParser p;
   EXPECT_NO_THROW(p.Init(schema));
 }

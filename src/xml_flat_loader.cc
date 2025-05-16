@@ -2,6 +2,7 @@
 
 #include "agent.h"
 #include "context.h"
+#include "discovery.h"
 #include "env.h"
 #include "error.h"
 #include "infile_tree.h"
@@ -11,7 +12,7 @@
 
 namespace cyclus {
 
-std::string BuildFlatMasterSchema(std::string schema_path, std::string infile) {
+std::string BuildFlatMasterSchema(std::string schema_path, std::vector<AgentSpec> specs) {
   Timer ti;
   Recorder rec;
   Context ctx(&ti, &rec);
@@ -20,7 +21,6 @@ std::string BuildFlatMasterSchema(std::string schema_path, std::string infile) {
   LoadStringstreamFromFile(schema, schema_path);
   std::string master = schema.str();
 
-  std::vector<AgentSpec> specs = ParseSpecs(infile);
   std::string subschemas;
   for (int i = 0; i < specs.size(); ++i) {
     Agent* m = DynamicModule::Make(&ctx, specs[i]);
@@ -38,6 +38,22 @@ std::string BuildFlatMasterSchema(std::string schema_path, std::string infile) {
   }
 
   return master;
+}
+
+std::string BuildFlatMasterSchema(std::string schema_path, std::string infile) {
+
+  std::vector<AgentSpec> specs = ParseSpecs(infile);
+
+  return BuildFlatMasterSchema(schema_path, specs);
+
+}
+
+std::string BuildFlatMasterSchema(std::string schema_path) {
+
+  std::vector<AgentSpec> specs = ParseSpecs(cyclus::DiscoverSpecsInCyclusPath());
+
+  return BuildFlatMasterSchema(schema_path, specs);
+
 }
 
 std::string XMLFlatLoader::master_schema() {
