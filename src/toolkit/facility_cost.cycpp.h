@@ -142,7 +142,7 @@ double GetCost(double units_of_production, double input_cost) {
   double c = v / L;
   double f = F * PresentWorthGrowingAnnuity(r, T) / L;
   double w = variable_cost * k * PresentWorthGrowingAnnuity(r, T, cdf) / L;
-  double delta = ComputeTaxFactor(depreciation_constant, v, T_hat, r, alpha);
+  double delta = ComputeTaxFactor(depreciation_constant/T_hat, v, T_hat, r, alpha);
 
   double cost = w + f + c * (property_tax + delta); 
 
