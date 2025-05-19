@@ -76,6 +76,10 @@ double annual_labor_cost_increase_factor;
     }
 double cost_override;
 
+// This is for testing right now, need to think/talk about the "right" way to 
+// do this...
+double prev_cost = 0;
+
 
 // Must be done in a function so that we can access the user-defined values
 std::unordered_map<std::string, double> InitializeParamList() const override {
@@ -94,7 +98,8 @@ std::unordered_map<std::string, double> InitializeParamList() const override {
 double GetCost(double units_of_production, double input_cost) {
 
   if (cost_override > 0) {
-    return cost_override;
+    // Not totally sure how to levelize this yet, just sort of testing things...
+    return cost_override + input_cost;
   }
 
   // Economic Parameters (declared like this because of scoping with try{})
