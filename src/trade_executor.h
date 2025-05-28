@@ -97,6 +97,7 @@ class TradeExecutor {
               ->AddVal("ResourceId", rsrc->state_id())
               ->AddVal("Commodity", trade.request->commodity())
               ->AddVal("Time", ctx->time())
+              ->AddVal("Cost", 1/trade.bid->preference())
               ->Record();
         }
       }
