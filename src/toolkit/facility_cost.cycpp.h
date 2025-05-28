@@ -78,7 +78,8 @@ double cost_override;
 
 // This is for testing right now, need to think/talk about the "right" way to 
 // do this...
-double prev_cost = 0;
+double avg_per_unit_cost = 0;
+double total_qty_purchased = 0;
 
 
 // Must be done in a function so that we can access the user-defined values
@@ -95,11 +96,15 @@ std::unordered_map<std::string, double> InitializeParamList() const override {
   return econ_params;
 }
 
-double GetCost(double units_of_production, double input_cost) {
+// Added production_capacity_per_timestep to allow units_of_production to
+// take the actual production of that bid into account... Not totally sure
+// how I feel about all this at the moment.
+double GetCost(double production_capacity_per_timestep, 
+               double units_of_production, double input_cost) {
 
   if (cost_override > 0) {
     // Not totally sure how to levelize this yet, just sort of testing things...
-    return cost_override + input_cost;
+    return cost_override * units_of_production + input_cost;
   }
 
   // Economic Parameters (declared like this because of scoping with try{})
@@ -137,7 +142,7 @@ double GetCost(double units_of_production, double input_cost) {
   }
 
   double timesteps_per_year = kDefaultTimeStepDur * 12 / context()->dt();
-  double k = units_of_production * timesteps_per_year;
+  double k = production_capacity_per_timestep * timesteps_per_year;
   double variable_cost = labor_cost + input_cost;
 
   double property_tax = p * v;
@@ -152,7 +157,7 @@ double GetCost(double units_of_production, double input_cost) {
   double cost = w + f + c * (property_tax + delta); 
 
   // Since pref = 1/cost (for now) we CANNOT return 0
-  return cost != 0 ? cost : 1;
+  return cost != 0 ? (cost * units_of_production) : 1;
 }
 
 // Required for compilation but not added by the cycpp preprocessor. Do not
