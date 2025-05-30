@@ -56,6 +56,7 @@ Since last release
 * Set locale when writing/reading from serialized SQLite data (#1837)
 * Support mamba v2 CLI in Dockerfile (#1839)
 * Allow master schema be to reported with all discoverable archetypes (#1846)
+* Ensure that the RNG Schema is only printed if requested (#1858)
 
 v1.6.0
 ====================
