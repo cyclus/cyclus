@@ -6,7 +6,7 @@
   </control>
 
   <archetypes>
-    <spec><lib>libname</lib><name>StubInst</name></spec>
+    <spec><lib>LibName</lib><name>StubInst</name></spec>
     <spec><lib>agents</lib><name>NullRegion</name></spec>
   </archetypes>
 
