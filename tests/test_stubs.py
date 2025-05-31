@@ -22,23 +22,26 @@ def tmplog(fname):
 @pytest.mark.parametrize("pth", ['stubtest', 'stub_test', 'stubTest'])
 def test_stubs(pth):
     log = f'stub_test_{pth}.log'
-    src = os.path.join(d, pth)
-    bld = os.path.join(d, 'bar')
-    inst = os.path.join(d, 'baz')
+    agent_name_prefix = 'tmp'
 
-    stub_cmd = 'cycstub --type {0} {1}:{1}:{2}'
+    stub_cmd = f'cycstub --type {{0}} {pth}:{pth}:{{1}}'
     inst_cmd = 'python3 install.py --build_dir {0} --prefix {1}'
     tst_cmd = f'./bin/{pth}_unit_tests'
-    run_cmd = 'cyclus example_tmp_facility.xml'
+    run_cmd = f'cyclus example_{agent_name_prefix}_facility.xml'
 
     with tmpdir() as d:
+        src = os.path.join(d, pth)
+        bld = os.path.join(d, 'bar')
+        inst = os.path.join(d, 'baz')
+
         with tmplog(log) as f:
 
             msg = f'**Error, check the log in {log}**'
             os.mkdir(src)
+
             for flav in ['facility', 'inst', 'region']:
                 # generate stub
-                cmd = stub_cmd.format(flav, pth, 'tmp' + flav.capitalize())
+                cmd = stub_cmd.format(flav, agent_name_prefix + flav.capitalize())
                 print(cmd)
                 try:
                     subprocess.check_call(cmd.split(), shell=(os.name=='nt'),
@@ -68,10 +71,11 @@ def test_stubs(pth):
                 raise e
 
             # run sample file for stub
-            cmd = run_cmd.format('tmp_facility')
-            print(cmd)
             my_env = os.environ.copy()
             my_env["CYCLUS_PATH"] = f"{inst}/lib/cyclus"
+
+            cmd = run_cmd
+            print(cmd)
             try:
                 subprocess.check_call(cmd.split(), shell=(os.name=='nt'), cwd=src,
                                         stdout=f, stderr=f, env=my_env)
