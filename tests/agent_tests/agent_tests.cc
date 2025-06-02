@@ -67,3 +67,10 @@ TEST_P(AgentTests, Annotations_AllParents) {
       isagent = true;
   EXPECT_TRUE(isagent);
 }
+
+TEST_P(AgentTests, GetEconParam) {
+  agent_->InitializeCosts();
+  double econ_data = agent_->GetEconParameter("UnitTestHook");
+  EXPECT_EQ(econ_data, -1.0);
+}
+
