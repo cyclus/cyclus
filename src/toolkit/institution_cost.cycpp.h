@@ -28,15 +28,6 @@
 double minimum_acceptable_return_rate;
 
 #pragma cyclus var { \
-    "default": 0.0, \
-    "uilabel": "Corporate Income Tax Rate as decimal", \
-    "range": [0.0, 1.0], \
-    "doc": "Income Tax Rate for all facilities belonging to this institution as decimal (1% --> 0.01)", \
-    "units": "Dimensionless" \
-    }
-double corporate_income_tax_rate;
-
-#pragma cyclus var { \
     "default": 1.0, \
     "range": [1.0, 2.0], \
     "uilabel": "Constant to multiply Depreciation term (1/T) by", \
@@ -50,7 +41,6 @@ double depreciation_constant;
 std::unordered_map<std::string, double> InitializeParamList() const override {
     std::unordered_map<std::string, double> econ_params {
         {"minimum_acceptable_return_rate", minimum_acceptable_return_rate},
-        {"corporate_income_tax_rate", corporate_income_tax_rate},
         {"depreciation_constant", depreciation_constant}
     };
 
@@ -61,5 +51,4 @@ std::unordered_map<std::string, double> InitializeParamList() const override {
 // Required for compilation but not added by the cycpp preprocessor. Do not
 // remove. Must be one for each variable.
 std::vector<int> cycpp_shape_minimum_acceptable_return_rate = {0};
-std::vector<int> cycpp_shape_corporate_income_tax_rate = {0};
 std::vector<int> cycpp_shape_depreciation_constant = {0};

@@ -21,6 +21,14 @@
                    "units" : "$USD" }
 double capital_cost;
 
+#pragma cyclus var { \
+    "default": 0.0, \
+    "uilabel": "Property Tax Rate as decimal", \
+    "range": [0.0, 1.0], \
+    "doc": "Property tax rate for all facilities in region as decimal (1% --> 0.01)" \
+    }
+double property_tax_rate;
+
 #pragma cyclus var {                                                \
     "default" : 0.0, "uilabel" : "Annual O&M Cost in dollars",     \
     "doc" : "Annual O&M Cost required to run facility in dollars", \
@@ -59,7 +67,6 @@ double capacity_decline_factor;
     }
 double per_unit_labor_cost;
 
-
 #pragma cyclus var { \
     "default": 0.04, \
     "uilabel": "Compounding fractional annual increase in the cost of labor as a decimal", \
@@ -86,6 +93,7 @@ double total_qty_purchased = 0;
 std::unordered_map<std::string, double> InitializeParamList() const override {
   std::unordered_map<std::string, double> econ_params{
       {"capital_cost", capital_cost},
+       {"property_tax_rate", property_tax_rate},
       {"operations_and_maintenance", operations_and_maintenance},
       {"facility_operational_lifetime", facility_operational_lifetime},
       {"facility_taxable_lifetime", facility_taxable_lifetime},
@@ -96,73 +104,10 @@ std::unordered_map<std::string, double> InitializeParamList() const override {
   return econ_params;
 }
 
-// Added production_capacity_per_timestep to allow units_of_production to
-// take the actual production of that bid into account... Not totally sure
-// how I feel about all this at the moment.
-double GetCost(double production_capacity_per_timestep, 
-               double units_of_production, double input_cost) {
-
-  if (cost_override > 0) {
-    // Not totally sure how to levelize this yet, just sort of testing things...
-    return cost_override * units_of_production + input_cost;
-  }
-
-  // Economic Parameters (declared like this because of scoping with try{})
-  double r;
-  double cdf;
-  double v;
-  int T;
-  double OM;
-  double labor_cost;
-  double alpha;
-  double p;
-  double depreciation_constant;
-  int T_hat;
-
-  // This allows GetCost() to exit gracefully if it can't find parameters
-  try {
-    r = parent()->GetEconParameter("minimum_acceptable_return_rate");
-    cdf = GetEconParameter("capacity_decline_factor");
-    v = GetEconParameter("capital_cost");
-    T = static_cast<int>(GetEconParameter("facility_operational_lifetime"));
-    OM = GetEconParameter("operations_and_maintenance");
-    labor_cost = GetEconParameter("per_unit_labor_cost");
-    alpha = parent()->GetEconParameter("corporate_income_tax_rate");
-    p = parent()->parent()->GetEconParameter("property_tax_rate");
-    depreciation_constant = parent()->GetEconParameter("depreciation_constant");
-    T_hat = static_cast<int>(GetEconParameter("facility_taxable_lifetime"));
-  } 
-  catch (const std::exception& e) {
-    // If any of the above functions fail to get their parameters, return 1
-    // to default to old pref logic
-    LOG(cyclus::LEV_INFO1, "GetCost") << prototype() 
-                                      << "failed to get financial_data_: "
-                                      << e.what();
-    return 1;
-  }
-
-  double timesteps_per_year = kDefaultTimeStepDur * 12 / context()->dt();
-  double k = production_capacity_per_timestep * timesteps_per_year;
-  double variable_cost = labor_cost + input_cost;
-
-  double property_tax = p * v;
-  double F = OM;
-  double L = PresentWorthGrowingAnnuity(r, T, cdf) * k;
-
-  double c = v / L;
-  double f = F * PresentWorthGrowingAnnuity(r, T) / L;
-  double w = variable_cost * k * PresentWorthGrowingAnnuity(r, T, cdf) / L;
-  double delta = ComputeTaxFactor(depreciation_constant/T_hat, v, T_hat, r, alpha);
-
-  double cost = w + f + c * (property_tax + delta); 
-
-  // Since pref = 1/cost (for now) we CANNOT return 0
-  return cost != 0 ? (cost * units_of_production) : 1;
-}
-
 // Required for compilation but not added by the cycpp preprocessor. Do not
 // remove. Must be one for each variable.
 std::vector<int> cycpp_shape_capital_cost = {0};
+std::vector<int> cycpp_shape_property_tax_rate = {0};
 std::vector<int> cycpp_shape_operations_and_maintenance = {0};
 std::vector<int> cycpp_shape_facility_operational_lifetime = {0};
 std::vector<int> cycpp_shape_facility_taxable_lifetime = {0};
