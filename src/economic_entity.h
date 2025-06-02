@@ -26,51 +26,6 @@ class EconomicEntity {
     }
   }
 
-  double PresentWorthGrowingAnnuity(double r, int T, double cdf = 1.0) const {
-    if (T <= 0) {
-      return 0.0;
-    }
-
-    // Protects against divide by zero in discount factor
-    if (std::abs(r + 1.0) < 1e-12) {
-      return std::numeric_limits<double>::infinity();
-    }
-
-    double discount_factor = 1.0 / (1.0 + r);
-    double modified_discount_factor = discount_factor * cdf;
-
-    // Protects against divide by zero in the geometric series
-    if (std::abs(modified_discount_factor - 1.0) < 1e-12) {
-      return static_cast<double>(T);
-    }
-
-    // The geometric series representation of the sum
-    return modified_discount_factor *
-           (1.0 - std::pow(modified_discount_factor, T)) /
-           (1.0 - modified_discount_factor);
-  }
-
-  // Needs to be renamed and generalized
-  double ComputeTaxFactor(double depreciation_constant,
-                          double initial_book_value, int T_hat, double r,
-                          double alpha) const {
-    std::vector<double> dt;
-
-    double discount_factor = 1.0 / (1.0 + r);
-
-    for (int i = 1; i < T_hat; ++i) {
-      dt.push_back(std::pow((1 - depreciation_constant), (i - 1)) *
-                   depreciation_constant);
-    }
-
-    double delta_partial_sum = 0.0;
-    for (int t = 1; t < T_hat; ++t) {
-      delta_partial_sum += dt[t - 1] * std::pow(discount_factor, t);
-    }
-
-    return (1 - alpha * delta_partial_sum) / (1 - alpha);
-  }
-
  protected:
   void SetParameter(const std::string& key, double value) {
     financial_data_[key] = value;
