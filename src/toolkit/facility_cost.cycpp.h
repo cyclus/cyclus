@@ -90,7 +90,8 @@ double total_qty_purchased = 0;
 
 
 // Must be done in a function so that we can access the user-defined values
-std::unordered_map<std::string, double> InitializeParamList() const override {
+// add override back when reduced-cep-30 passes
+std::unordered_map<std::string, double> InitializeParamList() const {
   std::unordered_map<std::string, double> econ_params{
       {"capital_cost", capital_cost},
        {"property_tax_rate", property_tax_rate},

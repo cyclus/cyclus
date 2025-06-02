@@ -38,7 +38,7 @@ double depreciation_constant;
     
     
 // Must be done in a function so that we can access the user-defined values
-std::unordered_map<std::string, double> InitializeParamList() const override {
+std::unordered_map<std::string, double> InitializeParamList() const {
     std::unordered_map<std::string, double> econ_params {
         {"minimum_acceptable_return_rate", minimum_acceptable_return_rate},
         {"depreciation_constant", depreciation_constant}
