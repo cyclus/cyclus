@@ -19,17 +19,19 @@
 
 #pragma cyclus var { \
     "default": 0.0, \
-    "uilabel": "Property Tax Rate as decimal", \
+    "uilabel": "Corporate Income Tax Rate as decimal", \
     "range": [0.0, 1.0], \
-    "doc": "Property tax rate for all facilities in region as decimal (1% --> 0.01)" \
+    "doc": "Income Tax Rate for all facilities belonging to this institution as decimal (1% --> 0.01)", \
+    "units": "Dimensionless" \
     }
-double property_tax_rate;
+double corporate_income_tax_rate;
     
     
 // Must be done in a function so that we can access the user-defined values
 std::unordered_map<std::string, double> InitializeParamList() const override {
     std::unordered_map<std::string, double> econ_params {
-        {"property_tax_rate", property_tax_rate}
+        {"property_tax_rate", property_tax_rate},
+        {"corporate_income_tax_rate", corporate_income_tax_rate}
     };
 
     return econ_params;
@@ -37,4 +39,4 @@ std::unordered_map<std::string, double> InitializeParamList() const override {
 
 // Required for compilation but not added by the cycpp preprocessor. Do not
 // remove. Must be one for each variable.
-std::vector<int> cycpp_shape_property_tax_rate = {0};
+std::vector<int> cycpp_shape_corporate_income_tax_rate = {0};
