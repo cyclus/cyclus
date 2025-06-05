@@ -25,14 +25,14 @@ double capital_cost;
     "default": 0.0, \
     "uilabel": "Property Tax Rate as decimal", \
     "range": [0.0, 1.0], \
-    "doc": "Property tax rate for all facilities in region as decimal (1% --> 0.01)" \
+    "doc": "Property tax rate for this facility as decimal (1% --> 0.01)" \
     }
 double property_tax_rate;
 
 #pragma cyclus var {                                                \
-    "default" : 0.0, "uilabel" : "Annual O&M Cost in dollars",     \
-    "doc" : "Annual O&M Cost required to run facility in dollars", \
-    "units" : "$USD" }
+    "default" : 0.0, "uilabel" : "Annual O&M Cost",     \
+    "doc" : "Annual O&M Cost required to run facility", \
+    "units" : "Unit of Currency" }
 double operations_and_maintenance;
 
 #pragma cyclus var { \
@@ -49,31 +49,15 @@ double facility_operational_lifetime;
     "doc": "How long the facility will be depreciating their initial investment", \
     "units": "years" \
     }
-double facility_taxable_lifetime;
-
-#pragma cyclus var { \
-    "default": 1.0, \
-    "uilabel": "Annual fractional increase of initial facility capacity", \
-    "doc": "Fraction of initial capacity by which facility capacity increases/decreases each year", \
-    "units": "Dimensionless" \
-    }
-double capacity_decline_factor;
+double facility_depreciation_lifetime;
 
 #pragma cyclus var { \
     "default": 0.0, \
-    "uilabel": "Cost in dollars of labor required to produce one unit of production", \
-    "doc": "Cost in dollars of labor required to produce one unit of production", \
-    "units": "$USD" \
+    "uilabel": "Cost of labor required to produce one unit of production", \
+    "doc": "Cost of labor required to produce one unit of production", \
+    "units": "Unit of Currency" \
     }
 double per_unit_labor_cost;
-
-#pragma cyclus var { \
-    "default": 0.04, \
-    "uilabel": "Compounding fractional annual increase in the cost of labor as a decimal", \
-    "doc": "Cost in dollars of labor required to produce one unit of production", \
-    "units": "Dimensionless" \
-    }
-double annual_labor_cost_increase_factor;
 
 #pragma cyclus var { \
     "default": -1.0, \
@@ -82,11 +66,6 @@ double annual_labor_cost_increase_factor;
     "units": "Dimensionless" \
     }
 double cost_override;
-
-// This is for testing right now, need to think/talk about the "right" way to 
-// do this...
-double avg_per_unit_cost = 0;
-double total_qty_purchased = 0;
 
 
 // Must be done in a function so that we can access the user-defined values
@@ -97,10 +76,8 @@ std::unordered_map<std::string, double> InitializeParamList() const {
        {"property_tax_rate", property_tax_rate},
       {"operations_and_maintenance", operations_and_maintenance},
       {"facility_operational_lifetime", facility_operational_lifetime},
-      {"facility_taxable_lifetime", facility_taxable_lifetime},
-      {"capacity_decline_factor", capacity_decline_factor},
-      {"per_unit_labor_cost", per_unit_labor_cost},
-      {"annual_labor_cost_increase_factor", annual_labor_cost_increase_factor}};
+      {"facility_depreciation_lifetime", facility_taxable_lifetime},
+      {"per_unit_labor_cost", per_unit_labor_cost}};
 
   return econ_params;
 }
@@ -111,8 +88,6 @@ std::vector<int> cycpp_shape_capital_cost = {0};
 std::vector<int> cycpp_shape_property_tax_rate = {0};
 std::vector<int> cycpp_shape_operations_and_maintenance = {0};
 std::vector<int> cycpp_shape_facility_operational_lifetime = {0};
-std::vector<int> cycpp_shape_facility_taxable_lifetime = {0};
-std::vector<int> cycpp_shape_capacity_decline_factor = {0};
+std::vector<int> cycpp_shape_facility_depreciation_lifetime = {0};
 std::vector<int> cycpp_shape_per_unit_labor_cost = {0};
-std::vector<int> cycpp_shape_annual_labor_cost_increase_factor = {0};
 std::vector<int> cycpp_shape_cost_override = {0};

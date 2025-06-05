@@ -21,7 +21,7 @@
     "default": 0.0, \
     "uilabel": "Corporate Income Tax Rate as decimal", \
     "range": [0.0, 1.0], \
-    "doc": "Income Tax Rate for all facilities belonging to this institution as decimal (1% --> 0.01)", \
+    "doc": "Income Tax Rate for all facilities belonging to this region as decimal (1% --> 0.01)", \
     "units": "Dimensionless" \
     }
 double corporate_income_tax_rate;
