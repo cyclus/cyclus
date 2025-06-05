@@ -8,10 +8,16 @@
 class EconomicEntity {
  public:
   virtual double GetEconParameter(const std::string& key) const {
-    return GetParameter(key);
+        auto it = financial_data_.find(key);
+    if (it != financial_data_.end()) {
+      return it->second;
+    } else {
+      throw std::runtime_error("Key '" + key +
+                               "' not found in financial_data_");
+    }
   }
   virtual void SetEconParameter(const std::string& key, double value) {
-    SetParameter(key, value);
+    financial_data_[key] = value;
   }
 
   // Given default implementation so as not to break backwards compatability
@@ -27,21 +33,6 @@ class EconomicEntity {
 
     // This allows us to test more easily
     this->SetEconParameter("UnitTestHook", -1.0);
-  }
-
- protected:
-  void SetParameter(const std::string& key, double value) {
-    financial_data_[key] = value;
-  }
-
-  double GetParameter(const std::string& key) const {
-    auto it = financial_data_.find(key);
-    if (it != financial_data_.end()) {
-      return it->second;
-    } else {
-      throw std::runtime_error("Key '" + key +
-                               "' not found in financial_data_");
-    }
   }
 
  private:
