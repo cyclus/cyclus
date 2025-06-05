@@ -73,7 +73,7 @@ double cost_override;
 std::unordered_map<std::string, double> InitializeParamList() const {
   std::unordered_map<std::string, double> econ_params{
       {"capital_cost", capital_cost},
-       {"property_tax_rate", property_tax_rate},
+      {"property_tax_rate", property_tax_rate},
       {"operations_and_maintenance", operations_and_maintenance},
       {"facility_operational_lifetime", facility_operational_lifetime},
       {"facility_depreciation_lifetime", facility_taxable_lifetime},
