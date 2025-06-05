@@ -30,9 +30,6 @@ class EconomicEntity {
     for (const auto& parameter : econ_params) {
       this->SetEconParameter(parameter.first, parameter.second);
     }
-
-    // This allows us to test more easily
-    this->SetEconParameter("UnitTestHook", -1.0);
   }
 
  private:
