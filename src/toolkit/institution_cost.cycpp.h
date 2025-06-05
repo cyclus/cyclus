@@ -26,22 +26,11 @@
     "units": "Dimensionless" \
     }
 double minimum_acceptable_return_rate;
-
-#pragma cyclus var { \
-    "default": 1.0, \
-    "range": [1.0, 2.0], \
-    "uilabel": "Constant to multiply Depreciation term (1/T) by", \
-    "doc": "Should be 1.0 for straight-line depreciation, and 2.0 for double declining balance", \
-    "units": "Dimensionless" \
-    }
-double depreciation_constant;
-    
     
 // Must be done in a function so that we can access the user-defined values
 std::unordered_map<std::string, double> InitializeParamList() const {
     std::unordered_map<std::string, double> econ_params {
-        {"minimum_acceptable_return_rate", minimum_acceptable_return_rate},
-        {"depreciation_constant", depreciation_constant}
+        {"minimum_acceptable_return_rate", minimum_acceptable_return_rate}
     };
 
     return econ_params;
