@@ -234,5 +234,4 @@ void Agent::AddToTable() {
       ->AddVal("EnterTime", enter_time_)
       ->Record();
 }
-
 }  // namespace cyclus

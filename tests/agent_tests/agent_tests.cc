@@ -67,3 +67,14 @@ TEST_P(AgentTests, Annotations_AllParents) {
       isagent = true;
   EXPECT_TRUE(isagent);
 }
+
+TEST_P(AgentTests, EmptyGetEconParam) {
+  EXPECT_THROW(agent_->GetEconParameter("UnitTestHook"), std::runtime_error);
+}
+
+TEST_P(AgentTests, SetThenGetEconParam) {
+  agent_->SetEconParameter("UnitTestHook", -1.0);
+  double data = agent_->GetEconParameter("UnitTestHook");
+  EXPECT_EQ(data, -1.0);
+}
+

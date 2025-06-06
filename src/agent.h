@@ -14,6 +14,7 @@
 #include "query_backend.h"
 #include "resource.h"
 #include "state_wrangler.h"
+#include "economic_entity.h"
 
 // Undefines isnan from pyne
 #ifdef isnan
@@ -46,7 +47,7 @@ typedef std::map<std::string, std::vector<Resource::Ptr> > Inventories;
 /// functions all do inter-related things.  Notably, the #InfileToDb, #InitFrom,
 /// and #Snapshot functions must all write/read to/from the same database tables
 /// (and table schemas).
-class Agent : public StateWrangler, virtual public Ider {
+class Agent : public StateWrangler, virtual public Ider, public EconomicEntity {
   friend class SimInit;
   friend class ::SimInitTest;
 
