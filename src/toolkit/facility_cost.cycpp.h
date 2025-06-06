@@ -76,7 +76,7 @@ std::unordered_map<std::string, double> InitializeParamList() const {
       {"property_tax_rate", property_tax_rate},
       {"operations_and_maintenance", operations_and_maintenance},
       {"facility_operational_lifetime", facility_operational_lifetime},
-      {"facility_depreciation_lifetime", facility_taxable_lifetime},
+      {"facility_depreciation_lifetime", facility_depreciation_lifetime},
       {"per_unit_labor_cost", per_unit_labor_cost}};
 
   return econ_params;
