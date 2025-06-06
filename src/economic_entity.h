@@ -8,7 +8,7 @@
 class EconomicEntity {
  public:
   virtual double GetEconParameter(const std::string& key) const {
-        auto it = financial_data_.find(key);
+    auto it = financial_data_.find(key);
     if (it != financial_data_.end()) {
       return it->second;
     } else {
@@ -28,7 +28,7 @@ class EconomicEntity {
   void InitializeCosts() {
     std::unordered_map<std::string, double> econ_params = InitializeParamList();
     for (const auto& parameter : econ_params) {
-      this->SetEconParameter(parameter.first, parameter.second);
+      SetEconParameter(parameter.first, parameter.second);
     }
   }
 
