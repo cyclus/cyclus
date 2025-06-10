@@ -1,8 +1,11 @@
 #include "platform.h"
 #include <iostream>
+#include <sstream>
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <unistd.h>
+#include <ctime>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
@@ -268,6 +271,8 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
       ("format,f", po::value<std::string>()->default_value("none"),
        "input file format if a raw string, may be none, xml, json, or py.")
       ("flat-schema", "use the flat main simulation schema")
+      ("new-file,n", po::value<std::string>(),
+       "generate a new file with snapshot of current schema as grammar")
       ;
 
   po::options_description agent_info("Agent Information");
@@ -378,6 +383,24 @@ int EarlyExitArgs(const ArgInfo& ai) {
     return 0;
   } else if (ai.vm.count("schema")) {
     std::cout << cyclus::BuildMasterSchema(ai.schema_path) << "\n";
+    return 0;
+  } else if (ai.vm.count("new-file")) {
+    char hostname[1024];
+    gethostname(hostname, 1024);
+    time_t timestamp;
+    time(&timestamp);
+    std::stringstream grammar_fname;
+    grammar_fname << "cyclus_grammar_" << hostname << "_" << timestamp << ".rng";
+    std::ofstream grammar_file;
+    grammar_file.open(grammar_fname.str());
+    grammar_file << cyclus::BuildMasterSchema(ai.schema_path) << "\n";
+    grammar_file.close();
+
+    std::string new_fname(ai.vm["new-file"].as<std::string>());
+    std::ofstream new_file;
+    new_file.open(new_fname);
+    new_file << "<?xml-model href=\"" << grammar_fname.str() << "\" application=\"text/xml\"?>\n<simulation>\n</simulation>\n";
+    new_file.close();
     return 0;
   } else if (ai.vm.count("agent-schema")) {
     std::string name(ai.vm["agent-schema"].as<std::string>());
