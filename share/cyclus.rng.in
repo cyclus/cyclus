@@ -13,7 +13,7 @@
 
     <optional><element name="ui"><text/></element></optional>
     
-    <element name ="control">
+    <element name="control">
       <a:documentation>Block to define control parameters of simulation.</a:documentation>
       <interleave>
         <optional>
