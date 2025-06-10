@@ -244,9 +244,7 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
   general.add_options()
       ("help,h", "produce help message")
       ("version,V", "print cyclus core and dependency versions and quit")
-  #if CYCLUS_IS_PARALLEL
-      ("nthreads,j", po::value<int>(), "number of threads to use")       
-  #endif // CYCLUS_IS_PARALLEL
+      ("nthreads,j", po::value<int>(), "number of threads to use (if compiled with parallel support)")       
       ("restart", po::value<std::string>(),
        "restart from the specified simulation snapshot [db-file]:[sim-id]:[timestep]")
       ;
