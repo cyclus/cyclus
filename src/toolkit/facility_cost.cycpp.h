@@ -18,7 +18,7 @@
 #pragma cyclus var {"default" : 0.0,                                       \
                    "uilabel" : "Capital cost required to build facility", \
                    "doc" : "Capital cost required to build facility",     \
-                   "units" : "$USD" }
+                   "units" : "Unit of Currency" }
 double capital_cost;
 
 #pragma cyclus var { \
@@ -69,8 +69,7 @@ double cost_override;
 
 
 // Must be done in a function so that we can access the user-defined values
-// add override back when reduced-cep-30 passes
-std::unordered_map<std::string, double> InitializeParamList() const {
+std::unordered_map<std::string, double> GenerateParamList() const override {
   std::unordered_map<std::string, double> econ_params{
       {"capital_cost", capital_cost},
       {"property_tax_rate", property_tax_rate},

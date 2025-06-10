@@ -21,12 +21,12 @@ class EconomicEntity {
   }
 
   // Given default implementation so as not to break backwards compatability
-  virtual std::unordered_map<std::string, double> InitializeParamList() const {
+  virtual std::unordered_map<std::string, double> GenerateParamList() const {
     return {};
   };
 
   void InitializeCosts() {
-    std::unordered_map<std::string, double> econ_params = InitializeParamList();
+    std::unordered_map<std::string, double> econ_params = GenerateParamList();
     for (const auto& parameter : econ_params) {
       SetEconParameter(parameter.first, parameter.second);
     }
