@@ -385,21 +385,52 @@ int EarlyExitArgs(const ArgInfo& ai) {
     std::cout << cyclus::BuildMasterSchema(ai.schema_path) << "\n";
     return 0;
   } else if (ai.vm.count("new-file")) {
-    char hostname[1024];
-    gethostname(hostname, 1024);
-    time_t timestamp;
-    time(&timestamp);
     std::stringstream grammar_fname;
-    grammar_fname << "cyclus_grammar_" << hostname << "_" << timestamp << ".rng";
-    std::ofstream grammar_file;
-    grammar_file.open(grammar_fname.str());
-    grammar_file << cyclus::BuildMasterSchema(ai.schema_path) << "\n";
-    grammar_file.close();
-
+    if (ai.vm.count("schema-path")) {
+      grammar_fname << ai.vm["schema-path"].as<std::string>();
+    } else {
+      char hostname[1024];
+      gethostname(hostname, 1024);
+      time_t timestamp;
+      time(&timestamp);
+      grammar_fname << "cyclus_grammar_" << hostname << "_" << timestamp << ".rng";
+      std::ofstream grammar_file;
+      grammar_file.open(grammar_fname.str());
+      grammar_file << cyclus::BuildMasterSchema(ai.schema_path) << "\n";
+      grammar_file.close();      
+    }
     std::string new_fname(ai.vm["new-file"].as<std::string>());
     std::ofstream new_file;
     new_file.open(new_fname);
-    new_file << "<?xml-model href=\"" << grammar_fname.str() << "\" application=\"text/xml\"?>\n<simulation>\n</simulation>\n";
+    new_file << "<?xml-model href=\"" << grammar_fname.str() << "\" application=\"text/xml\"?>" << "\n";
+    new_file << "<simulation>" << "\n";
+    new_file << "        <control>" << "\n";
+    new_file << "        <duration></duration>" << "\n";
+    new_file << "        <startmonth></startmonth>" << "\n";
+    new_file << "        <startyear></startyear>" << "\n";
+    new_file << "    </control>" << "\n";
+    new_file << "    <archetypes>" << "\n";
+    new_file << "        <spec><name></name></spec>" << "\n";
+    new_file << "    </archetypes>" << "\n";
+    new_file << "    <facility>" << "\n";
+    new_file << "        <name></name>" << "\n";
+    new_file << "        <config>" << "\n";
+    new_file << "" << "\n";
+    new_file << "        </config>" << "\n";
+    new_file << "    </facility>" << "\n";
+    new_file << "    <region>" << "\n";
+    new_file << "        <name></name>" << "\n";
+    new_file << "        <institution>" << "\n";
+    new_file << "            <name></name>" << "\n";
+    new_file << "            <config>" << "\n";
+    new_file << "" << "\n";
+    new_file << "            </config>" << "\n";
+    new_file << "        </institution>" << "\n";
+    new_file << "        <config>" << "\n";
+    new_file << "" << "\n";
+    new_file << "        </config>" << "\n";
+    new_file << "    </region>" << "\n";
+    new_file << "</simulation>" << "\n";
     new_file.close();
     return 0;
   } else if (ai.vm.count("agent-schema")) {
