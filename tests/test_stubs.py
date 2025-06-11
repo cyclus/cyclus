@@ -19,7 +19,7 @@ def tmplog(fname):
     yield file_ptr
     os.remove(fname)
 
-@pytest.mark.parametrize("pth", ['stubtest', 'stub_test', 'stubTest'])
+@pytest.mark.parametrize("pth", ['stubtest', 'stub_test', 'stubTest', 'StubTest'])
 def test_stubs(pth):
     log = f'stub_test_{pth}.log'
     agent_name_prefix = 'tmp'
