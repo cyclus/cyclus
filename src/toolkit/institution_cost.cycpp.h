@@ -28,7 +28,7 @@
 double minimum_acceptable_return_rate;
     
 // Must be done in a function so that we can access the user-defined values
-std::unordered_map<std::string, double> GenerateParamList() const {
+std::unordered_map<std::string, double> GenerateEconParamList() const {
     std::unordered_map<std::string, double> econ_params {
         {"minimum_acceptable_return_rate", minimum_acceptable_return_rate}
     };

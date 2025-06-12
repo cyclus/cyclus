@@ -69,7 +69,7 @@ double cost_override;
 
 
 // Must be done in a function so that we can access the user-defined values
-std::unordered_map<std::string, double> GenerateParamList() const override {
+std::unordered_map<std::string, double> GenerateEconParamList() const override {
   std::unordered_map<std::string, double> econ_params{
       {"capital_cost", capital_cost},
       {"property_tax_rate", property_tax_rate},
