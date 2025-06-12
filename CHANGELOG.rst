@@ -20,6 +20,7 @@ Since last release
 * Added example of header code injection for facility cost (#1829)
 * Table for recording active/dormant cycle periods (#1830)
 * Support for OpenMP parallelized simulations (#1709)
+* Command-line option to make a new blank input file referencing a current schema (#1861)
 
 **Changed:**
 

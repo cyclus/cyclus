@@ -1,8 +1,11 @@
 #include "platform.h"
 #include <iostream>
+#include <sstream>
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <unistd.h>
+#include <ctime>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/program_options.hpp>
@@ -31,7 +34,7 @@ using namespace cyclus;
 
 struct ArgInfo {
   po::variables_map vm;  // Holds parsed/specified cli opts and values
-  po::options_description desc;  // Holds cli opts description
+  po::options_description cli_options;  // Holds cli opts description
   bool flat_schema;
   std::string schema_path;
   std::string output_path;
@@ -82,7 +85,7 @@ int main(int argc, char* argv[]) {
   if (ai.vm.count("input-file") == 0 && ai.restart == "") {
     std::cout << "No input file specified.\n"
               << usage << "\n\n"
-              << ai.desc << "\n";
+              << ai.cli_options << "\n";
     return 1;
   } else if (ai.vm.count("input-file") > 0) {
     infile = ai.vm["input-file"].as<std::string>();
@@ -237,62 +240,89 @@ int main(int argc, char* argv[]) {
 }
 
 int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
-  ai->desc.add_options()
+  po::options_description general("General Options");
+  general.add_options()
       ("help,h", "produce help message")
       ("version,V", "print cyclus core and dependency versions and quit")
+      ("nthreads,j", po::value<int>(), "number of threads to use (if compiled with parallel support)")       
       ("restart", po::value<std::string>(),
        "restart from the specified simulation snapshot [db-file]:[sim-id]:[timestep]")
-      ("schema",
-       "dump the cyclus main schema including all installed module schemas")
+      ;
+
+  po::options_description verbosity("Output Verbosity");
+  verbosity.add_options()
+      ("verb,v", po::value<std::string>(),
+       "log verbosity. integer from 0 (quiet) to 11 (verbose).")
+      ("no-agent", "only print log entries from cyclus core code")
+      ("no-mem", "exclude memory log statement from logger output")
+      ("warn-limit", po::value<unsigned int>(),
+       "number of warnings to issue per kind, defaults to 42")
+      ("warn-as-error", "throw errors when warnings are issued")
+      ("rng-print", "prints the full relaxng schema for the simulation")
+      ;
+
+  po::options_description file_options("File Options");
+  file_options.add_options()
+      ("output-path,o", po::value<std::string>(), "output path")
+      ("input-file,i", po::value<std::string>(),
+       "input file, may be a path or a raw string")
+      ("format,f", po::value<std::string>()->default_value("none"),
+       "input file format if a raw string, may be none, xml, json, or py.")
+      ("flat-schema", "use the flat main simulation schema")
+      ("new-file,n", po::value<std::string>(),
+       "generate a new file with snapshot of current schema as grammar")
+      ;
+
+  po::options_description agent_info("Agent Information");
+  agent_info.add_options()
       ("agent-schema", po::value<std::string>(),
        "dump the schema for the named agent")
       ("agent-version", po::value<std::string>(),
        "print the version of the specified agent")
-      ("schema-path", po::value<std::string>(),
-       "manually specify the path to the cyclus main schema")
-      ("flat-schema", "use the flat main simulation schema")
       ("agent-annotations", po::value<std::string>(),
        "dump the annotations for the named agent")
       ("agent-listing,l", po::value<std::string>(),
        "dump the agents in a library.")
       ("all-agent-listing,a", "dump all the agents cyclus knows about.")
       ("metadata,m", "dump metadata for all the agents cyclus knows about.")
-      ("no-agent", "only print log entries from cyclus core code")
-      ("no-mem", "exclude memory log statement from logger output")
-      ("verb,v", po::value<std::string>(),
-       "log verbosity. integer from 0 (quiet) to 11 (verbose).")
-      ("output-path,o", po::value<std::string>(), "output path")
-      ("input-file,i", po::value<std::string>(),
-       "input file, may be a path or a raw string")
-      ("format,f", po::value<std::string>()->default_value("none"),
-       "input file format if a raw string, may be none, xml, json, or py.")
-      ("warn-limit", po::value<unsigned int>(),
-       "number of warnings to issue per kind, defaults to 42")
-      ("warn-as-error", "throw errors when warnings are issued")
-      ("path,p", "print the CYCLUS_PATH")
-      ("include", "print the cyclus include directory")
-      ("install-path", "print the cyclus install directory")
-      ("cmake-module-path", "print the cyclus CMake module path")
-      ("build-path", "print the cyclus build directory")
-      ("rng-schema", "print the path to cyclus.rng.in")
-      ("rng-print", "prints the full relaxng schema for the simulation")
-      ("nuc-data", "print the path to cyclus_nuc_data.h5")
+      ;
+
+  po::options_description file_conversion("File Format Converstion Options");
+  file_conversion.add_options()
       ("json-to-xml", po::value<std::string>(), "*.json input file")
       ("xml-to-json", po::value<std::string>(), "*.xml input file")
       ("json-to-py", po::value<std::string>(), "*.json input file")
       ("py-to-json", po::value<std::string>(), "*.py input file")
       ("py-to-xml", po::value<std::string>(), "*.py input file")
       ("xml-to-py", po::value<std::string>(), "*.xml input file")
-      ("nthreads,j", po::value<int>(), "number of threads to use, available if built with --parallel")
       ;
+
+  po::options_description configuration_query("Cyclus Configuration Information");
+  configuration_query.add_options()
+      ("schema",
+       "dump the cyclus main schema including all installed module schemas")
+      ("schema-path", po::value<std::string>(),
+       "manually specify the path to the cyclus main schema")
+      ("path,p", "print the CYCLUS_PATH")
+      ("include", "print the cyclus include directory")
+      ("install-path", "print the cyclus install directory")
+      ("cmake-module-path", "print the cyclus CMake module path")
+      ("build-path", "print the cyclus build directory")
+      ("rng-schema", "print the path to cyclus.rng.in")
+      ("nuc-data", "print the path to cyclus_nuc_data.h5")
+      ;
+
+  ai->cli_options.add(general).add(verbosity).add(file_options).add(agent_info)
+                 .add(file_conversion).add(configuration_query);
+
 
   po::variables_map vm;
   try {
-    po::store(po::parse_command_line(argc, argv, ai->desc), ai->vm);
+    po::store(po::parse_command_line(argc, argv, ai->cli_options), ai->vm);
   } catch(std::exception err) {
     std::cout << "Invalid arguments.\n"
               <<  usage << "\n\n"
-              << ai->desc << "\n";
+              << ai->cli_options << "\n";
     return 1;
   }
   po::notify(ai->vm);
@@ -301,7 +331,7 @@ int ParseCliArgs(ArgInfo* ai, int argc, char* argv[]) {
   p.add("input-file", 1);
 
   po::store(po::command_line_parser(argc, argv).
-                options(ai->desc).positional(p).run(), ai->vm);
+                options(ai->cli_options).positional(p).run(), ai->vm);
   po::notify(ai->vm);
   return -1;
 }
@@ -310,7 +340,7 @@ int EarlyExitArgs(const ArgInfo& ai) {
   // Respond to command line args that don't run a simulation
   if (ai.vm.count("help")) {
     std::cout << usage << "\n\n"
-              << ai.desc << "\n";
+              << ai.cli_options << "\n";
     return 0;
   } else if (ai.vm.count("version")) {
     std::cout << "Cyclus Core " << version::core()
@@ -351,6 +381,55 @@ int EarlyExitArgs(const ArgInfo& ai) {
     return 0;
   } else if (ai.vm.count("schema")) {
     std::cout << cyclus::BuildMasterSchema(ai.schema_path) << "\n";
+    return 0;
+  } else if (ai.vm.count("new-file")) {
+    std::stringstream grammar_fname;
+    if (ai.vm.count("schema-path")) {
+      grammar_fname << ai.vm["schema-path"].as<std::string>();
+    } else {
+      char hostname[1024];
+      gethostname(hostname, 1024);
+      time_t timestamp;
+      time(&timestamp);
+      grammar_fname << "cyclus_grammar_" << hostname << "_" << timestamp << ".rng";
+      std::ofstream grammar_file;
+      grammar_file.open(grammar_fname.str());
+      grammar_file << cyclus::BuildMasterSchema(ai.schema_path) << "\n";
+      grammar_file.close();      
+    }
+    std::string new_fname(ai.vm["new-file"].as<std::string>());
+    std::ofstream new_file;
+    new_file.open(new_fname);
+    new_file << "<?xml-model href=\"" << grammar_fname.str() << "\" application=\"text/xml\"?>" << "\n";
+    new_file << "<simulation>" << "\n";
+    new_file << "        <control>" << "\n";
+    new_file << "        <duration></duration>" << "\n";
+    new_file << "        <startmonth></startmonth>" << "\n";
+    new_file << "        <startyear></startyear>" << "\n";
+    new_file << "    </control>" << "\n";
+    new_file << "    <archetypes>" << "\n";
+    new_file << "        <spec><name></name></spec>" << "\n";
+    new_file << "    </archetypes>" << "\n";
+    new_file << "    <facility>" << "\n";
+    new_file << "        <name></name>" << "\n";
+    new_file << "        <config>" << "\n";
+    new_file << "" << "\n";
+    new_file << "        </config>" << "\n";
+    new_file << "    </facility>" << "\n";
+    new_file << "    <region>" << "\n";
+    new_file << "        <name></name>" << "\n";
+    new_file << "        <institution>" << "\n";
+    new_file << "            <name></name>" << "\n";
+    new_file << "            <config>" << "\n";
+    new_file << "" << "\n";
+    new_file << "            </config>" << "\n";
+    new_file << "        </institution>" << "\n";
+    new_file << "        <config>" << "\n";
+    new_file << "" << "\n";
+    new_file << "        </config>" << "\n";
+    new_file << "    </region>" << "\n";
+    new_file << "</simulation>" << "\n";
+    new_file.close();
     return 0;
   } else if (ai.vm.count("agent-schema")) {
     std::string name(ai.vm["agent-schema"].as<std::string>());
