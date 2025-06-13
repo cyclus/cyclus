@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-
 #include <iostream>
 #include <string>
+
 #include "toolkit/position.h"
 using cyclus::toolkit::Position;
 

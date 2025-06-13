@@ -38,6 +38,7 @@ Since last release
 * Package GetFillMass returns vector of masses (#1790, #1813)
 * Modified Doxygen homepage (#1815)
 * Pin ``python<3.13`` in CI workflows (#1826)
+* changed the way Position is added to the archetypes (#1510)
 
 **Removed:**
 
