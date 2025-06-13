@@ -2,7 +2,7 @@
 /// One should only need to:
 /// - '#include "toolkit/region_cost.cycpp.h"' in the header of the 
 ///    archetype class (as private)
-/// - Add `InitializeCosts()` to `EnterNotify()` in the cc file of the
+/// - Add `InitEconParameters()` to `EnterNotify()` in the cc file of the
 ///   archetype class.
 
 
@@ -28,7 +28,7 @@ double corporate_income_tax_rate;
     
     
 // Must be done in a function so that we can access the user-defined values
-std::unordered_map<std::string, double> GenerateEconParamList() const {
+std::unordered_map<std::string, double> GenerateParamList() const {
     std::unordered_map<std::string, double> econ_params {
         {"corporate_income_tax_rate", corporate_income_tax_rate}
     };

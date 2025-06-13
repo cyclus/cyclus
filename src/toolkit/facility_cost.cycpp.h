@@ -2,7 +2,7 @@
 /// One should only need to:
 /// - '#include "toolkit/facility_cost.cycpp.h"' in the header of the
 ///    archetype class (as private)
-/// - Add `InitializeCosts()` to `EnterNotify()` in the cc file of the
+/// - Add `InitEconParameters()` to `EnterNotify()` in the cc file of the
 ///   archetype class, and then `GetCost()` should become available.
 
 /// How to add parameters to this file:
@@ -69,7 +69,7 @@ double cost_override;
 
 
 // Must be done in a function so that we can access the user-defined values
-std::unordered_map<std::string, double> GenerateEconParamList() const override {
+std::unordered_map<std::string, double> GenerateParamList() const override {
   std::unordered_map<std::string, double> econ_params{
       {"capital_cost", capital_cost},
       {"property_tax_rate", property_tax_rate},

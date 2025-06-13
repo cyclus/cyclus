@@ -7,7 +7,7 @@ NullRegion::NullRegion(cyclus::Context* ctx) : cyclus::Region(ctx) {}
 NullRegion::~NullRegion() {}
 
 void NullRegion::EnterNotify() {
-  InitializeCosts();
+  InitEconParameters();
 }
 
 extern "C" cyclus::Agent* ConstructNullRegion(cyclus::Context* ctx) {
