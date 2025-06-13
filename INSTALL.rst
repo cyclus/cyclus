@@ -29,7 +29,7 @@ Default Installation
 
 Run the install script:
 
-.. code-block:: bash
+.. code-block:: console
   
   python3 install.py
 
@@ -37,7 +37,7 @@ If you successfully followed the instruction above, the cyclus binary has been
 generated and placed in the  ``~/.local/`` in your home directory. 
 You need to add ``~/.local/bin`` to the front of your ``$PATH``:
 
-.. code-block:: bash
+.. code-block:: console
   
   echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
   source ~/.bashrc
@@ -45,7 +45,7 @@ You need to add ``~/.local/bin`` to the front of your ``$PATH``:
 On MacOSX you also need to add ~/.local/lib/pythonX.Y/site-packages to your
 ``$PYTHONPATH``:
 
-.. code-block:: bash
+.. code-block:: console
 
   echo "export PYTHONPATH=\"\$HOME/.local/lib/python`python3 -c 'import sys; \
   print(".".join(map(str, sys.version_info[:2])))'`/site-packages:\$PYTHONPATH\"" >> ~/.bashrc
@@ -141,7 +141,7 @@ For example, if you have installed coin-Cbc from source or otherwise have it
 installed in a non-standard location, you should make use of the ``coin_root``
 installation flag. The otherwise identical process would look like:
 
-.. code-block:: bash
+.. code-block:: console
 
     .../cyclus$  python3 install.py --coin-root=path/to/coin
 
@@ -153,7 +153,7 @@ If you are ``CMake`` aficionado you can also install Cyclus without using the
 ``install.py`` python script and use ``cmake`` directly, which should look like:
 
 
-.. code-block:: bash
+.. code-block:: console
 
   mkdir build
   cd build
@@ -195,7 +195,7 @@ Note on Building Cyclus with Conda
 If your python libraries are installed using Conda, install cyclus
 dependencies through conda-forge.
 
-.. code-block:: bash
+.. code-block:: console
 
   conda config --add channels conda-forge
   conda install cyclus --only-deps
@@ -210,7 +210,7 @@ our tests). We strongly recommend after a fresh install of Cyclus, or after
 any modification on the source code, to rerun those tests in order to insure the
 proper functioning of Cyclus. You can run the tests yourself via:
 
-.. code-block:: bash
+.. code-block:: console
 
     $ cyclus_unit_tests
 

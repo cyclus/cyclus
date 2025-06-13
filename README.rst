@@ -83,7 +83,7 @@ To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 22
 - Download and install Miniconda for Linux
 
 
-.. code-block:: bash
+.. code-block:: console
 
   mkdir -p ~/miniconda3
   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
@@ -92,14 +92,14 @@ To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 22
 
 - Execute the following commands to initialize Miniconda:
 
-.. code-block:: bash
+.. code-block:: console
 
   ~/miniconda3/bin/conda init bash
   source ~/.bashrc
 
 - Create a new environment and install the Cyclus package
 
-.. code-block:: bash
+.. code-block:: console
 
   conda config --add channels conda-forge
   conda create -n cyclus
@@ -116,7 +116,7 @@ Running Tests
 Installing Cyclus will also install a test driver (i.e., an executable of all of
 our tests). You can run the tests yourself via:
 
-.. code-block:: bash
+.. code-block:: console
 
     cyclus_unit_tests
 
@@ -145,7 +145,7 @@ You can find instructions for writing an input file for cyclus from `Cyclus User
 Guide`_ or use sample input files from `Cycamore Repo`_. Assuming you have some
 file ``input.xml``, you can run Cyclus via:
 
-.. code-block:: bash
+.. code-block:: console
 
     cyclus path/to/input.xml
 
