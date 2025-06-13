@@ -6,6 +6,7 @@ Since last release
 ====================
 
 **Added:**
+* Added code injection variables for economic data (#1853)
 * Agent now inherits EconomicEntity to allow limited communication across RIF (#1850)
 * Added TransportUnits (#1750, #1772, #1784)
 * Added CI support for Ubuntu 24.04 (#1770)
