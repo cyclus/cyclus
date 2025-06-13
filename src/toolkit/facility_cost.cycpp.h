@@ -3,7 +3,7 @@
 /// - '#include "toolkit/facility_cost.cycpp.h"' in the header of the
 ///    archetype class (as private)
 /// - Add `InitEconParameters()` to `EnterNotify()` in the cc file of the
-///   archetype class, and then `GetCost()` should become available.
+///   archetype class.
 
 /// How to add parameters to this file:
 /// 1. Add the pragma. A default value MUST be added to ensure backwards
