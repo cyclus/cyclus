@@ -78,3 +78,27 @@ TEST_P(AgentTests, SetThenGetEconParam) {
   EXPECT_EQ(data, -1.0);
 }
 
+TEST_P(AgentTests, PV) {
+  double present_value = agent_->PV(10, 0.05, 10000.0, 100.0);
+  double pv_hand_calc = 6911.306028;
+  EXPECT_NEAR(present_value, pv_hand_calc, 1e-3);
+}
+
+TEST_P(AgentTests, FV) {
+  double future_value = agent_->FV(10, 0.05, 10000.0, 100.0);
+  double fv_hand_calc = 17546.73552;
+  EXPECT_NEAR(future_value, fv_hand_calc, 1e-3);
+}
+
+TEST_P(AgentTests, PMT) {
+  double payment = agent_->PMT(10, 0.05, 10000.0, 40000.0);
+  double pmt_hand_calc = 4475.2287;
+  EXPECT_NEAR(payment, pmt_hand_calc, 1e-3);
+}
+
+TEST_P(AgentTests, PV_def_by_A) {
+  std::vector<double> payments = {100.0, 200.0, 300.0, 10.0, 15.0, 1000.0};
+  double pv = agent_->PV(0.05, payments);
+  double pv_hand_calc = 1367.0901;
+  EXPECT_NEAR(pv, pv_hand_calc, 1e-3);
+}
