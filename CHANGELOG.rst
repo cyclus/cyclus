@@ -6,6 +6,7 @@ Since last release
 ====================
 
 **Added:**
+* Added set of basic finance math function to EconomicEntity (#1864)
 * Added code injection variables for economic data (#1853)
 * Agent now inherits EconomicEntity to allow limited communication across RIF (#1850)
 * Added TransportUnits (#1750, #1772, #1784)
