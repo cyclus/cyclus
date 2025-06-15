@@ -2,8 +2,8 @@
 /// One should only need to:
 /// - '#include "toolkit/matl_buy_policy.cycpp.h"' in the header of the
 ///    archetype class (as private)
-/// - Add `InitEconParameters()` to `EnterNotify()` in the cc file of the
-///   archetype class.
+/// - Add `InitBuyPolicyParameters()` to `EnterNotify()` in the cc file of the
+///   archetype class as needed.
 
 /// How to add parameters to this file:
 /// 1. Add the pragma. A default value MUST be added to ensure backwards
