@@ -12,6 +12,48 @@
 ///    file with the other ones, reaplcing <param_name> with the name you put
 ///    in the econ_params array (again, must match exactly).
 
+
+
+/// @addtogroup optionalparams
+/// @{
+/// active_buying_frequency_type is the type of distribution used to determine the length of the active buying period
+/// active_buying_val is the length of the active buying period if active_buying_frequency_type is Fixed
+/// active_buying_min is the minimum length of the active buying period if active_buying_frequency_type is Uniform (required) or 
+/// Normal (optional)
+/// active_buying_max is the maximum length of the active buying period if active_buying_frequency_type is Uniform (required) or
+/// Normal (optional)
+/// active_buying_mean is the mean length of the active buying period if active_buying_frequency_type is Normal
+/// active_buying_stddev is the standard deviation of the active buying period if active_buying_frequency_type is Normal
+/// active_buying_end_probability is the probability that at any given timestep, the agent ends the active buying 
+///                               period if the active buying frequency type is Binomial
+/// active_buying_disruption_probability is the probability that in any given cycle, the agent undergoes a disruption 
+///                               (disrupted active period) if the active buying frequency type is FixedWithDisruption
+/// active_buying_disruption is the length of the disrupted active cycle if the active buying frequency type is 
+///                               FixedWithDisruption
+/// dormant_buying_frequency_type is the type of distribution used to determine the length of the dormant buying period
+/// dormant_buying_val is the length of the dormant buying period if dormant_buying_frequency_type is Fixed
+/// dormant_buying_min is the minimum length of the dormant buying period if dormant_buying_frequency_type is Uniform (required) or
+/// Normal (optional)
+/// dormant_buying_max is the maximum length of the dormant buying period if dormant_buying_frequency_type is Uniform (required) or
+/// Normal (optional)
+/// dormant_buying_mean is the mean length of the dormant buying period if dormant_buying_frequency_type is Normal
+/// dormant_buying_stddev is the standard deviation of the dormant buying period if dormant_buying_frequency_type is Normal
+/// dormant_buying_end_probability is the probability that at any given timestep, the agent ends the dormant buying period if
+///                               the dormant buying frequency type is Binomial
+/// dormant_buying_disruption_probability is the probability that in any given cycle, the agent undergoes a disruption (disrupted
+///                               offline period) if the dormant buying frequency type is FixedWithDisruption
+/// dormant_buying_disruption is the length of the disrupted dormant cycle if the dormant buying frequency type is 
+///                               FixedWithDisruption
+/// buying_size_type is the type of distribution used to determine the size of buy requests, as a fraction of the current capacity
+/// buying_size_val is the size of the buy request for Fixed  buying_size_type
+/// buying_size_min is the minimum size of the buy request if buying_size_type is Uniform (required) or Normal (optional)
+/// buying_size_max is the maximum size of the buy request if buying_size_type is Uniform (required) or Normal (optional)
+/// buying_size_mean is the mean size of the buy request if buying_size_type is Normal
+/// buying_size_stddev is the standard deviation of the buy request if buying_size_type is Normal
+/// @}
+
+
+
 ///   @brief sets up the distributions for the buy policy
 inline void InitBuyPolicyParameters() {
   /// set up active buying distribution
