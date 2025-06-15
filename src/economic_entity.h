@@ -43,9 +43,14 @@ class EconomicEntity {
   /// @return  Present value
 
   virtual double PV(int n, double i, double F, double A) const {
+    // throw some kind of error here just in case
+    if (n <= 0) {
+        throw std::invalid_argument("Number of periods n must be > 0");
+    }
+
     double pv_F = F / std::pow((1 + i),n);
     double pv_A;
-
+    
     // Since we're allowing certain terms to be zero
     if (i != 0.0) {
       pv_A = A * (1 - std::pow((1 + i), -n)) / i;
@@ -66,6 +71,10 @@ class EconomicEntity {
   /// @return Future value
 
   virtual double FV(int n, double i, double P, double A) const {
+    // throw some kind of error here just in case
+    if (n <= 0) {
+        throw std::invalid_argument("Number of periods n must be > 0");
+    }
     double fv_P = P * std::pow((1 + i), n);
     double fv_A;
 
@@ -90,7 +99,7 @@ class EconomicEntity {
 
 virtual double PMT(int n, double i, double P, double F) const {
     // throw some kind of error here just in case
-    if (n == 0) {
+    if (n <= 0) {
         throw std::invalid_argument("Number of periods n must be > 0");
     }
 
@@ -117,7 +126,7 @@ virtual double PV(double i, const std::vector<double>& A) const {
     double pv = 0.0;
 
     for (int t = 0; t < A.size(); ++t) {
-        pv += A[t] / std::pow((1 + i), t);
+        pv += A[t] / std::pow((1 + i), t+1);
     }
 
     return pv;

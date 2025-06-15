@@ -68,6 +68,7 @@ TEST_P(AgentTests, Annotations_AllParents) {
   EXPECT_TRUE(isagent);
 }
 
+// EconomicEntity Tests
 TEST_P(AgentTests, EmptyGetEconParam) {
   EXPECT_THROW(agent_->GetEconParameter("UnitTestHook"), std::runtime_error);
 }
@@ -78,16 +79,68 @@ TEST_P(AgentTests, SetThenGetEconParam) {
   EXPECT_EQ(data, -1.0);
 }
 
-TEST_P(AgentTests, PV) {
+TEST_P(AgentTests, PV_A_and_F) {
   double present_value = agent_->PV(10, 0.05, 10000.0, 100.0);
   double pv_hand_calc = 6911.306028;
   EXPECT_NEAR(present_value, pv_hand_calc, 1e-3);
 }
 
-TEST_P(AgentTests, FV) {
+TEST_P(AgentTests, PV_only_F) {
+  double present_value = agent_->PV(10, 0.05, 10000.0, 0.0);
+  double pv_hand_calc = 6139.132535;
+  EXPECT_NEAR(present_value, pv_hand_calc, 1e-3);
+}
+
+TEST_P(AgentTests, PV_only_A) {
+  double present_value = agent_->PV(10, 0.05, 0.0, 100.0);
+  double pv_hand_calc = 772.1734929;
+  EXPECT_NEAR(present_value, pv_hand_calc, 1e-3);
+}
+
+TEST_P(AgentTests, PV_i_equals_zero) {
+  double present_value = agent_->PV(10, 0.0, 10000.0, 100.0);
+  double pv_hand_calc = 11000.0;
+  EXPECT_NEAR(present_value, pv_hand_calc, 1e-3);
+}
+
+TEST_P(AgentTests, PV_n_lessthan_zero) {
+  EXPECT_THROW(agent_->PV(-10, 0.0, 10000.0, 100.0), std::invalid_argument);
+}
+
+TEST_P(AgentTests, PV_n_equals_zero) {
+  EXPECT_THROW(agent_->PV(0, 0.0, 10000.0, 100.0), std::invalid_argument);
+}
+
+TEST_P(AgentTests, FV_A_and_P) {
   double future_value = agent_->FV(10, 0.05, 10000.0, 100.0);
   double fv_hand_calc = 17546.73552;
   EXPECT_NEAR(future_value, fv_hand_calc, 1e-3);
+}
+
+TEST_P(AgentTests, FV_only_P) {
+  double future_value = agent_->FV(10, 0.05, 10000.0, 0.0);
+  double fv_hand_calc = 16288.946267;
+  EXPECT_NEAR(future_value, fv_hand_calc, 1e-3);
+}
+
+TEST_P(AgentTests, FV_only_A) {
+  double future_value = agent_->FV(10, 0.05, 0.0, 100.0);
+  double fv_hand_calc = 1257.7892535;
+  EXPECT_NEAR(future_value, fv_hand_calc, 1e-3);
+}
+
+TEST_P(AgentTests, FV_i_equals_zero) {
+  double future_value = agent_->FV(10, 0.0, 10000.0, 100.0);
+  double fv_hand_calc = 11000.0;
+  EXPECT_NEAR(future_value, fv_hand_calc, 1e-3);
+}
+
+TEST_P(AgentTests, FV_n_lessthan_zero) {
+  EXPECT_THROW(agent_->FV(-10, 0.0, 10000.0, 100.0), std::invalid_argument);
+}
+
+TEST_P(AgentTests, FV_n_equals_zero) {
+  EXPECT_THROW(agent_->FV(0, 0.0, 10000.0, 100.0), std::invalid_argument);
 }
 
 TEST_P(AgentTests, PMT) {
@@ -96,9 +149,23 @@ TEST_P(AgentTests, PMT) {
   EXPECT_NEAR(payment, pmt_hand_calc, 1e-3);
 }
 
+TEST_P(AgentTests, PMT_against_PV_and_FV) {
+  double present_value = agent_->PV(10, 0.05, 0.0, agent_->PMT(10, 0.05, 1.0, 0.0));
+  EXPECT_NEAR(present_value, 1.0, 1e-3);
+}
+
 TEST_P(AgentTests, PV_def_by_A) {
   std::vector<double> payments = {100.0, 200.0, 300.0, 10.0, 15.0, 1000.0};
   double pv = agent_->PV(0.05, payments);
-  double pv_hand_calc = 1367.0901;
+  double pv_hand_calc = 1301.990584;
   EXPECT_NEAR(pv, pv_hand_calc, 1e-3);
 }
+
+TEST_P(AgentTests, PV_against_PV) {
+  std::vector<double> payments = {100.0, 100.0, 100.0, 100.0, 100.0, 100.0};
+  double pv_vec = agent_->PV(0.05, payments);
+  double pv_regular = agent_->PV(6, 0.05, 0.0, 100.0);
+  EXPECT_NEAR(pv_vec, pv_regular, 1e-3);
+}
+
+
