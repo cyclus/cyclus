@@ -20,7 +20,11 @@
 #include "recorder.h"
 #include "package.h"
 
-const uint64_t kDefaultTimeStepDur = 2629846;
+// Defined as 4 seconds longer than a Gaussian year (to make division by 12 
+// a round number)
+const uint64_t cyclusYear = 31558200;
+
+const uint64_t kDefaultTimeStepDur = cyclusYear / 12;
 
 const uint64_t kDefaultSeed = 20160212;
 
