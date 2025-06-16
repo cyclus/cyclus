@@ -100,6 +100,12 @@ class Material: public Resource {
   /// Records the internal nuclide composition of this resource.
   virtual void Record(Context* ctx) const;
 
+  /// Prints the normalied nuclide composition of this resource in atom basis.
+  virtual std::string GetNormalizedCompAtom() const;
+
+  /// Prints the normalied nuclide composition of this resource in mass basis.
+  virtual std::string GetNormalizedCompMass() const;
+
   /// Returns "kg"
   virtual std::string units() const;
 

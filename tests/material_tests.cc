@@ -440,4 +440,16 @@ TEST_F(MaterialTest, DecayHeatTest) {
   ASSERT_NEAR(3.614E-14 , dec_heat, 0.0005);
 }
 
+TEST_F(MaterialTest, GetNormalizedCompAtom) {
+  double val = 1.5 * units::kg;
+  Material::Ptr m1 = Material::CreateUntracked(val, diff_comp_);
+  EXPECT_EQ(m1->GetNormalizedCompAtom(), "{{380890000,0.459861},{822080000,0.196585},{922350000,0.173947},{952410000,0.169608}}");
+}
+
+TEST_F(MaterialTest, GetNormalizedCompMass) {
+  double val = 1.5 * units::kg;
+  Material::Ptr m1 = Material::CreateUntracked(val, diff_comp_);
+  EXPECT_EQ(m1->GetNormalizedCompMass(), "{{380890000,0.250000},{822080000,0.250000},{922350000,0.250000},{952410000,0.250000}}");
+}
+
 }  // namespace cyclus
