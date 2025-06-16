@@ -6,6 +6,7 @@ Since last release
 ====================
 
 **Added:**
+* Added Material functions to get printable material composition information in mass and atom basis (#1868)
 * Added code injection variables for economic data (#1853)
 * Agent now inherits EconomicEntity to allow limited communication across RIF (#1850)
 * Added TransportUnits (#1750, #1772, #1784)
