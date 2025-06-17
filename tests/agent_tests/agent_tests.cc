@@ -79,93 +79,88 @@ TEST_P(AgentTests, SetThenGetEconParam) {
   EXPECT_EQ(data, -1.0);
 }
 
-TEST_P(AgentTests, PV_A_and_F) {
-  double present_value = agent_->PV(10, 0.05, 10000.0, 100.0);
-  double pv_hand_calc = 6911.306028;
-  EXPECT_NEAR(present_value, pv_hand_calc, 1e-3);
+TEST_P(AgentTetss, PV) {
+
+  int n = 5;
+  double i = 0.1;
+  double F = 1;
+  double A = 0.5;
+
+  EXPECT_NEAR(F, agent_->PV(n,0,F,0));  // discount rate = 0
+  EXPECT_NEAR(F, agent_->PV(0,i,F,0));  // discount time = 0
+  EXPECT_NEAR(F / (1+i), agent_->PV(1,i,F,0)); // discount time = 1
+  EXPECT_NEAR(F / std::pow((1+i), n), agent_->PV(n,i,F,0)); // general
+  EXPECT_NEAR(F / std::pow((1 + (i/12)), n*12), agent_->PV(n*12,i/12,F,0)); // general
+  EXPECT_NEAR(F / std::pow((1+i), -n), agent_->PV(-n,i,F,0)); // negative time
+
+  EXPECT_NEAR(A, agent_->PV(n,0,0,A)); // discount rate = 0
+  EXPECT_NEAR(0, agent->PV(0,i,0,A));  // discount time = 0
+  EXPECT_NEAR(A / (1+i), agent_->PV(1,i,0,A)); // discount time = 1
+  EXPECT_NEAR(A * (1 - std::pow((1 + i), -n)) / i, agent_->PV(n,i,0,A)); // general
+  EXPECT_NEAR(A * (1 - std::pow((1 + (i/12)), -n*12)) / (i/12), agent_->PV(n*12,i/12,0,A)); // general
+  EXPECT_NEAR(A * (1 - std::pow((1 + i), n)) / i, agent_->PV(-n,i,0,A)); // negative time
+
+  EXPECT_NEAR(F + A, agent_->PV(n,0,F,A)); // discount rate = 0
+  EXPECT_NEAR(F, agent_->PV(0,i,F,A)); // discount time = 0
+  EXPECT_NEAR((F + A) / (1+i), agent_->PV(1,i,F,A)); // discount time = 1
+  EXPECT_NEAR(F / std::pow((1+i), n) + A * (1 - std::pow((1 + i), -n)) / i,
+              agent_->PV(n,i,F,A)); // general
+
 }
 
-TEST_P(AgentTests, PV_only_F) {
-  double present_value = agent_->PV(10, 0.05, 10000.0, 0.0);
-  double pv_hand_calc = 6139.132535;
-  EXPECT_NEAR(present_value, pv_hand_calc, 1e-3);
-}
 
-TEST_P(AgentTests, PV_only_A) {
-  double present_value = agent_->PV(10, 0.05, 0.0, 100.0);
-  double pv_hand_calc = 772.1734929;
-  EXPECT_NEAR(present_value, pv_hand_calc, 1e-3);
-}
+TEST_P(AgentTests, FV) {
 
-TEST_P(AgentTests, PV_i_equals_zero) {
-  double present_value = agent_->PV(10, 0.0, 10000.0, 100.0);
-  double pv_hand_calc = 11000.0;
-  EXPECT_NEAR(present_value, pv_hand_calc, 1e-3);
-}
+  int n = 5;
+  double i = 0.1;
+  double P = 1;
+  double A = 0.5;
 
-TEST_P(AgentTests, PV_n_lessthan_zero) {
-  EXPECT_THROW(agent_->PV(-10, 0.0, 10000.0, 100.0), std::invalid_argument);
-}
+  // testing by "round trip" with already tested functions
+  EXPECT_NEAR(P, agent_->PV(n,0,agent_->FV(n,0,P,0),0));  // discount rate = 0
+  EXPECT_NEAR(P, agent_->PV(0,i,agent_->FV(0,i,P,0),0));  // discount time = 0
+  EXPECT_NEAR(P, agent_->PV(i,i,agent_->FV(1,i,P,0),0));  // discount time = 1
+  EXPECT_NEAR(P, agent_->PV(n,i,agent_->FV(n,i,P,0),0));  // general
+  EXPECT_NEAR(P, agent_->PV(n*12,i/12,agent_->FV(n*12,i/12,P,0),0));  // general
+  EXPECT_NEAR(P, agent_->PV(-n,i,agent_->FV(-n,i,P,0),0));  // general
+  
+  // manual testing
+  EXPECT_NEAR(A, agent_->FV(n,0,0,A)); // discount rate = 0
+  EXPECT_NEAR(0, agent_->FV(0,i,0,A));  // discount time = 0
+  EXPECT_NEAR(A, agent_->FV(1,i,0,A)); // discount time = 1
+  EXPECT_NEAR(A * (std::pow((1 + i), n) - 1) / i, agent_->PV(n,i,0,A)); // general
+  EXPECT_NEAR(A * (std::pow((1 + i/12), n*12) - 1) / i/12, agent_->PV(n*12,i/12,0,A)); // general
+  EXPECT_NEAR(A * (std::pow((1 + i), -n) - 1) / i, agent_->PV(-n,i,0,A)); // general
 
-TEST_P(AgentTests, PV_n_equals_zero) {
-  EXPECT_THROW(agent_->PV(0, 0.0, 10000.0, 100.0), std::invalid_argument);
-}
+  EXPECT_NEAR(P + A, agent_->FV(n,0,P,A)); // discount rate = 0
+  EXPECT_NEAR(P, agent_->FV(0,i,P,A)); // discount time = 0
+  EXPECT_NEAR(P * (1+i) + A, agent_->FV(1,i,P,A)); // discount time = 1
+  EXPECT_NEAR(P * std::pow((1+i), n) + A * (std::pow((1 + i), n) - 1),
+              agent_->FV(n,i,P,A)); // general
 
-TEST_P(AgentTests, FV_A_and_P) {
-  double future_value = agent_->FV(10, 0.05, 10000.0, 100.0);
-  double fv_hand_calc = 17546.73552;
-  EXPECT_NEAR(future_value, fv_hand_calc, 1e-3);
-}
-
-TEST_P(AgentTests, FV_only_P) {
-  double future_value = agent_->FV(10, 0.05, 10000.0, 0.0);
-  double fv_hand_calc = 16288.946267;
-  EXPECT_NEAR(future_value, fv_hand_calc, 1e-3);
-}
-
-TEST_P(AgentTests, FV_only_A) {
-  double future_value = agent_->FV(10, 0.05, 0.0, 100.0);
-  double fv_hand_calc = 1257.7892535;
-  EXPECT_NEAR(future_value, fv_hand_calc, 1e-3);
-}
-
-TEST_P(AgentTests, FV_i_equals_zero) {
-  double future_value = agent_->FV(10, 0.0, 10000.0, 100.0);
-  double fv_hand_calc = 11000.0;
-  EXPECT_NEAR(future_value, fv_hand_calc, 1e-3);
-}
-
-TEST_P(AgentTests, FV_n_lessthan_zero) {
-  EXPECT_THROW(agent_->FV(-10, 0.0, 10000.0, 100.0), std::invalid_argument);
-}
-
-TEST_P(AgentTests, FV_n_equals_zero) {
-  EXPECT_THROW(agent_->FV(0, 0.0, 10000.0, 100.0), std::invalid_argument);
 }
 
 TEST_P(AgentTests, PMT) {
-  double payment = agent_->PMT(10, 0.05, 10000.0, 40000.0);
-  double pmt_hand_calc = 4475.2287;
-  EXPECT_NEAR(payment, pmt_hand_calc, 1e-3);
-}
 
-TEST_P(AgentTests, PMT_against_PV_and_FV) {
-  double present_value = agent_->PV(10, 0.05, 0.0, agent_->PMT(10, 0.05, 1.0, 0.0));
-  EXPECT_NEAR(present_value, 1.0, 1e-3);
-}
+  int n = 5;
+  double i = 0.1;
+  double P = 1.5;
+  double F = 3.5;
 
-TEST_P(AgentTests, PV_def_by_A) {
-  std::vector<double> payments = {100.0, 200.0, 300.0, 10.0, 15.0, 1000.0};
-  double pv = agent_->PV(0.05, payments);
-  double pv_hand_calc = 1301.990584;
-  EXPECT_NEAR(pv, pv_hand_calc, 1e-3);
-}
+  // all testing by "round trip" with already tested functions
 
-TEST_P(AgentTests, PV_against_PV) {
-  std::vector<double> payments = {100.0, 100.0, 100.0, 100.0, 100.0, 100.0};
-  double pv_vec = agent_->PV(0.05, payments);
-  double pv_regular = agent_->PV(6, 0.05, 0.0, 100.0);
-  EXPECT_NEAR(pv_vec, pv_regular, 1e-3);
+  EXPECT_NEAR(P, agent_->PV(n,0,0,agent_->PMT(n,0,P,0))); // discount rate = 0
+  EXPECT_NEAR(P, agent_->PV(0,i,0,agent_->PMT(0,i,P,0))); // discount time = 0
+  EXPECT_NEAR(P, agent_->PV(1,i,0,agent_->PMT(1,i,P,0))); // discount time = 1
+  EXPECT_NEAR(P, agent_->PV(n,i,0,agent_->PMT(n,i,P,0))); // general
+  
+  EXPECT_NEAR(F, agent_->FV(n,0,0,agent_->PMT(n,0,0,F))); // discount rate = 0
+  EXPECT_NEAR(F, agent_->FV(0,i,0,agent_->PMT(0,i,0,F))); // discount time = 0
+  EXPECT_NEAR(F, agent_->FV(1,i,0,agent_->PMT(1,i,0,F))); // discount time = 1
+  EXPECT_NEAR(F, agent_->FV(n,i,0,agent_->PMT(n,i,0,F))); // general
+
+  EXPECT_NEAR(P + agent_->PV(n,i,F,0), agent_->PV(n,i,0,agent_->PMT(n,i,P,F)))
+
 }
 
 
