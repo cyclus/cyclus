@@ -167,7 +167,7 @@ TEST_P(AgentTests, PMT) {
 TEST_P(AgentTests, PVA) {
 
   std::vector<double> A1({1.0,1.0,1.0,1.0,1.0});
-  std::vector<double> A2({1.0,1.0,1.0,1.0,1.0});
+  std::vector<double> A2({1.0,2.0,3.0,3.5,4.71});
 
   int n = A1.size();
   double i = 0.1;
