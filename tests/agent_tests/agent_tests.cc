@@ -159,8 +159,25 @@ TEST_P(AgentTests, PMT) {
   EXPECT_NEAR(F, agent_->FV(1,i,0,agent_->PMT(1,i,0,F))); // discount time = 1
   EXPECT_NEAR(F, agent_->FV(n,i,0,agent_->PMT(n,i,0,F))); // general
 
-  EXPECT_NEAR(P + agent_->PV(n,i,F,0), agent_->PV(n,i,0,agent_->PMT(n,i,P,F)))
+  EXPECT_NEAR(P + agent_->PV(n,i,F,0), agent_->PV(n,i,0,agent_->PMT(n,i,P,F)));
 
 }
 
+
+TEST_P(AgentTests, PVA) {
+
+  std::vector<double> A1({1.0,1.0,1.0,1.0,1.0});
+  std::vector<double> A2({1.0,1.0,1.0,1.0,1.0});
+
+  int n = A1.size();
+  double i = 0.1;
+
+  EXPECT_NEAR(agent_->PV(n,i,0,A1[0]), agent_->PV(i, A1));
+  double PV_A2 = 0;
+  for (int n2=0, n2 < A2.size(), n2++) {
+    PV_A2 += agent_->PV(n2+1, i, 0, A2[n2]);
+  }
+  EXPECT_NEAR(PV_A2, agent_->PV(i, A2));
+
+}
 
