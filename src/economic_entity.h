@@ -43,11 +43,7 @@ class EconomicEntity {
   /// @return  Present value
 
   virtual double PV(int n, double i, double F, double A) const {
-    // throw some kind of error here just in case
-    if (n <= 0) {
-        throw std::invalid_argument("Number of periods n must be > 0");
-    }
-
+    
     double pv_F = F / std::pow((1 + i),n);
     double pv_A;
     
@@ -71,10 +67,7 @@ class EconomicEntity {
   /// @return Future value
 
   virtual double FV(int n, double i, double P, double A) const {
-    // throw some kind of error here just in case
-    if (n <= 0) {
-        throw std::invalid_argument("Number of periods n must be > 0");
-    }
+
     double fv_P = P * std::pow((1 + i), n);
     double fv_A;
 
@@ -86,22 +79,18 @@ class EconomicEntity {
     }
 
     return fv_P + fv_A;
-}
+  }
 
-/// @brief computes the regular payment for n time periods that is equivalent 
-/// to the combination of a single payment of P immediately and a single 
-/// payment F after n time periods, using a discount rate of i per time periods
-/// @param n Number of periods
-/// @param i Discount rate
-/// @param P Immediate payment 
-/// @param F Future payment
-/// @return the regular payment (PMT) which is equivalent to P and F
+  /// @brief computes the regular payment for n time periods that is equivalent 
+  /// to the combination of a single payment of P immediately and a single 
+  /// payment F after n time periods, using a discount rate of i per time periods
+  /// @param n Number of periods
+  /// @param i Discount rate
+  /// @param P Immediate payment 
+  /// @param F Future payment
+  /// @return the regular payment (PMT) which is equivalent to P and F
 
-virtual double PMT(int n, double i, double P, double F) const {
-    // throw some kind of error here just in case
-    if (n <= 0) {
-        throw std::invalid_argument("Number of periods n must be > 0");
-    }
+  virtual double PMT(int n, double i, double P, double F) const {
 
     double p_term = P;
     double f_term = F / std::pow((1 + i), n);
@@ -112,27 +101,27 @@ virtual double PMT(int n, double i, double P, double F) const {
     } else {
         return (p_term + F) / n;
     }
-}
+  }
 
-/// @brief calculates the present value of a series of payments described by 
-/// the vector [A], occurring over a time period defined by the length of [A], 
-/// with a discount rate of i per time periods
-/// @param i Discount rate
-/// @param A Vector of payments which also defines how many time periods are
-/// summed over (by the length of A)
-/// @return Present value
+  /// @brief calculates the present value of a series of payments described by 
+  /// the vector [A], occurring over a time period defined by the length of [A], 
+  /// with a discount rate of i per time periods
+  /// @param i Discount rate
+  /// @param A Vector of payments which also defines how many time periods are
+  /// summed over (by the length of A)
+  /// @return Present value
 
-virtual double PV(double i, const std::vector<double>& A) const {
-    double pv = 0.0;
+  virtual double PV(double i, const std::vector<double>& A) const {
+      double pv = 0.0;
 
-    for (int t = 0; t < A.size(); ++t) {
-        pv += A[t] / std::pow((1 + i), t+1);
-    }
+      for (int t = 0; t < A.size(); ++t) {
+          pv += A[t] / std::pow((1 + i), t+1);
+      }
 
-    return pv;
-}
+      return pv;
+  }
 
- private:
+  private:
   std::unordered_map<std::string, double> financial_data_;
 };
 
