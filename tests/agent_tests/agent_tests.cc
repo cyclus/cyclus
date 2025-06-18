@@ -79,7 +79,7 @@ TEST_P(AgentTests, SetThenGetEconParam) {
   EXPECT_EQ(data, -1.0);
 }
 
-TEST_P(AgentTetss, PV) {
+TEST_P(AgentTests, PV) {
 
   int n = 5;
   double i = 0.1;
@@ -95,7 +95,7 @@ TEST_P(AgentTetss, PV) {
   EXPECT_NEAR(F / std::pow((1+i), -n), agent_->PV(-n,i,F,0), finance_eps); // negative time
 
   EXPECT_NEAR(A, agent_->PV(n,0,0,A), finance_eps); // discount rate = 0
-  EXPECT_NEAR(0, agent->PV(0,i,0,A), finance_eps);  // discount time = 0
+  EXPECT_NEAR(0, agent_->PV(0,i,0,A), finance_eps);  // discount time = 0
   EXPECT_NEAR(A / (1+i), agent_->PV(1,i,0,A), finance_eps); // discount time = 1
   EXPECT_NEAR(A * (1 - std::pow((1 + i), -n)) / i, agent_->PV(n,i,0,A), finance_eps); // general
   EXPECT_NEAR(A * (1 - std::pow((1 + (i/12)), -n*12)) / (i/12), agent_->PV(n*12,i/12,0,A), finance_eps); // general
@@ -178,7 +178,7 @@ TEST_P(AgentTests, PVA) {
 
   EXPECT_NEAR(agent_->PV(n,i,0,A1[0]), agent_->PV(i, A1), finance_eps);
   double PV_A2 = 0;
-  for (int n2=0, n2 < A2.size(), n2++) {
+  for (int n2=0; n2 < A2.size(); n2++) {
     PV_A2 += agent_->PV(n2+1, i, 0, A2[n2]);
   }
   EXPECT_NEAR(PV_A2, agent_->PV(i, A2), finance_eps);
