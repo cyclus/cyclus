@@ -53,34 +53,6 @@ void Material::Record(Context* ctx) const {
   comp_->Record(ctx);
 }
 
-std::string Material::GetNormalizedCompAtom() const {
-  std::string comp = "{";
-  cyclus::CompMap c = comp_->atom();
-  cyclus::compmath::Normalize(&c, 1);
-  for (std::map<const int, double>::const_iterator it = c.begin();
-       it != c.end(); ++it) {
-    comp = comp + std::string("{") + std::to_string(it->first) +
-           std::string(",") + std::to_string(it->second) + std::string("},");
-  }
-  comp.pop_back();
-  comp = comp + std::string("}");
-  return comp;
-}
-
-std::string Material::GetNormalizedCompMass() const {
-  std::string comp = "{";
-  cyclus::CompMap c = comp_->mass();
-  cyclus::compmath::Normalize(&c, 1);
-  for (std::map<const int, double>::const_iterator it = c.begin();
-       it != c.end(); ++it) {
-    comp = comp + std::string("{") + std::to_string(it->first) +
-           std::string(",") + std::to_string(it->second) + std::string("},");
-  }
-  comp.pop_back();
-  comp = comp + std::string("}");
-  return comp;
-}
-
 std::string Material::units() const {
   return "kg";
 }

@@ -116,6 +116,18 @@ Composition::Composition(int prev_decay, ChainPtr decay_line)
   next_id_++;
 }
 
+std::string Composition::ToString(CompMap v) {
+  std::string comp = "{";
+  for (cyclus::CompMap::const_iterator it = v.begin();
+       it != v.end(); ++it) {
+    comp += std::string("{") + std::to_string(it->first) +
+            std::string(",") + std::to_string(it->second) + std::string("},");
+  }
+  comp.pop_back();
+  comp = comp + std::string("}");
+  return comp;
+}
+
 Composition::Ptr Composition::NewDecay(int delta, uint64_t secs_per_timestep) {
   int tot_decay = prev_decay_ + delta;
   atom();  // force evaluation of atom-composition if not calculated already
