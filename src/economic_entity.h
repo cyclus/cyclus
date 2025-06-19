@@ -84,13 +84,17 @@ class EconomicEntity {
   /// @brief computes the regular payment for n time periods that is equivalent 
   /// to the combination of a single payment of P immediately and a single 
   /// payment F after n time periods, using a discount rate of i per time periods
-  /// @param n Number of periods
+  /// @param n Number of payments
   /// @param i Discount rate
   /// @param P Immediate payment 
   /// @param F Future payment
   /// @return the regular payment (PMT) which is equivalent to P and F
 
   virtual double PMT(int n, double i, double P, double F) const {
+
+    if (n <= 0) {
+      throw std::invalid_argument("n must be greater than or equal to zero!");
+    }
 
     double p_term = P;
     double f_term = F / std::pow((1 + i), n);
