@@ -179,7 +179,7 @@ TEST_P(AgentTests, PVA) {
   EXPECT_NEAR(agent_->PV(n,i,0,A1[0]), agent_->PV(i, A1), finance_eps);
   double PV_A2 = 0;
   for (int n2=0; n2 < A2.size(); n2++) {
-    PV_A2 += agent_->PV(n2+1, i, 0, A2[n2]);
+    PV_A2 += agent_->PV(n2+1, i, A2[n2], 0);
   }
   EXPECT_NEAR(PV_A2, agent_->PV(i, A2), finance_eps);
 
