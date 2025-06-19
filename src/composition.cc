@@ -117,14 +117,13 @@ Composition::Composition(int prev_decay, ChainPtr decay_line)
 }
 
 std::string Composition::ToString(CompMap v) {
-  std::string comp = "{";
+  std::string comp = "";
   for (cyclus::CompMap::const_iterator it = v.begin();
        it != v.end(); ++it) {
-    comp += std::string("{") + std::to_string(it->first) +
-            std::string(",") + std::to_string(it->second) + std::string("},");
+    comp += std::to_string(it->first) + std::string(": ") + 
+            std::to_string(it->second) + std::string("\n");
   }
-  comp.pop_back();
-  comp = comp + std::string("}");
+
   return comp;
 }
 
