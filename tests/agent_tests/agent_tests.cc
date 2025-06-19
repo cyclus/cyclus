@@ -127,7 +127,7 @@ TEST_P(AgentTests, FV) {
   EXPECT_NEAR(P, agent_->PV(-n,i,agent_->FV(-n,i,P,0),0), finance_eps);  // general
   
   // manual testing
-  EXPECT_NEAR(A, agent_->FV(n,0,0,A), finance_eps); // discount rate = 0
+  EXPECT_NEAR(A * n, agent_->FV(n,0,0,A), finance_eps); // discount rate = 0
   EXPECT_NEAR(0, agent_->FV(0,i,0,A), finance_eps);  // discount time = 0
   EXPECT_NEAR(A, agent_->FV(1,i,0,A), finance_eps); // discount time = 1
   EXPECT_NEAR(A * (std::pow((1 + i), n) - 1) / i, agent_->PV(n,i,0,A), finance_eps); // general
