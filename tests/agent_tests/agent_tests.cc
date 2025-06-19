@@ -121,7 +121,7 @@ TEST_P(AgentTests, FV) {
   // testing by "round trip" with already tested functions
   EXPECT_NEAR(P, agent_->PV(n,0,agent_->FV(n,0,P,0),0), finance_eps);  // discount rate = 0
   EXPECT_NEAR(P, agent_->PV(0,i,agent_->FV(0,i,P,0),0), finance_eps);  // discount time = 0
-  EXPECT_NEAR(P, agent_->PV(i,i,agent_->FV(1,i,P,0),0), finance_eps);  // discount time = 1
+  EXPECT_NEAR(P, agent_->PV(1,i,agent_->FV(1,i,P,0),0), finance_eps);  // discount time = 1
   EXPECT_NEAR(P, agent_->PV(n,i,agent_->FV(n,i,P,0),0), finance_eps);  // general
   EXPECT_NEAR(P, agent_->PV(n*12,i/12,agent_->FV(n*12,i/12,P,0),0), finance_eps);  // general
   EXPECT_NEAR(P, agent_->PV(-n,i,agent_->FV(-n,i,P,0),0), finance_eps);  // general
