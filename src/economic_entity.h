@@ -103,7 +103,7 @@ class EconomicEntity {
     if (i != 0) {
         return (p_term + f_term) * i / (1 - std::pow((1 + i), -n));
     } else {
-        return (p_term + F) / n;
+        return (p_term + f_term) / n;
     }
   }
 
