@@ -246,8 +246,6 @@ double active_buying_end_probability;
                     "uilabel": "Active Buying Disruption Probability"}
 double active_buying_disruption_probability;
 
-
-
 #pragma cyclus var {"default": -1,\
                     "tooltip": "Fixed length of disrupted active cycle",\
                     "doc": "When a active cycle is disrupted, this is length of the active period instead "\
@@ -271,8 +269,6 @@ int active_buying_disruption;
                     "categorical": ["Fixed", "Uniform", "Normal", "Binomial", "FixedWithDisruption"],\
                     "uilabel": "Dormant Buying Frequency Type"}
 std::string dormant_buying_frequency_type;
-
-
 
 #pragma cyclus var {"default": -1,\
                     "tooltip": "Fixed dormant buying frequency",\
@@ -337,7 +333,6 @@ double dormant_buying_end_probability;
                     "range": [0.0, 1.0],\
                     "uilabel": "Dormant Buying Disruption Probability"}
 double dormant_buying_disruption_probability;
-
 
 #pragma cyclus var {"default": -1,\
                     "tooltip": "Fixed length of disrupted cycle",\
