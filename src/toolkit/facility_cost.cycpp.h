@@ -15,6 +15,8 @@
 ///    file with the other ones, reaplcing <param_name> with the name you put
 ///    in the econ_params array (again, must match exactly).
 
+#include "economic_parameter.h"
+
 #pragma cyclus var {"default" : 0.0,                                       \
                    "uilabel" : "Capital cost required to build facility", \
                    "doc" : "Capital cost required to build facility",     \
@@ -69,16 +71,60 @@ double cost_override;
 
 
 // Must be done in a function so that we can access the user-defined values
-std::unordered_map<std::string, double> GenerateParamList() const override {
-  std::unordered_map<std::string, double> econ_params{
-      {"capital_cost", capital_cost},
-      {"property_tax_rate", property_tax_rate},
-      {"operations_and_maintenance", operations_and_maintenance},
-      {"facility_operational_lifetime", facility_operational_lifetime},
-      {"facility_depreciation_lifetime", facility_depreciation_lifetime},
-      {"per_unit_labor_cost", per_unit_labor_cost}};
+std::vector<EconParameter> GenerateParamList() const override {
+  std::vector<EconParameter> econ_params{
+      {"capital_cost", capital_cost, CostCategory::Depreciable},
+      {"property_tax_rate", property_tax_rate, CostCategory::Tax},
+      {"operations_and_maintenance", operations_and_maintenance, CostCategory::Fixed},
+      {"facility_operational_lifetime", facility_operational_lifetime, CostCategory::Time},
+      {"facility_depreciation_lifetime", facility_depreciation_lifetime, CostCategory::Time},
+      {"per_unit_labor_cost", per_unit_labor_cost, CostCategory::Variable}};
 
   return econ_params;
+}
+
+double CalculateUnitCost(double production_capacity, double units_to_produce, 
+    double input_cost) const {
+    
+    if (cost_override > 0) {
+        return cost_override * units_of_production + input_cost;
+    }
+
+        // Economic Parameters (declared like this because of scoping with try{})
+    double return_rate;
+    double cap_cost;
+    int operational_lifetime;
+    double operations_maintenance;
+    double labor_cost;
+    double corporate_tax;
+    double property_tax;
+    int taxable_lifetime;
+
+    // This allows us to exit gracefully if we can't find parameters
+    try {
+        return_rate = parent()->GetEconParameter("minimum_acceptable_return_rate");
+        cap_cost = GetEconParameter("capital_cost");
+        operational_lifetime = static_cast<int>(GetEconParameter("facility_operational_lifetime"));
+        operations_maintenance = GetEconParameter("operations_and_maintenance");
+        labor_cost = GetEconParameter("per_unit_labor_cost");
+        corporate_tax = parent()->GetEconParameter("corporate_income_tax_rate");
+        property_tax = parent()->parent()->GetEconParameter("property_tax_rate");
+        taxable_lifetime = static_cast<int>(GetEconParameter("facility_taxable_lifetime"));
+    } 
+    catch (const std::exception& e) {
+        // If any of the above functions fail to get their parameters, return 1
+        // to default to old pref logic
+        LOG(cyclus::LEV_INFO1, "GetCost") << prototype() 
+                                        << "failed to get financial_data_: "
+                                        << e.what();
+        return 1;
+    }
+
+    double timesteps_per_year = kDefaultTimeStepDur * 12 / context()->dt();
+    double annual_production = production_capacity * timesteps_per_year;
+
+
+    
 }
 
 // Required for compilation but not added by the cycpp preprocessor. Do not

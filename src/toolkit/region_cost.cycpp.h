@@ -5,8 +5,6 @@
 /// - Add `InitEconParameters()` to `EnterNotify()` in the cc file of the
 ///   archetype class.
 
-
-
 /// How to add parameters to this file:
 /// 1. Add the pragma. A default value MUST be added to ensure backwards
 ///    compatibility. 
@@ -16,6 +14,8 @@
 /// 3. Add "std::vector<int> cycpp_shape_<param_name> = {0};" to the end of the
 ///    file with the other ones, reaplcing <param_name> with the name you put
 ///    in the econ_params array (again, must match exactly).
+
+#include "economic_parameter.h"
 
 #pragma cyclus var { \
     "default": 0.0, \
@@ -28,9 +28,9 @@ double corporate_income_tax_rate;
     
     
 // Must be done in a function so that we can access the user-defined values
-std::unordered_map<std::string, double> GenerateParamList() const {
-    std::unordered_map<std::string, double> econ_params {
-        {"corporate_income_tax_rate", corporate_income_tax_rate}
+std::vector<EconParameter> GenerateParamList() const {
+    std::vector<EconParameter> econ_params {
+        {"corporate_income_tax_rate", corporate_income_tax_rate, CostCategory::Tax}
     };
 
     return econ_params;

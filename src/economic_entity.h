@@ -3,32 +3,57 @@
 
 #include <stdexcept>
 #include <string>
-#include <unordered_map>
+#include <vector>
+#include <cmath>
+#include "economic_parameter.h"
 
 class EconomicEntity {
  public:
-  virtual double GetEconParameter(const std::string& key) const {
-    auto it = financial_data_.find(key);
-    if (it != financial_data_.end()) {
-      return it->second;
-    } else {
-      throw std::runtime_error("Key '" + key +
-                               "' not found in financial_data_");
+
+  /// @brief Fetches an economic parameter from the financial_data_ vector
+  /// @param name the name of the parameter to fetch. Must be an exact match
+  /// @return The value associated with the entry with "name" in financial_data_ 
+  virtual double GetEconParameter(const std::string& name) const {
+    for (auto& p : financial_data_) {
+      if (p.name == name) {
+        return p.value;
+      }
     }
+    throw std::out_of_range("Parameter not found: " + name);
   }
-  virtual void SetEconParameter(const std::string& key, double value) {
-    financial_data_[key] = value;
+
+  /// @brief Add a new Economic parameter to financial_data_
+  /// @param name The name of the EconParameter
+  /// @param value The value of the EconParameter
+  /// @param category The CostCategory of the EconParameter
+  virtual void AddEconParameter(const std::string& name, double value, 
+                                CostCategory category) {
+    financial_data_.push_back({name, value, category});
+  }
+
+  /// @brief Get all EconParameters in a certain category
+  /// @param cat The desired CostCategory
+  /// @return A vector of all visible EconParameters for which category == cat 
+  std::vector<EconParameter> GetByCategory(CostCategory cat) const {
+    std::vector<EconParameter> out;
+    for (auto& p : financial_data_) {
+      if (p.category == cat) {
+        out.push_back(p);
+      }
+    }
+    return out;
   }
 
   // Given default implementation so as not to break backwards compatability
-  virtual std::unordered_map<std::string, double> GenerateParamList() const {
+  virtual std::vector<EconParameter> GenerateParamList() const {
     return {};
-  };
+  }
 
+  /// @brief Initialize the list of EconParameters from the ParamList
   void InitEconParameters() {
-    std::unordered_map<std::string, double> econ_params = GenerateParamList();
+    std::vector<EconParameter> econ_params = GenerateParamList();
     for (const auto& parameter : econ_params) {
-      SetEconParameter(parameter.first, parameter.second);
+      AddEconParameter(parameter.name, parameter.value, parameter.category);
     }
   }
 
@@ -126,7 +151,7 @@ class EconomicEntity {
   }
 
   private:
-  std::unordered_map<std::string, double> financial_data_;
+  std::vector<EconParameter> financial_data_;
 };
 
 #endif  // ECONOMIC_ENTITY_H
