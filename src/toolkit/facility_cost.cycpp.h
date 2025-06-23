@@ -53,13 +53,14 @@ double facility_operational_lifetime;
     }
 double facility_depreciation_lifetime;
 
+// We maybe want this to be more like a line-item not per unit?
 #pragma cyclus var { \
     "default": 0.0, \
-    "uilabel": "Cost of labor required to produce one unit of production", \
-    "doc": "Cost of labor required to produce one unit of production", \
+    "uilabel": "Annual cost of labor", \
+    "doc": "Annual cost of labor", \
     "units": "Unit of Currency" \
     }
-double per_unit_labor_cost;
+double labor_cost;
 
 #pragma cyclus var { \
     "default": -1.0, \
@@ -78,38 +79,36 @@ std::vector<EconParameter> GenerateParamList() const override {
       {"operations_and_maintenance", operations_and_maintenance, CostCategory::Fixed},
       {"facility_operational_lifetime", facility_operational_lifetime, CostCategory::Time},
       {"facility_depreciation_lifetime", facility_depreciation_lifetime, CostCategory::Time},
-      {"per_unit_labor_cost", per_unit_labor_cost, CostCategory::Variable}};
+      {"labor_cost", labor_cost, CostCategory::Variable}};
 
   return econ_params;
 }
 
-double CalculateUnitCost(double production_capacity, double units_to_produce, 
+double CalculateBidCost(double production_capacity, double units_to_produce, 
     double input_cost) const {
     
-    if (cost_override > 0) {
-        return cost_override * units_of_production + input_cost;
+    // Check if there's a cost override, and if so, use that
+    if (auto ov = GetByCategory(CostCategory::Override); !ov.empty()) {
+        return ov.front().value * units_to_produce + input_cost;
     }
 
-        // Economic Parameters (declared like this because of scoping with try{})
+    // Economic Parameters (declared like this because of scoping with try{})
     double return_rate;
     double cap_cost;
     int operational_lifetime;
-    double operations_maintenance;
-    double labor_cost;
-    double corporate_tax;
-    double property_tax;
     int taxable_lifetime;
+    double corporate_tax_rate;
+    double property_tax;
 
     // This allows us to exit gracefully if we can't find parameters
     try {
         return_rate = parent()->GetEconParameter("minimum_acceptable_return_rate");
-        cap_cost = GetEconParameter("capital_cost");
+        capital_cost = GetEconParameter("capital_cost");
         operational_lifetime = static_cast<int>(GetEconParameter("facility_operational_lifetime"));
-        operations_maintenance = GetEconParameter("operations_and_maintenance");
-        labor_cost = GetEconParameter("per_unit_labor_cost");
-        corporate_tax = parent()->GetEconParameter("corporate_income_tax_rate");
-        property_tax = parent()->parent()->GetEconParameter("property_tax_rate");
         taxable_lifetime = static_cast<int>(GetEconParameter("facility_taxable_lifetime"));
+        corporate_tax_rate = parent()->GetEconParameter("corporate_income_tax_rate");
+        property_tax_rate = parent()->parent()->GetEconParameter("property_tax_rate");
+        
     } 
     catch (const std::exception& e) {
         // If any of the above functions fail to get their parameters, return 1
@@ -120,9 +119,29 @@ double CalculateUnitCost(double production_capacity, double units_to_produce,
         return 1;
     }
 
+    // Once that other time-step related PR gets merged this can be cyclusYear
     double timesteps_per_year = kDefaultTimeStepDur * 12 / context()->dt();
     double annual_production = production_capacity * timesteps_per_year;
 
+    // Right now this doesn't make a ton of sense, but it'll be nice if the
+    // model gets more complicated and more costs get added (it might).
+    double total_dep = SumByCategory(CostCategory::Depreciable);
+    double total_fixed = SumByCategory(CostCategory::Fixed);
+    double total_variable = SumByCategory(CostCategory::Variable);
+    
+    property_tax = property_tax_rate * capital_cost;
+
+    // Adjust for Corp. Income Tax and Depreciation
+    tax_shield = PV(taxable_lifetime, return_rate, 0, 
+        total_dep * corporate_tax_rate / taxable_lifetime);
+
+    annualized_depreciable = PV(operational_lifetime, return_rate, 0, 
+        total_dep - tax_shield);
+    
+    double unit_cost = (annualized_depreciable + total_fixed + total_variable + 
+        property_tax) / annual_production;
+    
+    return unit_cost * units_to_produce + input_cost;
 
     
 }
@@ -134,5 +153,5 @@ std::vector<int> cycpp_shape_property_tax_rate = {0};
 std::vector<int> cycpp_shape_operations_and_maintenance = {0};
 std::vector<int> cycpp_shape_facility_operational_lifetime = {0};
 std::vector<int> cycpp_shape_facility_depreciation_lifetime = {0};
-std::vector<int> cycpp_shape_per_unit_labor_cost = {0};
+std::vector<int> cycpp_shape_labor_cost = {0};
 std::vector<int> cycpp_shape_cost_override = {0};

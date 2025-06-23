@@ -44,6 +44,18 @@ class EconomicEntity {
     return out;
   }
 
+  /// @brief Sums the values of all EconParams in a CostCategory
+  /// @param cat the CostCategory to sum the values over
+  /// @return the sum of all values p.value in the CostCategory
+  double SumByCategory(CostCategory cat) const {
+    double total = 0.0;
+    for (auto& p : GetByCategory(cat)) {
+        total += p.value;
+    }
+
+    return total;
+  }
+
   // Given default implementation so as not to break backwards compatability
   virtual std::vector<EconParameter> GenerateParamList() const {
     return {};

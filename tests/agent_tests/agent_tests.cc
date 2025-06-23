@@ -70,11 +70,11 @@ TEST_P(AgentTests, Annotations_AllParents) {
 
 // EconomicEntity Tests
 TEST_P(AgentTests, EmptyGetEconParam) {
-  EXPECT_THROW(agent_->GetEconParameter("UnitTestHook"), std::runtime_error);
+  EXPECT_THROW(agent_->GetEconParameter("UnitTestHook"), std::out_of_range);
 }
 
 TEST_P(AgentTests, SetThenGetEconParam) {
-  agent_->SetEconParameter("UnitTestHook", -1.0);
+  agent_->AddEconParameter("UnitTestHook", -1.0, CostCategory::Fixed);
   double data = agent_->GetEconParameter("UnitTestHook");
   EXPECT_EQ(data, -1.0);
 }
