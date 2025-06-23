@@ -6,6 +6,7 @@ Since last release
 ====================
 
 **Added:**
+* Added cyclusYear (Gaussian + 4s) and changed kDefaultTimeStepDur to be cyclusYear/12 (#1867)
 * Added set of basic finance math function to EconomicEntity (#1864)
 * Added Composition functions to get printable material composition information (#1868)
 * Added code injection variables for economic data (#1853)
