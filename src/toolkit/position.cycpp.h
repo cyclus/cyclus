@@ -26,9 +26,9 @@ double latitude;
 }
 double longitude;
 
-void InitializePosition(cyclus::Agent* agent) {
+void InitializePosition() {
   coordinates.set_position(latitude, longitude);
-  coordinates.RecordPosition(agent);
+  coordinates.RecordPosition(this);
 }
 
 // required for compilation but not added by the cycpp preprocessor...
