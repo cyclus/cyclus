@@ -26,12 +26,10 @@ double latitude;
 }
 double longitude;
 
-protected:
-
-  void InitializePosition(cyclus::Agent* agent) {
-    coordinates.set_position(latitude, longitude);
-    coordinates.RecordPosition(agent);
-  }
+void InitializePosition(cyclus::Agent* agent) {
+  coordinates.set_position(latitude, longitude);
+  coordinates.RecordPosition(agent);
+}
 
 // required for compilation but not added by the cycpp preprocessor...
 std::vector<int> cycpp_shape_latitude = {0};
