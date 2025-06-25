@@ -1,12 +1,12 @@
 // This includes the required header to add geographic coordinates to a
 // archetypes.
-// One only need to:
-// - '#include "toolkit/position.cycpp.h"' in the core of the archetype class (as
+// One only needs to:
+// - '#include "toolkit/position.cycpp.h"' in the header of the archetype class (as
 // private)
-// - and in the EnterNotify() method:
-//   - set the coordinates 'coordinates = cyclus::toolkit::Position(latitude,
-//   longitude);'
-//   - call the record method: 'coordinates.RecordPosititon(this);'
+// - In the EnterNotify() method:
+//   - Call the InitializePosition(); function
+// - In the constructor in the .cc file:
+//   - Add  latitude(0.0), longitude(0.0), to the initialization list
 
 cyclus::toolkit::Position coordinates;
 
