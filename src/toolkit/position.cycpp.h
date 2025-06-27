@@ -27,6 +27,7 @@ double latitude;
 }
 double longitude;
 
+// Provided default values to give the option to manually override
 void InitializePosition() {
   coordinates.set_position(latitude, longitude);
   coordinates.RecordPosition(this);

@@ -1,10 +1,23 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>
+#include <functional>
 
 #include "toolkit/position.h"
 using cyclus::toolkit::Position;
 
+std::string CaptureCerr(std::function<void()> f) {
+  std::stringstream buffer;
+
+  // This line grabs/copies the cerr buffer, and stores it in old/buffer so we
+  // can check it, and then restore it later.
+  std::streambuf* old = std::cerr.rdbuf(buffer.rdbuf());
+  f();
+
+  // Restore the old cerr buffer so that it gets back what it expects
+  std::cerr.rdbuf(old);
+  return buffer.str();
+}
 namespace cyclus {
 
 class PositionTest : public ::testing::Test {
@@ -100,9 +113,21 @@ TEST_F(PositionTest, ToStringDMS) {
 }
 
 TEST_F(PositionTest, Setters) {
-  EXPECT_THROW(eiffel_.latitude(1000), ValueError);
-  EXPECT_THROW(sydney_.set_position(-90.1, 0), ValueError);
-  EXPECT_THROW(museum_.longitude(180.1), ValueError);
+
+  std::string eiffel_out = CaptureCerr([&]() {
+    eiffel_.latitude(1000);
+  });
+
+  std::string sydney_out = CaptureCerr([&]() {
+    sydney_.set_position(-90.1, 0);
+  });
+  std::string museum_out = CaptureCerr([&]() {
+    museum_.longitude(180.1);
+  });
+
+  EXPECT_NE(eiffel_out.find("is outside the acceptable range"), std::string::npos);
+  EXPECT_NE(sydney_out.find("is outside the acceptable range"), std::string::npos);
+  EXPECT_NE(museum_out.find("is outside the acceptable range"), std::string::npos);
 }
 
 }  // namespace cyclus
