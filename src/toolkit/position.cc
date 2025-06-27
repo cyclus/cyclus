@@ -60,7 +60,7 @@ void Position::LatCheck(double lat) {
     msg << "The provided latitude (" << lat
         << ") is outside the acceptable range. "
         << "[-90, 90]";
-      cyclus::Warn<cyclus::VALUE_WARNING>(msg.str());
+    cyclus::Warn<cyclus::VALUE_WARNING>(msg.str());
   }
 }
 
