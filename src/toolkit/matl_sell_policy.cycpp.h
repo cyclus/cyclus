@@ -1,7 +1,8 @@
 /// This includes the required header to add a material sell policy to archetypes.
 /// One should only need to:
 /// - '#include "toolkit/matl_sell_policy.cycpp.h"' in the header of the
-///    archetype class (as private)
+///    archetype class (it is strongly recommended to inject this snippet as 
+///    `private:`, but archetype developers are free to make other choices)
 
 /// How to add parameters to this file:
 /// 1. Add the pragma. A default value MUST be added to ensure backwards

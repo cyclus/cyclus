@@ -1,7 +1,8 @@
 /// This includes the required header to add a material buy policy to archetypes.
 /// One should only need to:
 /// - '#include "toolkit/matl_buy_policy.cycpp.h"' in the header of the
-///    archetype class (as private)
+///    archetype class (it is strongly recommended to inject this snippet as 
+///    `private:`, but archetype developers are free to make other choices)
 /// - Add `InitBuyPolicyParameters()` to `EnterNotify()` in the cc file of the
 ///   archetype class as needed.
 
