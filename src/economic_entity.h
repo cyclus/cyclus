@@ -3,9 +3,6 @@
 
 #include <stdexcept>
 #include <string>
-#include <vector>
-#include <cmath>
-#include "economic_parameter.h"
 
 class EconomicEntity {
  public:

@@ -15,8 +15,6 @@
 ///    file with the other ones, reaplcing <param_name> with the name you put
 ///    in the econ_params array (again, must match exactly).
 
-#include "economic_parameter.h"
-
 #pragma cyclus var {"default" : 0.0,                                       \
                    "uilabel" : "Capital cost required to build facility", \
                    "doc" : "Capital cost required to build facility",     \
