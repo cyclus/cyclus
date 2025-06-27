@@ -15,8 +15,6 @@
 ///    file with the other ones, reaplcing <param_name> with the name you put
 ///    in the econ_params array (again, must match exactly).
 
-#include "economic_parameter.h"
-
 #pragma cyclus var { \
     "default": 0.0, \
     "uilabel": "Minimum acceptable rate of return", \
@@ -27,9 +25,9 @@
 double minimum_acceptable_return_rate;
     
 // Must be done in a function so that we can access the user-defined values
-std::vector<EconParameter> GenerateParamList() const {
-    std::vector<EconParameter> econ_params {
-        {"minimum_acceptable_return_rate", minimum_acceptable_return_rate, CostCategory::Profit}
+std::unordered_map<std::string, double> GenerateParamList() const {
+    std::unordered_map<std::string, double> econ_params {
+        {"minimum_acceptable_return_rate", minimum_acceptable_return_rate}
     };
 
     return econ_params;

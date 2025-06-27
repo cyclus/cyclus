@@ -72,14 +72,14 @@ double cost_override;
 
 
 // Must be done in a function so that we can access the user-defined values
-std::vector<EconParameter> GenerateParamList() const override {
-  std::vector<EconParameter> econ_params{
-      {"capital_cost", capital_cost, CostCategory::Depreciable},
-      {"property_tax_rate", property_tax_rate, CostCategory::Tax},
-      {"operations_and_maintenance", operations_and_maintenance, CostCategory::Fixed},
-      {"facility_operational_lifetime", facility_operational_lifetime, CostCategory::Time},
-      {"facility_depreciation_lifetime", facility_depreciation_lifetime, CostCategory::Time},
-      {"labor_cost", labor_cost, CostCategory::Variable}};
+std::unordered_map<std::string, double> GenerateParamList() const override {
+  std::unordered_map<std::string, double> econ_params{
+      {"capital_cost", capital_cost},
+      {"property_tax_rate", property_tax_rate},
+      {"operations_and_maintenance", operations_and_maintenance},
+      {"facility_operational_lifetime", facility_operational_lifetime},
+      {"facility_depreciation_lifetime", facility_depreciation_lifetime},
+      {"labor_cost", labor_cost}};
 
   return econ_params;
 }
@@ -88,22 +88,26 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
     double input_cost) const {
     
     // Check if there's a cost override, and if so, use that
-    if (auto ov = GetByCategory(CostCategory::Override); !ov.empty()) {
-        return ov.front().value * units_to_produce + input_cost;
+    if (cost_override > 0) {
+        return cost_override * units_of_production + input_cost;
     }
 
     // Economic Parameters (declared like this because of scoping with try{})
     double return_rate;
     double cap_cost;
+    double operations_and_maintenance;
+    double labor_cost;
     int operational_lifetime;
     int taxable_lifetime;
     double corporate_tax_rate;
-    double property_tax;
+    double property_tax_rate;
 
     // This allows us to exit gracefully if we can't find parameters
     try {
         return_rate = parent()->GetEconParameter("minimum_acceptable_return_rate");
         capital_cost = GetEconParameter("capital_cost");
+        operations_and_maintenance = GetEconParameter("operations_and_maintenance");
+        labor_cost = GetEconParameter("labor_cost");
         operational_lifetime = static_cast<int>(GetEconParameter("facility_operational_lifetime"));
         taxable_lifetime = static_cast<int>(GetEconParameter("facility_taxable_lifetime"));
         corporate_tax_rate = parent()->GetEconParameter("corporate_income_tax_rate");
@@ -123,13 +127,13 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
     double timesteps_per_year = kDefaultTimeStepDur * 12 / context()->dt();
     double annual_production = production_capacity * timesteps_per_year;
 
-    // Right now this doesn't make a ton of sense, but it'll be nice if the
-    // model gets more complicated and more costs get added (it might).
-    double total_dep = SumByCategory(CostCategory::Depreciable);
-    double total_fixed = SumByCategory(CostCategory::Fixed);
-    double total_variable = SumByCategory(CostCategory::Variable);
+    // This is my way of keeping the categories. New costs can be added to these
+    // as needed and it should be "easy" to do, but still require some thinking
+    double total_dep = capital_cost;
+    double total_fixed = operations_and_maintenance;
+    double total_variable = labor_cost;
     
-    property_tax = property_tax_rate * capital_cost;
+    double property_tax = property_tax_rate * capital_cost;
 
     // Adjust for Corp. Income Tax and Depreciation
     tax_shield = PV(taxable_lifetime, return_rate, 0, 
