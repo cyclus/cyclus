@@ -1,8 +1,9 @@
 // This includes the required header to add geographic coordinates to a
 // archetypes.
 // One only needs to:
-// - '#include "toolkit/position.cycpp.h"' in the header of the archetype class (as
-// private)
+// - '#include "toolkit/position.cycpp.h"' in the header of the archetype class
+//   (it is strongly recommended to inject this snippet as `private:`, but 
+//   archetype developers are free to make other choices)
 // - In the EnterNotify() method:
 //   - Call the InitializePosition(); function
 // - In the constructor in the .cc file:
