@@ -6,6 +6,7 @@ Since last release
 ====================
 
 **Added:**
+* Added code injection for matl_buy/sell_policy (#1866)
 * Added set of basic finance math function to EconomicEntity (#1864)
 * Added Composition functions to get printable material composition information (#1868)
 * Added code injection variables for economic data (#1853)
