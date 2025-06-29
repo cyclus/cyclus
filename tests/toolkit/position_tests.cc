@@ -128,6 +128,11 @@ TEST_F(PositionTest, Setters) {
   EXPECT_NE(eiffel_out.find("is outside the acceptable range"), std::string::npos);
   EXPECT_NE(sydney_out.find("is outside the acceptable range"), std::string::npos);
   EXPECT_NE(museum_out.find("is outside the acceptable range"), std::string::npos);
+
+  EXPECT_EQ(eiffel_.latitude(), 0.0);
+  EXPECT_EQ(sydney_.latitude(), 0.0);
+  EXPECT_EQ(sydney_.longitude(), 0.0);
+  EXPECT_EQ(museum_.longitude(), 0.0);
 }
 
 }  // namespace cyclus

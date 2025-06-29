@@ -141,12 +141,14 @@ class Position {
   /// Checks if the decimal degree of longitude is within acceptable range.
   /// The acceptable range is between -180 and 180 (inclusive).
   /// @param lat latitude expressed in decimal degrees.
-  void LonCheck(double lon);
-
-  /// Checks if the decimal degree of latitude is within acceptable range.
-  /// The acceptable range is between -90 and 90 (inclusive).
+  /// @return bool (true if valid, false otherwise)
+  bool ValidLongitude(double lon);
+  
+  /// @brief Checks if the decimal degree of latitude is within acceptable
+  /// range. The acceptable range is between -90 and 90 (inclusive).
   /// @param lat latitude expressed in decimal degrees.
-  void LatCheck(double lat);
+  /// @return bool (true if valid, false otherwise)
+  bool ValidLatitude(double lat);
 
   /// Sets the precision for double values.
   /// @param value that requires change of precision
