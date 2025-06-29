@@ -16,8 +16,8 @@ Position::Position(double decimal_lat, double decimal_lon) {
     longitude_ = SetPrecision(decimal_lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
   } else {
     // Set to some legal value. 0.0 is chosen as the default.
-    latitude_ = 0.0; 
-    longitude_ = 0.0;
+    latitude_ = kDefaultLatitude; 
+    longitude_ = kDefaultLongitude;
   }
 }
 
@@ -35,7 +35,7 @@ void Position::latitude(double lat) {
   if (ValidLatitude(lat)) {
     latitude_ = SetPrecision(lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
   } else { 
-    latitude_ = 0.0;
+    latitude_ = kDefaultLatitude;
   }
 }
 
@@ -52,8 +52,8 @@ void Position::set_position(double lat, double lon) {
     latitude_ = SetPrecision(lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
     longitude_ = SetPrecision(lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
   } else {
-    latitude_ = 0.0;
-    longitude_ = 0.0;
+    latitude_ = kDefaultLatitude;
+    longitude_ = kDefaultLongitude;
   }
 }
 

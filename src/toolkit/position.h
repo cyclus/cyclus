@@ -138,6 +138,12 @@ class Position {
   /// Longitude is stored as seconds of degree.
   double longitude_;
 
+  /// @brief Default Latitude
+  static constexpr double kDefaultLatitude = 0.0;
+
+  /// @brief Default Latitude
+  static constexpr double kDefaultLongitude = 0.0;
+
   /// Checks if the decimal degree of longitude is within acceptable range.
   /// The acceptable range is between -180 and 180 (inclusive).
   /// @param lat latitude expressed in decimal degrees.
