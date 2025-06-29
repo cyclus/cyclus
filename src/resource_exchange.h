@@ -15,16 +15,34 @@
 #include "trader_management.h"
 
 namespace cyclus {
+  
+/// @warning deprecated!
+/// @{
+template<class T>
+inline static void AdjustPrefs(Agent* m, typename PrefMap<T>::type& prefs) {}
+inline static void AdjustPrefs(Agent* m, PrefMap<Material>::type& prefs) {}
+inline static void AdjustPrefs(Agent* m, PrefMap<Product>::type& prefs) {}
+/// @}
+
 
 /// @brief Preference adjustment method helpers to convert from templates to the
 /// Agent inheritance hierarchy
 template<class T>
-inline static void AdjustPrefs(Agent* m, typename PrefMap<T>::type& prefs) {}
-inline static void AdjustPrefs(Agent* m, PrefMap<Material>::type& prefs) {
-  m->AdjustMatlPrefs(prefs);
+inline static double AdjustPref(Agent* m,
+                                Request<T>* req, Bid<T>* bid,
+                                double pref, TradeSense sense,
+                                ExchangeContext<T>* ex_ctx) { return pref; }
+inline static double AdjustPref(Agent* m,
+                                Request<Material>* req, Bid<Material>* bid,
+                                double pref, TradeSense sense,
+                                ExchangeContext<Material>* ex_ctx) {
+  return m->AdjustMatlPref(req, bid, pref, sense, ex_ctx);
 }
-inline static void AdjustPrefs(Agent* m, PrefMap<Product>::type& prefs) {
-  m->AdjustProductPrefs(prefs);
+inline static double AdjustPref(Agent* m,
+                                Request<Product>* req, Bid<Product>* bid,
+                                double pref, TradeSense sense,
+                                ExchangeContext<Product>* ex_ctx) {
+  return m->AdjustProductPref(req, bid, pref, sense, ex_ctx);
 }
 inline static void AdjustPrefs(Trader* t, PrefMap<Material>::type& prefs) {
   t->AdjustMatlPrefs(prefs);
@@ -142,14 +160,38 @@ class ResourceExchange {
 
   /// @brief allows a trader and its parents to adjust any preferences in the
   /// system
-  void AdjustPrefs_(Trader* t) {
-    typename PrefMap<T>::type& prefs = ex_ctx_.trader_prefs[t];
-    AdjustPrefs(t, prefs);
-    Agent* m = t->manager()->parent();
-    while (m != NULL) {
-      AdjustPrefs(m, prefs);
-      m = m->parent();
+  void AdjustPrefs_(Trader* reqr) {
+    typename PrefMap<T>::type& prefs = ex_ctx_.trader_prefs[reqr];
+    AdjustPrefs(reqr, prefs);
+
+    Agent* a;
+    Request<T>* req;
+    Bid<T>* bid;
+    double pref;
+    typename PrefMap<T>::type::iterator rit = prefs.begin();
+    for (; rit != prefs.end(); ++rit) {
+      req = rit->first;
+      typename std::map<Bid<T>*, double>::iterator bit = rit->second.begin();
+      for (; bit != rit->second.end(); ++bit) {
+        bid = bit->first;
+        pref = bit->second;
+        // requester insts/regions/etc get to update the pref first
+        a = reqr->manager()->parent();
+        while (a != NULL) {
+          pref = AdjustPref(a, req, bid, pref, REQUEST, &ex_ctx_);
+          a = a->parent();
+        }
+        // followed by bidder inst/regions/etc
+        a = bid->bidder()->manager()->parent();
+        while (a != NULL) {
+          pref = AdjustPref(a, req, bid, pref, BID, &ex_ctx_);
+          a = a->parent();
+        }
+        // update the actual preference in the data structure
+        bit->second = pref;
+      }
     }
+    
   }
 
   struct trader_compare {

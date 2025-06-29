@@ -322,12 +322,43 @@ class Agent : public StateWrangler, virtual public Ider, public EconomicEntity {
   /// their Decommission function.
   virtual void Decommission();
 
-  /// default implementation for material preferences.
+  /// @warning Deprecated!
+  /// @{
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
-
-  /// default implementation for material preferences.
   virtual void AdjustProductPrefs(PrefMap<Product>::type& prefs) {}
-
+  /// @}
+  
+  /// default implementation for material preferences.
+  /// @param req the request associated with the adjustment
+  /// @param bid the bid associated with the adjustment
+  /// @param pref the current value of the preference
+  /// @param sense whether the called agent is associated with the Request or
+  /// the Bid
+  /// @param ex_ctx the ExchangeContext, i.e., information about all other
+  /// Requests and Bids
+  /// @return pref an adjusted preference value
+  virtual double AdjustMatlPref(Request<Material>* req, Bid<Material>* bid,
+                                double pref, TradeSense sense,
+                                ExchangeContext<Material>* ex_ctx) {
+    return pref;
+  }
+  
+  /// default implementation for product preferences.
+  /// @param req the request associated with the adjustment
+  /// @param bid the bid associated with the adjustment
+  /// @param pref the current value of the preference
+  /// @param sense whether the called agent is associated with the Request or
+  /// the Bid
+  /// @param ex_ctx the ExchangeContext, i.e., information about all other
+  /// Requests and Bids
+  /// @return pref an adjusted preference value
+  virtual double AdjustProductPref(Request<Product>* req, Bid<Product>* bid,
+                                   double pref, TradeSense sense,
+                                   ExchangeContext<Product>* ex_ctx) {
+    return pref;
+  }
+  
+  
   /// Returns an agent's xml rng schema for initializing from input files. All
   /// concrete agents should override this function. This must validate the same
   /// xml input that the InfileToDb function receives.
