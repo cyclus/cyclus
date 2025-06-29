@@ -76,7 +76,7 @@ manager (scroll down further for Mac OSX instructions).
 
 The command to install a dependency takes the form of:
 
-.. code-block:: bash
+.. code-block:: console
 
   sudo apt-get install package
 
@@ -113,21 +113,21 @@ and (optionally):
 
 For example, in order to install libxml++ (and libxml2) on your system, type:
 
-.. code-block:: bash
+.. code-block:: console
 
   sudo apt-get install libxml++2.6-dev
 
 If you'd prefer to copy/paste, the following line will install all **required**
 *Cyclus* dependencies:
 
-.. code-block:: bash
+.. code-block:: console
 
    sudo apt-get install -y cmake make pkg-config libboost-all-dev libxml2-dev libxml++2.6-dev \
    python3-dev libsqlite3-dev libhdf5-dev liblapack-dev
 
 And to install all *Cyclus* dependencies (**required and optional**):
 
-.. code-block:: bash
+.. code-block:: console
 
    sudo apt-get install -y cmake make pkg-config libboost-all-dev libxml2-dev libxml++2.6-dev \
    python3-dev libsqlite3-dev libhdf5-dev liblapack-dev coinor-libcbc-dev coinor-libcoinutils-dev \
@@ -136,7 +136,7 @@ And to install all *Cyclus* dependencies (**required and optional**):
 
 To determine which version of Python is already installed on your computer, run:
 
-.. code-block:: bash
+.. code-block:: console
 
    python -V
 
@@ -145,19 +145,19 @@ Despite having installed python3, Ubuntu installations may still point at python
 
 First, you can list alternatives with the following command:
 
- .. code-block:: bash
+ .. code-block:: console
 
    update-alternatives --list python
 
 Ubuntu may not list any alternatives. To make Ubuntu aware of python 3, use:
 
- .. code-block:: bash
+ .. code-block:: console
 
    sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 From now on, to switch between different versions, use:
 
- .. code-block:: bash
+ .. code-block:: console
 
    sudo update-alternatives --config python
 
@@ -165,13 +165,13 @@ Even if you only have a single python installation, you may have to use update-a
 
 Check your current python version with the following command:
 
- .. code-block:: bash
+ .. code-block:: console
 
    python --version
 
 Then make Ubuntu aware of your current python version. Run the following command, using the python version you just checked. The following command uses version python3.8 as an example and will fail if you do not replace 3.8 with your own version number.
 
- .. code-block:: bash
+ .. code-block:: console
 
    sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 2
 
@@ -218,7 +218,7 @@ with brew commands in place of the port commands.
 
 The command to install a dependency takes the form of:
 
-.. code-block:: bash
+.. code-block:: console
 
   sudo port install package
 
@@ -239,7 +239,7 @@ your computer:
 
 **Coin-Cbc**: Download and build using the svn command in the terminal:
 
-.. code-block:: bash
+.. code-block:: console
 
   svn co https://projects.coin-or.org/svn/Cbc/stable/2.8 Coin-Cbc
   cd Coin-Cbc/
@@ -253,7 +253,7 @@ your computer:
 Finally, update your path and the following environment variables in your
 ``~/.profile`` (or ``~/.bashrc`` ) file:
 
-.. code-block:: bash
+.. code-block:: console
 
   export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local:$DYLD_FALLBACK_LIBRARY_PATH
 
