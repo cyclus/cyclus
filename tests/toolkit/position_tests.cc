@@ -6,18 +6,6 @@
 #include "toolkit/position.h"
 using cyclus::toolkit::Position;
 
-std::string CaptureCerr(std::function<void()> f) {
-  std::stringstream buffer;
-
-  // This line grabs/copies the cerr buffer, and stores it in old/buffer so we
-  // can check it, and then restore it later.
-  std::streambuf* old = std::cerr.rdbuf(buffer.rdbuf());
-  f();
-
-  // Restore the old cerr buffer so that it gets back what it expects
-  std::cerr.rdbuf(old);
-  return buffer.str();
-}
 namespace cyclus {
 
 class PositionTest : public ::testing::Test {
