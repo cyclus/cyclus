@@ -3,6 +3,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 
 class EconomicEntity {
  public:
@@ -35,7 +36,7 @@ class EconomicEntity {
   void InitEconParameters() {
     std::unordered_map<std::string, double> econ_params = GenerateParamList();
     for (const auto& parameter : econ_params) {
-      this->SetEconParameter(parameter.first, parameter.second);
+      SetEconParameter(parameter.first, parameter.second);
     }
   }
 
@@ -126,6 +127,24 @@ class EconomicEntity {
       }
 
       return pv;
+  }
+
+  /// @brief Calculate the annual payment over n periods for some given single 
+  /// payment now at some interest rate i
+  /// @param n Number of periods to annualize over
+  /// @param i Rate of return
+  /// @param P A current-valued payment
+  /// @return 
+  virtual double Annualize(int n, double i, double P) const {
+      if (n == 0) {
+        return P;
+      } else if (i == 0.0) {
+        return P / n;
+      } else {
+        double pow = std::pow((1 + i), n);
+        return P * (i * pow) / (pow - 1);
+      }
+
   }
 
   private:

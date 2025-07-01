@@ -33,7 +33,7 @@ double property_tax_rate;
     "default" : 0.0, "uilabel" : "Annual O&M Cost",     \
     "doc" : "Annual O&M Cost required to run facility", \
     "units" : "Unit of Currency" }
-double operations_and_maintenance;
+double annual_operations_and_maintenance;
 
 #pragma cyclus var { \
     "default": 1.0, \
@@ -58,7 +58,7 @@ double facility_depreciation_lifetime;
     "doc": "Annual cost of labor", \
     "units": "Unit of Currency" \
     }
-double labor_cost;
+double annual_labor_cost;
 
 #pragma cyclus var { \
     "default": -1.0, \
@@ -74,10 +74,10 @@ std::unordered_map<std::string, double> GenerateParamList() const override {
   std::unordered_map<std::string, double> econ_params{
       {"capital_cost", capital_cost},
       {"property_tax_rate", property_tax_rate},
-      {"operations_and_maintenance", operations_and_maintenance},
+      {"annual_operations_and_maintenance", annual_operations_and_maintenance},
       {"facility_operational_lifetime", facility_operational_lifetime},
       {"facility_depreciation_lifetime", facility_depreciation_lifetime},
-      {"labor_cost", labor_cost}};
+      {"annual_labor_cost", annual_labor_cost}};
 
   return econ_params;
 }
@@ -93,31 +93,50 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
     // Economic Parameters (declared like this because of scoping with try{})
     double return_rate;
     double cap_cost;
-    double operations_and_maintenance;
-    double labor_cost;
+    double annual_operations_and_maintenance;
+    double annual_labor_cost;
     int operational_lifetime;
     int taxable_lifetime;
     double corporate_tax_rate;
     double property_tax_rate;
 
-    // This allows us to exit gracefully if we can't find parameters
+    // This allows us to exit gracefully if we can't find parameters. Separated
+    // by Facility/Institution/Region for more verbose errors.
     try {
-        return_rate = parent()->GetEconParameter("minimum_acceptable_return_rate");
         capital_cost = GetEconParameter("capital_cost");
-        operations_and_maintenance = GetEconParameter("operations_and_maintenance");
-        labor_cost = GetEconParameter("labor_cost");
+        annual_operations_and_maintenance = GetEconParameter("annual_operations_and_maintenance");
+        annual_labor_cost = GetEconParameter("annual_labor_cost");
         operational_lifetime = static_cast<int>(GetEconParameter("facility_operational_lifetime"));
         taxable_lifetime = static_cast<int>(GetEconParameter("facility_taxable_lifetime"));
-        corporate_tax_rate = parent()->GetEconParameter("corporate_income_tax_rate");
-        property_tax_rate = parent()->parent()->GetEconParameter("property_tax_rate");
-        
     } 
     catch (const std::exception& e) {
-        // If any of the above functions fail to get their parameters, return 1
-        // to default to old pref logic
-        LOG(cyclus::LEV_INFO1, "GetCost") << prototype() 
+        LOG(cyclus::LEV_INFO1, "CalculateBidCost") << prototype() 
                                         << "failed to get financial_data_: "
                                         << e.what();
+        return 1;
+    }
+
+    try {
+        return_rate = parent()->GetEconParameter("minimum_acceptable_return_rate");
+        corporate_tax_rate = parent()->GetEconParameter("corporate_income_tax_rate");
+    }
+    catch (const std::exception& e) {
+        LOG(cyclus::LEV_INFO1, "CalculateBidCost") << prototype() 
+                                        << "failed to get financial_data_ from: " 
+                                        << parent()->prototype()
+                                        << e.what();
+        return 1;
+    }
+
+    try {
+        property_tax_rate = parent()->parent()->GetEconParameter("property_tax_rate");
+    }
+    catch (const std::exception& e) {
+        LOG(cyclus::LEV_INFO1, "CalculateBidCost") << prototype()
+                                            << "failed to get financial_data_ from: "
+                                            << parent()->parent()->prototype()
+                                            << e.what();
+
         return 1;
     }
 
@@ -128,8 +147,8 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
     // This is my way of keeping the categories. New costs can be added to these
     // as needed and it should be "easy" to do, but still require some thinking
     double total_dep = capital_cost;
-    double total_fixed = operations_and_maintenance;
-    double total_variable = labor_cost;
+    double total_annual_fixed = annual_operations_and_maintenance;
+    double total_annual_variable = annual_labor_cost;
     
     double property_tax = property_tax_rate * capital_cost;
 
@@ -137,11 +156,11 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
     tax_shield = PV(taxable_lifetime, return_rate, 0, 
         total_dep * corporate_tax_rate / taxable_lifetime);
 
-    annualized_depreciable = PV(operational_lifetime, return_rate, 0, 
+    annualized_depreciable = Annualize(operational_lifetime, return_rate, 
         total_dep - tax_shield);
     
-    double unit_cost = (annualized_depreciable + total_fixed + total_variable + 
-        property_tax) / annual_production;
+    double unit_cost = (annualized_depreciable + total_annual_fixed + 
+        total_annual_variable + property_tax) / annual_production;
     
     return unit_cost * units_to_produce + input_cost;
 
@@ -152,8 +171,8 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
 // remove. Must be one for each variable.
 std::vector<int> cycpp_shape_capital_cost = {0};
 std::vector<int> cycpp_shape_property_tax_rate = {0};
-std::vector<int> cycpp_shape_operations_and_maintenance = {0};
+std::vector<int> cycpp_shape_annual_operations_and_maintenance = {0};
 std::vector<int> cycpp_shape_facility_operational_lifetime = {0};
 std::vector<int> cycpp_shape_facility_depreciation_lifetime = {0};
-std::vector<int> cycpp_shape_labor_cost = {0};
+std::vector<int> cycpp_shape_annual_labor_cost = {0};
 std::vector<int> cycpp_shape_cost_override = {0};
