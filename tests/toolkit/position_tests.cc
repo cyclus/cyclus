@@ -113,26 +113,12 @@ TEST_F(PositionTest, ToStringDMS) {
 }
 
 TEST_F(PositionTest, Setters) {
-
-  std::string eiffel_out = CaptureCerr([&]() {
-    eiffel_.latitude(1000);
-  });
-
-  std::string sydney_out = CaptureCerr([&]() {
-    sydney_.set_position(-90.1, 0);
-  });
-  std::string museum_out = CaptureCerr([&]() {
-    museum_.longitude(180.1);
-  });
-
-  EXPECT_NE(eiffel_out.find("is outside the acceptable range"), std::string::npos);
-  EXPECT_NE(sydney_out.find("is outside the acceptable range"), std::string::npos);
-  EXPECT_NE(museum_out.find("is outside the acceptable range"), std::string::npos);
-
-  EXPECT_EQ(eiffel_.latitude(), 0.0);
-  EXPECT_EQ(sydney_.latitude(), 0.0);
-  EXPECT_EQ(sydney_.longitude(), 0.0);
-  EXPECT_EQ(museum_.longitude(), 0.0);
+  cyclus::warn_as_error = true;
+  EXPECT_THROW(eiffel_.latitude(1000), cyclus::ValueError);
+  EXPECT_THROW(sydney_.set_position(-90.1, 0), cyclus::ValueError);
+  EXPECT_THROW(museum_.longitude(180.1), cyclus::ValueError);
+  cyclus::warn_as_error = false;
+ 
 }
 
 }  // namespace cyclus
