@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string>
+#include <functional>
 
 #include "toolkit/position.h"
 using cyclus::toolkit::Position;
@@ -100,9 +101,12 @@ TEST_F(PositionTest, ToStringDMS) {
 }
 
 TEST_F(PositionTest, Setters) {
-  EXPECT_THROW(eiffel_.latitude(1000), ValueError);
-  EXPECT_THROW(sydney_.set_position(-90.1, 0), ValueError);
-  EXPECT_THROW(museum_.longitude(180.1), ValueError);
+  cyclus::warn_as_error = true;
+  EXPECT_THROW(eiffel_.latitude(1000), cyclus::ValueError);
+  EXPECT_THROW(sydney_.set_position(-90.1, 0), cyclus::ValueError);
+  EXPECT_THROW(museum_.longitude(180.1), cyclus::ValueError);
+  cyclus::warn_as_error = false;
+ 
 }
 
 }  // namespace cyclus
