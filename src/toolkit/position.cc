@@ -28,6 +28,11 @@ double Position::longitude() const {
 void Position::latitude(double lat) {
   if (!ValidLatitude(lat)) {
     latitude_ = kInvalidLatitude;
+    std::stringstream msg;
+    msg << "The provided latitude (" << lat
+        << ") is outside the acceptable range "
+        << "[-90, 90]. Setting to " << kInvalidLatitude;
+    cyclus::Warn<cyclus::VALUE_WARNING>(msg.str());
   } else { 
     latitude_ = SetPrecision(lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
   }
@@ -36,6 +41,11 @@ void Position::latitude(double lat) {
 void Position::longitude(double lon) {
   if (!ValidLongitude(lon)) {
     longitude_ = kInvalidLongitude;
+    std::stringstream msg;
+    msg << "The provided longitude (" << lon
+        << ") is outside the acceptable range "
+        << "[-180, 180]. Setting to " << kInvalidLongitude;
+    cyclus::Warn<cyclus::VALUE_WARNING>(msg.str());
   } else {
     longitude_ = SetPrecision(lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
   }
@@ -58,11 +68,6 @@ void Position::RecordPosition(Agent* agent) {
 }
 bool Position::ValidLatitude(double lat) {
   if (lat > 90 || lat < -90) {
-    std::stringstream msg;
-    msg << "The provided latitude (" << lat
-        << ") is outside the acceptable range "
-        << "[-90, 90]. Setting to NaN.";
-    cyclus::Warn<cyclus::VALUE_WARNING>(msg.str());
     return false;
   }
   return true;
@@ -70,11 +75,6 @@ bool Position::ValidLatitude(double lat) {
 
 bool Position::ValidLongitude(double lon) {
   if (lon > 180 || lon < -180) {
-    std::stringstream msg;
-    msg << "The provided longitude (" << lon
-        << ") is outside the acceptable range "
-        << "[-180, 180]. Setting to NaN.";
-    cyclus::Warn<cyclus::VALUE_WARNING>(msg.str());
     return false;
   }
   return true;
