@@ -25,6 +25,7 @@ Since last release
 * Table for recording active/dormant cycle periods (#1830)
 * Support for OpenMP parallelized simulations (#1709)
 * Command-line option to make a new blank input file referencing a current schema (#1861)
+* Allow multiple archetype blocks to facilitate includes ()
 
 **Changed:**
 
