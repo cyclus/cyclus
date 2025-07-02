@@ -31,7 +31,7 @@ void Position::latitude(double lat) {
     std::stringstream msg;
     msg << "The provided latitude (" << lat
         << ") is outside the acceptable range "
-        << "[-90, 90]. Setting to " << kInvalidLatitude;
+        << "[-90, 90]. Latitude has been set to " << latitude_;
     cyclus::Warn<cyclus::VALUE_WARNING>(msg.str());
   } else { 
     latitude_ = SetPrecision(lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
