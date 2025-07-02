@@ -44,7 +44,7 @@ void Position::longitude(double lon) {
     std::stringstream msg;
     msg << "The provided longitude (" << lon
         << ") is outside the acceptable range "
-        << "[-180, 180]. Setting to " << kInvalidLongitude;
+        << "[-180, 180]. Longitude has been set to " << longitude_;
     cyclus::Warn<cyclus::VALUE_WARNING>(msg.str());
   } else {
     longitude_ = SetPrecision(lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
