@@ -26,7 +26,7 @@ def test_include_recipe(thread_count):
 
 
 def test_include_source_w_archetype(thread_count):
-    """Testing for including of other XML files.
+    """Testing for including of other XML files with additional archetypes block in other files.
     """
     clean_outs()
     # Cyclus simulation input for recipe including
