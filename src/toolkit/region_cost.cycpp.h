@@ -5,8 +5,6 @@
 /// - Add `InitEconParameters()` to `EnterNotify()` in the cc file of the
 ///   archetype class.
 
-
-
 /// How to add parameters to this file:
 /// 1. Add the pragma. A default value MUST be added to ensure backwards
 ///    compatibility. 
