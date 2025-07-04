@@ -129,26 +129,9 @@ class EconomicEntity {
       return pv;
   }
 
-  /// @brief Calculate the annual payment over n periods for some given single 
-  /// payment now at some interest rate i
-  /// @param n Number of periods to annualize over
-  /// @param i Rate of return
-  /// @param P A current-valued payment
-  /// @return 
-  virtual double Annualize(int n, double i, double P) const {
-      if (n == 0) {
-        return P;
-      } else if (i == 0.0) {
-        return P / n;
-      } else {
-        double pow = std::pow((1 + i), n);
-        return P * (i * pow) / (pow - 1);
-      }
-
-  }
-
   private:
   std::unordered_map<std::string, double> financial_data_;
+  static constexpr int kDefaultBidCost = 1;
 };
 
 #endif  // ECONOMIC_ENTITY_H

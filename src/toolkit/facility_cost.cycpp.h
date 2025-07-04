@@ -113,7 +113,7 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
         LOG(cyclus::LEV_INFO1, "CalculateBidCost") << prototype() 
                                         << "failed to get financial_data_: "
                                         << e.what();
-        return 1;
+        return kDefaultBidCost;
     }
 
     try {
@@ -125,7 +125,7 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
                                         << "failed to get financial_data_ from: " 
                                         << parent()->prototype()
                                         << e.what();
-        return 1;
+        return kDefaultBidCost;
     }
 
     try {
@@ -137,7 +137,7 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
                                             << parent()->parent()->prototype()
                                             << e.what();
 
-        return 1;
+        return kDefaultBidCost;
     }
 
     // Once that other time-step related PR gets merged this can be cyclusYear
@@ -156,13 +156,16 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
     tax_shield = PV(taxable_lifetime, return_rate, 0, 
         total_dep * corporate_tax_rate / taxable_lifetime);
 
-    annualized_depreciable = Annualize(operational_lifetime, return_rate, 
-        total_dep - tax_shield);
+    annualized_depreciable = PMT(operational_lifetime, return_rate, 
+        total_dep - tax_shield, 0);
     
     double unit_cost = (annualized_depreciable + total_annual_fixed + 
         total_annual_variable + property_tax) / annual_production;
     
-    return unit_cost * units_to_produce + input_cost;
+    double bid_cost = unit_cost * units_to_produce + input_cost;
+
+    // Protects against divide by zero in pref = 1/BidCost
+    return bid_cost != 0 ? bid_cost : kDefaultBidCost;
 
     
 }
