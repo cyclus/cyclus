@@ -3,6 +3,7 @@
 #define CYCLUS_DECIMAL_SECOND_MULTIPLIER 3600
 
 #include <string>
+
 #include "cyclus.h"
 
 namespace cyclus {
@@ -138,15 +139,25 @@ class Position {
   /// Longitude is stored as seconds of degree.
   double longitude_;
 
+  /// @brief Catch for Invalid Latitude
+  static constexpr double kInvalidLatitude =
+      std::numeric_limits<double>::quiet_NaN();
+
+  /// @brief Catch for Invalid Longitude
+  static constexpr double kInvalidLongitude =
+      std::numeric_limits<double>::quiet_NaN();
+
   /// Checks if the decimal degree of longitude is within acceptable range.
   /// The acceptable range is between -180 and 180 (inclusive).
   /// @param lat latitude expressed in decimal degrees.
-  void LonCheck(double lon);
+  /// @return bool (true if valid, false otherwise)
+  bool ValidLongitude(double lon);
 
-  /// Checks if the decimal degree of latitude is within acceptable range.
-  /// The acceptable range is between -90 and 90 (inclusive).
+  /// @brief Checks if the decimal degree of latitude is within acceptable
+  /// range. The acceptable range is between -90 and 90 (inclusive).
   /// @param lat latitude expressed in decimal degrees.
-  void LatCheck(double lat);
+  /// @return bool (true if valid, false otherwise)
+  bool ValidLatitude(double lat);
 
   /// Sets the precision for double values.
   /// @param value that requires change of precision

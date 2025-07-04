@@ -6,7 +6,8 @@ Since last release
 ====================
 
 **Added:**
-* Added a function to facility_cost.cycpp.h to calculate unit cost of a DRE bid (#1870)
+* Added a function to facility_cost.cycpp.h to calculate cost of a DRE bid (#1870)
+* Added code injection for matl_buy/sell_policy (#1866)
 * Added set of basic finance math function to EconomicEntity (#1864)
 * Added Composition functions to get printable material composition information (#1868)
 * Added code injection variables for economic data (#1853)
@@ -25,6 +26,7 @@ Since last release
 * Table for recording active/dormant cycle periods (#1830)
 * Support for OpenMP parallelized simulations (#1709)
 * Command-line option to make a new blank input file referencing a current schema (#1861)
+* Allow multiple archetype blocks to facilitate includes (#1874)
 
 **Changed:**
 
@@ -41,7 +43,7 @@ Since last release
 * Package GetFillMass returns vector of masses (#1790, #1813)
 * Modified Doxygen homepage (#1815)
 * Pin ``python<3.13`` in CI workflows (#1826)
-* changed the way Position is added to the archetypes (#1510)
+* Changed the way Position is added to the archetypes (#1510) (#1872)
 
 **Removed:**
 

@@ -136,32 +136,34 @@
         </interleave>
       </element>
     </zeroOrMore>
-      
-    <element name="archetypes"> 
-      <a:documentation>A list of archetypes that will be dynamically loaded for use in Regions, Insitutions, and Facilities.</a:documentation>
-      <oneOrMore>
-        <element name="spec">
-          <a:documentation>A complete archetype specification</a:documentation>
-          <interleave>
-            <optional>
-              <element name="path">
-                <a:documentation>An optional path to find this archetype; only needed if not discoverable in the standard locations.</a:documentation>
-                <text/></element></optional>
-            <optional>
-              <element name="lib">
-                <a:documentation>An optional name for the library that contains this archetype.</a:documentation>
-                <text/></element></optional>
-            <element name="name">
-              <a:documentation>The name that will be used to refer to this archetype.</a:documentation>
-              <text/></element>
-            <optional>
-              <element name="alias">
-                <a:documentation>An optional alias to refer to this archetype by a different name.</a:documentation>
-                <text/></element></optional>
-          </interleave>
-        </element>
-      </oneOrMore>
-    </element>
+
+    <oneOrMore>  
+      <element name="archetypes"> 
+        <a:documentation>A list of archetypes that will be dynamically loaded for use in Regions, Insitutions, and Facilities.</a:documentation>
+        <oneOrMore>
+          <element name="spec">
+            <a:documentation>A complete archetype specification</a:documentation>
+            <interleave>
+              <optional>
+                <element name="path">
+                  <a:documentation>An optional path to find this archetype; only needed if not discoverable in the standard locations.</a:documentation>
+                  <text/></element></optional>
+              <optional>
+                <element name="lib">
+                  <a:documentation>An optional name for the library that contains this archetype.</a:documentation>
+                  <text/></element></optional>
+              <element name="name">
+                <a:documentation>The name that will be used to refer to this archetype.</a:documentation>
+                <text/></element>
+              <optional>
+                <element name="alias">
+                  <a:documentation>An optional alias to refer to this archetype by a different name.</a:documentation>
+                  <text/></element></optional>
+            </interleave>
+          </element>
+        </oneOrMore>
+      </element>
+    </oneOrMore>
 
     <oneOrMore>
       <element name="facility">
