@@ -11,7 +11,6 @@ Since last release
 * Added code injection for matl_buy/sell_policy (#1866)
 * Added set of basic finance math function to EconomicEntity (#1864)
 * Added Composition functions to get printable material composition information (#1868)
-* Added cyclusYear (Gaussian + 4s) and changed kDefaultTimeStepDur to be cyclusYear/12
 * Added cyclusYear (Gaussian + 4s) and changed kDefaultTimeStepDur to be cyclusYear/12 (#1867)
 * Added code injection variables for economic data (#1853)
 * Agent now inherits EconomicEntity to allow limited communication across RIF (#1850)
