@@ -1,13 +1,12 @@
----
 Language:        Cpp
-BasedOnStyle:  Google
-# only allow single line functions if they are inlined in class def'n
+BasedOnStyle:    Google
+# Only allow single-line functions if they are inlined in class definition
 AllowShortFunctionsOnASingleLine: Inline
-# do not force new line after template declarations
+# Do not force new line after template declarations
 AlwaysBreakTemplateDeclarations: false
-# Automatically detect whether a given fuction's arguments are one-per-line
+# Automatically detect whether a given function's arguments are one-per-line
 ExperimentalAutoDetectBinPacking: true
 # Use C++11 standard
-Standard:        Cpp11
-...
-
+Standard: Cpp11
+# Prevent automatic include sorting
+SortIncludes: Never
