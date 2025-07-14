@@ -16,6 +16,7 @@
 /// sell_quantity restricts selling to only integer multiples of this value
 /// @}
 
+// clang-format off
 #pragma cyclus var {"default": 0,\
                     "tooltip":"sell quantity (kg)",\
                     "doc":"material will be sold in integer multiples of this quantity. If"\
@@ -26,6 +27,7 @@
                     "range": [0.0, CY_LARGE_DOUBLE], \
                     "units": "kg"}
 double sell_quantity;
+// clang-format on
 
 //// A policy for sending material
 cyclus::toolkit::MatlSellPolicy sell_policy;
