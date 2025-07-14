@@ -7,6 +7,7 @@ Since last release
 
 **Added:**
 
+* Added a function to facility_cost.cycpp.h to calculate price of a DRE bid (#1877)
 * Added a function to facility_cost.cycpp.h to calculate cost of a DRE bid (#1870)
 * Added code injection for matl_buy/sell_policy (#1866)
 * Added set of basic finance math function to EconomicEntity (#1864)
