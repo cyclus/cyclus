@@ -141,8 +141,7 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
         return kDefaultBidCost;
     }
 
-    // Once that other time-step related PR gets merged this can be cyclusYear
-    double timesteps_per_year = kDefaultTimeStepDur * 12 / context()->dt();
+    double timesteps_per_year = cyclusYear / context()->dt();
     double annual_production = production_capacity * timesteps_per_year;
 
     // This is my way of keeping the categories. New costs can be added to these
@@ -169,6 +168,13 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
     return bid_cost != 0 ? bid_cost : kDefaultBidCost;
 
     
+}
+
+double CalculateBidPrice(double production_capacity, double units_to_produce, 
+    double input_cost) const {
+
+    // Default implementation
+    return CalculateBidCost(production_capacity, units_to_produce, input_cost);
 }
 
 // Required for compilation but not added by the cycpp preprocessor. Do not
