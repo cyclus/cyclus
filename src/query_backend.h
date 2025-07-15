@@ -1,3 +1,4 @@
+// clang-format off
 #ifndef CYCLUS_SRC_QUERY_BACKEND_H_
 #define CYCLUS_SRC_QUERY_BACKEND_H_
 
@@ -1044,3 +1045,4 @@ class Sha1 {
 }  // namespace cyclus
 
 #endif  // CYCLUS_SRC_QUERY_BACKEND_H_
+// clang-format on
