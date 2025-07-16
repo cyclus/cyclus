@@ -1,3 +1,6 @@
+# These files are automatically generated, and may cause issues if formatted.
 src/eventhooks.*
+# These files are automatically generated, and very complex. Best not to touch.
 src/decay.*
+# This file is read by dbtypes_gen.py which expects very specific formatting.
 src/query_backend.h
