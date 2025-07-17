@@ -1,0 +1,5 @@
+# This file is read by dbtypes_gen.py which expects very specific formatting.
+src/query_backend.h
+# These files are automatically generated, and may cause issues if formatted.
+src/eventhooks.*
+src/decay.*

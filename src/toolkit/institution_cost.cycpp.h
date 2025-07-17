@@ -15,6 +15,7 @@
 ///    file with the other ones, reaplcing <param_name> with the name you put
 ///    in the econ_params array (again, must match exactly).
 
+// clang-format off
 #pragma cyclus var { \
     "default": 0.0, \
     "uilabel": "Minimum acceptable rate of return", \
@@ -23,7 +24,8 @@
     "units": "Dimensionless" \
     }
 double minimum_acceptable_return_rate;
-    
+// clang-format on    
+
 // Must be done in a function so that we can access the user-defined values
 std::unordered_map<std::string, double> GenerateParamList() const {
     std::unordered_map<std::string, double> econ_params {

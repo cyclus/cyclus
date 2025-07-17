@@ -15,6 +15,7 @@
 ///    file with the other ones, reaplcing <param_name> with the name you put
 ///    in the econ_params array (again, must match exactly).
 
+// clang-format off
 #pragma cyclus var {"default" : 0.0,                                       \
                    "uilabel" : "Capital cost required to build facility", \
                    "doc" : "Capital cost required to build facility",     \
@@ -67,7 +68,7 @@ double annual_labor_cost;
     "units": "Dimensionless" \
     }
 double cost_override;
-
+// clang-format on
 
 // Must be done in a function so that we can access the user-defined values
 std::unordered_map<std::string, double> GenerateParamList() const override {

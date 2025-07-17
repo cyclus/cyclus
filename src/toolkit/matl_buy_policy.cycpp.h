@@ -165,6 +165,7 @@ inline void InitBuyPolicyParameters() {
     throw cyclus::ValueError("Invalid buying size type");}
 }
 
+// clang-format off
 #pragma cyclus var {"default": "Fixed",\
                     "tooltip": "Type of active buying frequency",\
                     "doc": "Options: Fixed, Uniform, Normal, Binomial, FixedWithDisruption. "\
@@ -428,6 +429,7 @@ double reorder_quantity;
                     "The per-time step demand is unchanged except the cycle cap is almost reached.",\
                     "uilabel": "Cumulative Cap"}
 double cumulative_cap;
+// clang-format on
 
 //// A policy for requesting material
 cyclus::toolkit::MatlBuyPolicy buy_policy;
