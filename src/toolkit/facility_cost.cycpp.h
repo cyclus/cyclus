@@ -84,7 +84,7 @@ std::unordered_map<std::string, double> GenerateParamList() const override {
 }
 
 double CalculateBidCost(double production_capacity, double units_to_produce, 
-    double input_cost) const {
+    double input_cost = 0.0) const {
     
     // Check if there's a cost override, and if so, use that
     if (cost_override > 0) {
@@ -171,7 +171,7 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
 }
 
 double CalculateBidPrice(double production_capacity, double units_to_produce, 
-    double input_cost) const {
+    double input_cost = 0.0) const {
 
     // Default implementation
     return CalculateBidCost(production_capacity, units_to_produce, input_cost);
