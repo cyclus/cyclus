@@ -18,11 +18,7 @@ ExchangeNode::ExchangeNode(double qty, bool exclusive, std::string commod,
       group(NULL) {}
 
 ExchangeNode::ExchangeNode(double qty, bool exclusive)
-    : qty(qty),
-      exclusive(exclusive),
-      commod(""),
-      agent_id(-1),
-      group(NULL) {}
+    : qty(qty), exclusive(exclusive), commod(""), agent_id(-1), group(NULL) {}
 
 ExchangeNode::ExchangeNode(double qty, bool exclusive, std::string commod)
     : qty(qty),
@@ -32,11 +28,7 @@ ExchangeNode::ExchangeNode(double qty, bool exclusive, std::string commod)
       group(NULL) {}
 
 ExchangeNode::ExchangeNode(double qty)
-    : qty(qty),
-      exclusive(false),
-      commod(""),
-      agent_id(-1),
-      group(NULL) {}
+    : qty(qty), exclusive(false), commod(""), agent_id(-1), group(NULL) {}
 
 ExchangeNode::ExchangeNode()
     : qty(std::numeric_limits<double>::max()),
@@ -47,18 +39,16 @@ ExchangeNode::ExchangeNode()
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs) {
-  return (lhs.unit_capacities == rhs.unit_capacities &&
-          lhs.qty == rhs.qty &&
-          lhs.exclusive == rhs.exclusive &&
-          lhs.group == rhs.group &&
+  return (lhs.unit_capacities == rhs.unit_capacities && lhs.qty == rhs.qty &&
+          lhs.exclusive == rhs.exclusive && lhs.group == rhs.group &&
           lhs.commod == rhs.commod);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
-         boost::shared_ptr<ExchangeNode> vnode)
-    : unode_(unode),
-      vnode_(vnode) {
+         boost::shared_ptr<ExchangeNode>
+             vnode)
+    : unode_(unode), vnode_(vnode) {
   exclusive_ = unode->exclusive || vnode->exclusive;
   if (exclusive_) {
     double fqty = unode->qty;
@@ -111,7 +101,7 @@ void RequestGroup::AddExchangeNode(ExchangeNode::Ptr node) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ExchangeGraph::ExchangeGraph() : next_arc_id_(0) { }
+ExchangeGraph::ExchangeGraph() : next_arc_id_(0) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddRequestGroup(RequestGroup::Ptr prs) {

@@ -70,4 +70,3 @@ std::vector<Resource::Ptr> ResCast(std::vector<Resource::Ptr> rs) {
 
 }  // namespace toolkit
 }  // namespace cyclus
-

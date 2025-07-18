@@ -2,19 +2,14 @@
 
 #include "trader.h"
 
-
-
 namespace cyclus {
 
+std::string GetTraderPrototype(Trader* bidder) {
+  return bidder->manager()->prototype();
+}
 
-  std::string GetTraderPrototype(Trader* bidder){
-    return bidder->manager()->prototype();
-  }
+std::string GetTraderSpec(Trader* bidder) {
+  return bidder->manager()->spec();
+}
 
-
-  std::string GetTraderSpec(Trader* bidder){
-    return bidder->manager()->spec();
-  }
-
-
-} // namespace cyclus
+}  // namespace cyclus

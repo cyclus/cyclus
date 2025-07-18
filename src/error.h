@@ -15,20 +15,16 @@ class Error : public std::exception {
   Error();
 
   /// Constructs a new Error with a provided message
-  Error(std::string  msg);
+  Error(std::string msg);
 
   /// Returns the error message associated with this Error.
   virtual const char* what() const throw();
 
   /// Returns the error message associated with this Error.
-  std::string msg() const {
-    return msg_;
-  }
+  std::string msg() const { return msg_; }
 
   /// sets the error message
-  void msg(std::string msg) {
-    msg_ = msg;
-  }
+  void msg(std::string msg) { msg_ = msg; }
 
   virtual ~Error() throw() {}
 
@@ -79,7 +75,6 @@ class DepricationError : public Error {
   DepricationError(std::string msg) : Error(msg) {}
 };
 
-
 enum Warnings {
   WARNING = 0,
   VALUE_WARNING,
@@ -92,7 +87,6 @@ enum Warnings {
   PENDING_DEPRECATION_WARNING,
   EXPERIMENTAL_WARNING,
 };
-
 
 /// This is maximum number of times to issue a warning of each kind.
 extern unsigned int warn_limit;
@@ -111,8 +105,7 @@ extern std::map<Warnings, std::string> warn_prefix;
 
 /// Issue a warning with the approriate message, accoring to the current
 /// warning settings.
-template <Warnings T>
-void Warn(const std::string& msg) {
+template <Warnings T> void Warn(const std::string& msg) {
   if (warn_as_error) {
     switch (T) {
       case VALUE_WARNING:

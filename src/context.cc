@@ -5,7 +5,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #if CYCLUS_IS_PARALLEL
 #include <omp.h>
-#endif // CYCLUS_IS_PARALLEL
+#endif  // CYCLUS_IS_PARALLEL
 
 #include "error.h"
 #include "exchange_solver.h"
@@ -65,9 +65,8 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d)
       seed(kDefaultSeed),
       stride(kDefaultStride) {}
 
-SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
-                 int branch_time, std::string parent_type,
-                 std::string handle)
+SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim, int branch_time,
+                 std::string parent_type, std::string handle)
     : duration(dur),
       y0(-1),
       m0(-1),
@@ -83,13 +82,9 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim,
       stride(kDefaultStride) {}
 
 Context::Context(Timer* ti, Recorder* rec)
-    : ti_(ti),
-      rec_(rec),
-      solver_(NULL),
-      trans_id_(0),
-      si_(0) {
-        rng_ = new RandomNumberGenerator();
-      }
+    : ti_(ti), rec_(rec), solver_(NULL), trans_id_(0), si_(0) {
+  rng_ = new RandomNumberGenerator();
+}
 
 Context::~Context() {
   if (solver_ != NULL) {
@@ -122,7 +117,7 @@ void Context::DelAgent(Agent* m) {
 }
 
 void Context::SchedBuild(Agent* parent, std::string proto_name, int t) {
-  #pragma omp critical
+#pragma omp critical
   {
     if (t == -1) {
       t = time() + 1;
@@ -139,7 +134,7 @@ void Context::SchedBuild(Agent* parent, std::string proto_name, int t) {
 }
 
 void Context::SchedDecom(Agent* m, int t) {
-  #pragma omp critical
+#pragma omp critical
   {
     if (t == -1) {
       t = time();
@@ -180,9 +175,9 @@ void Context::AddPrototype(std::string name, Agent* p, bool overwrite) {
   if (rec_ver_.count(spec) == 0) {
     rec_ver_.insert(spec);
     NewDatum("AgentVersions")
-      ->AddVal("Spec", spec)
-      ->AddVal("Version", p->version())
-      ->Record();
+        ->AddVal("Spec", spec)
+        ->AddVal("Version", p->version())
+        ->Record();
   }
 }
 
@@ -214,18 +209,18 @@ void Context::AddPackage(std::string name, double fill_min, double fill_max,
 
 void Context::RecordPackage(Package::Ptr pkg) {
   NewDatum("Packages")
-    ->AddVal("PackageName", pkg->name())
-    ->AddVal("FillMin", pkg->fill_min())
-    ->AddVal("FillMax", pkg->fill_max())
-    ->AddVal("Strategy", pkg->strategy())
-    ->Record();
+      ->AddVal("PackageName", pkg->name())
+      ->AddVal("FillMin", pkg->fill_min())
+      ->AddVal("FillMax", pkg->fill_max())
+      ->AddVal("Strategy", pkg->strategy())
+      ->Record();
 }
 
 Package::Ptr Context::GetPackage(std::string name) {
   if (name == Package::unpackaged_name()) {
     return Package::unpackaged();
   }
-  if (packages_.size() == 0 ) {
+  if (packages_.size() == 0) {
     throw KeyError("No user-created packages exist");
   }
   if (packages_.count(name) == 0) {
@@ -234,11 +229,11 @@ Package::Ptr Context::GetPackage(std::string name) {
   return packages_[name];
 }
 
-void Context::AddTransportUnit(std::string name, int fill_min, int fill_max, 
-                      std::string strategy) {
+void Context::AddTransportUnit(std::string name, int fill_min, int fill_max,
+                               std::string strategy) {
   if (transport_units_.count(name) == 0) {
-    TransportUnit::Ptr tu = TransportUnit::Create(name, fill_min, fill_max,
-                                                strategy);
+    TransportUnit::Ptr tu =
+        TransportUnit::Create(name, fill_min, fill_max, strategy);
     transport_units_[name] = tu;
     RecordTransportUnit(tu);
   } else {
@@ -248,11 +243,11 @@ void Context::AddTransportUnit(std::string name, int fill_min, int fill_max,
 
 void Context::RecordTransportUnit(TransportUnit::Ptr tu) {
   NewDatum("TransportUnits")
-    ->AddVal("TransportUnitName", tu->name())
-    ->AddVal("FillMin", tu->fill_min())
-    ->AddVal("FillMax", tu->fill_max())
-    ->AddVal("Strategy", tu->strategy())
-    ->Record();
+      ->AddVal("TransportUnitName", tu->name())
+      ->AddVal("FillMin", tu->fill_min())
+      ->AddVal("FillMax", tu->fill_max())
+      ->AddVal("Strategy", tu->strategy())
+      ->Record();
 }
 
 /// Retrieve a registered transport unit
@@ -260,7 +255,7 @@ TransportUnit::Ptr Context::GetTransportUnit(std::string name) {
   if (name == TransportUnit::unrestricted_name()) {
     return TransportUnit::unrestricted();
   }
-  if (transport_units_.size() == 0 ) {
+  if (transport_units_.size() == 0) {
     throw KeyError("No user-created transport units exist");
   }
   if (transport_units_.count(name) == 0) {
@@ -268,7 +263,6 @@ TransportUnit::Ptr Context::GetTransportUnit(std::string name) {
   }
   return transport_units_[name];
 }
-
 
 void Context::InitSim(SimInfo si) {
   NewDatum("Info")
@@ -290,9 +284,7 @@ void Context::InitSim(SimInfo si) {
       ->AddVal("CoinCBCVersion", std::string(version::coincbc()))
       ->Record();
 
-  NewDatum("DecayMode")
-      ->AddVal("Decay", si.decay)
-      ->Record();
+  NewDatum("DecayMode")->AddVal("Decay", si.decay)->Record();
 
   NewDatum("InfoExplicitInv")
       ->AddVal("RecordInventory", si.explicit_inventory)
@@ -317,7 +309,6 @@ void Context::InitSim(SimInfo si) {
   si_ = si;
   ti_->Initialize(this, si);
   rng_->Initialize(si);
-
 }
 
 int Context::time() {
@@ -341,12 +332,11 @@ double Context::random_uniform_real(double low, double high) {
 }
 
 double Context::random_normal_real(double mean, double std_dev, double low,
-                                     double high) {
+                                   double high) {
   return rng_->random_normal_real(mean, std_dev, low, high);
 }
 
-int Context::random_normal_int(double mean, double std_dev, int low,
-                                 int high) {
+int Context::random_normal_int(double mean, double std_dev, int low, int high) {
   return rng_->random_normal_int(mean, std_dev, low, high);
 }
 

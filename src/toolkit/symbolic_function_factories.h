@@ -11,7 +11,6 @@
 namespace cyclus {
 namespace toolkit {
 
-
 /// An abstract factory for pointers to symbolic functions
 class SymbFunctionFactory {
  public:
@@ -29,8 +28,8 @@ class LinFunctionFactory : public SymbFunctionFactory {
  public:
   /// Return a function pointer to a linear function
   ///
-  /// @param params a string of space-separated values for m and b in the equation
-  /// \f[
+  /// @param params a string of space-separated values for m and b in the
+  /// equation \f[
   ///   y = mx + b
   /// \f]
   ///
@@ -58,7 +57,8 @@ class ExpFunctionFactory : public SymbFunctionFactory {
   ///
   /// \b Example
   /// @code
-  ///   SymFunction::Ptr func = fac.GetFunctionPtr("2.5 0.1 5"); // y = 2.5exp(0.1x) + 5
+  ///   SymFunction::Ptr func = fac.GetFunctionPtr("2.5 0.1 5"); // y
+  ///   = 2.5exp(0.1x) + 5
   /// @endcode
   virtual SymFunction::Ptr GetFunctionPtr(std::string params);
 };

@@ -26,9 +26,8 @@ void Agent::InitFrom(Agent* m) {
 
 std::string Agent::InformErrorMsg(std::string msg) {
   std::stringstream ret;
-  ret << "A(n) " << spec_ << " named " << prototype_
-      << " at time " << context()->time()
-      << " received the following error:\n"
+  ret << "A(n) " << spec_ << " named " << prototype_ << " at time "
+      << context()->time() << " received the following error:\n"
       << msg;
   return ret.str();
 }
@@ -75,10 +74,10 @@ Agent::~Agent() {
 
   std::set<Agent*>::iterator it;
   if (parent_ != NULL) {
-    CLOG(LEV_DEBUG2) << "Agent '" << parent_->prototype() << "' ID="
-                     << parent_->id()
-                     << " has removed child '" << prototype() << "' ID="
-                     << id() << " from its list of children.";
+    CLOG(LEV_DEBUG2) << "Agent '" << parent_->prototype()
+                     << "' ID=" << parent_->id() << " has removed child '"
+                     << prototype() << "' ID=" << id()
+                     << " from its list of children.";
     it = find(parent_->children_.begin(), parent_->children_.end(), this);
     if (it != parent_->children_.end()) {
       parent_->children_.erase(it);
@@ -95,13 +94,9 @@ Agent::~Agent() {
 
 std::string Agent::str() {
   std::stringstream ss;
-  ss << kind_ << "_" << prototype_
-     << " ( "
-     << "ID=" << id_
-     << ", implementation=" << spec_
-     << ",  name=" << prototype_
-     << ",  parentID=" << parent_id_
-     << " ) ";
+  ss << kind_ << "_" << prototype_ << " ( " << "ID=" << id_
+     << ", implementation=" << spec_ << ",  name=" << prototype_
+     << ",  parentID=" << parent_id_ << " ) ";
   return ss.str();
 }
 
@@ -113,15 +108,13 @@ void Agent::lifetime(int n_timesteps) {
 }
 
 void Agent::lifetime_force(int n_timesteps) {
-  try{
+  try {
     lifetime(n_timesteps);
-  }
-  catch (ValueError e){
-    if(enter_time_+n_timesteps <= context()->time()){
+  } catch (ValueError e) {
+    if (enter_time_ + n_timesteps <= context()->time()) {
       lifetime(context()->time() - enter_time_ + 1);
-    }
-    else{
-      lifetime_ = n_timesteps;    
+    } else {
+      lifetime_ = n_timesteps;
     }
   }
 }
@@ -129,8 +122,7 @@ void Agent::lifetime_force(int n_timesteps) {
 bool Agent::AncestorOf(Agent* other) {
   other = other->parent();
   while (other != NULL) {
-    if (this == other)
-      return true;
+    if (this == other) return true;
     other = other->parent();
   }
   return false;
@@ -140,8 +132,7 @@ bool Agent::DecendentOf(Agent* other) {
   const std::set<Agent*>& children = other->children();
   std::set<Agent*>::const_iterator it = children.begin();
   for (; it != children.end(); ++it) {
-    if (this == *(it) || this->DecendentOf(*(it)))
-      return true;
+    if (this == *(it) || this->DecendentOf(*(it))) return true;
   }
   return false;
 }

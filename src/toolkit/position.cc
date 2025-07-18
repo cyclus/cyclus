@@ -11,8 +11,8 @@ namespace toolkit {
 Position::Position() : latitude_(0), longitude_(0) {}
 
 Position::Position(double decimal_lat, double decimal_lon) {
-    latitude(decimal_lat);
-    longitude(decimal_lon);
+  latitude(decimal_lat);
+  longitude(decimal_lon);
 }
 
 Position::~Position() {}
@@ -33,7 +33,7 @@ void Position::latitude(double lat) {
         << ") is outside the acceptable range "
         << "[-90, 90]. Latitude has been set to " << latitude_;
     cyclus::Warn<cyclus::VALUE_WARNING>(msg.str());
-  } else { 
+  } else {
     latitude_ = SetPrecision(lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
   }
 }
@@ -89,9 +89,9 @@ double Position::Distance(Position target) const {
   double dlong = tarlongitude - curr_longitude;
   double dlat = tarlatitude - curr_latitude;
 
-  double half_chord_length_sq =
-      pow(sin(dlat / 2), 2) +
-      pow(sin(dlong / 2), 2) * cos(curr_latitude) * cos(tarlatitude);
+  double half_chord_length_sq = pow(sin(dlat / 2), 2) + pow(sin(dlong / 2), 2) *
+                                                            cos(curr_latitude) *
+                                                            cos(tarlatitude);
 
   double angular_distance =
       2 * atan2(sqrt(half_chord_length_sq), sqrt(1 - half_chord_length_sq));

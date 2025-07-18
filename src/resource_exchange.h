@@ -18,7 +18,7 @@ namespace cyclus {
 
 /// @brief Preference adjustment method helpers to convert from templates to the
 /// Agent inheritance hierarchy
-template<class T>
+template <class T>
 inline static void AdjustPrefs(Agent* m, typename PrefMap<T>::type& prefs) {}
 inline static void AdjustPrefs(Agent* m, PrefMap<Material>::type& prefs) {
   m->AdjustMatlPrefs(prefs);
@@ -57,53 +57,44 @@ inline static void AdjustPrefs(Trader* t, PrefMap<Product>::type& prefs) {
 /// exchng.AddAllBids();
 /// exchng.AdjustAll();
 /// @endcode
-template <class T>
-class ResourceExchange {
+template <class T> class ResourceExchange {
  public:
   /// @brief default constructor
   ///
   /// @param ctx the simulation context
-  ResourceExchange(Context* ctx) {
-    sim_ctx_ = ctx;
-  }
+  ResourceExchange(Context* ctx) { sim_ctx_ = ctx; }
 
-  inline ExchangeContext<T>& ex_ctx() {
-    return ex_ctx_;
-  }
+  inline ExchangeContext<T>& ex_ctx() { return ex_ctx_; }
 
   /// @brief queries traders and collects all requests for bids
   void AddAllRequests() {
     InitTraders();
-    std::for_each(
-        traders_.begin(),
-        traders_.end(),
-        std::bind(&cyclus::ResourceExchange<T>::AddRequests_,
-                     this,
-                     std::placeholders::_1));
+    std::for_each(traders_.begin(),
+                  traders_.end(),
+                  std::bind(&cyclus::ResourceExchange<T>::AddRequests_,
+                            this,
+                            std::placeholders::_1));
   }
 
   /// @brief queries traders and collects all responses to requests for bids
   void AddAllBids() {
     InitTraders();
-    std::for_each(
-        traders_.begin(),
-        traders_.end(),
-        std::bind(&cyclus::ResourceExchange<T>::AddBids_,
-                     this,
-                     std::placeholders::_1));
+    std::for_each(traders_.begin(),
+                  traders_.end(),
+                  std::bind(&cyclus::ResourceExchange<T>::AddBids_,
+                            this,
+                            std::placeholders::_1));
   }
 
   /// @brief adjust preferences for requests given bid responses
   void AdjustAll() {
     InitTraders();
     std::set<Trader*> traders = ex_ctx_.requesters;
-    std::for_each(
-        traders.begin(),
-        traders.end(),
-        std::bind(
-            &cyclus::ResourceExchange<T>::AdjustPrefs_,
-            this,
-            std::placeholders::_1));
+    std::for_each(traders.begin(),
+                  traders.end(),
+                  std::bind(&cyclus::ResourceExchange<T>::AdjustPrefs_,
+                            this,
+                            std::placeholders::_1));
   }
 
   /// return true if this is an empty exchange (i.e., no requests exist,

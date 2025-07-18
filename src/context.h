@@ -20,7 +20,7 @@
 #include "recorder.h"
 #include "package.h"
 
-// Defined as 4 seconds longer than a Gaussian year (to make division by 12 
+// Defined as 4 seconds longer than a Gaussian year (to make division by 12
 // a round number)
 const uint64_t cyclusYear = 31558200;
 
@@ -58,8 +58,7 @@ class SimInfo {
   /// @param m0 start month for the simulation
   /// @param handle is this simulation's unique simulation handle
   /// @return a SimInfo instance
-  SimInfo(int dur, int y0 = 2010, int m0 = 1,
-          std::string handle = "");
+  SimInfo(int dur, int y0 = 2010, int m0 = 1, std::string handle = "");
 
   /// @brief constructs a SimInfo instance using no default variables
   /// @param dur simulation duration in number of timesteps
@@ -68,8 +67,7 @@ class SimInfo {
   /// @param handle is this simulation's unique simulation handle
   /// @param d the decay data member, "never" for no decay. "manual" otherwise
   /// @return a SimInfo instance
-  SimInfo(int dur, int y0, int m0,
-          std::string handle, std::string d);
+  SimInfo(int dur, int y0, int m0, std::string handle, std::string d);
 
   /// @brief constructs a SimInfo instance
   /// @param dur simulation duration in number of timesteps
@@ -78,9 +76,8 @@ class SimInfo {
   /// @param parent_type a string indicating the type of the parent simulation
   /// @param handle is this simulation's unique simulation handle
   /// @return a SimInfo instance
-  SimInfo(int dur, boost::uuids::uuid parent_sim,
-          int branch_time, std::string parent_type,
-          std::string handle = "");
+  SimInfo(int dur, boost::uuids::uuid parent_sim, int branch_time,
+          std::string parent_type, std::string handle = "");
 
   /// user-defined label associated with a particular simulation
   std::string handle;
@@ -128,10 +125,10 @@ class SimInfo {
   /// Seed for random number generator
   uint64_t seed;
 
-  /// Stride length. Currently unused, but available for future development 
+  /// Stride length. Currently unused, but available for future development
   /// that may wish to initiate multiple random number generators from the
   /// same seed, skipping forward in the sequence by the stride length times
-  /// some parameter, such as the agent_id. 
+  /// some parameter, such as the agent_id.
   uint64_t stride;
 };
 
@@ -168,7 +165,8 @@ class Context {
   /// not** be added more than once.
   /// @param name the prototype name
   /// @param m a pointer to the agent prototype
-  /// @param overwrite, allow overwrites to the prototype listing, default: false
+  /// @param overwrite, allow overwrites to the prototype listing, default:
+  /// false
   /// @throws if overwrite is false and a prototype name has already been added
   /// @{
   void AddPrototype(std::string name, Agent* m);
@@ -177,38 +175,31 @@ class Context {
 
   /// Registers an agent as a participant in resource exchanges. Agents should
   /// register from their Deploy method.
-  inline void RegisterTrader(Trader* e) {
-    traders_.insert(e);
-  }
+  inline void RegisterTrader(Trader* e) { traders_.insert(e); }
 
   /// Unregisters an agent as a participant in resource exchanges.
-  inline void UnregisterTrader(Trader* e) {
-    traders_.erase(e);
-  }
+  inline void UnregisterTrader(Trader* e) { traders_.erase(e); }
 
   /// @return the current set of traders registered for resource exchange.
-  inline const std::set<Trader*>& traders() const {
-    return traders_;
-  }
+  inline const std::set<Trader*>& traders() const { return traders_; }
 
   /// Create a new agent by cloning the named prototype. The returned agent is
   /// not initialized as a simulation participant.
   ///
   /// @warning this method should generally NOT be used by agents.
-  template <class T>
-  T* CreateAgent(std::string proto_name) {
+  template <class T> T* CreateAgent(std::string proto_name) {
     if (protos_.count(proto_name) == 0) {
       throw KeyError("Invalid prototype name " + proto_name);
     }
 
     Agent* m = protos_[proto_name];
     if (m == NULL) {
-        throw KeyError("Null prototype for " + proto_name);
+      throw KeyError("Null prototype for " + proto_name);
     }
     T* casted(NULL);
     Agent* clone = m->Clone();
     if (clone == NULL) {
-        throw StateError("Clone operation failed for " + proto_name);
+      throw StateError("Clone operation failed for " + proto_name);
     }
     casted = dynamic_cast<T*>(clone);
     if (casted == NULL) {
@@ -269,20 +260,20 @@ class Context {
   /// to record user-declared packages
   void RecordPackage(Package::Ptr);
 
-  /// Retrieve a registered package. 
+  /// Retrieve a registered package.
   Package::Ptr GetPackage(std::string name);
 
   /// Adds a transport unit type to a simulation-wide accessible list.
   /// Agents should NOT add their own transport units.
   void AddTransportUnit(std::string name, int fill_min = 0,
-                  int fill_max = std::numeric_limits<int>::max(),
-                  std::string strategy = "first");
+                        int fill_max = std::numeric_limits<int>::max(),
+                        std::string strategy = "first");
 
   /// Records transport unit information. Should be used first on unrestricted,
   /// then to record user-declared transport units
   void RecordTransportUnit(TransportUnit::Ptr);
 
-  /// Retrieve a registered transport unit. 
+  /// Retrieve a registered transport unit.
   TransportUnit::Ptr GetTransportUnit(std::string name);
 
   int random();
@@ -297,26 +288,24 @@ class Context {
   double random_uniform_real(double low, double high);
 
   /// Returns a random number from a normal distribution.
-  double random_normal_real(double mean, double std_dev, double low=0,
-                            double high=std::numeric_limits<double>::max());
+  double random_normal_real(double mean, double std_dev, double low = 0,
+                            double high = std::numeric_limits<double>::max());
 
   /// Returns a random number from a lognormal distribution.
-  int random_normal_int(double mean, double std_dev, int low=0,
-                        int high=std::numeric_limits<int>::max());
+  int random_normal_int(double mean, double std_dev, int low = 0,
+                        int high = std::numeric_limits<int>::max());
 
   /// Returns the duration of a single time step in seconds.
-  inline uint64_t dt() {return si_.dt;};
+  inline uint64_t dt() { return si_.dt; };
 
   /// Returns the seed for the random number generator.
-  inline uint64_t seed() {return si_.seed;};
+  inline uint64_t seed() { return si_.seed; };
 
   /// Returns the stride for the random number generator.
-  inline uint64_t stride() {return si_.stride;};
+  inline uint64_t stride() { return si_.stride; };
 
   /// Return static simulation info.
-  inline SimInfo sim_info() const {
-    return si_;
-  }
+  inline SimInfo sim_info() const { return si_; }
 
   /// See Recorder::NewDatum documentation.
   Datum* NewDatum(std::string title);
@@ -329,9 +318,7 @@ class Context {
   void KillSim();
 
   /// @return the next transaction id
-  inline int NextTransactionID() {
-    return trans_id_++;
-  }
+  inline int NextTransactionID() { return trans_id_++; }
 
   /// Returns the exchange solver associated with this context
   ExchangeSolver* solver() {
@@ -349,15 +336,11 @@ class Context {
 
   /// @return the number of agents of a given prototype currently in the
   /// simulation
-  inline int n_prototypes(std::string type) {
-    return n_prototypes_[type];
-  }
+  inline int n_prototypes(std::string type) { return n_prototypes_[type]; }
 
   /// @return the number of agents of a given implementation currently in the
   /// simulation
-  inline int n_specs(std::string impl) {
-    return n_specs_[impl];
-  }
+  inline int n_specs(std::string impl) { return n_specs_[impl]; }
 
  private:
   /// Registers an agent as a participant in the simulation.

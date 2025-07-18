@@ -108,7 +108,8 @@ class Composition {
   CompMap atom_;
   CompMap mass_;
 
-  /// the total time delta this composition has been decayed from its root ancestor.
+  /// the total time delta this composition has been decayed from its root
+  /// ancestor.
   int prev_decay_;
 };
 

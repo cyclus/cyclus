@@ -15,7 +15,8 @@ Recorder::Recorder() : index_(0), inject_sim_id_(true) {
   set_dump_count(kDefaultDumpCount);
 }
 
-Recorder::Recorder(bool inject_sim_id) : index_(0), inject_sim_id_(inject_sim_id) {
+Recorder::Recorder(bool inject_sim_id)
+    : index_(0), inject_sim_id_(inject_sim_id) {
   uuid_ = boost::uuids::random_generator()();
   set_dump_count(kDefaultDumpCount);
 }
@@ -25,8 +26,8 @@ Recorder::Recorder(unsigned int dump_count) : index_(0), inject_sim_id_(true) {
   set_dump_count(dump_count);
 }
 
-Recorder::Recorder(boost::uuids::uuid simid) : index_(0), uuid_(simid), \
-                                               inject_sim_id_(true) {
+Recorder::Recorder(boost::uuids::uuid simid)
+    : index_(0), uuid_(simid), inject_sim_id_(true) {
   set_dump_count(kDefaultDumpCount);
 }
 
@@ -90,8 +91,7 @@ void Recorder::AddDatum(Datum* d) {
 }
 
 void Recorder::Flush() {
-  if (index_ == 0)
-    return;
+  if (index_ == 0) return;
   DatumList tmp = data_;
   tmp.resize(index_);
   index_ = 0;

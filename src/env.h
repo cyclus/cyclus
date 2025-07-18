@@ -11,7 +11,7 @@
 
 // Undefines isnan from pyne
 #ifdef isnan
-  #undef isnan
+#undef isnan
 #endif
 
 namespace cyclus {
@@ -52,9 +52,9 @@ class Env {
   /// @return path with the last item removed
   static std::string PathBase(std::string path);
 
-  /// The relative path to the root install directory (containing bin, lib, etc.)
-  /// This first checks the path of the cyclus executable itself and then tries
-  /// the install directory given at run time.
+  /// The relative path to the root install directory (containing bin, lib,
+  /// etc.) This first checks the path of the cyclus executable itself and then
+  /// tries the install directory given at run time.
   /// @return the absolute path to the install directory
   static const std::string GetInstallPath();
 
@@ -84,7 +84,8 @@ class Env {
   /// may be specified at run time with the ALLOW_MILPS environment variable
   static const bool allow_milps();
 
-  /// @return the correct environment variable delimiter based on the file system
+  /// @return the correct environment variable delimiter based on the file
+  /// system
   static const std::string EnvDelimiter();
 
   /// @return the correct path delimiter based on the file system
@@ -107,8 +108,9 @@ class Env {
   }
 
   /// Returns the full path to a module by searching through default install
-  /// and CYCLUS_PATH directories. You may optionally pass in the lib name itself
-  /// without any frills. In this case, Python modules will also be searched.
+  /// and CYCLUS_PATH directories. You may optionally pass in the lib name
+  /// itself without any frills. In this case, Python modules will also be
+  /// searched.
   static std::string FindModule(std::string path);
   static std::string FindModule(std::string path, std::string lib);
 

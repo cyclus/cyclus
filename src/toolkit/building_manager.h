@@ -65,9 +65,7 @@ class BuildingManager : public AgentManaged {
   std::vector<BuildOrder> MakeBuildDecision(Commodity& commodity,
                                             double demand);
 
-  inline const std::set<Builder*>& builders() const {
-    return builders_;
-  }
+  inline const std::set<Builder*>& builders() const { return builders_; }
 
  private:
   std::set<Builder*> builders_;

@@ -14,8 +14,7 @@ namespace cyclus {
 /// @brief An ExchangeTranslationContext is a simple holder class for any
 /// information needed to translate a ResourceExchange to and from an
 /// ExchangeGraph
-template <class T>
-struct ExchangeTranslationContext {
+template <class T> struct ExchangeTranslationContext {
  public:
   std::map<Request<T>*, ExchangeNode::Ptr> request_to_node;
   std::map<ExchangeNode::Ptr, Request<T>*> node_to_request;

@@ -82,11 +82,11 @@ class MatlSellPolicy : public Trader {
                        bool ignore_comp);
   MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                        double throughput, bool ignore_comp);
-  MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                       double throughput, bool ignore_comp,
-                       double quantize,
-                       std::string package_name = Package::unpackaged_name(),
-                       std::string transport_unit_name = TransportUnit::unrestricted_name());
+  MatlSellPolicy& Init(
+      Agent* manager, ResBuf<Material>* buf, std::string name,
+      double throughput, bool ignore_comp, double quantize,
+      std::string package_name = Package::unpackaged_name(),
+      std::string transport_unit_name = TransportUnit::unrestricted_name());
   /// @}
 
   /// Instructs the policy to empty its buffer with offers on the given
@@ -119,8 +119,8 @@ class MatlSellPolicy : public Trader {
   virtual std::set<BidPortfolio<Material>::Ptr> GetMatlBids(
       CommodMap<Material>::type& commod_requests);
   virtual void GetMatlTrades(
-      const std::vector<Trade<Material> >& trades,
-      std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses);
+      const std::vector<Trade<Material>>& trades,
+      std::vector<std::pair<Trade<Material>, Material::Ptr>>& responses);
   /// }@
 
  private:

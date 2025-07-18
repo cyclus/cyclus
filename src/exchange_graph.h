@@ -40,7 +40,7 @@ struct ExchangeNode {
   /// @brief unit values associated with this ExchangeNode corresponding to
   /// capacties of its parent ExchangeNodeGroup. This information corresponds to
   /// the resource object from which this ExchangeNode was translated.
-  std::map<Arc, std::vector<double> > unit_capacities;
+  std::map<Arc, std::vector<double>> unit_capacities;
 
   /// @brief preference values for arcs
   std::map<Arc, double> prefs;
@@ -72,7 +72,8 @@ class Arc {
   Arc() {}
 
   Arc(boost::shared_ptr<ExchangeNode> unode,
-      boost::shared_ptr<ExchangeNode> vnode);
+      boost::shared_ptr<ExchangeNode>
+          vnode);
   Arc(const Arc& other);
 
   inline Arc& operator=(const Arc& other) {
@@ -83,9 +84,9 @@ class Arc {
     return *this;
   }
 
-  inline bool operator <(const Arc& rhs) const {
+  inline bool operator<(const Arc& rhs) const {
     return unode_ < rhs.unode_ ||
-        (!(rhs.unode_ < unode_) && vnode_ < rhs.vnode_);
+           (!(rhs.unode_ < unode_) && vnode_ < rhs.vnode_);
   }
 
   inline bool operator==(const Arc& rhs) const {
@@ -124,11 +125,10 @@ class ExchangeNodeGroup {
 
   /// @brief exclusive node groups represent nodes over whose combined arcs flow
   /// can only exist on one arc
-  const std::vector< std::vector<ExchangeNode::Ptr> >&
-      excl_node_groups() const {
+  const std::vector<std::vector<ExchangeNode::Ptr>>& excl_node_groups() const {
     return excl_node_groups_;
   }
-  std::vector< std::vector<ExchangeNode::Ptr> >& excl_node_groups() {
+  std::vector<std::vector<ExchangeNode::Ptr>>& excl_node_groups() {
     return excl_node_groups_;
   }
 
@@ -154,8 +154,7 @@ class ExchangeNodeGroup {
     for (std::vector<ExchangeNode::Ptr>::iterator it = nodes_.begin();
          it != nodes_.end();
          ++it) {
-      if (it->get()->prefs.size() > 0)
-        return true;
+      if (it->get()->prefs.size() > 0) return true;
     }
     return false;
   }
@@ -169,14 +168,14 @@ class ExchangeNodeGroup {
 
  private:
   std::vector<ExchangeNode::Ptr> nodes_;
-  std::vector< std::vector<ExchangeNode::Ptr> > excl_node_groups_;
+  std::vector<std::vector<ExchangeNode::Ptr>> excl_node_groups_;
   std::vector<double> capacities_;
 };
 
 /// @class RequestGroup
 ///
-/// @brief A RequestGroup is a specific ExchangeNodeGroup with a notion of an total
-/// requested quantity.
+/// @brief A RequestGroup is a specific ExchangeNodeGroup with a notion of an
+/// total requested quantity.
 class RequestGroup : public ExchangeNodeGroup {
  public:
   typedef boost::shared_ptr<RequestGroup> Ptr;
@@ -242,11 +241,11 @@ class ExchangeGraph {
     return supply_groups_;
   }
 
-  inline const std::map<ExchangeNode::Ptr, std::vector<Arc> >&
-      node_arc_map() const {
+  inline const std::map<ExchangeNode::Ptr, std::vector<Arc>>& node_arc_map()
+      const {
     return node_arc_map_;
   }
-  inline std::map<ExchangeNode::Ptr, std::vector<Arc> >& node_arc_map() {
+  inline std::map<ExchangeNode::Ptr, std::vector<Arc>>& node_arc_map() {
     return node_arc_map_;
   }
 
@@ -264,7 +263,7 @@ class ExchangeGraph {
  private:
   std::vector<RequestGroup::Ptr> request_groups_;
   std::vector<ExchangeNodeGroup::Ptr> supply_groups_;
-  std::map<ExchangeNode::Ptr, std::vector<Arc> > node_arc_map_;
+  std::map<ExchangeNode::Ptr, std::vector<Arc>> node_arc_map_;
   std::vector<Match> matches_;
   std::vector<Arc> arcs_;
   std::map<Arc, int> arc_ids_;

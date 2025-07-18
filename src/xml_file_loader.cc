@@ -38,7 +38,8 @@ void LoadRawStringstreamFromFile(std::stringstream& stream, std::string file) {
   file_stream.close();
 }
 
-void LoadStringstreamFromFile(std::stringstream& stream, std::string file, std::string format) {
+void LoadStringstreamFromFile(std::stringstream& stream, std::string file,
+                              std::string format) {
   std::string inext;
   if (format == "none") {
     LoadRawStringstreamFromFile(stream, file);
@@ -62,7 +63,6 @@ std::string LoadStringFromFile(std::string file, std::string format) {
 }
 
 std::vector<AgentSpec> ParseSpecs(std::set<std::string> agent_set) {
-
   std::vector<AgentSpec> specs;
 
   for (const std::string& spec_str : agent_set) {
@@ -97,8 +97,8 @@ std::vector<AgentSpec> ParseSpecs(std::string infile, std::string format) {
   return specs;
 }
 
-std::string BuildMasterSchema(std::string schema_path, std::vector<AgentSpec> specs) {
-
+std::string BuildMasterSchema(std::string schema_path,
+                              std::vector<AgentSpec> specs) {
   Timer ti;
   Recorder rec;
   Context ctx(&ti, &rec);
@@ -125,7 +125,8 @@ std::string BuildMasterSchema(std::string schema_path, std::vector<AgentSpec> sp
   // replace refs in master rng template file
   std::map<std::string, std::string>::iterator it;
   for (it = subschemas.begin(); it != subschemas.end(); ++it) {
-    std::string search_str = std::string("@") + it->first + std::string("_REFS@");
+    std::string search_str =
+        std::string("@") + it->first + std::string("_REFS@");
     size_t pos = master.find(search_str);
     if (pos != std::string::npos) {
       master.replace(pos, search_str.size(), it->second);
@@ -136,19 +137,17 @@ std::string BuildMasterSchema(std::string schema_path, std::vector<AgentSpec> sp
 }
 
 std::string BuildMasterSchema(std::string schema_path) {
-
-  std::vector<AgentSpec> specs = ParseSpecs(cyclus::DiscoverSpecsInCyclusPath());
+  std::vector<AgentSpec> specs =
+      ParseSpecs(cyclus::DiscoverSpecsInCyclusPath());
 
   return BuildMasterSchema(schema_path, specs);
-
 }
 
-std::string BuildMasterSchema(std::string schema_path, std::string infile, std::string format) {
-
+std::string BuildMasterSchema(std::string schema_path, std::string infile,
+                              std::string format) {
   std::vector<AgentSpec> specs = ParseSpecs(infile, format);
 
   return BuildMasterSchema(schema_path, specs);
-
 }
 
 Composition::Ptr ReadRecipe(InfileTree* qe) {
@@ -182,11 +181,11 @@ Composition::Ptr ReadRecipe(InfileTree* qe) {
   }
 }
 
-XMLFileLoader::XMLFileLoader(Recorder* r,
-                             QueryableBackend* b,
+XMLFileLoader::XMLFileLoader(Recorder* r, QueryableBackend* b,
                              std::string schema_file,
                              const std::string input_file,
-                             const std::string format, bool ms_print) : b_(b), rec_(r) {
+                             const std::string format, bool ms_print)
+    : b_(b), rec_(r) {
   ctx_ = new Context(&ti_, rec_);
 
   schema_path_ = schema_file;
@@ -199,9 +198,7 @@ XMLFileLoader::XMLFileLoader(Recorder* r,
   ms_print_ = ms_print;
   std::stringstream ss;
   parser_->Document()->write_to_stream_formatted(ss);
-  ctx_->NewDatum("InputFiles")
-      ->AddVal("Data", Blob(ss.str()))
-      ->Record();
+  ctx_->NewDatum("InputFiles")->AddVal("Data", Blob(ss.str()))->Record();
 }
 
 XMLFileLoader::~XMLFileLoader() {
@@ -214,7 +211,7 @@ std::string XMLFileLoader::master_schema() {
 
 void XMLFileLoader::LoadSim() {
   std::stringstream ss(master_schema());
-  if(ms_print_){
+  if (ms_print_) {
     std::cout << master_schema() << std::endl;
   }
   parser_->Validate(ss);
@@ -266,9 +263,8 @@ void XMLFileLoader::LoadSolver() {
     if (qe->NMatches(config) == 1) {
       solver_name = qe->SubTree(config)->GetElementName(0);
     }
-    exclusive = cyclus::OptionalQuery<bool>(qe, "allow_exclusive_orders",
-                                            exclusive);
-
+    exclusive =
+        cyclus::OptionalQuery<bool>(qe, "allow_exclusive_orders", exclusive);
   }
 
   if (!exclusive) {
@@ -289,8 +285,8 @@ void XMLFileLoader::LoadSolver() {
     query = string("/*/control/solver/config/greedy/preconditioner");
     string precon_name = cyclus::OptionalQuery<string>(&xqe, query, greedy);
     ctx_->NewDatum("GreedySolverInfo")
-      ->AddVal("Preconditioner", precon_name)
-      ->Record();
+        ->AddVal("Preconditioner", precon_name)
+        ->Record();
   } else if (solver_name == coinor) {
     query = string("/*/control/solver/config/coin-or/timeout");
     double timeout = cyclus::OptionalQuery<double>(&xqe, query, -1);
@@ -299,34 +295,32 @@ void XMLFileLoader::LoadSolver() {
     query = string("/*/control/solver/config/coin-or/mps");
     bool mps = cyclus::OptionalQuery<bool>(&xqe, query, false);
     ctx_->NewDatum("CoinSolverInfo")
-      ->AddVal("Timeout", timeout)
-      ->AddVal("Verbose", verbose)
-      ->AddVal("Mps", mps)
-      ->Record();
+        ->AddVal("Timeout", timeout)
+        ->AddVal("Verbose", verbose)
+        ->AddVal("Mps", mps)
+        ->Record();
   } else {
     throw ValueError("unknown solver name: " + solver_name);
   }
 }
 
 void XMLFileLoader::ProcessCommodities(
-  std::map<std::string, double>* commod_priority) {
-  double max = std::max_element(
-                 commod_priority->begin(),
-                 commod_priority->end(),
-                 SecondLT< std::pair<std::string, double> >())->second;
+    std::map<std::string, double>* commod_priority) {
+  double max = std::max_element(commod_priority->begin(),
+                                commod_priority->end(),
+                                SecondLT<std::pair<std::string, double>>())
+                   ->second;
   if (max < 1) {
     max = 0;  // in case no priorities are specified
   }
 
   std::map<std::string, double>::iterator it;
-  for (it = commod_priority->begin();
-       it != commod_priority->end();
-       ++it) {
+  for (it = commod_priority->begin(); it != commod_priority->end(); ++it) {
     if (it->second < 1) {
       it->second = max + 1;
     }
-    CLOG(LEV_INFO1) << "Commodity priority for " << it->first
-                    << " is " << it->second;
+    CLOG(LEV_INFO1) << "Commodity priority for " << it->first << " is "
+                    << it->second;
   }
 }
 
@@ -354,13 +348,16 @@ void XMLFileLoader::LoadPackages() {
   int num_packages = xqe.NMatches(query);
   for (int i = 0; i < num_packages; i++) {
     InfileTree* qe = xqe.SubTree(query, i);
-    std::string name = cyclus::OptionalQuery<std::string>(qe, "name", "default");
+    std::string name =
+        cyclus::OptionalQuery<std::string>(qe, "name", "default");
     CLOG(LEV_DEBUG3) << "loading package: " << name;
-    
+
     double fill_min = cyclus::OptionalQuery<double>(qe, "fill_min", eps());
-    double fill_max = cyclus::OptionalQuery<double>(qe, "fill_max", std::numeric_limits<double>::max());
-    
-    std::string strategy = cyclus::OptionalQuery<std::string>(qe, "strategy", "first");
+    double fill_max = cyclus::OptionalQuery<double>(
+        qe, "fill_max", std::numeric_limits<double>::max());
+
+    std::string strategy =
+        cyclus::OptionalQuery<std::string>(qe, "strategy", "first");
 
     ctx_->AddPackage(name, fill_min, fill_max, strategy);
   }
@@ -373,13 +370,16 @@ void XMLFileLoader::LoadTransportUnits() {
   int num_transport_units = xqe.NMatches(query);
   for (int i = 0; i < num_transport_units; i++) {
     InfileTree* qe = xqe.SubTree(query, i);
-    std::string name = cyclus::OptionalQuery<std::string>(qe, "name", "default");
+    std::string name =
+        cyclus::OptionalQuery<std::string>(qe, "name", "default");
     CLOG(LEV_DEBUG3) << "loading transport unit: " << name;
-    
+
     double fill_min = cyclus::OptionalQuery<double>(qe, "fill_min", eps());
-    double fill_max = cyclus::OptionalQuery<double>(qe, "fill_max", std::numeric_limits<double>::max());
-    
-    std::string strategy = cyclus::OptionalQuery<std::string>(qe, "strategy", "first");
+    double fill_max = cyclus::OptionalQuery<double>(
+        qe, "fill_max", std::numeric_limits<double>::max());
+
+    std::string strategy =
+        cyclus::OptionalQuery<std::string>(qe, "strategy", "first");
 
     ctx_->AddTransportUnit(name, fill_min, fill_max, strategy);
   }
@@ -497,7 +497,8 @@ void XMLFileLoader::LoadControlParams() {
   SimInfo si(dur, y0, m0, handle, d);
 
   si.explicit_inventory = OptionalQuery<bool>(qe, "explicit_inventory", false);
-  si.explicit_inventory_compact = OptionalQuery<bool>(qe, "explicit_inventory_compact", false);
+  si.explicit_inventory_compact =
+      OptionalQuery<bool>(qe, "explicit_inventory_compact", false);
 
   // get time step duration
   si.dt = OptionalQuery<int>(qe, "dt", kDefaultTimeStepDur);
@@ -510,7 +511,7 @@ void XMLFileLoader::LoadControlParams() {
   double eps_rsrc_ = OptionalQuery<double>(qe, "tolerance_resource", 1e-6);
   cy_eps_rsrc = si.eps_rsrc = eps_rsrc_;
 
-    // get seed
+  // get seed
   si.seed = OptionalQuery<int>(qe, "seed", kDefaultSeed);
 
   // get stride
