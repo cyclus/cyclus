@@ -19,9 +19,7 @@ class RecBackend {
   class Deleter {
    public:
     /// Add another backend b to be deleted when the Deleter is destructed.
-    void Add(RecBackend* b) {
-      backs_.push_back(b);
-    }
+    void Add(RecBackend* b) { backs_.push_back(b); }
 
     /// Deletes all tracked backends.
     ~Deleter() {

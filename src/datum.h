@@ -37,12 +37,12 @@ class Datum {
   /// such as string and blob. If a shape is provided, this field and value
   /// is interpreted as having a fixed length (of the value given). If the
 
-  /// pointer is NULL or the entry is less than one (<1), the field is interpreted
-  /// as inherently variable length, which may affect persistance. This is a
-  /// vector of ints (a shape) rather than an int (a length) to accomodate
-  /// nested data types, such as a vector of vectors of doubles or a map of
-  /// strings to ints.  Use NULL as the shape for fixed length data types such
-  /// as int, float, double, etc.
+  /// pointer is NULL or the entry is less than one (<1), the field is
+  /// interpreted as inherently variable length, which may affect persistance.
+  /// This is a vector of ints (a shape) rather than an int (a length) to
+  /// accomodate nested data types, such as a vector of vectors of doubles or a
+  /// map of strings to ints.  Use NULL as the shape for fixed length data types
+  /// such as int, float, double, etc.
   ///
   /// @warning for the val argument - what variable types are supported
   /// depends on what the backend(s) in use are designed to handle.
@@ -59,11 +59,13 @@ class Datum {
   /// Returns the datum's title as specified during the datum's creation.
   std::string title();
 
-  /// Returns a vector of all field-value pairs that have been added to this datum.
+  /// Returns a vector of all field-value pairs that have been added to this
+  /// datum.
   const Vals& vals();
 
-  /// Returns a vector of all shapes (pointers to vectors of ints) that have been
-  /// added to this datum. The length of shapes must match the length of vals.
+  /// Returns a vector of all shapes (pointers to vectors of ints) that have
+  /// been added to this datum. The length of shapes must match the length of
+  /// vals.
   const Shapes& shapes();
 
   /// Returns a vector of all field names that have been added to this datum.

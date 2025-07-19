@@ -8,7 +8,8 @@
 namespace cyclus {
 namespace toolkit {
 
-/// A class that provides convenience methods for querying a material's properties.
+/// A class that provides convenience methods for querying a material's
+/// properties.
 class MatQuery {
  public:
   /// Creates a new query object inspecting m.

@@ -62,11 +62,10 @@ double ProgSolver::SolveGraph() {
     graph_->ClearMatches();
 
     // translate graph to iface_ instance
-    double pseudo_cost = PseudoCost(); // from ExchangeSolver API
+    double pseudo_cost = PseudoCost();  // from ExchangeSolver API
     ProgTranslator xlator(graph_, iface_, exclusive_orders_, pseudo_cost);
     xlator.ToProg();
-    if (mps_)
-      WriteMPS();
+    if (mps_) WriteMPS();
 
     // set noise level
     CoinMessageHandler h;
@@ -85,7 +84,7 @@ double ProgSolver::SolveGraph() {
     SolveProg(iface_, greedy_obj, verbose_);
 
     xlator.FromProg();
-  } catch(...) {
+  } catch (...) {
     delete iface_;
     throw;
   }

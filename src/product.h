@@ -20,29 +20,25 @@ class Product : public Resource {
   friend class ::SimInitTest;
 
  public:
-  typedef
-  boost::shared_ptr<Product> Ptr;
+  typedef boost::shared_ptr<Product> Ptr;
   static const ResourceType kType;
 
   /// Creates a new product that is "live" and tracked. creator is a
   /// pointer to the agent creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
-  static Ptr Create(Agent* creator, double quantity, std::string quality, std::string package_name = Package::unpackaged_name());
+  static Ptr Create(Agent* creator, double quantity, std::string quality,
+                    std::string package_name = Package::unpackaged_name());
 
   /// Creates a new product that does not actually exist as part of
   /// the simulation and is untracked.
   static Ptr CreateUntracked(double quantity, std::string quality);
 
   /// Returns 0 (for now).
-  virtual int qual_id() const {
-    return qualids_[quality_];
-  }
+  virtual int qual_id() const { return qualids_[quality_]; }
 
   /// Returns Product::kType.
-  virtual const ResourceType type() const {
-    return kType;
-  }
+  virtual const ResourceType type() const { return kType; }
 
   virtual Resource::Ptr Clone() const;
 
@@ -50,14 +46,11 @@ class Product : public Resource {
 
   virtual std::string units() const { return "NONE"; }
 
-  virtual double quantity() const {
-    return quantity_;
-  }
+  virtual double quantity() const { return quantity_; }
 
-  /// Returns the quality of this resource (e.g. bananas, human labor, water, etc.).
-  virtual const std::string& quality() const {
-    return quality_;
-  }
+  /// Returns the quality of this resource (e.g. bananas, human labor, water,
+  /// etc.).
+  virtual const std::string& quality() const { return quality_; }
 
   virtual Resource::Ptr ExtractRes(double quantity);
 
@@ -74,10 +67,12 @@ class Product : public Resource {
   /// Returns the package id.
   virtual std::string package_name();
 
-  virtual Resource::Ptr PackageExtract(double qty, std::string new_package_name = Package::unpackaged_name());
+  virtual Resource::Ptr PackageExtract(
+      double qty, std::string new_package_name = Package::unpackaged_name());
 
   /// Changes the product's package id
-  virtual void ChangePackage(std::string new_package_name = Package::unpackaged_name());
+  virtual void ChangePackage(
+      std::string new_package_name = Package::unpackaged_name());
 
  private:
   /// @param ctx the simulation context

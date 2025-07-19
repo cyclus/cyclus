@@ -11,10 +11,10 @@
 namespace cyclus {
 
 /// An Recorder backend that writes data to an sqlite database.  Identically
-/// named Datum objects have their data placed as rows in a single table.  Handles the
-/// following datum value types: int, float, double, std::string, cyclus::Blob.
-/// Unsupported value types are stored as an empty string.
-class SqliteBack: public FullBackend {
+/// named Datum objects have their data placed as rows in a single table.
+/// Handles the following datum value types: int, float, double, std::string,
+/// cyclus::Blob. Unsupported value types are stored as an empty string.
+class SqliteBack : public FullBackend {
  public:
   /// Creates a new sqlite backend that will write to the database file
   /// specified by path. If the file doesn't exist, a new one is created.
@@ -47,7 +47,8 @@ class SqliteBack: public FullBackend {
   SqliteDb& db();
 
  private:
-  void Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr stmt, int index);
+  void Bind(boost::spirit::hold_any v, DbTypes type, SqlStatement::Ptr stmt,
+            int index);
 
   QueryResult GetTableInfo(std::string table);
 
@@ -61,7 +62,8 @@ class SqliteBack: public FullBackend {
 
   /// converts the string value in s to a c++ value corresponding the the
   /// supported sqlite datatype type in a hold_any object.
-  boost::spirit::hold_any ColAsVal(SqlStatement::Ptr stmt, int col, DbTypes type);
+  boost::spirit::hold_any ColAsVal(SqlStatement::Ptr stmt, int col,
+                                   DbTypes type);
 
   /// Queue up a table-create command for d.
   void CreateTable(Datum* d);
@@ -81,7 +83,7 @@ class SqliteBack: public FullBackend {
   std::set<std::string> tbl_names_;
 
   std::map<std::string, SqlStatement::Ptr> stmts_;
-  std::map<std::string, std::vector<DbTypes> > schemas_;
+  std::map<std::string, std::vector<DbTypes>> schemas_;
 };
 
 }  // namespace cyclus

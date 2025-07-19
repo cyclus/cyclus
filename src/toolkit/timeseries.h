@@ -21,7 +21,7 @@ namespace toolkit {
 /// - POWER [MWe]
 /// - ENRICH_SWU [kg SWU]
 /// - ENRICH_FEED [kg]
-enum TimeSeriesType : int{
+enum TimeSeriesType : int {
   POWER,
   ENRICH_SWU,
   ENRICH_FEED,
@@ -33,10 +33,11 @@ typedef boost::variant<
     std::function<void(cyclus::Agent*, int, int, std::string)>,
     std::function<void(cyclus::Agent*, int, float, std::string)>,
     std::function<void(cyclus::Agent*, int, double, std::string)>,
-    std::function<void(cyclus::Agent*, int, std::string, std::string)>
-    > time_series_listener_t;
+    std::function<void(cyclus::Agent*, int, std::string, std::string)>>
+    time_series_listener_t;
 
-extern std::map<std::string, std::vector<time_series_listener_t>> TIME_SERIES_LISTENERS;
+extern std::map<std::string, std::vector<time_series_listener_t>>
+    TIME_SERIES_LISTENERS;
 
 /// Records a per-time step quantity for a given type
 template <TimeSeriesType T>
@@ -50,15 +51,17 @@ void RecordTimeSeries(std::string tsname, cyclus::Agent* agent, T value,
   std::string tblname = "TimeSeries" + tsname;
   int time = agent->context()->time();
   agent->context()
-       ->NewDatum(tblname)
-       ->AddVal("AgentId", agent->id())
-       ->AddVal("Time", time)
-       ->AddVal("Value", value)
-       ->AddVal("Units", units)
-       ->Record();
+      ->NewDatum(tblname)
+      ->AddVal("AgentId", agent->id())
+      ->AddVal("Time", time)
+      ->AddVal("Value", value)
+      ->AddVal("Units", units)
+      ->Record();
   std::vector<time_series_listener_t> vec = TIME_SERIES_LISTENERS[tsname];
-  for (auto f=vec.begin(); f != vec.end(); ++f){
-    std::function<void(cyclus::Agent*, int, T, std::string)> fn = boost::get<std::function<void(cyclus::Agent*, int, T, std::string)> >(*f);
+  for (auto f = vec.begin(); f != vec.end(); ++f) {
+    std::function<void(cyclus::Agent*, int, T, std::string)> fn =
+        boost::get<std::function<void(cyclus::Agent*, int, T, std::string)>>(
+            *f);
     fn(agent, time, value, tsname);
   }
   PyCallListeners(tsname, agent, agent->context(), time, value);

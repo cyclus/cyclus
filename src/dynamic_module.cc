@@ -18,11 +18,7 @@ namespace cyclus {
 
 AgentSpec::AgentSpec(std::string path, std::string lib, std::string agent,
                      std::string alias)
-    : path_(path),
-      lib_(lib),
-      agent_(agent),
-      alias_(alias) {
-
+    : path_(path), lib_(lib), agent_(agent), alias_(alias) {
   if (lib_ == "") {
     lib_ = agent_;
   }
@@ -117,15 +113,14 @@ void DynamicModule::CloseAll() {
 
 bool DynamicModule::IsPyAgent(AgentSpec spec) {
   bool rtn = false;
-  if (DynamicModule::Exists(spec) && boost::starts_with(modules_[spec.str()]->path(), "<py>")) {
+  if (DynamicModule::Exists(spec) &&
+      boost::starts_with(modules_[spec.str()]->path(), "<py>")) {
     rtn = true;
   }
   return rtn;
 }
 
-DynamicModule::DynamicModule(AgentSpec spec)
-    : module_library_(0),
-      ctor_(NULL) {
+DynamicModule::DynamicModule(AgentSpec spec) : module_library_(0), ctor_(NULL) {
   path_ = Env::FindModule(spec.LibPath(), spec.lib());
   if (boost::starts_with(path_, "<py>")) {
     /// python module, so no need to do more

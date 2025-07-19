@@ -1,10 +1,10 @@
 #ifdef PYNE_CRAM_SOLVE_C
-#error "Both cram.h (the C header for CRAM) and cram.hpp (C++) have been included, only one is allowed!"
+#error \
+    "Both cram.h (the C header for CRAM) and cram.hpp (C++) have been included, only one is allowed!"
 #endif
 
 #ifndef PYNE_CRAM_SOLVE_CPP
 #define PYNE_CRAM_SOLVE_CPP
-
 
 typedef struct pyne_cram_transmute_info_tag {
   int n;
@@ -37,4 +37,4 @@ void pyne_cram_expm_multiply12(double* A, double* b, double* x);
 void pyne_cram_expm_multiply14(double* A, double* b, double* x);
 void pyne_cram_expm_multiply16(double* A, double* b, double* x);
 void pyne_cram_expm_multiply18(double* A, double* b, double* x);
-#endif // PYNE_CRAM_SOLVE_CPP
+#endif  // PYNE_CRAM_SOLVE_CPP

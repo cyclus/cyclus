@@ -83,98 +83,95 @@ std::unordered_map<std::string, double> GenerateParamList() const override {
   return econ_params;
 }
 
-double CalculateBidCost(double production_capacity, double units_to_produce, 
-    double input_cost) const {
-    
-    // Check if there's a cost override, and if so, use that
-    if (cost_override > 0) {
-        return cost_override * units_of_production + input_cost;
-    }
+double CalculateBidCost(double production_capacity, double units_to_produce,
+                        double input_cost) const {
+  // Check if there's a cost override, and if so, use that
+  if (cost_override > 0) {
+    return cost_override * units_of_production + input_cost;
+  }
 
-    // Economic Parameters (declared like this because of scoping with try{})
-    double return_rate;
-    double cap_cost;
-    double annual_operations_and_maintenance;
-    double annual_labor_cost;
-    int operational_lifetime;
-    int taxable_lifetime;
-    double corporate_tax_rate;
-    double property_tax_rate;
+  // Economic Parameters (declared like this because of scoping with try{})
+  double return_rate;
+  double cap_cost;
+  double annual_operations_and_maintenance;
+  double annual_labor_cost;
+  int operational_lifetime;
+  int taxable_lifetime;
+  double corporate_tax_rate;
+  double property_tax_rate;
 
-    // This allows us to exit gracefully if we can't find parameters. Separated
-    // by Facility/Institution/Region for more verbose errors.
-    try {
-        capital_cost = GetEconParameter("capital_cost");
-        annual_operations_and_maintenance = GetEconParameter("annual_operations_and_maintenance");
-        annual_labor_cost = GetEconParameter("annual_labor_cost");
-        operational_lifetime = static_cast<int>(GetEconParameter("facility_operational_lifetime"));
-        taxable_lifetime = static_cast<int>(GetEconParameter("facility_taxable_lifetime"));
-    } 
-    catch (const std::exception& e) {
-        LOG(cyclus::LEV_INFO1, "CalculateBidCost") << prototype() 
-                                        << "failed to get financial_data_: "
-                                        << e.what();
-        return kDefaultBidCost;
-    }
+  // This allows us to exit gracefully if we can't find parameters. Separated
+  // by Facility/Institution/Region for more verbose errors.
+  try {
+    capital_cost = GetEconParameter("capital_cost");
+    annual_operations_and_maintenance =
+        GetEconParameter("annual_operations_and_maintenance");
+    annual_labor_cost = GetEconParameter("annual_labor_cost");
+    operational_lifetime =
+        static_cast<int>(GetEconParameter("facility_operational_lifetime"));
+    taxable_lifetime =
+        static_cast<int>(GetEconParameter("facility_taxable_lifetime"));
+  } catch (const std::exception& e) {
+    LOG(cyclus::LEV_INFO1, "CalculateBidCost")
+        << prototype() << "failed to get financial_data_: " << e.what();
+    return kDefaultBidCost;
+  }
 
-    try {
-        return_rate = parent()->GetEconParameter("minimum_acceptable_return_rate");
-        corporate_tax_rate = parent()->GetEconParameter("corporate_income_tax_rate");
-    }
-    catch (const std::exception& e) {
-        LOG(cyclus::LEV_INFO1, "CalculateBidCost") << prototype() 
-                                        << "failed to get financial_data_ from: " 
-                                        << parent()->prototype()
-                                        << e.what();
-        return kDefaultBidCost;
-    }
+  try {
+    return_rate = parent()->GetEconParameter("minimum_acceptable_return_rate");
+    corporate_tax_rate =
+        parent()->GetEconParameter("corporate_income_tax_rate");
+  } catch (const std::exception& e) {
+    LOG(cyclus::LEV_INFO1, "CalculateBidCost")
+        << prototype()
+        << "failed to get financial_data_ from: " << parent()->prototype()
+        << e.what();
+    return kDefaultBidCost;
+  }
 
-    try {
-        property_tax_rate = parent()->parent()->GetEconParameter("property_tax_rate");
-    }
-    catch (const std::exception& e) {
-        LOG(cyclus::LEV_INFO1, "CalculateBidCost") << prototype()
-                                            << "failed to get financial_data_ from: "
-                                            << parent()->parent()->prototype()
-                                            << e.what();
+  try {
+    property_tax_rate =
+        parent()->parent()->GetEconParameter("property_tax_rate");
+  } catch (const std::exception& e) {
+    LOG(cyclus::LEV_INFO1, "CalculateBidCost")
+        << prototype() << "failed to get financial_data_ from: "
+        << parent()->parent()->prototype() << e.what();
 
-        return kDefaultBidCost;
-    }
+    return kDefaultBidCost;
+  }
 
-    double timesteps_per_year = cyclusYear / context()->dt();
-    double annual_production = production_capacity * timesteps_per_year;
+  double timesteps_per_year = cyclusYear / context()->dt();
+  double annual_production = production_capacity * timesteps_per_year;
 
-    // This is my way of keeping the categories. New costs can be added to these
-    // as needed and it should be "easy" to do, but still require some thinking
-    double total_dep = capital_cost;
-    double total_annual_fixed = annual_operations_and_maintenance;
-    double total_annual_variable = annual_labor_cost;
-    
-    double property_tax = property_tax_rate * capital_cost;
+  // This is my way of keeping the categories. New costs can be added to these
+  // as needed and it should be "easy" to do, but still require some thinking
+  double total_dep = capital_cost;
+  double total_annual_fixed = annual_operations_and_maintenance;
+  double total_annual_variable = annual_labor_cost;
 
-    // Adjust for Corp. Income Tax and Depreciation
-    tax_shield = PV(taxable_lifetime, return_rate, 0, 
-        total_dep * corporate_tax_rate / taxable_lifetime);
+  double property_tax = property_tax_rate * capital_cost;
 
-    annualized_depreciable = PMT(operational_lifetime, return_rate, 
-        total_dep - tax_shield, 0);
-    
-    double unit_cost = (annualized_depreciable + total_annual_fixed + 
-        total_annual_variable + property_tax) / annual_production;
-    
-    double bid_cost = unit_cost * units_to_produce + input_cost;
+  // Adjust for Corp. Income Tax and Depreciation
+  tax_shield = PV(taxable_lifetime, return_rate, 0,
+                  total_dep * corporate_tax_rate / taxable_lifetime);
 
-    // Protects against divide by zero in pref = 1/BidCost
-    return bid_cost != 0 ? bid_cost : kDefaultBidCost;
+  annualized_depreciable =
+      PMT(operational_lifetime, return_rate, total_dep - tax_shield, 0);
 
-    
+  double unit_cost = (annualized_depreciable + total_annual_fixed +
+                      total_annual_variable + property_tax) /
+                     annual_production;
+
+  double bid_cost = unit_cost * units_to_produce + input_cost;
+
+  // Protects against divide by zero in pref = 1/BidCost
+  return bid_cost != 0 ? bid_cost : kDefaultBidCost;
 }
 
-double CalculateBidPrice(double production_capacity, double units_to_produce, 
-    double input_cost) const {
-
-    // Default implementation
-    return CalculateBidCost(production_capacity, units_to_produce, input_cost);
+double CalculateBidPrice(double production_capacity, double units_to_produce,
+                         double input_cost) const {
+  // Default implementation
+  return CalculateBidCost(production_capacity, units_to_produce, input_cost);
 }
 
 // Required for compilation but not added by the cycpp preprocessor. Do not

@@ -17,8 +17,7 @@ void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
               double) {};
 
 GreedySolver::GreedySolver(bool exclusive_orders, GreedyPreconditioner* c)
-    : conditioner_(c),
-      ExchangeSolver(exclusive_orders) {}
+    : conditioner_(c), ExchangeSolver(exclusive_orders) {}
 
 GreedySolver::GreedySolver(bool exclusive_orders)
     : ExchangeSolver(exclusive_orders) {
@@ -26,41 +25,32 @@ GreedySolver::GreedySolver(bool exclusive_orders)
 }
 
 GreedySolver::GreedySolver(GreedyPreconditioner* c)
-    : conditioner_(c),
-      ExchangeSolver(true) {}
+    : conditioner_(c), ExchangeSolver(true) {}
 
 GreedySolver::GreedySolver() : ExchangeSolver(true) {
   conditioner_ = new cyclus::GreedyPreconditioner();
 }
 
 GreedySolver::~GreedySolver() {
-  if (conditioner_ != NULL)
-    delete conditioner_;
+  if (conditioner_ != NULL) delete conditioner_;
 }
 
 void GreedySolver::Condition() {
-  if (conditioner_ != NULL)
-    conditioner_->Condition(graph_);
+  if (conditioner_ != NULL) conditioner_->Condition(graph_);
 }
 
 void GreedySolver::Init() {
- std::for_each(graph_->request_groups().begin(),
+  std::for_each(graph_->request_groups().begin(),
                 graph_->request_groups().end(),
-                std::bind(
-                    &GreedySolver::GetCaps,
-                    this,
-                    std::placeholders::_1));
+                std::bind(&GreedySolver::GetCaps, this, std::placeholders::_1));
 
   std::for_each(graph_->supply_groups().begin(),
                 graph_->supply_groups().end(),
-                std::bind(
-                    &GreedySolver::GetCaps,
-                    this,
-                    std::placeholders::_1));
+                std::bind(&GreedySolver::GetCaps, this, std::placeholders::_1));
 }
 
 double GreedySolver::SolveGraph() {
-  double pseudo_cost = PseudoCost(); // from ExchangeSolver API
+  double pseudo_cost = PseudoCost();  // from ExchangeSolver API
   Condition();
   obj_ = 0;
   unmatched_ = 0;
@@ -68,19 +58,18 @@ double GreedySolver::SolveGraph() {
 
   Init();
 
-  std::for_each(graph_->request_groups().begin(),
-                graph_->request_groups().end(),
-                std::bind(
-                    &GreedySolver::GreedilySatisfySet,
-                    this,
-                    std::placeholders::_1));
+  std::for_each(
+      graph_->request_groups().begin(),
+      graph_->request_groups().end(),
+      std::bind(
+          &GreedySolver::GreedilySatisfySet, this, std::placeholders::_1));
 
   obj_ += unmatched_ * pseudo_cost;
   return obj_;
 }
 
 double GreedySolver::Capacity(const Arc& a, double u_curr_qty,
-                               double v_curr_qty) {
+                              double v_curr_qty) {
   bool min = true;
   double ucap = Capacity(a.unode(), a, !min, u_curr_qty);
   double vcap = Capacity(a.vnode(), a, min, v_curr_qty);
@@ -94,9 +83,10 @@ double GreedySolver::Capacity(const Arc& a, double u_curr_qty,
 }
 
 double GreedySolver::Capacity(ExchangeNode::Ptr n, const Arc& a, bool min_cap,
-                               double curr_qty) {
+                              double curr_qty) {
   if (n->group == NULL) {
-    throw cyclus::StateError("An notion of node capacity requires a nodegroup.");
+    throw cyclus::StateError(
+        "An notion of node capacity requires a nodegroup.");
   }
 
   if (n->unit_capacities[a].size() == 0) {
@@ -178,10 +168,10 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
         if (arc_it->exclusive()) {
           excl_val = a.excl_val();
 
-          // this careful float comparison is vital for preventing false positive
-          // constraint violations w.r.t. exclusivity-related capacity.
+          // this careful float comparison is vital for preventing false
+          // positive constraint violations w.r.t. exclusivity-related capacity.
           double dist = boost::math::float_distance(tomatch, excl_val);
-          if (dist >= float_ulp_eq ) {
+          if (dist >= float_ulp_eq) {
             tomatch = 0;
           } else {
             tomatch = excl_val;
@@ -226,13 +216,11 @@ void GreedySolver::UpdateCapacity(ExchangeNode::Ptr n, const Arc& a,
   for (int i = 0; i < caps.size(); i++) {
     double prev = caps[i];
     // special case for unlimited capacities
-    CLOG(cyclus::LEV_DEBUG1) << "Updating capacity value from: "
-                             << prev;
-    caps[i] = (prev == std::numeric_limits<double>::max()) ?
-              std::numeric_limits<double>::max() :
-              prev - qty * unit_caps[i];
-    CLOG(cyclus::LEV_DEBUG1) << "                          to: "
-                             << caps[i];
+    CLOG(cyclus::LEV_DEBUG1) << "Updating capacity value from: " << prev;
+    caps[i] = (prev == std::numeric_limits<double>::max())
+                  ? std::numeric_limits<double>::max()
+                  : prev - qty * unit_caps[i];
+    CLOG(cyclus::LEV_DEBUG1) << "                          to: " << caps[i];
   }
 
   if (IsNegative(n->qty - qty)) {

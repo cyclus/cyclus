@@ -21,7 +21,7 @@ typedef _xmlRelaxNGParserCtxt xmlRelaxNGParserCtxt;
 typedef _xmlRelaxNGValidCtxt xmlRelaxNGValidCtxt;
 
 namespace xmlpp {
-  class Document;
+class Document;
 }
 
 namespace cyclus {

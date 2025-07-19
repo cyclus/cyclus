@@ -1,14 +1,14 @@
 /// This includes the required header to add institution costs to archetypes.
 /// One should only need to:
-/// - '#include "toolkit/institution_cost.cycpp.h"' in the header of the 
+/// - '#include "toolkit/institution_cost.cycpp.h"' in the header of the
 ///    archetype class (as private)
 /// - Add `InitEconParameters()` to `EnterNotify()` in the cc file of the
 ///   archetype class.
 
 /// How to add parameters to this file:
 /// 1. Add the pragma. A default value MUST be added to ensure backwards
-///    compatibility. 
-/// 2. Edit the unordered_map called "econ_params"  
+///    compatibility.
+/// 2. Edit the unordered_map called "econ_params"
 ///          i. add the desired parameter to the array {"name", value}
 ///         ii. the value of the pair should be the variable name exactly
 /// 3. Add "std::vector<int> cycpp_shape_<param_name> = {0};" to the end of the
