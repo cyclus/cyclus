@@ -70,6 +70,7 @@ Since last release
 * Support mamba v2 CLI in Dockerfile (#1839)
 * Allow master schema be to reported with all discoverable archetypes (#1846)
 * Ensure that the RNG Schema is only printed if requested (#1858)
+* Update conributing guide to match current practice (#1882)
 
 v1.6.0
 ====================
