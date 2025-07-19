@@ -6,17 +6,14 @@ The Developer Workflow
 General Notes
 =============
 
-* The terminology we use is based on the `Integrator Workflow
-  <http://en.wikipedia.org/wiki/Integrator_workflow>`_
-
-* Use a branching workflow similar to the one described at
-  http://progit.org/book/ch3-4.html.
+* We expect contributors to use a forking workflow `as described here
+  <https://www.atlassian.com/git/tutorials/comparing-workflows/forking-workflow>`_.
 
 * Keep your own "main" branch in sync with the mainline
   repository's "main" branch. Specifically, do not push your
   own commits directly to your "main" branch.
 
-* Any commit should *pass all tests* (see `Running Tests`_).
+* Any pull request should *pass all tests* (see `Running Tests`_).
 
 * See the `An Example`_ section below for a full walk through
 
@@ -86,93 +83,108 @@ An Example
 Introduction
 ------------
 
-As this type of workflow can be complicated to converts from SVN and very complicated
-for brand new programmers, an example is provided.
+As this type of workflow can be complicated, an example is provided.
 
 For the sake of simplicity, let us assume that we want a single "sandbox" branch
 in which we would like to work, i.e. where we can store all of our work that may not
 yet pass tests or even compile, but where we also want to save our progress. Let us
-call this branch "Work". So, when all is said and done, in our fork there will be
-three branches: "Master", "Develop", and "Work".
+call this branch ``work``. So, when all is said and done, in our fork there will be
+two branches: ``main`` and ``work``
 
 Acquiring Cyclus and Workflow
 -----------------------------
 
 We begin with a fork of the mainline Cyclus repository. After initially forking
-the repo, we will have the main branch in your fork.
+the repo, we will have the ``main`` branch in your fork.
 
 Acquiring a Fork of the Cyclus Repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A fork is *your* copy of Cyclus. Github offers an excellent
-`tutorial <http://help.github.com/fork-a-repo/>`_ on how to set one up. The rest of this
-example assumes you have set up the "upstream" repository as ``cyclus/core``. Note that git
-refers to your fork as "origin".
+A fork is *your* copy of Cyclus. Github offers an excellent `tutorial
+<https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/fork-a-repo>`_
+on how to create a fork and then setup your local development evnironment with
+remote connections to both the ``upstream`` repository at ``cyclus/cyclus`` and
+your fork of this repository referred to as ``origin``.
 
-First, let's make our "work" branch:
+First, let's make our ``work`` branch.  Assuming that you are in the ``cyclus`` directory:
 ::
-    .../cyclus_dir/$ git branch work
-    .../cyclus_dir/$ git push origin work
+    $ git branch work
+    $ git push origin work
 
-We now have the following situation: there exists the mainline copy of the main
-branch, there exists your fork's copy of the main and working branches,
-*AND* there exists your *local* copy of the main and working branches. It is
-important now to note that you may wish to work from home or the office. If you keep your
-fork's branches up to date (i.e., "push" your changes before you leave), only your *local*
-copies of your branches may be different when you next sit down at the other location.
+We now have the following situation: there exists the mainline copy of the ``main``
+branch, there exists your fork's copy of the ``main`` and ``work`` branches,
+*AND* there exists your *local* copy of the ``main`` and ``work`` branches. 
 
-Workflow: The Beginning
-^^^^^^^^^^^^^^^^^^^^^^^
+Workflow
+^^^^^^^^
 
 Now, for the workflow! This is by no means the only way to perform this type of
-workflow, but I assume that you wish to handle conflicts as often as possible
-(so as to keep their total number small). Let us imagine that you have been at
-work, finished, and successfully pushed your changes to your *Origin*
-repository. You are now at home and want to continue working a bit. To begin,
-let's update our *home's local branches*::
+workflow, but we assume that you wish to handle conflicts as often as possible
+(so as to keep their total number small). 
 
-    .../cyclus_dir/$ git checkout main
-    .../cyclus_dir/$ git pull upstream main
-    .../cyclus_dir/$ git push origin main
+As time passes, you make some changes to files, and you commit those changes (to
+your *local ``work`` branch*). Eventually (hopefully) you come to a stopping
+point where you have finished your project on your ``work`` branch *AND* it
+compiles *AND* it runs input files correctly *AND* it passes all tests! Perhaps
+you have found Nirvana. 
 
-    .../cyclus_dir/$ git checkout work
-    .../cyclus_dir/$ git pull origin work
-    .../cyclus_dir/$ git rebase main
-    .../cyclus_dir/$ git push origin work
+Over this time, it is possible that the ``main`` branch into which you are
+proposing your pull request has advanced with other changes. In order to make
+sure your ``work`` branch remains up to date, you will want to periodically
+rebase your ``work`` branch onto the ``upstream/main`` branch.  This will
+process will reapply all of the changes you have made on top of the most
+up-to-date version of the ``upstream/main`` branch.  Even if you have not been
+doing this regularly, you'll want to do it before you initiate a pull request.
+::
 
-Perhaps a little explanation is required. We first want to make sure that this new local copy of
-the main branch is up-to-date with respect to the remote origin's branch and remote upstream's
-branch. If there was a change from the remote upstream's branch, we want to push that to origin.
-We then follow the same process to update the work branch, except:
+  $ git checkout main
+  $ git pull upstream main
+  $ git checkout work
+  $ git rebase main
+  $ git push origin work
 
-#. we don't need to worry about the *upstream* repo because it doesn't have a work branch, and
-#. we want to incorporate any changes which may have been introduced in the main branch update.
+Note: you may need to force the push of the rebased ``work`` branch to your fork.
 
-Workflow: The End
-^^^^^^^^^^^^^^^^^
+In any case, you've performed the final commit to your ``work`` branch, so it's
+time to make a pull request online and wait for our main friends to review and
+accept it.  
 
-As time passes, you make some changes to files, and you commit those changes (to your *local work
-branch*). Eventually (hopefully) you come to a stopping point where you have finished your project
-on your work branch *AND* it compiles *AND* it runs input files correctly *AND* it passes all tests!
-Perhaps you have found Nirvana. In any case, you've performed the final commit to your work branch,
-so it's time to make a pull request online and wait for our main friends to
-review and accept it.
+Sometimes, your pull request will be held by the reviewer until
+further changes are made to appease the reviewer's concerns. This may be
+frustrating, but please act rationally, discuss the issues on the GitHub space
+made for your pull request, consult the `style guide
+<http://cyclus.github.com/devdoc/style_guide.html>`_, reach out on `slack
+<https://cyclus-nuclear.slack.com>`_ for further advice, and make changes to
+your ``work`` branch accordingly. The pull request will be updated with those
+changes when you push them to your fork. When you think your request is ready
+for another review, you can reopen the review yourself with the button made
+available to you.
 
-Sometimes, your pull request will be held by the reviewer until further changes
-are made to appease the reviewer's concerns. This may be frustrating, but please
-act rationally, discuss the issues on the GitHub space made for your pull
-request, consult the `style guide
-<http://cyclus.github.com/devdoc/style_guide.html>`_, email the developer
-listhost for further advice, and make changes to your topic branch accordingly.
-The pull request will be updated with those changes when you push them to your
-fork.  When you think your request is ready for another review, you can reopen
-the review yourself with the button made available to you.
+Synchronizing across multiple computers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+You may wish to work on different computers over time, sometime on your laptop
+and other times on a desktop at the office. If you keep your fork's branches up
+to date (i.e., "push" your changes before you leave), only your *local* copies
+of your branches may be different when you next sit down at the other location.
 
-See also
---------
+Let us imagine that you have been at the office, finished, and successfully
+pushed your changes to your ``origin`` repository. You are now at home and want
+to continue working a bit on your laptop. To begin, let's update our *laptop's
+local branches*
+::
+  $ git checkout work
+  $ git pull origin work
 
-A good description of a git workflow with good graphics is available at
-http://nvie.com/posts/a-successful-git-branching-model/
+This may also be a good time to ensure your ``work`` branch is up-to-date with the 
+``upstream/main`` branch
+::
+
+  $ git chekout main
+  $ git pull upstream main
+  $ git checkout work
+  $ git rebase main
+  $ git push origin work
+
 
 Releases
 ========
