@@ -34,6 +34,7 @@ Since last release
 
 **Changed:**
 
+* Fixed some bugs in facility_cost.cycpp.h and economic_entity.h (#1884)
 * Changed README.rst installation instructions, tested on fresh Ubuntu-22.04 system with Python3.11 (#1744)
 * Rely on ``python3`` in environment instead of ``python`` (#1747)
 * Remove ``pandas`` as build dependency (#1748)
