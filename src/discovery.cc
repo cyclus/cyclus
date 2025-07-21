@@ -26,41 +26,43 @@ std::set<std::string> DiscoverArchetypes(const std::string s) {
   std::set<string> archs;
   size_t offset = 0;
   size_t end_offset = 0;
-  const string words = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
-                                 "abcdefghijklmnopqrstuvwxyz";
+  const string words =
+      "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
+      "abcdefghijklmnopqrstuvwxyz";
   string construct = "Construct";
-  if (SUFFIX == ".dylib")
-    construct = "_Construct";
+  if (SUFFIX == ".dylib") construct = "_Construct";
   size_t lenconstruct = construct.length();
   while ((offset = s.find(construct, offset)) != string::npos) {
-    end_offset = s.find_first_not_of(words, offset+lenconstruct);
-    if (words.find(s[offset-1]) != string::npos || offset+lenconstruct == end_offset) {
+    end_offset = s.find_first_not_of(words, offset + lenconstruct);
+    if (words.find(s[offset - 1]) != string::npos ||
+        offset + lenconstruct == end_offset) {
       // make sure construct starts the word
       offset += lenconstruct;
       continue;
     }
-    archs.insert(string(s, offset+lenconstruct, end_offset - offset - lenconstruct));
+    archs.insert(
+        string(s, offset + lenconstruct, end_offset - offset - lenconstruct));
     offset = end_offset;
   }
   return archs;
 }
 
 std::set<std::string> DiscoverSpecs(std::string p, std::string lib) {
-  using std::string;
   using std::set;
+  using std::string;
   namespace fs = boost::filesystem;
   // find file
   string libpath = (fs::path(p) / fs::path("lib" + lib + SUFFIX)).string();
   libpath = Env::FindModule(libpath);
 
   // read in file, pre-allocates space
-  std::ifstream f (libpath.c_str());
+  std::ifstream f(libpath.c_str());
   std::string s;
   f.seekg(0, std::ios::end);
   s.reserve(f.tellg());
   f.seekg(0, std::ios::beg);
   s.assign((std::istreambuf_iterator<char>(f)),
-            std::istreambuf_iterator<char>());
+           std::istreambuf_iterator<char>());
 
   // find specs
   set<string> archs = DiscoverArchetypes(s);
@@ -78,8 +80,8 @@ std::set<std::string> DiscoverSpecs(std::string p, std::string lib) {
 }
 
 std::set<std::string> DiscoverSpecsInDir(std::string d) {
-  using std::string;
   using std::set;
+  using std::string;
   namespace fs = boost::filesystem;
   set<string> specs;
   set<string> libspecs;
@@ -113,14 +115,16 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
     string p = pth.parent_path().string();
     string lib = pth.filename().string();
     if (d.length() < p.length())
-      p = p.substr(d.length()+1, string::npos);
+      p = p.substr(d.length() + 1, string::npos);
     else
       p = "";
     lib = lib.substr(3, lib.rfind(".") - 3);  // remove 'lib' prefix and suffix
     try {
       libspecs = DiscoverSpecs(p, lib);
-    } catch (cyclus::IOError& e) {}
-    for (set<string>::iterator ls = libspecs.begin(); ls != libspecs.end(); ++ls) {
+    } catch (cyclus::IOError& e) {
+    }
+    for (set<string>::iterator ls = libspecs.begin(); ls != libspecs.end();
+         ++ls) {
       specs.insert(*ls);
     }
   }
@@ -128,15 +132,17 @@ std::set<std::string> DiscoverSpecsInDir(std::string d) {
 }
 
 std::set<std::string> DiscoverSpecsInCyclusPath() {
-  using std::string;
   using std::set;
+  using std::string;
   using std::vector;
   set<string> specs;
   set<string> dirspecs;
   vector<string> cycpath = Env::cyclus_path();
-  for (vector<string>::iterator it = cycpath.begin(); it != cycpath.end(); ++it) {
+  for (vector<string>::iterator it = cycpath.begin(); it != cycpath.end();
+       ++it) {
     dirspecs = DiscoverSpecsInDir((*it).length() == 0 ? "." : (*it));
-    for (set<string>::iterator ds = dirspecs.begin(); ds != dirspecs.end(); ++ds) {
+    for (set<string>::iterator ds = dirspecs.begin(); ds != dirspecs.end();
+         ++ds) {
       specs.insert(*ds);
     }
   }

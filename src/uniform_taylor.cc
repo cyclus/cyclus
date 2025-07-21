@@ -16,9 +16,10 @@ Vector UniformTaylor::MatrixExpSolver(const Matrix& A, const Vector& x_o,
   // checks if the dimensions of A and x_o are compatible for matrix-vector
   // computations
   if (x_o.NumRows() != n) {
-    std::string error = "Error: Matrix-Vector dimensions are not compatible: " + \
-                        boost::lexical_cast<std::string>(x_o.NumRows()) + \
-                        " rows vs " + boost::lexical_cast<std::string>(n) + " nuclides.";
+    std::string error = "Error: Matrix-Vector dimensions are not compatible: " +
+                        boost::lexical_cast<std::string>(x_o.NumRows()) +
+                        " rows vs " + boost::lexical_cast<std::string>(n) +
+                        " nuclides.";
     throw ValueError(error);
   }
 
@@ -41,8 +42,8 @@ Vector UniformTaylor::MatrixExpSolver(const Matrix& A, const Vector& x_o,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double UniformTaylor::MaxAbsDiag(const Matrix& A) {
-  int n = A.NumRows();       // stores the order of the matrix A
-  double a_ii = A(1, 1);     // begins with the first diagonal element
+  int n = A.NumRows();    // stores the order of the matrix A
+  double a_ii = A(1, 1);  // begins with the first diagonal element
 
   // Initializes the maximum diagonal element to the absolute value of the
   // first diagonal element a_ii
@@ -109,7 +110,7 @@ Vector UniformTaylor::GetSolutionVector(const Matrix& B, const Vector& x_o,
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int UniformTaylor::MaxNumTerms(long double alpha_t, double epsilon) {
-  long double nextTerm;           // stores the next term in the series
+  long double nextTerm;  // stores the next term in the series
 
   // initializes the previous term and the sum of terms in the series
   long double prevTerm = 1;

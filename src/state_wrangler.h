@@ -24,10 +24,10 @@ class StateWrangler {
   /// concrete type.
   virtual StateWrangler* Clone() = 0;
 
-  /// Translates info for the object from input file information to the database by reading
-  /// parameters from the passed InfileTree and recording data via the DbInit
-  /// variable.  The simulation and agent id's are automatically injected in all
-  /// data transfered through di.
+  /// Translates info for the object from input file information to the database
+  /// by reading parameters from the passed InfileTree and recording data via
+  /// the DbInit variable.  The simulation and agent id's are automatically
+  /// injected in all data transfered through di.
   ///
   /// Agent parameters in the InfileTree are scoped in the
   /// "config/*" path. The superclass InitFrom expects the InfileTree

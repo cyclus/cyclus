@@ -15,8 +15,7 @@ namespace cyclus {
 int Composition::next_id_ = 1;
 
 Composition::Ptr Composition::CreateFromAtom(CompMap v) {
-  if (!compmath::ValidNucs(v))
-    throw ValueError("invalid nuclide in CompMap");
+  if (!compmath::ValidNucs(v)) throw ValueError("invalid nuclide in CompMap");
 
   if (!compmath::AllPositive(v))
     throw ValueError("negative quantity in CompMap");
@@ -27,8 +26,7 @@ Composition::Ptr Composition::CreateFromAtom(CompMap v) {
 }
 
 Composition::Ptr Composition::CreateFromMass(CompMap v) {
-  if (!compmath::ValidNucs(v))
-    throw ValueError("invalid nuclide in CompMap");
+  if (!compmath::ValidNucs(v)) throw ValueError("invalid nuclide in CompMap");
 
   if (!compmath::AllPositive(v))
     throw ValueError("negative quantity in CompMap");
@@ -109,18 +107,15 @@ Composition::Composition() : prev_decay_(0), recorded_(false) {
 }
 
 Composition::Composition(int prev_decay, ChainPtr decay_line)
-    : recorded_(false),
-      prev_decay_(prev_decay),
-      decay_line_(decay_line) {
+    : recorded_(false), prev_decay_(prev_decay), decay_line_(decay_line) {
   id_ = next_id_;
   next_id_++;
 }
 
 std::string Composition::ToString(CompMap v) {
   std::string comp = "";
-  for (cyclus::CompMap::const_iterator it = v.begin();
-       it != v.end(); ++it) {
-    comp += std::to_string(it->first) + std::string(": ") + 
+  for (cyclus::CompMap::const_iterator it = v.begin(); it != v.end(); ++it) {
+    comp += std::to_string(it->first) + std::string(": ") +
             std::to_string(it->second) + std::string("\n");
   }
 
@@ -136,11 +131,10 @@ Composition::Ptr Composition::NewDecay(int delta, uint64_t secs_per_timestep) {
   Composition::Ptr decayed(new Composition(tot_decay, decay_line_));
 
   // FIXME this is only here for testing, see issue #761
-  if (atom_.size() == 0)
-    return decayed;
+  if (atom_.size() == 0) return decayed;
 
   // Get intial condition vector
-  std::vector<double> n0 (pyne_cram_transmute_info.n, 0.0);
+  std::vector<double> n0(pyne_cram_transmute_info.n, 0.0);
   CompMap::const_iterator it;
   int i = -1;
   for (it = atom_.begin(); it != atom_.end(); ++it) {
@@ -153,18 +147,18 @@ Composition::Ptr Composition::NewDecay(int delta, uint64_t secs_per_timestep) {
 
   // get decay matrix
   double t = static_cast<double>(secs_per_timestep) * delta;
-  std::vector<double> decay_matrix (pyne_cram_transmute_info.nnz);
-  for (i=0; i < pyne_cram_transmute_info.nnz; ++i) {
+  std::vector<double> decay_matrix(pyne_cram_transmute_info.nnz);
+  for (i = 0; i < pyne_cram_transmute_info.nnz; ++i) {
     decay_matrix[i] = -pyne_cram_transmute_info.decay_matrix[i] * t;
   }
 
   // perform decay
-  std::vector<double> n1 (pyne_cram_transmute_info.n);
+  std::vector<double> n1(pyne_cram_transmute_info.n);
   pyne_cram_expm_multiply14(decay_matrix.data(), n0.data(), n1.data());
 
   // convert back to map
   CompMap cm;
-  for (i=0; i < pyne_cram_transmute_info.n; ++i) {
+  for (i = 0; i < pyne_cram_transmute_info.n; ++i) {
     if (n1[i] > 0.0) {
       cm[(pyne_cram_transmute_info.nucids)[i]] = n1[i];
     }

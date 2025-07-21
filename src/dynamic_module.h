@@ -52,13 +52,11 @@ class DynamicModule {
   /// dynamic modules.
   class Closer {
    public:
-    ~Closer() {
-      CloseAll();
-    }
+    ~Closer() { CloseAll(); }
   };
 
   /// Do-nothing constructor
-  DynamicModule() {};
+  DynamicModule(){};
 
   /// Returns a newly constructed agent for the given module spec.
   static Agent* Make(Context* ctx, AgentSpec spec);
@@ -71,8 +69,8 @@ class DynamicModule {
   /// been destructed.
   static void CloseAll();
 
-  /// Tests that an agent spec is for a Python Agent. This will also return false
-  /// if the agent doesn't already exist.
+  /// Tests that an agent spec is for a Python Agent. This will also return
+  /// false if the agent doesn't already exist.
   static bool IsPyAgent(AgentSpec spec);
 
   /// The path to the module's shared object library.

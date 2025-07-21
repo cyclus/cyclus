@@ -114,8 +114,8 @@ template <class T> class Bid {
         package_(package) {}
 
   Bid(Request<T>* request, boost::shared_ptr<T> offer, Trader* bidder,
-      typename BidPortfolio<T>::Ptr portfolio, bool exclusive, double preference,
-      Package::Ptr package = Package::unpackaged())
+      typename BidPortfolio<T>::Ptr portfolio, bool exclusive,
+      double preference, Package::Ptr package = Package::unpackaged())
       : request_(request),
         offer_(offer),
         bidder_(bidder),
@@ -133,7 +133,7 @@ template <class T> class Bid {
         portfolio_(portfolio),
         exclusive_(exclusive),
         preference_(std::numeric_limits<double>::quiet_NaN()),
-        package_(package)  {}
+        package_(package) {}
 
   Request<T>* request_;
   boost::shared_ptr<T> offer_;

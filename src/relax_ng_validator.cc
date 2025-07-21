@@ -38,7 +38,7 @@ void RelaxNGValidator::parse_context(xmlRelaxNGParserCtxtPtr context) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void RelaxNGValidator::parse_memory(const Glib::ustring& contents) {
   xmlRelaxNGParserCtxtPtr context =
-    xmlRelaxNGNewMemParserCtxt(contents.c_str(), contents.bytes());
+      xmlRelaxNGNewMemParserCtxt(contents.c_str(), contents.bytes());
   parse_context(context);
 }
 

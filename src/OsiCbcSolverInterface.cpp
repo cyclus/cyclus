@@ -14,14 +14,15 @@ void OsiSolverInterface::addCol(CoinPackedVectorBase const& vec, double collb,
 }
 
 void OsiSolverInterface::addCol(int numberElements, const int* rows,
-                                const double* elements, double collb, double colub,
-                                double obj, std::string name) {
+                                const double* elements, double collb,
+                                double colub, double obj, std::string name) {
   // just ignore the name
   addCol(numberElements, rows, elements, collb, colub, obj);
 }
 
 void OsiSolverInterface::addRow(CoinPackedVectorBase const& vec, char rowsen,
-                                double rowrhs, double rowrng, std::string name) {
+                                double rowrhs, double rowrng,
+                                std::string name) {
   // just ignore the name
   addRow(vec, rowsen, rowrhs, rowrng, name);
 }

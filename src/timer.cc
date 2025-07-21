@@ -6,7 +6,7 @@
 #include <string>
 #if CYCLUS_IS_PARALLEL
 #include <omp.h>
-#endif // CYCLUS_IS_PARALLEL
+#endif  // CYCLUS_IS_PARALLEL
 
 #include "agent.h"
 #include "error.h"
@@ -17,8 +17,8 @@
 namespace cyclus {
 
 void Timer::RunSim() {
-  CLOG(LEV_INFO1) << "Simulation set to run from start="
-                  << 0 << " to end=" << si_.duration;
+  CLOG(LEV_INFO1) << "Simulation set to run from start=" << 0
+                  << " to end=" << si_.duration;
   CLOG(LEV_INFO1) << "Beginning simulation";
 
   ExchangeManager<Material> matl_manager(ctx_);
@@ -56,20 +56,21 @@ void Timer::RunSim() {
 
   ctx_->NewDatum("Finish")
       ->AddVal("EarlyTerm", want_kill_)
-      ->AddVal("EndTime", time_-1)
+      ->AddVal("EndTime", time_ - 1)
       ->Record();
 
-  SimInit::Snapshot(ctx_);  // always do a snapshot at the end of every simulation
+  SimInit::Snapshot(
+      ctx_);  // always do a snapshot at the end of every simulation
 }
 
 void Timer::DoBuild() {
   // build queued agents
-  std::vector<std::pair<std::string, Agent*> > build_list = build_queue_[time_];
+  std::vector<std::pair<std::string, Agent*>> build_list = build_queue_[time_];
   for (int i = 0; i < build_list.size(); ++i) {
     Agent* m = ctx_->CreateAgent<Agent>(build_list[i].first);
     Agent* parent = build_list[i].second;
-    CLOG(LEV_INFO3) << "Building a " << build_list[i].first
-                    << " from parent " << build_list[i].second;
+    CLOG(LEV_INFO3) << "Building a " << build_list[i].first << " from parent "
+                    << build_list[i].second;
     m->Build(parent);
     if (parent != NULL) {
       parent->BuildNotify(m);
@@ -79,14 +80,12 @@ void Timer::DoBuild() {
   }
 }
 
-
 void Timer::DoTick() {
-  
   for (TimeListener* agent : py_tickers_) {
     agent->Tick();
   }
 
-  #pragma omp parallel for
+#pragma omp parallel for
   for (size_t i = 0; i < cpp_tickers_.size(); ++i) {
     cpp_tickers_[i]->Tick();
   }
@@ -103,7 +102,7 @@ void Timer::DoTock() {
     agent->Tock();
   }
 
-  #pragma omp parallel for
+#pragma omp parallel for
   for (size_t i = 0; i < cpp_tickers_.size(); ++i) {
     cpp_tickers_[i]->Tock();
   }
@@ -111,12 +110,12 @@ void Timer::DoTock() {
   if (si_.explicit_inventory || si_.explicit_inventory_compact) {
     std::set<Agent*> ags = ctx_->agent_list_;
     std::vector<Agent*> agent_vec(ags.begin(), ags.end());
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int i = 0; i < agent_vec.size(); i++) {
-        Agent* a = agent_vec[i];
-        if (a->enter_time() != -1) {
-            RecordInventories(a);
-        }
+      Agent* a = agent_vec[i];
+      if (a->enter_time() != -1) {
+        RecordInventories(a);
+      }
     }
   }
 }
@@ -136,7 +135,7 @@ void Timer::RecordInventories(Agent* a) {
     std::string name = it2->first;
     std::vector<Resource::Ptr> mats = it2->second;
     if (mats.empty() || ResCast<Material>(mats[0]) == NULL) {
-      continue; // skip non-material inventories
+      continue;  // skip non-material inventories
     }
 
     Material::Ptr m = ResCast<Material>(mats[0]->Clone());
@@ -202,15 +201,12 @@ void Timer::RegisterTimeListener(TimeListener* agent) {
 void Timer::UnregisterTimeListener(TimeListener* tl) {
   tickers_.erase(tl->id());
   if (tl->IsShim()) {
-    py_tickers_.erase(
-      std::remove(py_tickers_.begin(), py_tickers_.end(), tl),
-      py_tickers_.end()
-    );
+    py_tickers_.erase(std::remove(py_tickers_.begin(), py_tickers_.end(), tl),
+                      py_tickers_.end());
   } else {
     cpp_tickers_.erase(
-      std::remove(cpp_tickers_.begin(), cpp_tickers_.end(), tl),
-      cpp_tickers_.end()
-    );
+        std::remove(cpp_tickers_.begin(), cpp_tickers_.end(), tl),
+        cpp_tickers_.end());
   }
 }
 
@@ -231,15 +227,16 @@ void Timer::SchedDecom(Agent* m, int t) {
   // - the duplicate entries will result in a double delete attempt and
   // segfaults and otherwise bad things.  Remove previous decommissionings
   // before scheduling this new one.
-  std::map<int, std::vector<Agent*> >::iterator it;
+  std::map<int, std::vector<Agent*>>::iterator it;
   bool done = false;
   for (it = decom_queue_.begin(); it != decom_queue_.end(); ++it) {
     int t = it->first;
     std::vector<Agent*> ags = it->second;
     for (int i = 0; i < ags.size(); i++) {
       if (ags[i] == m) {
-        CLOG(LEV_WARN) << "scheduled over previous decommissioning of " << m->id();
-        decom_queue_[t].erase(decom_queue_[t].begin()+i);
+        CLOG(LEV_WARN) << "scheduled over previous decommissioning of "
+                       << m->id();
+        decom_queue_[t].erase(decom_queue_[t].begin() + i);
         done = true;
         break;
       }

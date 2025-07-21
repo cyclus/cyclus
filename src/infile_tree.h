@@ -11,7 +11,7 @@
 #include "xml_parser.h"
 
 namespace xmlpp {
-  class Node;
+class Node;
 }
 
 namespace cyclus {
@@ -90,15 +90,13 @@ inline std::string Query(InfileTree* tree, std::string query, int index) {
   return tree->GetString(query, index);
 }
 
-template <>
-inline int Query(InfileTree* tree, std::string query, int index) {
+template <> inline int Query(InfileTree* tree, std::string query, int index) {
   std::string s = tree->GetString(query, index);
   boost::trim(s);
   return boost::lexical_cast<int>(s.c_str());
 }
 
-template <>
-inline float Query(InfileTree* tree, std::string query, int index) {
+template <> inline float Query(InfileTree* tree, std::string query, int index) {
   std::string s = tree->GetString(query, index);
   boost::trim(s);
   return boost::lexical_cast<float>(s.c_str());
@@ -120,15 +118,14 @@ inline double Query(InfileTree* tree, std::string query, int index) {
 template <typename T>
 inline T OptionalQuery(InfileTree* tree, std::string query, T default_val) {
   T val;
-  tree->NMatches(query) == 1 ?
-    val = boost::lexical_cast<T>(tree->GetString(query).c_str()) :
-    val = default_val;
+  tree->NMatches(query) == 1
+      ? val = boost::lexical_cast<T>(tree->GetString(query).c_str())
+      : val = default_val;
   return val;
 }
 
 template <>
-inline int OptionalQuery(InfileTree* tree, std::string query,
-                         int default_val) {
+inline int OptionalQuery(InfileTree* tree, std::string query, int default_val) {
   int val = default_val;
   if (tree->NMatches(query) == 1) {
     std::string s = tree->GetString(query);
@@ -140,7 +137,7 @@ inline int OptionalQuery(InfileTree* tree, std::string query,
 
 template <>
 inline bool OptionalQuery(InfileTree* tree, std::string query,
-                         bool default_val) {
+                          bool default_val) {
   if (tree->NMatches(query) == 0) {
     return default_val;
   }

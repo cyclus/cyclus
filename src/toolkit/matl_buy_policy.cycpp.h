@@ -1,7 +1,7 @@
-/// This includes the required header to add a material buy policy to archetypes.
-/// One should only need to:
+/// This includes the required header to add a material buy policy to
+/// archetypes. One should only need to:
 /// - '#include "toolkit/matl_buy_policy.cycpp.h"' in the header of the
-///    archetype class (it is strongly recommended to inject this snippet as 
+///    archetype class (it is strongly recommended to inject this snippet as
 ///    `private:`, but archetype developers are free to make other choices)
 /// - Add `InitBuyPolicyParameters()` to `EnterNotify()` in the cc file of the
 ///   archetype class as needed.
@@ -13,47 +13,60 @@
 ///    file with the other ones, reaplcing <param_name> with the name you put
 ///    in the econ_params array (again, must match exactly).
 
-
-
 /// @addtogroup optionalparams
 /// @{
-/// active_buying_frequency_type is the type of distribution used to determine the length of the active buying period
-/// active_buying_val is the length of the active buying period if active_buying_frequency_type is Fixed
-/// active_buying_min is the minimum length of the active buying period if active_buying_frequency_type is Uniform (required) or 
-/// Normal (optional)
-/// active_buying_max is the maximum length of the active buying period if active_buying_frequency_type is Uniform (required) or
-/// Normal (optional)
-/// active_buying_mean is the mean length of the active buying period if active_buying_frequency_type is Normal
-/// active_buying_stddev is the standard deviation of the active buying period if active_buying_frequency_type is Normal
-/// active_buying_end_probability is the probability that at any given timestep, the agent ends the active buying 
-///                               period if the active buying frequency type is Binomial
-/// active_buying_disruption_probability is the probability that in any given cycle, the agent undergoes a disruption 
-///                               (disrupted active period) if the active buying frequency type is FixedWithDisruption
-/// active_buying_disruption is the length of the disrupted active cycle if the active buying frequency type is 
+/// active_buying_frequency_type is the type of distribution used to determine
+/// the length of the active buying period active_buying_val is the length of
+/// the active buying period if active_buying_frequency_type is Fixed
+/// active_buying_min is the minimum length of the active buying period if
+/// active_buying_frequency_type is Uniform (required) or Normal (optional)
+/// active_buying_max is the maximum length of the active buying period if
+/// active_buying_frequency_type is Uniform (required) or Normal (optional)
+/// active_buying_mean is the mean length of the active buying period if
+/// active_buying_frequency_type is Normal active_buying_stddev is the standard
+/// deviation of the active buying period if active_buying_frequency_type is
+/// Normal active_buying_end_probability is the probability that at any given
+/// timestep, the agent ends the active buying
+///                               period if the active buying frequency type is
+///                               Binomial
+/// active_buying_disruption_probability is the probability that in any given
+/// cycle, the agent undergoes a disruption
+///                               (disrupted active period) if the active buying
+///                               frequency type is FixedWithDisruption
+/// active_buying_disruption is the length of the disrupted active cycle if the
+/// active buying frequency type is
 ///                               FixedWithDisruption
-/// dormant_buying_frequency_type is the type of distribution used to determine the length of the dormant buying period
-/// dormant_buying_val is the length of the dormant buying period if dormant_buying_frequency_type is Fixed
-/// dormant_buying_min is the minimum length of the dormant buying period if dormant_buying_frequency_type is Uniform (required) or
-/// Normal (optional)
-/// dormant_buying_max is the maximum length of the dormant buying period if dormant_buying_frequency_type is Uniform (required) or
-/// Normal (optional)
-/// dormant_buying_mean is the mean length of the dormant buying period if dormant_buying_frequency_type is Normal
-/// dormant_buying_stddev is the standard deviation of the dormant buying period if dormant_buying_frequency_type is Normal
-/// dormant_buying_end_probability is the probability that at any given timestep, the agent ends the dormant buying period if
+/// dormant_buying_frequency_type is the type of distribution used to determine
+/// the length of the dormant buying period dormant_buying_val is the length of
+/// the dormant buying period if dormant_buying_frequency_type is Fixed
+/// dormant_buying_min is the minimum length of the dormant buying period if
+/// dormant_buying_frequency_type is Uniform (required) or Normal (optional)
+/// dormant_buying_max is the maximum length of the dormant buying period if
+/// dormant_buying_frequency_type is Uniform (required) or Normal (optional)
+/// dormant_buying_mean is the mean length of the dormant buying period if
+/// dormant_buying_frequency_type is Normal dormant_buying_stddev is the
+/// standard deviation of the dormant buying period if
+/// dormant_buying_frequency_type is Normal dormant_buying_end_probability is
+/// the probability that at any given timestep, the agent ends the dormant
+/// buying period if
 ///                               the dormant buying frequency type is Binomial
-/// dormant_buying_disruption_probability is the probability that in any given cycle, the agent undergoes a disruption (disrupted
-///                               offline period) if the dormant buying frequency type is FixedWithDisruption
-/// dormant_buying_disruption is the length of the disrupted dormant cycle if the dormant buying frequency type is 
+/// dormant_buying_disruption_probability is the probability that in any given
+/// cycle, the agent undergoes a disruption (disrupted
+///                               offline period) if the dormant buying
+///                               frequency type is FixedWithDisruption
+/// dormant_buying_disruption is the length of the disrupted dormant cycle if
+/// the dormant buying frequency type is
 ///                               FixedWithDisruption
-/// buying_size_type is the type of distribution used to determine the size of buy requests, as a fraction of the current capacity
-/// buying_size_val is the size of the buy request for Fixed  buying_size_type
-/// buying_size_min is the minimum size of the buy request if buying_size_type is Uniform (required) or Normal (optional)
-/// buying_size_max is the maximum size of the buy request if buying_size_type is Uniform (required) or Normal (optional)
-/// buying_size_mean is the mean size of the buy request if buying_size_type is Normal
-/// buying_size_stddev is the standard deviation of the buy request if buying_size_type is Normal
+/// buying_size_type is the type of distribution used to determine the size of
+/// buy requests, as a fraction of the current capacity buying_size_val is the
+/// size of the buy request for Fixed  buying_size_type buying_size_min is the
+/// minimum size of the buy request if buying_size_type is Uniform (required) or
+/// Normal (optional) buying_size_max is the maximum size of the buy request if
+/// buying_size_type is Uniform (required) or Normal (optional) buying_size_mean
+/// is the mean size of the buy request if buying_size_type is Normal
+/// buying_size_stddev is the standard deviation of the buy request if
+/// buying_size_type is Normal
 /// @}
-
-
 
 ///   @brief sets up the distributions for the buy policy
 inline void InitBuyPolicyParameters() {
@@ -69,100 +82,133 @@ inline void InitBuyPolicyParameters() {
   }
 
   if (active_buying_frequency_type == "Fixed") {
-    active_dist_ = cyclus::FixedIntDist::Ptr (new cyclus::FixedIntDist(active_buying_val));
-  }
-  else if (active_buying_frequency_type == "Uniform") {
+    active_dist_ =
+        cyclus::FixedIntDist::Ptr(new cyclus::FixedIntDist(active_buying_val));
+  } else if (active_buying_frequency_type == "Uniform") {
     if ((active_buying_min == -1) || (active_buying_max == -1)) {
-      throw cyclus::ValueError("Invalid active buying frequency range. Please provide both a min and max value.");
+      throw cyclus::ValueError(
+          "Invalid active buying frequency range. Please provide both a min "
+          "and max value.");
     }
-    active_dist_ = cyclus::UniformIntDist::Ptr (new cyclus::UniformIntDist(active_buying_min, active_buying_max));
-  }
-  else if (active_buying_frequency_type == "Normal") {
+    active_dist_ = cyclus::UniformIntDist::Ptr(
+        new cyclus::UniformIntDist(active_buying_min, active_buying_max));
+  } else if (active_buying_frequency_type == "Normal") {
     if ((active_buying_mean == -1) || (active_buying_stddev == -1)) {
-      throw cyclus::ValueError("Invalid active buying frequency range. Please provide both a mean and standard deviation value.");
+      throw cyclus::ValueError(
+          "Invalid active buying frequency range. Please provide both a mean "
+          "and standard deviation value.");
     }
-    if (active_buying_min == -1) {active_buying_min = 1;}
+    if (active_buying_min == -1) {
+      active_buying_min = 1;
+    }
     if (active_buying_max == -1) {
-      active_buying_max = std::numeric_limits<int>::max();}
-
-    active_dist_ = cyclus::NormalIntDist::Ptr (new cyclus::NormalIntDist(active_buying_mean, active_buying_stddev,
-                          active_buying_min, active_buying_max));
-  }
-  else if (active_buying_frequency_type == "Binomial") {
-    if (active_buying_end_probability < 0 || active_buying_end_probability > 1) {
-      throw cyclus::ValueError("Active buying end probability must be between 0 and 1");
+      active_buying_max = std::numeric_limits<int>::max();
     }
-    int success = 1; // only one success is needed to end the active buying period
-    active_dist_ = cyclus::NegativeBinomialIntDist::Ptr (new cyclus::NegativeBinomialIntDist(success, active_buying_end_probability));
+
+    active_dist_ = cyclus::NormalIntDist::Ptr(
+        new cyclus::NormalIntDist(active_buying_mean, active_buying_stddev,
+                                  active_buying_min, active_buying_max));
+  } else if (active_buying_frequency_type == "Binomial") {
+    if (active_buying_end_probability < 0 ||
+        active_buying_end_probability > 1) {
+      throw cyclus::ValueError(
+          "Active buying end probability must be between 0 and 1");
+    }
+    int success =
+        1;  // only one success is needed to end the active buying period
+    active_dist_ = cyclus::NegativeBinomialIntDist::Ptr(
+        new cyclus::NegativeBinomialIntDist(success,
+                                            active_buying_end_probability));
   } else if (active_buying_frequency_type == "FixedWithDisruption") {
     if (active_buying_disruption < 0) {
       throw cyclus::ValueError("Disruption must be greater than or equal to 0");
     }
-    active_dist_ = cyclus::BinaryIntDist::Ptr (
-      new cyclus::BinaryIntDist(active_buying_disruption_probability,
-      active_buying_disruption, active_buying_val));
+    active_dist_ = cyclus::BinaryIntDist::Ptr(
+        new cyclus::BinaryIntDist(active_buying_disruption_probability,
+                                  active_buying_disruption, active_buying_val));
+  } else {
+    throw cyclus::ValueError("Invalid active buying frequency type");
   }
-  else {
-    throw cyclus::ValueError("Invalid active buying frequency type");}
 
   /// set up dormant buying distribution
   if (dormant_buying_frequency_type == "Fixed") {
-    dormant_dist_ = cyclus::FixedIntDist::Ptr (new cyclus::FixedIntDist(dormant_buying_val));
-  }
-  else if (dormant_buying_frequency_type == "Uniform") {
+    dormant_dist_ =
+        cyclus::FixedIntDist::Ptr(new cyclus::FixedIntDist(dormant_buying_val));
+  } else if (dormant_buying_frequency_type == "Uniform") {
     if ((dormant_buying_min == -1) || (dormant_buying_max == -1)) {
-      throw cyclus::ValueError("Invalid dormant buying frequency range. Please provide both a min and max value.");
+      throw cyclus::ValueError(
+          "Invalid dormant buying frequency range. Please provide both a min "
+          "and max value.");
     }
-    dormant_dist_ = cyclus::UniformIntDist::Ptr (new cyclus::UniformIntDist(dormant_buying_min, dormant_buying_max));
-  }
-  else if (dormant_buying_frequency_type == "Normal") {
+    dormant_dist_ = cyclus::UniformIntDist::Ptr(
+        new cyclus::UniformIntDist(dormant_buying_min, dormant_buying_max));
+  } else if (dormant_buying_frequency_type == "Normal") {
     if ((dormant_buying_mean == -1) || (dormant_buying_stddev == -1)) {
-      throw cyclus::ValueError("Invalid dormant buying frequency range. Please provide both a mean and standard deviation value.");
+      throw cyclus::ValueError(
+          "Invalid dormant buying frequency range. Please provide both a mean "
+          "and standard deviation value.");
     }
-    if (dormant_buying_min == -1) {dormant_buying_min = 1;}
+    if (dormant_buying_min == -1) {
+      dormant_buying_min = 1;
+    }
     if (dormant_buying_max == -1) {
-      dormant_buying_max = std::numeric_limits<int>::max();}
-    dormant_dist_ = cyclus::NormalIntDist::Ptr (new cyclus::NormalIntDist(dormant_buying_mean, dormant_buying_stddev,
-                          dormant_buying_min, dormant_buying_max));
-  }
-  else if (dormant_buying_frequency_type == "Binomial") {
-    if (dormant_buying_end_probability < 0 || dormant_buying_end_probability > 1) {
-      throw cyclus::ValueError("Dormant buying end probability must be between 0 and 1");
+      dormant_buying_max = std::numeric_limits<int>::max();
     }
-    int success = 1; // only one success is needed to end the dormant buying period
-    dormant_dist_ = cyclus::NegativeBinomialIntDist::Ptr (new cyclus::NegativeBinomialIntDist(success, dormant_buying_end_probability));
+    dormant_dist_ = cyclus::NormalIntDist::Ptr(
+        new cyclus::NormalIntDist(dormant_buying_mean, dormant_buying_stddev,
+                                  dormant_buying_min, dormant_buying_max));
+  } else if (dormant_buying_frequency_type == "Binomial") {
+    if (dormant_buying_end_probability < 0 ||
+        dormant_buying_end_probability > 1) {
+      throw cyclus::ValueError(
+          "Dormant buying end probability must be between 0 and 1");
+    }
+    int success =
+        1;  // only one success is needed to end the dormant buying period
+    dormant_dist_ = cyclus::NegativeBinomialIntDist::Ptr(
+        new cyclus::NegativeBinomialIntDist(success,
+                                            dormant_buying_end_probability));
   } else if (dormant_buying_frequency_type == "FixedWithDisruption") {
     if (dormant_buying_disruption < 0) {
       throw cyclus::ValueError("Disruption must be greater than or equal to 0");
     }
-    dormant_dist_ = cyclus::BinaryIntDist::Ptr (
-      new cyclus::BinaryIntDist(dormant_buying_disruption_probability,
-      dormant_buying_disruption, dormant_buying_val));
+    dormant_dist_ = cyclus::BinaryIntDist::Ptr(new cyclus::BinaryIntDist(
+        dormant_buying_disruption_probability, dormant_buying_disruption,
+        dormant_buying_val));
+  } else {
+    throw cyclus::ValueError("Invalid dormant buying frequency type");
   }
-  else {
-    throw cyclus::ValueError("Invalid dormant buying frequency type");}
 
   /// set up buying size distribution
   if (buying_size_type == "Fixed") {
-    size_dist_ = cyclus::FixedDoubleDist::Ptr (new cyclus::FixedDoubleDist(buying_size_val));
-  }
-  else if (buying_size_type == "Uniform") {
+    size_dist_ = cyclus::FixedDoubleDist::Ptr(
+        new cyclus::FixedDoubleDist(buying_size_val));
+  } else if (buying_size_type == "Uniform") {
     if ((buying_size_min == -1) || (buying_size_max == -1)) {
-      throw cyclus::ValueError("Invalid buying size range. Please provide both a min and max value.");
+      throw cyclus::ValueError(
+          "Invalid buying size range. Please provide both a min and max "
+          "value.");
     }
-    size_dist_ = cyclus::UniformDoubleDist::Ptr (new cyclus::UniformDoubleDist(buying_size_min, buying_size_max));
-  }
-  else if (buying_size_type == "Normal") {
+    size_dist_ = cyclus::UniformDoubleDist::Ptr(
+        new cyclus::UniformDoubleDist(buying_size_min, buying_size_max));
+  } else if (buying_size_type == "Normal") {
     if ((buying_size_mean == -1) || (buying_size_stddev == -1)) {
-      throw cyclus::ValueError("Invalid buying size range. Please provide both a mean and standard deviation value.");
+      throw cyclus::ValueError(
+          "Invalid buying size range. Please provide both a mean and standard "
+          "deviation value.");
     }
-    if (buying_size_min == -1) {buying_size_min = 0;}
-    if (buying_size_max == -1) {buying_size_max = 1;}
-    size_dist_ = cyclus::NormalDoubleDist::Ptr (new cyclus::NormalDoubleDist(buying_size_mean, buying_size_stddev,
-                             buying_size_min, buying_size_max));
+    if (buying_size_min == -1) {
+      buying_size_min = 0;
+    }
+    if (buying_size_max == -1) {
+      buying_size_max = 1;
+    }
+    size_dist_ = cyclus::NormalDoubleDist::Ptr(
+        new cyclus::NormalDoubleDist(buying_size_mean, buying_size_stddev,
+                                     buying_size_min, buying_size_max));
+  } else {
+    throw cyclus::ValueError("Invalid buying size type");
   }
-  else {
-    throw cyclus::ValueError("Invalid buying size type");}
 }
 
 // clang-format off
@@ -438,13 +484,12 @@ cyclus::IntDistribution::Ptr active_dist_ = NULL;
 cyclus::IntDistribution::Ptr dormant_dist_ = NULL;
 cyclus::DoubleDistribution::Ptr size_dist_ = NULL;
 
-
 // Required for compilation but not added by the cycpp preprocessor. Do not
 // remove. Must be one for each variable.
 std::vector<int> cycpp_shape_active_buying_frequency_type = {0};
 std::vector<int> cycpp_shape_active_buying_val = {0};
 std::vector<int> cycpp_shape_active_buying_min = {0};
-std::vector<int> cycpp_shape_active_buying_max= {0};
+std::vector<int> cycpp_shape_active_buying_max = {0};
 std::vector<int> cycpp_shape_active_buying_mean = {0};
 std::vector<int> cycpp_shape_active_buying_stddev = {0};
 std::vector<int> cycpp_shape_active_buying_end_probability = {0};

@@ -32,7 +32,8 @@ class CycArithmetic {
 
   /// orders the values in a map from smallest value to largest value.
   /// This helps for addition algorithms.
-  /// @param to_sort is a map of values to sort (according to the value of the double)
+  /// @param to_sort is a map of values to sort (according to the value of the
+  /// double)
   /// @returns a set sorted from smallest to largest
   static std::vector<double> sort_ascending(std::map<int, double> to_sort);
 };

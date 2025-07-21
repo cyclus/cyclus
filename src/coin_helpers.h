@@ -19,7 +19,7 @@ namespace cyclus {
 //  Ignore names if that set.
 //  (Note initial version does not check names)
 //  May modify both agents by cleaning up
-int differentAgent(OsiSolverInterface & lhs, OsiSolverInterface & rhs,
+int differentAgent(OsiSolverInterface& lhs, OsiSolverInterface& rhs,
                    bool ignoreNames = true);
 
 }  // namespace cyclus

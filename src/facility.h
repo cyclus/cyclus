@@ -25,10 +25,10 @@ class Institution;
 ///
 /// The Facility type plays a primary role in Cyclus.  A Facility
 /// facility is where offers and requests are generated and transmitted to a
-/// ResourceExchange and where shipments of material, issued by the exchange, are
-/// executed. The algorithms to determine what offers and requests are issued and
-/// how material shipments are handled are the primary differentiators between
-/// different Facility implementations.
+/// ResourceExchange and where shipments of material, issued by the exchange,
+/// are executed. The algorithms to determine what offers and requests are
+/// issued and how material shipments are handled are the primary
+/// differentiators between different Facility implementations.
 ///
 /// Like all agent implementations, there are a number of implementations that
 /// are distributed as part of the core Cyclus application as well as
@@ -105,26 +105,24 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual std::string str();
 
   /// @brief default implementation for material requests
-  virtual std::set<RequestPortfolio<Material>::Ptr>
-      GetMatlRequests() {
+  virtual std::set<RequestPortfolio<Material>::Ptr> GetMatlRequests() {
     return std::set<RequestPortfolio<Material>::Ptr>();
   }
 
   /// @brief default implementation for product requests
-  virtual std::set<RequestPortfolio<Product>::Ptr>
-      GetProductRequests() {
+  virtual std::set<RequestPortfolio<Product>::Ptr> GetProductRequests() {
     return std::set<RequestPortfolio<Product>::Ptr>();
   }
 
   /// @brief default implementation for material requests
-  virtual std::set<BidPortfolio<Material>::Ptr>
-      GetMatlBids(CommodMap<Material>::type& commod_requests) {
+  virtual std::set<BidPortfolio<Material>::Ptr> GetMatlBids(
+      CommodMap<Material>::type& commod_requests) {
     return std::set<BidPortfolio<Material>::Ptr>();
   }
 
   /// @brief default implementation for product requests
-  virtual std::set<BidPortfolio<Product>::Ptr>
-      GetProductBids(CommodMap<Product>::type& commod_requests) {
+  virtual std::set<BidPortfolio<Product>::Ptr> GetProductBids(
+      CommodMap<Product>::type& commod_requests) {
     return std::set<BidPortfolio<Product>::Ptr>();
   }
 
@@ -138,29 +136,26 @@ class Facility : public TimeListener, public Agent, public Trader {
   /// @param trades all trades in which this trader is the supplier
   /// @param responses a container to populate with responses to each trade
   virtual void GetMatlTrades(
-      const std::vector< Trade<Material> >& trades,
-      std::vector<std::pair<Trade<Material>, Material::Ptr> >& responses) {
+      const std::vector<Trade<Material>>& trades,
+      std::vector<std::pair<Trade<Material>, Material::Ptr>>& responses) {
     std::cout << "in material facility getmatltrades\n";
-    }
+  }
 
   /// @brief default implementation for responding to product trades
   /// @param trades all trades in which this trader is the supplier
   /// @param responses a container to populate with responses to each trade
   virtual void GetProductTrades(
-      const std::vector< Trade<Product> >& trades,
-      std::vector<std::pair<Trade<Product>,
-      Product::Ptr> >& responses) {}
+      const std::vector<Trade<Product>>& trades,
+      std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {}
 
   /// @brief default implementation for material trade acceptance
   virtual void AcceptMatlTrades(
-      const std::vector<std::pair<Trade<Material>,
-      Material::Ptr> >& responses) {}
+      const std::vector<std::pair<Trade<Material>, Material::Ptr>>& responses) {
+  }
 
   /// @brief default implementation for product trade acceptance
   virtual void AcceptProductTrades(
-      const std::vector<std::pair<Trade<Product>,
-      Product::Ptr> >& responses) {}
-
+      const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {}
 };
 
 }  // namespace cyclus

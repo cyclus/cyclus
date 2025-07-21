@@ -16,21 +16,22 @@ Product::Ptr Product::Create(Agent* creator, double quantity,
                              std::string quality, std::string package_name) {
   if (qualids_.count(quality) == 0) {
     qualids_[quality] = next_qualid_++;
-    creator->context()->NewDatum("Products")
+    creator->context()
+        ->NewDatum("Products")
         ->AddVal("QualId", qualids_[quality])
         ->AddVal("Quality", quality)
         ->Record();
   }
 
   // the next lines must come after qual id setting
-  Product::Ptr r(new Product(creator->context(), quantity, quality, package_name));
+  Product::Ptr r(
+      new Product(creator->context(), quantity, quality, package_name));
   r->tracker_.Create(creator);
   return r;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Product::Ptr Product::CreateUntracked(double quantity,
-                                      std::string quality) {
+Product::Ptr Product::CreateUntracked(double quantity, std::string quality) {
   Product::Ptr r(new Product(NULL, quantity, quality));
   r->tracker_.DontTrack();
   return r;
@@ -77,7 +78,8 @@ std::string Product::package_name() {
   return package_name_;
 }
 
-Resource::Ptr Product::PackageExtract(double qty, std::string new_package_name) {
+Resource::Ptr Product::PackageExtract(double qty,
+                                      std::string new_package_name) {
   if (qty > quantity_) {
     throw ValueError("Attempted to extract more quantity than exists.");
   }
@@ -85,7 +87,7 @@ Resource::Ptr Product::PackageExtract(double qty, std::string new_package_name) 
   quantity_ -= qty;
   Product::Ptr other(new Product(ctx_, qty, quality_, new_package_name));
 
-  // this call to res_tracker must come first before the parent resource 
+  // this call to res_tracker must come first before the parent resource
   // state id gets modified
   other->tracker_.Package(&tracker_);
   if (quantity_ > cyclus::eps_rsrc()) {
@@ -98,8 +100,7 @@ void Product::ChangePackage(std::string new_package_name) {
   if (new_package_name == package_name_ || ctx_ == NULL) {
     // no change needed
     return;
-  }
-  else if (new_package_name == Package::unpackaged_name()) {
+  } else if (new_package_name == Package::unpackaged_name()) {
     // unpackaged has functionally no restrictions
     package_name_ = new_package_name;
     tracker_.Package();
@@ -117,7 +118,8 @@ void Product::ChangePackage(std::string new_package_name) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Product::Product(Context* ctx, double quantity, std::string quality, std::string package_name)
+Product::Product(Context* ctx, double quantity, std::string quality,
+                 std::string package_name)
     : quality_(quality),
       quantity_(quantity),
       tracker_(ctx, this),

@@ -6,11 +6,7 @@
 namespace cyclus {
 
 ResTracker::ResTracker(Context* ctx, Resource* r)
-    : tracked_(true),
-      res_(r),
-      ctx_(ctx),
-      parent1_(0),
-      parent2_(0) {}
+    : tracked_(true), res_(r), ctx_(ctx), parent1_(0), parent2_(0) {}
 
 void ResTracker::DontTrack() {
   tracked_ = false;
@@ -84,8 +80,8 @@ void ResTracker::Package(ResTracker* parent) {
 
   if (parent != NULL) {
     parent1_ = parent->res_->state_id();
-    
-    // Resource was just created, with packaging info, and assigned a state id. 
+
+    // Resource was just created, with packaging info, and assigned a state id.
     // Do not need to bump again
     bool bumpId = false;
     Record(bumpId);
@@ -95,9 +91,6 @@ void ResTracker::Package(ResTracker* parent) {
     parent1_ = res_->state_id();
     Record();
   }
-
-  
-  
 }
 
 void ResTracker::Record(bool bumpId) {

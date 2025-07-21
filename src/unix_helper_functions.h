@@ -11,7 +11,8 @@ namespace cyclus {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::OpenLibrary() {
-  // Do not change this to RTLD_LAZY, because it randomly breaks modules discovery!
+  // Do not change this to RTLD_LAZY, because it randomly breaks modules
+  // discovery!
   module_library_ = dlopen(path_.c_str(), RTLD_NOW);
 
   if (!module_library_) {
@@ -25,8 +26,7 @@ void DynamicModule::OpenLibrary() {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void DynamicModule::SetConstructor() {
-  ctor_ = (AgentCtor*)
-                 dlsym(module_library_, ctor_name_.c_str());
+  ctor_ = (AgentCtor*)dlsym(module_library_, ctor_name_.c_str());
 
   if (!ctor_) {
     std::stringstream ss;
@@ -44,9 +44,9 @@ void DynamicModule::SetConstructor() {
 void DynamicModule::CloseLibrary() {
   if (module_library_) {
     int exit_code = dlclose(module_library_);
-    if (exit_code != 0)  {
+    if (exit_code != 0) {
       std::string err_msg = "Error closing shared object file: ";
-      err_msg  += dlerror();
+      err_msg += dlerror();
       throw IOError(err_msg);
     }
     dlerror();  // reset errors

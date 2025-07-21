@@ -15,9 +15,9 @@ class Context;
 
 namespace units {
 const double kg = 1.0;
-const double g =  kg* .001;
-const double mg = kg* .000001;
-const double ug = kg* .000000001;
+const double g = kg * .001;
+const double mg = kg * .000001;
+const double ug = kg * .000000001;
 }  // namespace units
 
 /// The material class is primarily responsible for enabling basic material
@@ -52,8 +52,8 @@ const double ug = kg* .000000001;
 /// * A reactor transmuting fuel:
 ///
 ///   @code
-///   Composition::Ptr burned_comp = ... // fancy code to calculate burned nuclides
-///   Material::Ptr assembly = core_fuel.Pop();
+///   Composition::Ptr burned_comp = ... // fancy code to calculate burned
+///   nuclides Material::Ptr assembly = core_fuel.Pop();
 ///
 ///   assembly.Transmute(burned_comp);
 ///   @endcode
@@ -68,7 +68,7 @@ const double ug = kg* .000000001;
 ///   Material::Ptr mox = bucket.ExtractComp(qty, comp);
 ///   @endcode
 ///
-class Material: public Resource {
+class Material : public Resource {
   friend class SimInit;
 
  public:
@@ -137,7 +137,7 @@ class Material: public Resource {
   /// not result in an updated material composition.  Does nothing if the
   /// simulation decay mode is set to "never" or none of the nuclides' decay
   /// constants are significant with respect to the time delta.
-  /// @param curr_time current time to use for the decay calculation 
+  /// @param curr_time current time to use for the decay calculation
   ///        (default: -1 forces the decay to the context's current time)
   virtual void Decay(int curr_time = -1);
 
@@ -158,12 +158,13 @@ class Material: public Resource {
 
   virtual std::string package_name();
 
-  virtual Resource::Ptr PackageExtract(double qty,
-    std::string new_package_name = Package::unpackaged_name());
+  virtual Resource::Ptr PackageExtract(
+      double qty, std::string new_package_name = Package::unpackaged_name());
 
-  /// Changes the package id. Checks that the resource fits the package 
+  /// Changes the package id. Checks that the resource fits the package
   /// type minimum and maximum mass criteria.
-  virtual void ChangePackage(std::string new_package_name = Package::unpackaged_name());
+  virtual void ChangePackage(
+      std::string new_package_name = Package::unpackaged_name());
 
  protected:
   Material(Context* ctx, double quantity, Composition::Ptr c,

@@ -12,19 +12,17 @@ class Blob {
 
   explicit Blob(std::string s) : str_(s) {}
 
-  const std::string& str() const {
-    return str_;
-  }
+  const std::string& str() const { return str_; }
 
   inline std::ostream& operator<<(std::ostream& out) const {
-     return out << str();
+    return out << str();
   }
 
-  inline bool operator< (const cyclus::Blob& rhs) const {
+  inline bool operator<(const cyclus::Blob& rhs) const {
     return str() < rhs.str();
   }
 
-  inline bool operator> (const cyclus::Blob& rhs) const {
+  inline bool operator>(const cyclus::Blob& rhs) const {
     return !operator<(rhs) && !operator==(rhs);
   }
 

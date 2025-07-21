@@ -12,7 +12,8 @@
 
 namespace cyclus {
 
-std::string BuildFlatMasterSchema(std::string schema_path, std::vector<AgentSpec> specs) {
+std::string BuildFlatMasterSchema(std::string schema_path,
+                                  std::vector<AgentSpec> specs) {
   Timer ti;
   Recorder rec;
   Context ctx(&ti, &rec);
@@ -41,19 +42,16 @@ std::string BuildFlatMasterSchema(std::string schema_path, std::vector<AgentSpec
 }
 
 std::string BuildFlatMasterSchema(std::string schema_path, std::string infile) {
-
   std::vector<AgentSpec> specs = ParseSpecs(infile);
 
   return BuildFlatMasterSchema(schema_path, specs);
-
 }
 
 std::string BuildFlatMasterSchema(std::string schema_path) {
-
-  std::vector<AgentSpec> specs = ParseSpecs(cyclus::DiscoverSpecsInCyclusPath());
+  std::vector<AgentSpec> specs =
+      ParseSpecs(cyclus::DiscoverSpecsInCyclusPath());
 
   return BuildFlatMasterSchema(schema_path, specs);
-
 }
 
 std::string XMLFlatLoader::master_schema() {
@@ -97,10 +95,10 @@ void XMLFlatLoader::LoadInitialAgents() {
 
   // retrieve agent hierarchy and initial inventories
   int num_agents = xqe.NMatches("/*/agent");
-  std::map<std::string, std::string> protos;  // map<name, prototype>
+  std::map<std::string, std::string> protos;   // map<name, prototype>
   std::map<std::string, std::string> parents;  // map<agent, parent>
-  std::set<std::string> agents;  // set<agent_name>
-  std::map<std::string, InfileTree*> invs;  // map<agent, qe>;
+  std::set<std::string> agents;                // set<agent_name>
+  std::map<std::string, InfileTree*> invs;     // map<agent, qe>;
   for (int i = 0; i < num_agents; i++) {
     InfileTree* qe = xqe.SubTree("/*/agent", i);
     std::string name = qe->GetString("name");
