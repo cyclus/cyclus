@@ -126,9 +126,11 @@ class EconomicEntity {
     return pv;
   }
 
+ protected:
+  static constexpr int kDefaultBidCost = 1;
+
  private:
   std::unordered_map<std::string, double> financial_data_;
-  static constexpr int kDefaultBidCost = 1;
 };
 
 #endif  // ECONOMIC_ENTITY_H
