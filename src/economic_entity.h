@@ -131,7 +131,6 @@ class EconomicEntity {
 
  private:
   std::unordered_map<std::string, double> financial_data_;
-
 };
 
 #endif  // ECONOMIC_ENTITY_H
