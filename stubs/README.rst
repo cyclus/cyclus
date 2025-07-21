@@ -14,7 +14,7 @@ Let's put this code in a ``tutorial`` directory and go into it.
 
 **Getting cycstub via Cyclus:**
 
-.. code-block:: bash
+.. code-block:: console
 
     $ mkdir tutorial
     $ cd tutorial/
@@ -51,7 +51,7 @@ install the ``tutorial`` project.  This done with the install.py script.
 The install script puts the project into your cyclus userspace,
 ``${HOME}/.local/lib/cyclus``.
 
-.. code-block:: bash
+.. code-block:: console
 
     tutorial $ python install.py
 
@@ -61,7 +61,7 @@ Let's run |cyclus| with the TutorialFacility! In the directory there is
 an :file:`example.xml`. Running |cyclus| on this file with the command
 ``cyclus example.xml`` should produce the following output.
 
-.. code-block:: bash
+.. code-block:: console
 
     tutorial $ cyclus example.xml
                   :
