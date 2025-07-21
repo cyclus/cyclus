@@ -131,7 +131,7 @@ you have found Nirvana.
 Over this time, it is possible that the ``main`` branch into which you are
 proposing your pull request has advanced with other changes. In order to make
 sure your ``work`` branch remains up to date, you will want to periodically
-rebase your ``work`` branch onto the ``upstream/main`` branch.  This will
+rebase your ``work`` branch onto the ``upstream/main`` branch.  This
 process will reapply all of the changes you have made on top of the most
 up-to-date version of the ``upstream/main`` branch.  Even if you have not been
 doing this regularly, you'll want to do it before you initiate a pull request.
