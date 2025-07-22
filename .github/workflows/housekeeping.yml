@@ -5,28 +5,22 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - develop
+      - main
 
 jobs:
   Housekeeping:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Dependencies
         run: |
           sudo apt-get install -y clang-format
 
-      - name: Setup environment
-        run: |
-          echo "REPO_SLUG=${GITHUB_REPOSITORY}" >> $GITHUB_ENV
-          echo "PULL_REQUEST=$(echo  $GITHUB_REF | cut -d"/" -f3)" >> $GITHUB_ENV
-
       - name: Housekeeping
         run: |
-          cd $GITHUB_WORKSPACE
-          git config --global --add safe.directory /__w/cyclus/cyclus
+          git config --global --add safe.directory $GITHUB_WORKSPACE
           find src/ \( -name "*.hpp" -o -name "*.cpp" -o -name "*.hh" -o -name "*.cc" -o -name "*.h" \) \
               -exec clang-format -style=file -i {} \;
           clang_diffs=`git status --porcelain`
