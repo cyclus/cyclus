@@ -84,7 +84,7 @@ std::unordered_map<std::string, double> GenerateParamList() const override {
 }
 
 double CalculateUnitCost(double production_capacity, double units_to_produce,
-                        double input_cost = 0.0) const {
+                         double input_cost = 0.0) const {
   // Check if there's a cost override, and if so, use that
   if (cost_override > 0) {
     return cost_override + input_cost / units_to_produce;
@@ -159,8 +159,8 @@ double CalculateUnitCost(double production_capacity, double units_to_produce,
       PMT(operational_lifetime, return_rate, total_dep - tax_shield, 0);
 
   double unit_production_cost = (annualized_depreciable + total_annual_fixed +
-                      total_annual_variable + property_tax) /
-                     annual_production;
+                                 total_annual_variable + property_tax) /
+                                annual_production;
 
   double unit_cost = unit_production_cost + input_cost / units_to_produce;
 
@@ -169,7 +169,7 @@ double CalculateUnitCost(double production_capacity, double units_to_produce,
 }
 
 double CalculateUnitPrice(double production_capacity, double units_to_produce,
-                         double input_cost = 0.0) const {
+                          double input_cost = 0.0) const {
   // Default implementation
   return CalculateUnitCost(production_capacity, units_to_produce, input_cost);
 }
