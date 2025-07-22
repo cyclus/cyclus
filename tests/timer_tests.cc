@@ -1,3 +1,7 @@
+#include "platform.h"
+#if CYCLUS_IS_PARALLEL
+#include <omp.h>
+#endif // CYCLUS_IS_PARALLEL
 #include <gtest/gtest.h>
 
 #include "context.h"
@@ -97,7 +101,21 @@ class SnapperDec : public cyclus::Facility {
   bool snap;
 };
 
-TEST(TimerTests, BareSim) {
+class TimerTestsFixture : public ::testing::TestWithParam<int> {
+  protected:
+    #if CYCLUS_IS_PARALLEL
+    virtual void SetUp() {
+      int nthreads = GetParam();
+      omp_set_num_threads(nthreads);
+    }
+
+    virtual void TearDown() {
+      omp_set_num_threads(1);
+    }
+    #endif // CYCLUS_IS_PARALLEL
+};
+
+TEST_P(TimerTestsFixture, BareSim) {
   cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
@@ -109,7 +127,7 @@ TEST(TimerTests, BareSim) {
   cyclus::PyStop();
 }
 
-TEST(TimerTests, EarlyTermination) {
+TEST_P(TimerTestsFixture, EarlyTermination) {
   cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
@@ -134,7 +152,7 @@ TEST(TimerTests, EarlyTermination) {
   cyclus::PyStop();
 }
 
-TEST(TimerTests, DefaultSnapshotTick) {
+TEST_P(TimerTestsFixture, DefaultSnapshotTick) {
   cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
@@ -156,7 +174,7 @@ TEST(TimerTests, DefaultSnapshotTick) {
   cyclus::PyStop();
 }
 
-TEST(TimerTests, DefaultSnapshotTock) {
+TEST_P(TimerTestsFixture, DefaultSnapshotTock) {
   cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
@@ -179,7 +197,7 @@ TEST(TimerTests, DefaultSnapshotTock) {
 }
 
 
-TEST(TimerTests, DefaultSnapshotDec) {
+TEST_P(TimerTestsFixture, DefaultSnapshotDec) {
   cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
@@ -201,7 +219,7 @@ TEST(TimerTests, DefaultSnapshotDec) {
   cyclus::PyStop();
 }
 
-TEST(TimerTests, CustomSnapshot) {
+TEST_P(TimerTestsFixture, CustomSnapshot) {
   cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
@@ -227,7 +245,7 @@ TEST(TimerTests, CustomSnapshot) {
   cyclus::PyStop();
 }
 
-TEST(TimerTests, NullParentDecomNoSegfault) {
+TEST_P(TimerTestsFixture, NullParentDecomNoSegfault) {
   cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
@@ -243,7 +261,7 @@ TEST(TimerTests, NullParentDecomNoSegfault) {
   cyclus::PyStop();
 }
 
-TEST(TimerTests, DoubleDecom) {
+TEST_P(TimerTestsFixture, DoubleDecom) {
   cyclus::PyStart();
   cyclus::Recorder rec;
   cyclus::Timer ti;
@@ -260,3 +278,9 @@ TEST(TimerTests, DoubleDecom) {
   EXPECT_EQ(1, Dier::decom_count);
   cyclus::PyStop();
 }
+
+#if CYCLUS_IS_PARALLEL
+INSTANTIATE_TEST_CASE_P(TimerTestsParallel, TimerTestsFixture, ::testing::Values(1, 2, 3, 4));
+#else
+INSTANTIATE_TEST_CASE_P(TimerTests, TimerTestsFixture, ::testing::Values(1));
+#endif // CYCLUS_IS_PARALLEL

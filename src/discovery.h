@@ -9,7 +9,7 @@
 
 // Undefines isnan from pyne
 #ifdef isnan
-  #undef isnan
+#undef isnan
 #endif
 
 namespace cyclus {
@@ -24,7 +24,8 @@ std::set<std::string> DiscoverSpecs(std::string p, std::string lib);
 /// Discover archetype specifications that live recursively in modules in a dir.
 std::set<std::string> DiscoverSpecsInDir(std::string d);
 
-/// Discover archetype specifications that live recursively in CYCLUS_PATH directories.
+/// Discover archetype specifications that live recursively in CYCLUS_PATH
+/// directories.
 std::set<std::string> DiscoverSpecsInCyclusPath();
 
 /// Discover archetype metadata in cyclus path

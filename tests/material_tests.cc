@@ -7,6 +7,7 @@
 #include "cyc_limits.h"
 #include "toolkit/mat_query.h"
 #include "error.h"
+#include "toolkit/res_buf.h"
 
 using pyne::nucname::id;
 
@@ -208,12 +209,38 @@ TEST_F(MaterialTest, ExtractInGrams) {
   EXPECT_DOUBLE_EQ(test_size_ - kg_to_rem, default_mat_->quantity());
 }
 
+TEST_F(MaterialTest, DecayResBuf) {
+  // prequeries
+  cyclus::toolkit::MatQuery orig(tracked_mat_);
+  double u235_qty = orig.mass(u235_);
+  double pb208_qty = orig.mass(pb208_);
+  double am241_qty = orig.mass(am241_);
+  double sr89_qty = orig.mass(sr89_);
+  double orig_mass = tracked_mat_->quantity();
+
+  cyclus::toolkit::ResBuf<cyclus::Material> res_buf;
+  res_buf.Push(tracked_mat_);
+  // decay for 2 months which is just over 1 Sr-89 half-life
+  res_buf.Decay(2);
+  cyclus::Material::Ptr pop_mat = res_buf.Pop();
+
+  // postquery
+  cyclus::toolkit::MatQuery mq(pop_mat);
+
+  // postchecks
+  EXPECT_NE(u235_qty, mq.mass(u235_));
+  EXPECT_NE(pb208_qty, mq.mass(pb208_));
+  EXPECT_NE(am241_qty, mq.mass(am241_));
+  EXPECT_NE(sr89_qty, mq.mass(sr89_));
+}
+
 TEST_F(MaterialTest, DecayManual) {
   // prequeries
   cyclus::toolkit::MatQuery orig(tracked_mat_);
   double u235_qty = orig.mass(u235_);
   double pb208_qty = orig.mass(pb208_);
   double am241_qty = orig.mass(am241_);
+  double sr89_qty = orig.mass(sr89_);
   double orig_mass = tracked_mat_->quantity();
 
   tracked_mat_->Decay(100);
@@ -225,6 +252,7 @@ TEST_F(MaterialTest, DecayManual) {
   EXPECT_NE(u235_qty, mq.mass(u235_));
   EXPECT_NE(pb208_qty, mq.mass(pb208_));
   EXPECT_NE(am241_qty, mq.mass(am241_));
+  EXPECT_NE(sr89_qty, mq.mass(sr89_));
 }
 
 TEST_F(MaterialTest, DecayLazy) {
@@ -306,7 +334,7 @@ TEST_F(MaterialTest, DecayShortcut) {
   Material::Ptr m = Material::CreateUntracked(1.0, c);
 
   std::string u235 ("u235");
-  ASSERT_NEAR(3.11996e-17, pyne::decay_const(u235), 1e-20);
+  ASSERT_NEAR(3.11996e-17, pyne::decay_const(u235), cyclus::CY_NEAR_ZERO);
 
   double sec_per_month = 2629152;
   double u235_lambda = pyne::decay_const(u235) * sec_per_month;  // per month
@@ -345,7 +373,7 @@ TEST_F(MaterialTest, DecayCustomTimeStep) {
   cyclus::compmath::Normalize(&newv);
 
   // one half of atoms should have decayed away
-  double eps = 1e-6;
+  double eps = cyclus::CY_NEAR_ZERO;
   EXPECT_NEAR(0.5, newv[id("Cs137")], eps) << "one Cs137 half-life duration time step did not decay half of Cs atoms";
 }
 
@@ -410,6 +438,22 @@ TEST_F(MaterialTest, DecayHeatTest) {
                                         diff_test_comp);
   double dec_heat = diff_test_mat->DecayHeat();
   ASSERT_NEAR(3.614E-14 , dec_heat, 0.0005);
+}
+
+TEST_F(MaterialTest, GetNormalizedCompAtom) {
+  double val = 1.5 * units::kg;
+  Material::Ptr m1 = Material::CreateUntracked(val, diff_comp_);
+  cyclus::CompMap c(m1->comp()->atom());
+  cyclus::compmath::Normalize(&c);
+  EXPECT_EQ(Composition::ToString(c), "380890000: 0.459861\n822080000: 0.196585\n922350000: 0.173947\n952410000: 0.169608\n");
+}
+
+TEST_F(MaterialTest, GetNormalizedCompMass) {
+  double val = 1.5 * units::kg;
+  Material::Ptr m1 = Material::CreateUntracked(val, diff_comp_);
+  cyclus::CompMap c(m1->comp()->mass());
+  cyclus::compmath::Normalize(&c);
+  EXPECT_EQ(Composition::ToString(c), "380890000: 0.250000\n822080000: 0.250000\n922350000: 0.250000\n952410000: 0.250000\n");
 }
 
 }  // namespace cyclus

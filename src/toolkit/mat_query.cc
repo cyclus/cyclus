@@ -28,11 +28,11 @@ double MatQuery::mass_frac(Nuc nuc) {
 
 double MatQuery::mass_frac(std::set<Nuc> nucs) {
   double m_tot = 0;
-  std::set<Nuc>::iterator it ;
+  std::set<Nuc>::iterator it;
   for (it = nucs.begin(); it != nucs.end(); ++it) {
     m_tot += mass(*it);
   }
-  return m_tot/qty();
+  return m_tot / qty();
 }
 
 double MatQuery::atom_frac(Nuc nuc) {
@@ -46,9 +46,9 @@ double MatQuery::atom_frac(std::set<Nuc> nucs) {
   compmath::Normalize(&v);
 
   double frac_tot = 0;
-  std::set<Nuc>::iterator it ;
+  std::set<Nuc>::iterator it;
   for (it = nucs.begin(); it != nucs.end(); ++it) {
-    if (v.find(*it) != v.end()){
+    if (v.find(*it) != v.end()) {
       frac_tot += v[*it];
     }
   }
@@ -87,7 +87,7 @@ double MatQuery::Amount(Composition::Ptr c) {
   compmath::Normalize(&m_other);
 
   Nuc limiter;
-  double min_ratio = 1e300;
+  double min_ratio = cyclus::CY_LARGE_DOUBLE;
   CompMap::iterator it;
   for (it = m_other.begin(); it != m_other.end(); ++it) {
     Nuc nuc = it->first;

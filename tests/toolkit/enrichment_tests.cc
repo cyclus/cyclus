@@ -95,7 +95,7 @@ TEST_F(EnrichmentTests, enrichmentcalcs) {
   double product_qty = UraniumQty(mat_by_mass_);
   EXPECT_DOUBLE_EQ(feed_qty_, FeedQty(product_qty, assays));
   EXPECT_DOUBLE_EQ(tails_qty_, TailsQty(product_qty, assays));
-  EXPECT_NEAR(swu_, SwuRequired(product_qty, assays), 1e-8);
+  EXPECT_NEAR(swu_, SwuRequired(product_qty, assays), cyclus::CY_NEAR_ZERO);
 }
 
 }  // namespace toolkit

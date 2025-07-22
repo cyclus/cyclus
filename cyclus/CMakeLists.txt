@@ -7,10 +7,11 @@ INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 #
 # First things first, code-generation
 #
+CONFIGURE_FILE(system.py.in "${CMAKE_CURRENT_SOURCE_DIR}/system.py" @ONLY)
 message(STATUS "Generating Type System API for Python")
-EXECUTE_PROCESS(COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/gentypesystem.py
+EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/gentypesystem.py
     "--src-dir=${CMAKE_CURRENT_SOURCE_DIR}"
-    "--cyclus-version=${core_version}"
+    "--data-model-version=${DATA_MODEL_VERSION}"
     "--verbose"
     RESULT_VARIABLE res_var)
 IF(NOT "${res_var}" STREQUAL "0")
@@ -37,11 +38,11 @@ foreach(file ${CYCLUS_CYTHON_FILES})
     set_target_properties(${targ} PROPERTIES LINKER_LANGUAGE CXX
                                              OUTPUT_NAME ${name}
                                              LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+    if (CYTHON_VERSION_MAJOR GREATER_EQUAL 3)
+        target_compile_definitions(${targ} PRIVATE NPY_NO_DEPRECATED_API=NPY_1_7_API_VERSION)
+    endif()
     # the following install is needed so that CMake sets the correct RPATH for the
     # python extension modules, even though they are installed (with the wrong RPATH)
     # by setup.py, along with the pure python files.
     install(TARGETS ${targ} LIBRARY DESTINATION "${PYTHON_SITE_PACKAGES}/cyclus")
 endforeach()
-
-FILE(GLOB CYCLUS_PYTHON_FILES "${CYCLUS_PYSOURCE_DIR}/*.py")
-INSTALL(FILES ${CYCLUS_PYTHON_FILES} DESTINATION "${PYTHON_SITE_PACKAGES}/cyclus")

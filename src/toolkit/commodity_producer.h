@@ -13,8 +13,7 @@ namespace toolkit {
 
 /// A container to hold information about a commodity
 struct CommodInfo {
-  CommodInfo(double default_capacity = 0,
-             double default_cost = kModifierLimit);
+  CommodInfo(double default_capacity = 0, double default_cost = kModifierLimit);
   double capacity;
   double cost;
 };
@@ -75,9 +74,7 @@ class CommodityProducer : public AgentManaged {
 
   /// Unregister a commodity as being produced by this object
   /// @param commodity the commodity being produced
-  inline void Rm(const Commodity& commodity) {
-    commodities_.erase(commodity);
-  }
+  inline void Rm(const Commodity& commodity) { commodities_.erase(commodity); }
 
   /// @return the set of commodities produced by this producers
   std::set<Commodity, CommodityCompare> ProducedCommodities();

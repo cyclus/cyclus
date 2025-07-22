@@ -10,18 +10,18 @@ information on the entire "ecosystem" please refer to the `Cyclus website
 <http://fuelcycle.org>`_.
 
 
-================    =================    ===================    ===================
 Cyclus Projects Status
------------------------------------------------------------------------------------
-**Branch**              **Cyclus**         **Cycamore**           **Cymetric**
-================    =================    ===================    ===================
-main              |cyclus_main|       |cycamore_main|      |cymetric_main|
-================    =================    ===================    ===================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
++--------------------+--------------------+--------------------+--------------------+
+| Branch             | Cyclus             | Cycamore           | Cymetric           |
++====================+====================+====================+====================+
+| ``main``           | |cyclus_main|      | |cycamore_main|    | |cymetric_main|    |
++--------------------+--------------------+--------------------+--------------------+
 
-.. |cyclus_main| image:: https://circleci.com/gh/cyclus/cyclus/tree/main.png?&amp;circle-token= 35d82ba8661d4f32e0f084b9d8a2388fa62c0262
-.. |cycamore_main| image:: https://circleci.com/gh/cyclus/cycamore/tree/main.png?&amp;circle-token= 333211090d5d5a15110eed1adbe079a6f3a4a704
-.. |cymetric_main| image:: https://circleci.com/gh/cyclus/cymetric/tree/main.png?&amp;circle-token= 72639b59387f077973af98e7ce72996eac18b96c
+.. |cyclus_main| image:: https://github.com/cyclus/cyclus/actions/workflows/publish_latest.yml/badge.svg
+.. |cycamore_main| image:: https://github.com/cyclus/cycamore/actions/workflows/publish_latest.yml/badge.svg
+.. |cymetric_main| image:: https://github.com/cyclus/cymetric/actions/workflows/publish_latest.yml/badge.svg
 
 
 
@@ -72,61 +72,39 @@ Dependencies
 ************
 
 In order to facilitate future compatibility with multiple platforms,
-Cyclus is built using ``CMake``. A full list of the Cyclus package
-dependencies is shown below:
-
-====================   ==================
-Package                Minimum Version
-====================   ==================
-``CMake``                2.8
-``boost``                1.46.1
-``libxml2``              2
-``libxml++``             2.36
-``python``               2.7 or 3.10
-``sqlite3``              3.7.10
-``HDF5``                 1.8.4
-``Coin-Cbc``             2.5
-``zlib``                 1.1.4
-====================   ==================
-
-For detailed instructions on installing dependencies, see `Installing Dependencies <DEPENDENCIES.rst>`_.
+Cyclus is built using ``CMake``. For detailed instructions on Cyclus dependencies (including minimum version requirements), see `Installing Dependencies <DEPENDENCIES.rst>`_.
 
 *************************
 Quick Cyclus Installation
 *************************
 The quickest way to install Cyclus and its dependencies relies on using the `conda-forge` channel and the `conda` package manager within the Anaconda python environment.  The following instructions guide you through that approach.
-To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 18.04 LTS):
+To install Cyclus and its dependencies onto a clean Ubuntu machine (tested on 22.04 LTS):
 
-- Download the latest Anaconda installer for Linux at
-  ``https://www.anaconda.com/distribution/#download-section``
+- Download and install Miniconda for Linux
 
-- Move the ``.sh`` to your Home directory
 
-- In Terminal, execute the following commands:
+.. code-block:: console
 
-- ``bash Anaconda3-2019.03-Linux-x86_64.sh``
+  mkdir -p ~/miniconda3
+  wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
+  bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
+  rm -rf ~/miniconda3/miniconda.sh
 
-- ``echo 'export PATH="~/anaconda/bin:$PATH"' >> ~/.bashrc``
+- Execute the following commands to initialize Miniconda:
 
-- ``source .bashrc``
+.. code-block:: console
 
-- ``conda config --add channels conda-forge``
+  ~/miniconda3/bin/conda init bash
+  source ~/.bashrc
 
-- ``conda create -n cyclus python=3.11``
+- Create a new environment and install the Cyclus package
 
-- ``conda activate cyclus``
+.. code-block:: console
 
-- ``conda install -y openssh gxx_linux-64 gcc_linux-64 cmake make docker-pycreds git xo python-json-logger glib glibmm zlib libxml2 libxmlpp libxmlpp-4.0 libblas libcblas liblapack pkg-config coincbc boost-cpp hdf5 sqlite pcre gettext bzip2 xz setuptools pytest pytables pandas jinja2 "cython<3" websockets pprintpp``
-
-- ``conda install -y --force-reinstall libsqlite``
-
-- Use ``sudo apt install`` to install and configure git
-
-- Clone the Cyclus repository by running ``git clone https://github.com/cyclus/cyclus.git``
-
-- Navigate to the folder containing Cyclus
-
-- Run the command ``python install.py``
+  conda config --add channels conda-forge
+  conda create -n cyclus
+  conda activate cyclus
+  conda install -y cyclus
 
 For more detailed installation procedure, and/or custom installation please
 refer to the `INSTALLATION guide <INSTALL.rst>`_.
@@ -138,9 +116,9 @@ Running Tests
 Installing Cyclus will also install a test driver (i.e., an executable of all of
 our tests). You can run the tests yourself via:
 
-.. code-block:: bash
+.. code-block:: console
 
-    $ cyclus_unit_tests
+    cyclus_unit_tests
 
 
 *******************
@@ -156,7 +134,7 @@ simulations, first download Cycamore
   https://github.com/cyclus/cycamore.git``,
 
 - Install in the same location you installed Cyclus (eg. in ``~/.local/``):
-  ``python install.py`` from the ``cycamore`` folder.
+  ``python3 install.py`` from the ``cycamore`` folder.
 
 
 **************
@@ -167,9 +145,9 @@ You can find instructions for writing an input file for cyclus from `Cyclus User
 Guide`_ or use sample input files from `Cycamore Repo`_. Assuming you have some
 file ``input.xml``, you can run Cyclus via:
 
-.. code-block:: bash
+.. code-block:: console
 
-    $ cyclus path/to/input.xml
+    cyclus path/to/input.xml
 
 For a more detailed explanation, check out the `Cyclus User Guide`_.
 
@@ -182,11 +160,11 @@ to contribute into Cyclus, please follow this procedure:
 
 #. Fork Cyclus repository,
 
-#. Create a working branch on your fork from the ``develop`` branch,
+#. Create a working branch on your fork from the ``main`` branch,
 
 #. Implement your modification of the Cyclus source code,
 
-#. Submit a Pull request into ``Cyclus/develop`` branch,
+#. Submit a Pull request into ``Cyclus/main`` branch,
 
 #. Wait for reviews/merge (the proposer of a pull request cannot be the Merger).
 

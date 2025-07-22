@@ -10,6 +10,7 @@ on:
       - '.github/workflows/publish_release.yml'
       - '.github/workflows/changelog_test.yml'
       - '.github/workflows/rocky_build_test.yml'
+      - '.github/workflows/macos_build_test.yml'
       - 'doc/**'
       - 'CHANGELOG.rst'
   push:
@@ -67,7 +68,7 @@ jobs:
           format: lcov
 
       - name: Upload Coverage HTML Artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v3
         with:
           name: cyclus-coverage-report-${{ matrix.ubuntu_versions }}-${{ matrix.pkg_mgr }}
           path: ${{ github.workspace }}/html

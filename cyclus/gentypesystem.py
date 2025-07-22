@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Generates Cyclus Type System bindings.
 
 Module history:
@@ -357,7 +357,6 @@ CYTHON_TYPES = {
     'UUID': 'cpp_cyclus.uuid',
     'MATERIAL': 'cpp_cyclus.Material',
     'PRODUCT': 'cpp_cyclus.Product',
-    'RESOURCE_BUFF': 'cpp_cyclus.ResourceBuff',
     # C++ normal types
     'bool': 'cpp_bool',
     'int': 'int',
@@ -369,7 +368,6 @@ CYTHON_TYPES = {
     'boost::uuids::uuid': 'cpp_cyclus.uuid',
     'cyclus::Material': 'cpp_cyclus.Material',
     'cyclus::Product': 'cpp_cyclus.Product',
-    'cyclus::toolkit::ResourceBuff': 'cpp_cyclus.ResourceBuff',
     # Template Types
     'std::set': 'std_set',
     'std::map': 'std_map',
@@ -384,10 +382,11 @@ CYTHON_TYPES = {
 # Don't include the base resource class here since it is pure virtual.
 RESOURCES = ['MATERIAL', 'PRODUCT']
 
-INVENTORIES = ['cyclus::toolkit::ResourceBuff', 'cyclus::toolkit::ResBuf',
+INVENTORIES = ['cyclus::toolkit::ResBuf',
                'cyclus::toolkit::TotalInvTracker', 'cyclus::toolkit::ResMap']
 
-USE_SHARED_PTR = ('MATERIAL', 'PRODUCT', 'cyclus::Material', 'cyclus::Product')
+USE_SHARED_PTR = ('MATERIAL', 'PRODUCT', 
+                  'cyclus::Material', 'cyclus::Product')
 
 FUNCNAMES = {
     # type system types
@@ -401,7 +400,6 @@ FUNCNAMES = {
     'UUID': 'uuid',
     'MATERIAL': 'material',
     'PRODUCT': 'product',
-    'RESOURCE_BUFF': 'resource_buff',
     # C++ normal types
     'bool': 'bool',
     'int': 'int',
@@ -412,7 +410,6 @@ FUNCNAMES = {
     'boost::uuids::uuid': 'uuid',
     'cyclus::Material': 'material',
     'cyclus::Product': 'product',
-    'cyclus::toolkit::ResourceBuff': 'resource_buff',
     # Template Types
     'std::set': 'std_set',
     'std::map': 'std_map',
@@ -436,7 +433,6 @@ CLASSNAMES = {
     'UUID': 'Uuid',
     'MATERIAL': 'Material',
     'PRODUCT': 'Product',
-    'RESOURCE_BUFF': 'ResourceBuff',
     # C++ normal types
     'bool': 'Bool',
     'int': 'Int',
@@ -447,7 +443,6 @@ CLASSNAMES = {
     'boost::uuids::uuid': 'Uuid',
     'cyclus::Material': 'Material',
     'cyclus::Product': 'Product',
-    'cyclus::toolkit::ResourceBuff': 'ResourceBuff',
     # Template Types
     'std::set': 'Set',
     'std::map': 'Map',
@@ -470,7 +465,6 @@ VARS_TO_PY = {
     'std::string': 'bytes({var}).decode()',
     'cyclus::Blob': 'blob_to_bytes({var})',
     'boost::uuids::uuid': 'uuid_cpp_to_py({var})',
-    'cyclus::toolkit::ResourceBuff': 'None',
     }
 
 # note that this maps normal forms to python
@@ -482,7 +476,6 @@ VARS_TO_CPP = {
     'std::string': 'str_py_to_cpp({var})',
     'cyclus::Blob': 'cpp_cyclus.Blob(std_string(<const char*> {var}))',
     'boost::uuids::uuid': 'uuid_py_to_cpp({var})',
-    'cyclus::toolkit::ResourceBuff': 'resource_buff_to_cpp({var})',
     }
 
 TEMPLATE_ARGS = {
@@ -506,7 +499,6 @@ NPTYPES = {
     'boost::uuids::uuid': 'np.NPY_OBJECT',
     'cyclus::Material': 'np.NPY_OBJECT',
     'cyclus::Product': 'np.NPY_OBJECT',
-    'cyclus::toolkit::ResourceBuff': 'None',
     'std::set': 'np.NPY_OBJECT',
     'std::map': 'np.NPY_OBJECT',
     'std::pair': 'np.NPY_OBJECT',
@@ -527,7 +519,6 @@ NEW_PY_INSTS = {
     'boost::uuids::uuid': 'uuid.UUID(int=0)',
     'cyclus::Material': 'None',
     'cyclus::Product': 'None',
-    'cyclus::toolkit::ResourceBuff': 'None',
     'std::set': 'set()',
     'std::map': '{}',
     'std::pair': '(None, None)',
@@ -563,7 +554,6 @@ TO_PY_CONVERTERS = {
                             'cpp_cyclus.Product]({var})\n'
         'py_{var} = pyx_{var}\n',
         'py_{var}'),
-    'cyclus::toolkit::ResourceBuff': ('', '', 'None'),
     # templates
     'std::set': (
         '{valdecl}\n'
@@ -685,12 +675,6 @@ TO_CPP_CONVERTERS = {
         'py{var} = <_Product> {var}\n'
         'cpp{var} = reinterpret_pointer_cast[cpp_cyclus.Product, '
                          'cpp_cyclus.Resource](py{var}.ptx)\n',
-        'cpp{var}'),
-    'cyclus::toolkit::ResourceBuff': (
-        'cdef _{classname} py{var}\n'
-        'cdef cpp_cyclus.ResourceBuff cpp{var}\n',
-        'py{var} = <_{classname}> {var}\n'
-        'cpp{var} = deref(py{var}.ptx)\n',
         'cpp{var}'),
     # templates
     'std::set': (
@@ -1277,18 +1261,6 @@ class Product(_Product, Resource):
     """
 
 
-cdef object manifest_to_py(cpp_cyclus.Manifest manifest):
-    """Turns a manifest into a list of Resources."""
-    cdef list m = []
-    cdef _Resource r
-    for ptr in manifest:
-        r = Resource()
-        r.ptx = ptr
-        m.append(r)
-    rtn = m
-    return rtn
-
-
 #
 # Inventories block
 #
@@ -1316,93 +1288,7 @@ cdef class _{{tclassname}}:
         """Returns true if nothing is stored."""
         return self.ptx.empty()
 
-{% if t == 'RESOURCE_BUFF' %}
-    @property
-    def capacity(self):
-        """The maximum resource quantity this store can hold."""
-        return self.ptx.capacity()
-
-    @capacity.setter
-    def capacity(self, double val):
-        self.ptx.set_capacity(val)
-
-    @property
-    def count(self):
-        """the total number of constituent resource objects in the store."""
-        return self.ptx.count()
-
-    def __len__(self):
-        return self.ptx.count()
-
-    @property
-    def space(self):
-        """The quantity of space remaining in this store."""
-        return self.ptx.space()
-
-    def pop_qty(self, double quantity, double eps=-1.0):
-        """Pops the specified quantity of resources from the buffer.
-        Negative eps values are ignored (default).
-        """
-        cdef cpp_cyclus.Manifest manifest
-        if eps < 0.0:
-            manifest = self.ptx.PopQty(quantity)
-        else:
-            manifest = self.ptx.PopQty(quantity, eps)
-        rtn = manifest_to_py(manifest)
-        return rtn
-
-    def pop_n(self, int num):
-        """Pops the specified number of resources from the buffer."""
-        rtn = manifest_to_py(self.ptx.PopN(num))
-        return rtn
-
-    def pop(self, bint back=False):
-        """Pops one resource object from the store."""
-        cdef _Resource r = Resource()
-        if back:
-            r.ptx = self.ptx.Pop(cpp_cyclus.BACK)
-        else:
-            r.ptx = self.ptx.Pop(cpp_cyclus.FRONT)
-        rtn = r
-        return rtn
-
-    def push(self, _Resource r):
-        """Pushes a single resource object to the buffer."""
-        self.ptx.Push(r.ptx)
-
-    def push_all(self, rs):
-        """Pushes one or more resource objects to the store."""
-        cdef std_vector[shared_ptr[cpp_cyclus.Resource]] v
-        cdef _Resource cpp_r
-        for r in rs:
-            cpp_r = <_Resource> r
-            v.push_back(cpp_r.ptx)
-        self.ptx.PushAll[shared_ptr[cpp_cyclus.Resource]](v)
-
-    def pop_all_res(self):
-        """A consistent interface for popping all of the resources from the buffer.
-        For ResourceBuff, this is equivalent to self.pop_n(len(self))
-        """
-        rtn = manifest_to_py(self.ptx.PopN(self.ptx.count()))
-        return rtn
-
-    def push_many(self, rs):
-        """A consistent interface for pushing many resources into the buffer.
-        For ResourceBuff, this simply calls push_all().
-        """
-        self.push_all(rs)
-
-    {% for r in ts.resources %}{% set rfname = ts.funcname(r) %}{% set rcname = ts.classname(r) %}
-    def pop_{{rfname}}(self):
-        """Pops one resource object from the store as a {{rfname}}."""
-        cdef _{{rcname}} r = {{rcname}}()
-        r.ptx = self.ptx.Pop(cpp_cyclus.FRONT)  # don't bother casting back and forth
-        rtn = r
-        return rtn
-
-    {% endfor %}
-
-{% elif ts.norms[t][0] == 'cyclus::toolkit::ResBuf' %}
+{% if ts.norms[t][0] == 'cyclus::toolkit::ResBuf' %}
 {% set r = ts.norms[t][1] %}
 {% set rcname = ts.classname(r) %}
     @property
@@ -1896,7 +1782,7 @@ cdef class StateVar:
     uitype       The type of the input field in reference in a UI,
                  currently supported types are; incommodity, outcommodity,
                  commodity, range, combobox, facility, prototype, recipe, nuclide,
-                 and none.
+                 package, transportunit, and none.
                  For 'nuclide' when the type is an int, the values will be read in
                  from the input file in human readable string format ('U-235') and
                  automatically converted to results of ``pyne::nucname::id()``
@@ -2580,8 +2466,6 @@ cdef class _Material(_Resource):
 cdef class _Product(_Resource):
     pass
 
-cdef object manifest_to_py(cpp_cyclus.Manifest)
-
 {% for t in ts.inventory_types %}
 {% set tclassname = ts.classname(t)%}
 cdef class _{{tclassname}}:
@@ -2779,8 +2663,8 @@ def parse_args(argv):
                         dest='dbtypes_json',
                         help="the path to dbtypes.json file, "
                              "default " + dbtd)
-    parser.add_argument('--cyclus-version', default=None,
-                        dest='cyclus_version',
+    parser.add_argument('--data-model-version', default=None,
+                        dest='data_model_version',
                         help="The Cyclus API version to target."
                         )
     ns = parser.parse_args(argv)
@@ -2802,7 +2686,7 @@ def setup(ns):
     with io.open(ns.dbtypes_json, 'r') as f:
         tab = json.load(f)
     # get cyclus version
-    verstr = ns.cyclus_version
+    verstr = ns.data_model_version
     if verstr is None:
         try:
             verstr = safe_output(['cyclus', '--version']).split()[2]
@@ -2817,7 +2701,7 @@ def setup(ns):
     if verstr is not None:
         if isinstance(verstr, bytes):
             verstr = verstr.decode()
-        ns.cyclus_version = verstr
+        ns.data_model_version = verstr
         ver = tuple(map(int, verstr.partition('-')[0].split('.')))
     if ns.verbose:
         print('Found cyclus version: ' + verstr, file=sys.stderr)

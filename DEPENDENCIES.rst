@@ -22,51 +22,41 @@ In order to facilitate future compatibility with multiple platforms,
 Cyclus is built using ``CMake``. A full list of the Cyclus package
 dependencies is shown below:
 
-====================   ==================
-Package                Minimum Version
-====================   ==================
-``CMake``                2.8
-``boost``                1.46.1
-``libxml2``              2
-``libxml++``             2.36
-``python``               2.7 or 3.3+
-``sqlite3``              3.7.10
-``HDF5``                 1.8.4
-``Coin-Cbc``             2.5
-====================   ==================
+====================      ==================
+Package                   Minimum Version
+====================      ==================
+``CMake``                 3.16.3
+``pkg-config``            0.29.1
+``boost``                 1.71.0
+``libxml2``               2.9.10
+``libxml++``              2.40.1
+``python``                3.8.10
+``sqlite3``               3.31.1
+``HDF5``                  1.10.4
+``LAPACK``                3.9.0
+====================      ==================
 
 .. website_include_end
 
-On some platforms, such as Ubuntu 16.04, the following are also necessary:
-
-====================   ==================
-Package                Minimum Version
-====================   ==================
-``g++``                  4.8.2
-``libblas-dev``          1.2
-``liblapack-dev``        3.5.0
-====================   ==================
-
-
 And a few optional dependencies:
 
-====================   ==================
-Package                Minimum Version
-====================   ==================
-doxygen (for docs)     1.7.6.1
-tcmalloc (for speed)   any
-Cython                  >=0.25 and  <0.27
-Python (dev version)   2.7 or 3.3+
-Jinja2                 any
-NumPy                  1.9+
-Pandas                 any
-====================   ==================
+====================   ==================  =============================================  ==================        
+Package                Minimum Version     Purpose                                        Notes
+====================   ==================  =============================================  ==================  
+``git``                2.32.0              Enables access to source code via Github       N/A
+``Coin-Cbc``           2.10.3              Enables use of Branch-and-Cut solver           Cyclus must be built with ``--allow-milps`` flag
+``Coin-Clp``           1.17.5              Enables use of Linear Programming solver       Cyclus must be built with ``--allow-milps`` flag
+``doxygen``            1.7.6.1             Building documentation                         N/A
+``TCMmalloc``          any                 Improves performance                           Only used if Cython is not present
+``Cython``             0.29                Enables use of Python agents and input files   N/A
+``Jinja2``             2.10.1              Enables use of Python agents and input files   Only needed if Cython is installed
+``NumPy``              1.9                 Enables use of Python agents and input files   Only needed if Cython is installed
+``pandas``             0.25.3              Enables use of Python agents and input files   Only needed if Cython is installed
+``pip``                20.0.2              Enables use of Python agents and input files   Only needed if Cython is installed
+====================   ==================  =============================================  ==================
 
 *Note that the Debian/Ubuntu package ``libtcmalloc`` is NOT discovered correctly
 by our build system.  Instead use ``libgoogle-perftools-dev``.*
-
-*Also note that the development version of Python, Jinja2, NumPy, and Pandas are
-only needed if Cython is installed.*
 
 ***********************
 Installing Dependencies
@@ -81,12 +71,12 @@ Installing Dependencies (Linux and Unix)
 This guide assumes that the user has root access (to issue ``sudo`` commands) and
 access to a package manager or has some other suitable method of automatically
 installing established libraries. This process was tested using a fresh install
-of Ubuntu versions 16.04, using ``apt-get`` as the package
+of Ubuntu versions 20.04 and 22.04, using ``apt-get`` as the package
 manager (scroll down further for Mac OSX instructions).
 
 The command to install a dependency takes the form of:
 
-.. code-block:: bash
+.. code-block:: console
 
   sudo apt-get install package
 
@@ -95,95 +85,79 @@ required library package names is:
 
 #. make
 #. cmake
+#. pkg-config
 #. libboost-all-dev (see note below)
 #. libxml2-dev
 #. libxml++2.6-dev
+#. python3-dev
 #. libsqlite3-dev
-#. libhdf5-serial-dev
-#. libbz2-dev
-#. coinor-libcbc-dev
-#. coinor-libcoinutils-dev
-#. coinor-libosi-dev
-#. coinor-libclp-dev
-#. coinor-libcgl-dev
+#. libhdf5-dev
+#. liblapack-dev
+
 
 and (optionally):
 
 #. doxygen
-#. g++
-#. libblas-dev
-#. liblapack-dev
 #. libgoogle-perftools-dev
-#. python-dev    or  python3-dev
-#. python-tables or  python3-tables
-#. python-pandas or  python3-pandas
-#. python-numpy  or  python3-numpy
-#. python-nose   or  python3-nose
-#. python-jinja2 or  python3-jinja2
-#. cython        or  cython3       (see note below)
+#. coinor-libcbc-dev
+#. coinor-libcoinutils-dev
+#. coinor-libosi-dev
+#. coinor-libclp-dev
+#. python3-tables
+#. python3-pandas
+#. python3-numpy
+#. python3-pytest
+#. python3-jinja2
+#. python3-pip
+#. cython3       (see note below)
 
 For example, in order to install libxml++ (and libxml2) on your system, type:
 
-.. code-block:: bash
+.. code-block:: console
 
   sudo apt-get install libxml++2.6-dev
 
 If you'd prefer to copy/paste, the following line will install all **required**
 *Cyclus* dependencies:
 
-.. code-block:: bash
+.. code-block:: console
 
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev \
-   libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev \
-   coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev
+   sudo apt-get install -y cmake make pkg-config libboost-all-dev libxml2-dev libxml++2.6-dev \
+   python3-dev libsqlite3-dev libhdf5-dev liblapack-dev
 
 And to install all *Cyclus* dependencies (**required and optional**):
 
-- if using python 2.x:
+.. code-block:: console
 
-.. code-block:: bash
-
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev \
-   libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev \
-   coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ \
-   libgoogle-perftools-dev python-dev python-tables python-pandas python-numpy python-nose \
-   python-jinja2 cython
-
-- if using python 3.x:
-
-.. code-block:: bash
-
-   sudo apt-get install -y cmake make libboost-all-dev libxml2-dev libxml++2.6-dev \
-   libsqlite3-dev libhdf5-serial-dev libbz2-dev coinor-libcbc-dev coinor-libcoinutils-dev \
-   coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev libblas-dev liblapack-dev g++ \
-   libgoogle-perftools-dev python3-dev python3-tables python3-pandas python3-numpy python3-nose \
-   python3-jinja2 cython3
+   sudo apt-get install -y cmake make pkg-config libboost-all-dev libxml2-dev libxml++2.6-dev \
+   python3-dev libsqlite3-dev libhdf5-dev liblapack-dev coinor-libcbc-dev coinor-libcoinutils-dev \
+   coinor-libosi-dev coinor-libclp-dev coinor-libcgl-dev doxygen libgoogle-perftools-dev python3-tables \
+   python3-pandas python3-numpy python3-pytest python3-jinja2 cython3
 
 To determine which version of Python is already installed on your computer, run:
 
-.. code-block:: bash
+.. code-block:: console
 
    python -V
 
 
-Despite having installed python3, Ubuntu installations may still point at python2.7 by default. So Python -V can return a version of python that is not preferred. In that case the python version can be changed system-wide with the update-alternatives command. 
+Despite having installed python3, Ubuntu installations may still point at python2 by default. So Python -V can return a version of python that is not preferred. In that case the python version can be changed system-wide with the update-alternatives command. 
 
 First, you can list alternatives with the following command:
 
- .. code-block:: bash
+ .. code-block:: console
 
    update-alternatives --list python
 
-Ubuntu may not list any alternatives. To make Ubuntu aware of python 2.7 and python 3.5, use:
+Ubuntu may not list any alternatives. To make Ubuntu aware of python 3, use:
 
- .. code-block:: bash
+ .. code-block:: console
 
-   sudo update-alternatives --install /usr/bin/python python /usr/bin/python2.7 1
-   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.5 2
+   sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 From now on, to switch between different versions, use:
 
- .. code-block:: bash
+ .. code-block:: console
 
    sudo update-alternatives --config python
 
@@ -191,13 +165,13 @@ Even if you only have a single python installation, you may have to use update-a
 
 Check your current python version with the following command:
 
- .. code-block:: bash
+ .. code-block:: console
 
    python --version
 
 Then make Ubuntu aware of your current python version. Run the following command, using the python version you just checked. The following command uses version python3.8 as an example and will fail if you do not replace 3.8 with your own version number.
 
- .. code-block:: bash
+ .. code-block:: console
 
    sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.8 2
 
@@ -206,7 +180,7 @@ Cython Note
 ^^^^^^^^^^^
 If you get an error related to an old Cython version, then this may be 
 because the Debian stable version of Cython is 0.23.4. However, 
-Cyclus requires 0.25.0+. To install the latest cython version, please 
+Cyclus requires 0.29.0+. To install the latest cython version, please 
 visit the `Cython Documentation`_.
 
 Boost Note
@@ -244,7 +218,7 @@ with brew commands in place of the port commands.
 
 The command to install a dependency takes the form of:
 
-.. code-block:: bash
+.. code-block:: console
 
   sudo port install package
 
@@ -265,7 +239,7 @@ your computer:
 
 **Coin-Cbc**: Download and build using the svn command in the terminal:
 
-.. code-block:: bash
+.. code-block:: console
 
   svn co https://projects.coin-or.org/svn/Cbc/stable/2.8 Coin-Cbc
   cd Coin-Cbc/
@@ -279,7 +253,7 @@ your computer:
 Finally, update your path and the following environment variables in your
 ``~/.profile`` (or ``~/.bashrc`` ) file:
 
-.. code-block:: bash
+.. code-block:: console
 
   export DYLD_FALLBACK_LIBRARY_PATH=/opt/local/lib:/opt/local:$DYLD_FALLBACK_LIBRARY_PATH
 

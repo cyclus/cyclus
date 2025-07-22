@@ -22,6 +22,7 @@ jobs:
         ubuntu_versions : [
           20.04,
           22.04,
+          24.04,
         ]
         pkg_mgr : [
           apt,

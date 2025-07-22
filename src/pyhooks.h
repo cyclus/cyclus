@@ -16,12 +16,6 @@ extern int PY_INTERP_COUNT;
 /// Whether or not the Python interpreter has been initilized.
 extern bool PY_INTERP_INIT;
 
-/// Convience function for appending to import table for initialization
-void PyAppendInitTab(void);
-
-/// Convience function for import initialization
-void PyImportInit(void);
-
 /// Initialize Python functionality, this is a no-op if Python was not
 /// installed along with Cyclus. This may be called many times and safely
 /// initializes the Python interpreter only once.
@@ -59,8 +53,9 @@ std::string PyToJson(std::string);
 std::string JsonToPy(std::string);
 
 /// Calls the Python listeners
-void PyCallListeners(std::string tsname, Agent* agent, void* cpp_ctx, int time, boost::spirit::hold_any value);
+void PyCallListeners(std::string tsname, Agent* agent, void* cpp_ctx, int time,
+                     boost::spirit::hold_any value);
 
-}  // ends namespace toolkit
-}  // ends namespace cyclus
+}  // namespace toolkit
+}  // namespace cyclus
 #endif  // ends CYCLUS_SRC_PYHOOKS_H_

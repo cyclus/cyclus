@@ -21,9 +21,7 @@ class ExchangeSolver {
   static double Cost(const Arc& a, bool exclusive_orders = kDefaultExclusive);
 
   explicit ExchangeSolver(bool exclusive_orders = kDefaultExclusive)
-    : exclusive_orders_(exclusive_orders),
-      sim_ctx_(NULL),
-      verbose_(false) {}
+      : exclusive_orders_(exclusive_orders), sim_ctx_(NULL), verbose_(false) {}
   virtual ~ExchangeSolver() {}
 
   /// simulation context get/set
@@ -40,8 +38,7 @@ class ExchangeSolver {
   /// @brief interface for solving a given exchange graph
   /// @param a pointer to the graph to be solved
   double Solve(ExchangeGraph* graph = NULL) {
-    if (graph != NULL)
-      graph_ = graph;
+    if (graph != NULL) graph_ = graph;
     return this->SolveGraph();
   }
 

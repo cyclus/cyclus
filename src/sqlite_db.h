@@ -21,6 +21,7 @@ class SqliteDb;
 /// work.
 class SqlStatement {
   friend class SqliteDb;
+
  public:
   typedef boost::shared_ptr<SqlStatement> Ptr;
 

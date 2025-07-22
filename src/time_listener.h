@@ -20,7 +20,7 @@ namespace cyclus {
 /// }
 ///
 /// @endcode
-class TimeListener: virtual public Ider {
+class TimeListener : virtual public Ider {
  public:
   /// Simulation agents do their beginning-of-timestep activities in the Tick
   /// method.
@@ -41,7 +41,9 @@ class TimeListener: virtual public Ider {
   /// should not occur during this phase.
   ///
   /// @param time is the current simulation timestep
-  virtual void Decision(){};
+  virtual void Decision() {};
+
+  virtual bool IsShim() { return true; };
 };
 
 }  // namespace cyclus

@@ -89,6 +89,30 @@ FIND_LIBRARY(CYCLUS_CORE_LIBRARY NAMES cyclus
     PATH_SUFFIXES cyclus/lib lib)
 
 # Look for the library
+FIND_LIBRARY(CYCLUS_EVENTHOOKS_LIBRARY NAMES eventhooks.so
+    HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus"
+    ${DEPS_CYCLUS}
+    /usr/local/cyclus/lib /usr/local/cyclus
+    /opt/local /opt/local/cyclus
+    PATH_SUFFIXES cyclus/lib lib)
+    
+# Look for the library
+FIND_LIBRARY(CYCLUS_PYINFILE_LIBRARY NAMES pyinfile.so
+    HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus"
+    ${DEPS_CYCLUS}
+    /usr/local/cyclus/lib /usr/local/cyclus
+    /opt/local /opt/local/cyclus
+    PATH_SUFFIXES cyclus/lib lib)  
+
+# Look for the library
+FIND_LIBRARY(CYCLUS_PYMODULE_LIBRARY NAMES pymodule.so
+    HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus"
+    ${DEPS_CYCLUS}
+    /usr/local/cyclus/lib /usr/local/cyclus
+    /opt/local /opt/local/cyclus
+    PATH_SUFFIXES cyclus/lib lib)  
+
+# Look for the library
 FIND_LIBRARY(CYCLUS_AGENT_TEST_LIBRARY NAMES baseagentunittests
     HINTS "${CYCLUS_ROOT_DIR}" "${CYCLUS_ROOT_DIR}/cyclus"
     ${DEPS_CYCLUS}
@@ -112,6 +136,17 @@ IF(CYCLUS_CORE_INCLUDE_DIR AND CYCLUS_CORE_TEST_INCLUDE_DIR
         AND CYCLUS_AGENT_TEST_LIBRARY)
     SET(CYCLUS_CORE_FOUND 1)
     SET(CYCLUS_CORE_LIBRARIES "${CYCLUS_CORE_LIBRARY}")
+    # if Cyclus was installed without Cython these three libraries won't be found because they don't exist
+    # if Cyclus was installed WITH Cython we need to link against them
+    if(NOT ${CYCLUS_EVENTHOOKS_LIBRARY} STREQUAL "CYCLUS_EVENTHOOKS_LIBRARY-NOTFOUND")
+        SET(CYCLUS_CORE_LIBRARIES "${CYCLUS_CORE_LIBRARIES}" "${CYCLUS_EVENTHOOKS_LIBRARY}")
+    endif()
+    if(NOT ${CYCLUS_PYINFILE_LIBRARY} STREQUAL "CYCLUS_PYINFILE_LIBRARY-NOTFOUND")
+        SET(CYCLUS_CORE_LIBRARIES "${CYCLUS_CORE_LIBRARIES}" "${CYCLUS_PYINFILE_LIBRARY}")
+    endif()
+    if(NOT ${CYCLUS_PYMODULE_LIBRARY} STREQUAL "CYCLUS_PYMODULE_LIBRARY-NOTFOUND")
+        SET(CYCLUS_CORE_LIBRARIES "${CYCLUS_CORE_LIBRARIES}" "${CYCLUS_PYMODULE_LIBRARY}")
+    endif()
     SET(CYCLUS_TEST_LIBRARIES "${CYCLUS_GTEST_LIBRARY}" "${CYCLUS_AGENT_TEST_LIBRARY}")
     SET(CYCLUS_AGENT_TEST_LIBRARIES "${CYCLUS_AGENT_TEST_LIBRARY}")
     SET(CYCLUS_CORE_INCLUDE_DIRS "${CYCLUS_CORE_INCLUDE_DIR}")

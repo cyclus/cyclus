@@ -1,31 +1,36 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
 #taken from http://geant4.cern.ch/support/source/geant4/CMakeLists.txt
-IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
-    message(STATUS "Cyclus requires an out-of-source build.")
-    message(STATUS "Please remove these files from ${CMAKE_BINARY_DIR} first:")
-    message(STATUS "CMakeCache.txt")
-    message(STATUS "CMakeFiles")
-    message(STATUS "Once these files are removed, create a separate directory")
-    message(STATUS "and run CMake from there")
-    message(FATAL_ERROR "in-source build detected")
-ENDIF()
+# Tell CMake where the modules are
+LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+MESSAGE("-- CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
+
+INCLUDE(CyclusBuildSetup)
+cyclus_minimum_cmake_version(MINIMUM_CMAKE_VERSION)
+CMAKE_MINIMUM_REQUIRED(VERSION ${MINIMUM_CMAKE_VERSION})
 
 # This project name is cyclus.
-PROJECT(CYCLUS)
+PROJECT(CYCLUS VERSION 1.6.0)
 
-# check for and enable c++17 support (required for cyclus)
-INCLUDE(CheckCXXCompilerFlag)
-CHECK_CXX_COMPILER_FLAG("-std=c++17" COMPILER_SUPPORTS_CXX17)
-IF(COMPILER_SUPPORTS_CXX17)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
-ELSE()
-    MESSAGE(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++17 support. Please use a different C++ compiler.")
-ENDIF()
+INCLUDE(CheckTypeSize)
+CHECK_TYPE_SIZE("int" INT_SIZE_IN_BYTES LANGUAGE CXX)
+MATH(EXPR INT_MAX "(1 << (${INT_SIZE_IN_BYTES} * 8 - 1)) - 1")
+
+SET(CY_LARGE_INT "${INT_MAX}")
+SET(CY_LARGE_DOUBLE "1e299")
+SET(CY_NEAR_ZERO "1e-08")
+
+MESSAGE("CY_LARGE_INT: ${CY_LARGE_INT}")
+MESSAGE("CY_LARGE_DOUBLE: ${CY_LARGE_DOUBLE}")
+MESSAGE("CY_NEAR_ZERO: ${CY_NEAR_ZERO}")
+
+cyclus_require_out_of_source_build()
+cyclus_require_cxx_support()
 
 IF(CODE_COVERAGE)
     MESSAGE(STATUS "Compiling with --coverage flag for code coverage analysis")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
 ENDIF()
+
 
 # enable assembly
 enable_language(ASM)
@@ -68,50 +73,11 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(BUILD_SHARED_LIBS true)
 
     # Setup build locations.
-    IF(NOT CMAKE_RUNTIME_OUTPUT_DIRECTORY)
-        SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CYCLUS_BINARY_DIR}/bin")
-    endif()
-    IF(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-        SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CYCLUS_BINARY_DIR}/lib")
-    endif()
-    IF(NOT CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
-        SET(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CYCLUS_BINARY_DIR}/lib")
-    ENDIF()
+    cyclus_setup_build_locations(${CYCLUS_BINARY_DIR})
 
     SET(CYCLUS_EXECUTABLE_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
-    # use, i.e. don't skip the full RPATH for the build tree
-    SET(CMAKE_SKIP_BUILD_RPATH FALSE)
-
-    # when building, don't use the install RPATH already
-    # (but later on when installing)
-    SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
-
-    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib/cyclus")
-
-    # add the automatically determined parts of the RPATH
-    # which point to directories outside the build tree to the install RPATH
-    SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-    # the RPATH to be used when installing, but only if it's not a system directory
-    LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-    IF("${isSystemDir}" STREQUAL "-1")
-        SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${CMAKE_INSTALL_PREFIX}/lib/cyclus")
-        GET_FILENAME_COMPONENT(cxxCompilerRoot ${CMAKE_CXX_COMPILER} DIRECTORY)
-        GET_FILENAME_COMPONENT(cxxCompilerRoot ${cxxCompilerRoot} DIRECTORY)
-        IF (NOT "${CMAKE_INSTALL_RPATH}" STREQUAL "${cxxCompilerRoot}")
-            SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${cxxCompilerRoot}/lib;${cxxCompilerRoot}/lib/cyclus")
-        ENDIF (NOT "${CMAKE_INSTALL_RPATH}" STREQUAL "${cxxCompilerRoot}")
-    ENDIF("${isSystemDir}" STREQUAL "-1")
-    MESSAGE("-- CMAKE_INSTALL_RPATH: ${CMAKE_INSTALL_RPATH}")
-    if (APPLE)
-      set(BUILD_WITH_INSTALL_NAME_DIR TRUE)
-    endif()
-
-    # Tell CMake where the modules are
-    MESSAGE("-- CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
-    LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}
-        "${PROJECT_SOURCE_DIR}/cmake")
+    cyclus_set_rpath()
 
     # Include macros
     INCLUDE(CopyWhenDiffMacro)
@@ -127,7 +93,7 @@ IF(NOT CYCLUS_DOC_ONLY)
         set(suffix ".dll")
         set(dynamicloadlib "windows_helper_functions.h")
     ELSEIF(APPLE)
-        set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
+        set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup -flat_namespace")
         set(suffix ".dylib")
         set(dynamicloadlib "unix_helper_functions.h")
     ELSE()
@@ -175,17 +141,18 @@ IF(NOT CYCLUS_DOC_ONLY)
 
     FIND_PACKAGE(LibXml2 REQUIRED)
     ADD_DEFINITIONS(${LIBXML2_DEFINITIONS})
-    SET(LIBS ${LIBS} ${LIBXML2_LIBRARIES})
+    SET(LIBS ${LIBS} LibXml2::LibXml2)
     message("-- LibXML2 Include Dir: ${LIBXML2_INCLUDE_DIR}")
+    message("-- LibXML2 Libraries: ${LIBXML2_LIBRARIES}")
 
     # Then use pkg-config for locate specific package
     pkg_check_modules(LIBXMLXX IMPORTED_TARGET libxml++-4.0)
-    IF ( NOT LIBXMLXX_LIBRARIES )
+    IF ( NOT LIBXMLXX_FOUND )
        pkg_check_modules(LIBXMLXX REQUIRED IMPORTED_TARGET libxml++-2.6)
-    ENDIF ( NOT LIBXMLXX_LIBRARIES )
-    SET(LIBS ${LIBS} ${LIBXMLXX_LIBRARIES})
+    ENDIF ( NOT LIBXMLXX_FOUND )
+    SET(LIBS ${LIBS} PkgConfig::LIBXMLXX)
     message("-- LibXML++ Include Dir: ${LIBXMLXX_INCLUDE_DIRS}")
-    message("-- LibXML++ Librarires: ${LIBXMLXX_LIBRARIES}")
+    message("-- LibXML++ Libraries: ${LIBXMLXX_LIBRARIES}")
     
     # find lapack and link to it
     FIND_PACKAGE(LAPACK REQUIRED)
@@ -235,6 +202,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     MESSAGE("--    Boost Filesystem location: ${Boost_FILESYSTEM_LIBRARY}")
     SET(LIBS ${LIBS} ${Boost_SERIALIZATION_LIBRARY})
     MESSAGE("--    Boost Serialization location: ${Boost_SERIALIZATION_LIBRARY}")
+    ADD_DEFINITIONS(-DBOOST_VERSION_MINOR=${Boost_VERSION_MINOR})
 
     # find coin and link to it
     if(DEFAULT_ALLOW_MILPS)
@@ -261,11 +229,11 @@ IF(NOT CYCLUS_DOC_ONLY)
     ENDIF(GFORTRAN_LIBRARIES)
 
     # openblas
-    FIND_LIBRARY(OPENBLAS_LIBRARIES openblas ${DEPS_LIB_HINTS})
-    MESSAGE("-- Found OPENBLAS Libraries (optional): ${OPENBLAS_LIBRARIES}")
-    IF(OPENBLAS_LIBRARIES)
-        set(LIBS ${LIBS} ${OPENBLAS_LIBRARIES})
-    ENDIF(OPENBLAS_LIBRARIES)
+    FIND_LIBRARY(BLAS_LIBRARIES blas ${DEPS_LIB_HINTS})
+    MESSAGE("-- Found BLAS Libraries (optional): ${BLAS_LIBRARIES}")
+    IF(BLAS_FOUND)
+        set(LIBS ${LIBS} ${BLAS_LIBRARIES})
+    ENDIF(BLAS_FOUND)
 
     # ClpSolver
     FIND_LIBRARY(CLPSOLVER_LIBRARIES ClpSolver ${DEPS_LIB_HINTS})
@@ -306,11 +274,12 @@ IF(NOT CYCLUS_DOC_ONLY)
     # Cython & Python Bindings
     #
     # Use new Python library finder
-    find_package (Python3 COMPONENTS Interpreter Development NumPy)
-
-    execute_process(COMMAND "${Python3_EXECUTABLE}" -m site --user-site
-                    OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
-                    OUTPUT_STRIP_TRAILING_WHITESPACE)
+    find_package (Python3 REQUIRED COMPONENTS Interpreter Development)
+    if(NOT DEFINED PYTHON_SITE_PACKAGES)
+        execute_process(COMMAND "${Python3_EXECUTABLE}" -m site --user-site
+                        OUTPUT_VARIABLE PYTHON_SITE_PACKAGES
+                        OUTPUT_STRIP_TRAILING_WHITESPACE)
+    endif()
     message("-- PYTHON_EXECUTABLE: ${Python3_EXECUTABLE}")
     message("-- PYTHON_SITE_PACKAGES: ${PYTHON_SITE_PACKAGES}")
 
@@ -325,9 +294,8 @@ IF(NOT CYCLUS_DOC_ONLY)
           message(FATAL_ERROR "Cython version is too old, must be 0.25+.")
         endif()
         include(UseCython)
-
+        find_package (Python3 REQUIRED COMPONENTS NumPy)
         find_package(Jinja2 REQUIRED)
-        find_package(Pandas REQUIRED)
 
         # With CMake, a clean separation can be made between the source tree and the
         # build tree.  When all source is compiled, as with pure C/C++, the source is
@@ -341,9 +309,6 @@ IF(NOT CYCLUS_DOC_ONLY)
 
         # make sure we know about having python
         add_definitions(-DCYCLUS_WITH_PYTHON)
-        IF (NOT APPLE)
-            set(LIBS ${LIBS} ${Python3_LIBRARIES})
-        ENDIF (NOT APPLE)
         INCLUDE_DIRECTORIES("${CMAKE_CURRENT_BINARY_DIR}/cyclus")
     else(Cython_FOUND)
         # If we don't have Python bindings, we may try to find tcmalloc.
@@ -352,6 +317,19 @@ IF(NOT CYCLUS_DOC_ONLY)
         FIND_PACKAGE(Tcmalloc)
         SET(LIBS ${LIBS} ${Tcmalloc_LIBRARIES})
     endif(Cython_FOUND)
+
+    
+    IF(PARALLEL) 
+        FIND_PACKAGE(OpenMP REQUIRED)
+        IF (OpenMP_CXX_FOUND)
+            MESSAGE("-- OpenMP Version: ${OpenMP_CXX_VERSION}")
+            MESSAGE("-- OpenMP Flags: ${OpenMP_CXX_FLAGS}")
+            SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+        ENDIF(OpenMP_CXX_FOUND)
+        IF(OpenMP_CXX_LIBRARIES)
+            set(LIBS ${LIBS} ${OpenMP_CXX_LIBRARIES})
+        ENDIF(OpenMP_CXX_LIBRARIES)
+    ENDIF(PARALLEL)
 
     ##############################################################################################
     #################################### end find libraries ######################################
@@ -365,6 +343,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     # NOTE: for some reason, adding quotes around
     # ${Glibmm_INCLUDE_DIRS} breaks Ubuntu 12.04
     set(inc_dirs
+        "${Python3_INCLUDE_DIRS}"
         "${LIBXML2_INCLUDE_DIR}"
         "${LIBXMLXX_INCLUDE_DIRS}"
         "${Glibmm_INCLUDE_DIRS}"
@@ -372,40 +351,35 @@ IF(NOT CYCLUS_DOC_ONLY)
         "${SQLite3_INCLUDE_DIR}"
         "${HDF5_INCLUDE_DIRS}"
         "${Boost_INCLUDE_DIR}"
-        "${COIN_INCLUDE_DIRS}")
+        "${COIN_INCLUDE_DIRS}"
+        "${OpenMP_CXX_INCLUDE_DIRS}")
     IF(NOT inc_dirs STREQUAL "")
       INCLUDE_DIRECTORIES(${inc_dirs})
     ENDIF()
     message("-- Include Directories: ${inc_dirs}")
 
-
     if(Cython_FOUND)
         INCLUDE_DIRECTORIES(AFTER "${Python3_INCLUDE_DIRS}" "${_Python3_NumPy_INCLUDE_DIR}")
     endif(Cython_FOUND)
     # set core version, one way or the other
-    IF(NOT "${CORE_VERSION}" STREQUAL "")
-        SET(core_version "${CORE_VERSION}")
-    ELSE(NOT "${CORE_VERSION}" STREQUAL "")
-        EXECUTE_PROCESS(COMMAND git describe --tags
-                        OUTPUT_VARIABLE core_version
-                        OUTPUT_STRIP_TRAILING_WHITESPACE)
-    ENDIF(NOT "${CORE_VERSION}" STREQUAL "")
-    IF("${core_version}" STREQUAL "")
-        MESSAGE(WARNING "Unable to read current core version, falling back to previous version. Core version will be set to -1")
-        SET(core_version "-1")
+    IF(NOT "${DATA_MODEL_VERSION}" STREQUAL "")
+        MESSAGE("-- $DATA_MODEL_VERSION set to: ${DATA_MODEL_VERSION}")
+    ENDIF(NOT "${DATA_MODEL_VERSION}" STREQUAL "")
+    IF("${DATA_MODEL_VERSION}" STREQUAL "")
+        MESSAGE("No data model version was specified... using version ${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}")
+        SET(DATA_MODEL_VERSION "${CMAKE_PROJECT_VERSION_MAJOR}.${CMAKE_PROJECT_VERSION_MINOR}")
     ENDIF()
-    SET(ENV{CYCLUS_CORE_VERSION} "${core_version}")
-    MESSAGE("-- core version ($CYCLUS_CORE_VERSION) set to: ${core_version}")
+    MESSAGE("-- Cyclus version ($CYCLUS_PROJECT_VERSION) set to: ${CMAKE_PROJECT_VERSION}")
 
     ADD_SUBDIRECTORY("${CYCLUS_SHARE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_SOURCE_DIR}")
     ADD_SUBDIRECTORY("${CYCLUS_TEST_DIR}")
-    ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
-    ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
-    ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
     if(Cython_FOUND)
         ADD_SUBDIRECTORY("${CYCLUS_PYSOURCE_DIR}")
     endif(Cython_FOUND)
+    ADD_SUBDIRECTORY("${CYCLUS_AGENTS_DIR}")
+    ADD_SUBDIRECTORY("${CYCLUS_CLI_DIR}")
+    ADD_SUBDIRECTORY("${CYCLUS_CMAKE_DIR}")
     
     ##############################################################################################
     ####################################### end includes #########################################
@@ -442,9 +416,17 @@ IF(NOT CYCLUS_DOC_ONLY)
         )
 
     if(Cython_FOUND)
-        set(pyinstallscript "${CMAKE_CURRENT_BINARY_DIR}/cmake/SetupPyInstall.cmake")
-        configure_file(cmake/SetupPyInstall.cmake.in ${pyinstallscript} @ONLY)
-        install(SCRIPT ${pyinstallscript})
+        install(CODE "
+            message(\"############### Begin Python Install ###############\")
+            set(ENV{CYCLUS_PROJECT_VERSION} \"${CMAKE_PROJECT_VERSION}\")
+            execute_process(COMMAND ${Python3_EXECUTABLE} -m pip install --target=${PYTHON_SITE_PACKAGES} --force-reinstall --upgrade --no-deps .
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                    RESULT_VARIABLE res_var)
+            if(NOT \"${res_var}\" STREQUAL \"\")
+                message(FATAL_ERROR \"Process python -m pip install failed, res_var = '${res_var}'\")
+            endif()
+            message(\"Cyclus Python package successfully installed in ${PYTHON_SITE_PACKAGES}\")
+        ")
     endif(Cython_FOUND)
     ##############################################################################################
     ################################## begin uninstall target ####################################
@@ -482,9 +464,9 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/LICENSE.rst")
 
     # Version
-    SET(CPACK_PACKAGE_VERSION_MAJOR "1")
-    SET(CPACK_PACKAGE_VERSION_MINOR "5")
-    SET(CPACK_PACKAGE_VERSION_PATCH "5")
+    SET(CPACK_PACKAGE_VERSION_MAJOR  ${CMAKE_PROJECT_VERSION_MAJOR})
+    SET(CPACK_PACKAGE_VERSION_MINOR  ${CMAKE_PROJECT_VERSION_MINOR})
+    SET(CPACK_PACKAGE_VERSION_PATCH  ${CMAKE_PROJECT_VERSION_PATCH})
 
     # Dependencies
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libboost-all-dev (>= 1.71.0)")

@@ -30,19 +30,21 @@ void SimInit::Init(Recorder* r, QueryableBackend* b) {
 }
 
 void SimInit::Restart(QueryableBackend* b, boost::uuids::uuid sim_id, int t) {
-  Warn<EXPERIMENTAL_WARNING>("restart capability is not finalized and fully"
-                             " tested. Its behavior may change in future"
-                             " releases.");
+  Warn<EXPERIMENTAL_WARNING>(
+      "restart capability is not finalized and fully"
+      " tested. Its behavior may change in future"
+      " releases.");
   rec_ = new Recorder();
   InitBase(b, sim_id, t);
   si_.parent_sim = sim_id;
   si_.parent_type = "restart";
   si_.branch_time = t;
-  ctx_->InitSim(si_);  // explicitly force this to show up in the new simulations output db
+  ctx_->InitSim(si_);  // explicitly force this to show up in the new
+                       // simulations output db
 }
 
-void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id,
-                     int t, boost::uuids::uuid new_sim_id) {
+void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id, int t,
+                     boost::uuids::uuid new_sim_id) {
   throw Error("simulation branching feature not implemented");
 }
 
@@ -58,6 +60,8 @@ void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
   // this sequence is imporant!!!
   LoadInfo();
   LoadRecipes();
+  LoadPackages();
+  LoadTransportUnits();
   LoadSolverInfo();
   LoadPrototypes();
   LoadInitialAgents();
@@ -72,9 +76,7 @@ void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
 }
 
 void SimInit::Snapshot(Context* ctx) {
-  ctx->NewDatum("Snapshots")
-     ->AddVal("Time", ctx->time())
-     ->Record();
+  ctx->NewDatum("Snapshots")->AddVal("Time", ctx->time())->Record();
 
   // snapshot all agent internal state
   std::set<Agent*> mlist = ctx->agent_list_;
@@ -155,7 +157,7 @@ void SimInit::LoadInfo() {
 
   si_.seed = qr.GetVal<int>("Seed");
   si_.stride = qr.GetVal<int>("Stride");
-  
+
   si_.parent_sim = qr.GetVal<boost::uuids::uuid>("ParentSimId");
 
   qr = b_->Query("TimeStepDur", NULL);
@@ -190,6 +192,50 @@ void SimInit::LoadRecipes() {
   }
 }
 
+void SimInit::LoadPackages() {
+  QueryResult qr;
+  try {
+    qr = b_->Query("Packages", NULL);
+  } catch (std::exception err) {
+    return;
+  }  // table doesn't exist (okay)
+
+  for (int i = 0; i < qr.rows.size(); ++i) {
+    std::string name = qr.GetVal<std::string>("PackageName", i);
+    double fill_min = qr.GetVal<double>("FillMin", i);
+    double fill_max = qr.GetVal<double>("FillMax", i);
+    std::string strategy = qr.GetVal<std::string>("Strategy", i);
+
+    if (name != Package::unpackaged_name()) {
+      ctx_->AddPackage(name, fill_min, fill_max, strategy);
+    } else {
+      ctx_->RecordPackage(Package::unpackaged());
+    }
+  }
+}
+
+void SimInit::LoadTransportUnits() {
+  QueryResult qr;
+  try {
+    qr = b_->Query("TransportUnits", NULL);
+  } catch (std::exception err) {
+    return;
+  }  // table doesn't exist (okay)
+
+  for (int i = 0; i < qr.rows.size(); ++i) {
+    std::string name = qr.GetVal<std::string>("TransportUnitName", i);
+    int fill_min = qr.GetVal<int>("FillMin", i);
+    int fill_max = qr.GetVal<int>("FillMax", i);
+    std::string strategy = qr.GetVal<std::string>("Strategy", i);
+
+    if (name != TransportUnit::unrestricted_name()) {
+      ctx_->AddTransportUnit(name, fill_min, fill_max, strategy);
+    } else {
+      ctx_->RecordTransportUnit(TransportUnit::unrestricted());
+    }
+  }
+}
+
 void* SimInit::LoadPreconditioner(std::string name) {
   using std::map;
   using std::string;
@@ -208,17 +254,19 @@ void* SimInit::LoadPreconditioner(std::string name) {
 
   // actually create and return the preconditioner
   if (name == "greedy") {
-    precon = new GreedyPreconditioner(commod_order,
-                                      GreedyPreconditioner::REVERSE);
+    precon =
+        new GreedyPreconditioner(commod_order, GreedyPreconditioner::REVERSE);
   } else {
-    throw ValueError("The name of the preconditioner was not recognized, "
-                     "got '" + name + "'.");
+    throw ValueError(
+        "The name of the preconditioner was not recognized, "
+        "got '" +
+        name + "'.");
   }
   return precon;
 }
 
-ExchangeSolver* SimInit::LoadGreedySolver(bool exclusive,
-                                          std::set<std::string> tables) {
+ExchangeSolver* SimInit::LoadGreedySolver(
+    bool exclusive, std::set<std::string> tables) {
   using std::set;
   using std::string;
   ExchangeSolver* solver;
@@ -238,13 +286,13 @@ ExchangeSolver* SimInit::LoadGreedySolver(bool exclusive,
     solver = new GreedySolver(exclusive);
   } else {
     solver = new GreedySolver(exclusive,
-      reinterpret_cast<GreedyPreconditioner*>(precon));
+                              reinterpret_cast<GreedyPreconditioner*>(precon));
   }
   return solver;
 }
 
-ExchangeSolver* SimInit::LoadCoinSolver(bool exclusive,
-                                        std::set<std::string> tables) {
+ExchangeSolver* SimInit::LoadCoinSolver(
+    bool exclusive, std::set<std::string> tables) {
 #if CYCLUS_HAS_COIN
   ExchangeSolver* solver;
   double timeout;
@@ -263,7 +311,8 @@ ExchangeSolver* SimInit::LoadCoinSolver(bool exclusive,
   solver = new ProgSolver("cbc", timeout, exclusive, verbose, mps);
   return solver;
 #else
-  throw cyclus::Error("Cyclus was not compiled with COIN support, cannot load solver.");
+  throw cyclus::Error(
+      "Cyclus was not compiled with COIN support, cannot load solver.");
 #endif
 }
 
@@ -292,8 +341,10 @@ void SimInit::LoadSolverInfo() {
   } else if (solver_name == "coin-or") {
     solver = LoadCoinSolver(exclusive_orders, tables);
   } else {
-    throw ValueError("The name of the solver was not recognized, "
-                     "got '" + solver_name + "'.");
+    throw ValueError(
+        "The name of the solver was not recognized, "
+        "got '" +
+        solver_name + "'.");
   }
 
   ctx_->solver(solver);
@@ -337,7 +388,7 @@ void SimInit::LoadInitialAgents() {
   std::vector<Cond> conds;
   conds.push_back(Cond("EnterTime", "<=", t_));
   QueryResult qentry = b_->Query("AgentEntry", &conds);
-  std::map<int, int> parentmap;  // map<agentid, parentid>
+  std::map<int, int> parentmap;   // map<agentid, parentid>
   std::map<int, Agent*> unbuilt;  // map<agentid, agent_ptr>
   for (int i = 0; i < qentry.rows.size(); ++i) {
     if (t_ > 0 && qentry.GetVal<int>("EnterTime", i) == t_) {
@@ -353,7 +404,8 @@ void SimInit::LoadInitialAgents() {
       if (qexit.rows.size() != 0) {
         continue;  // agent was decomissioned before t_ - skip
       }
-    } catch (std::exception err) {}  // table doesn't exist (okay)
+    } catch (std::exception err) {
+    }  // table doesn't exist (okay)
 
     // if the agent wasn't decommissioned before t_ create and init it
 
@@ -424,7 +476,9 @@ void SimInit::LoadInventories() {
     QueryResult qr;
     try {
       qr = b_->Query("AgentStateInventories", &conds);
-    } catch (std::exception err) {return;}  // table doesn't exist (okay)
+    } catch (std::exception err) {
+      return;
+    }  // table doesn't exist (okay)
 
     Inventories invs;
     for (int i = 0; i < qr.rows.size(); ++i) {
@@ -442,7 +496,9 @@ void SimInit::LoadBuildSched() {
   QueryResult qr;
   try {
     qr = b_->Query("BuildSchedule", &conds);
-  } catch (std::exception err) {return;}  // table doesn't exist (okay)
+  } catch (std::exception err) {
+    return;
+  }  // table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     int t = qr.GetVal<int>("BuildTime", i);
@@ -458,7 +514,9 @@ void SimInit::LoadDecomSched() {
   QueryResult qr;
   try {
     qr = b_->Query("DecomSchedule", &conds);
-  } catch (std::exception err) {return;}  // table doesn't exist (okay)
+  } catch (std::exception err) {
+    return;
+  }  // table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     int t = qr.GetVal<int>("DecomTime", i);
@@ -519,7 +577,8 @@ Product::Ptr SimInit::BuildProduct(QueryableBackend* b, int resid) {
   return p;
 }
 
-Resource::Ptr SimInit::LoadResource(Context* ctx, QueryableBackend* b, int state_id) {
+Resource::Ptr SimInit::LoadResource(Context* ctx, QueryableBackend* b,
+                                    int state_id) {
   std::vector<Cond> conds;
   conds.push_back(Cond("ResourceId", "==", state_id));
   QueryResult qr = b->Query("Resources", &conds);
@@ -540,7 +599,8 @@ Resource::Ptr SimInit::LoadResource(Context* ctx, QueryableBackend* b, int state
   return r;
 }
 
-Material::Ptr SimInit::LoadMaterial(Context* ctx, QueryableBackend* b, int state_id) {
+Material::Ptr SimInit::LoadMaterial(Context* ctx, QueryableBackend* b,
+                                    int state_id) {
   // get special material object state
   std::vector<Cond> conds;
   conds.push_back(Cond("ResourceId", "==", state_id));
@@ -580,7 +640,8 @@ Composition::Ptr SimInit::LoadComposition(QueryableBackend* b, int stateid) {
   return c;
 }
 
-Product::Ptr SimInit::LoadProduct(Context* ctx, QueryableBackend* b, int state_id) {
+Product::Ptr SimInit::LoadProduct(Context* ctx, QueryableBackend* b,
+                                  int state_id) {
   // get general resource object info
   std::vector<Cond> conds;
   conds.push_back(Cond("ResourceId", "==", state_id));

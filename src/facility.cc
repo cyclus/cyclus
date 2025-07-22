@@ -19,7 +19,6 @@ Facility::Facility(Context* ctx) : Trader(this), Agent(ctx) {
 
 Facility::~Facility() {}
 
-
 void Facility::InitFrom(Facility* m) {
   Agent::InitFrom(m);
 }
@@ -36,8 +35,7 @@ void Facility::EnterNotify() {
 
 std::string Facility::str() {
   std::stringstream ss("");
-  ss << Agent::str() << " with: "
-     << " lifetime: " << lifetime()
+  ss << Agent::str() << " with: " << " lifetime: " << lifetime()
      << " build date: " << enter_time();
   return ss.str();
 }

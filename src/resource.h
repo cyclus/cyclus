@@ -5,7 +5,8 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
-#include "error.h"
+#include "package.h"
+#include "cyc_limits.h"
 
 class SimInitTest;
 
@@ -38,14 +39,12 @@ class Resource {
   /// state.  All resource id's are unique - even across different resource
   /// types/implementations. Runtime tracking of resources should generally
   /// use the obj_id rather than this.
-  const int state_id() const {
-    return state_id_;
-  }
+  const int state_id() const { return state_id_; }
 
-  /// Assigns a new, unique internal id to this resource and its state. This should be
-  /// called by resource implementations whenever their state changes.  A call to
-  /// BumpStateId is not necessarily accompanied by a change to the state id.
-  /// This should NEVER be called by agents.
+  /// Assigns a new, unique internal id to this resource and its state. This
+  /// should be called by resource implementations whenever their state changes.
+  /// A call to BumpStateId is not necessarily accompanied by a change to the
+  /// state id. This should NEVER be called by agents.
   void BumpStateId();
 
   /// Returns an id representing the specific resource implementation's internal
@@ -84,19 +83,38 @@ class Resource {
   /// To enable the Decay method to be called on any child resource, define
   /// a null op Decay method here.
   /// @param curr_time the current time for the decay oepration
-  virtual void Decay(int curr_time) { throw Error("cannot decay resource type " + this->type()); };
+  virtual void Decay(int curr_time) {
+    throw Error("cannot decay resource type " + this->type());
+  };
 
   /// To enable the Absorb method to be called on any child resource, define
   /// a null op Absorb method here.
   /// @param res pointer to a resource to be absorbed by this resource
-  virtual void Absorb(Ptr res) { throw Error("cannot absorb resource type " + this->type()); };
+  virtual void Absorb(Ptr res) {
+    throw Error("cannot absorb resource type " + this->type());
+  };
 
- protected:
-  const static int default_package_id_ = 1;
+  /// Returns the package id.
+  virtual std::string package_name() { return Package::unpackaged_name(); };
+
+  virtual Ptr PackageExtract(double qty, std::string new_package_name) = 0;
+
+  /// Changes the product's package id
+  virtual void ChangePackage(
+      std::string new_package_name = Package::unpackaged_name()) {};
+
+  /// Repackages a single resource into a package. If some quantity of the
+  /// resource cannot be packaged using the given packaging strategy and
+  /// restrictions, the remainder is left in the resource object.
+  template <class T> std::vector<typename T::Ptr> Package(Package::Ptr pkg);
+
  private:
   static int nextstate_id_;
   static int nextobj_id_;
   int state_id_;
+  // Setting the state id should only be done when extracting one resource
+  void state_id(int st_id) { state_id_ = st_id; }
+
   int obj_id_;
 };
 
@@ -111,9 +129,28 @@ std::vector<typename T::Ptr> ResCast(std::vector<Resource::Ptr> rs) {
 }
 
 /// Casts a Resource::Ptr into a pointer of a specific resource type T.
-template <class T>
-typename T::Ptr ResCast(Resource::Ptr r) {
+template <class T> typename T::Ptr ResCast(Resource::Ptr r) {
   return boost::dynamic_pointer_cast<T>(r);
+}
+
+template <class T>
+std::vector<typename T::Ptr> Resource::Package(Package::Ptr pkg) {
+  std::vector<typename T::Ptr> ts_pkgd;
+  typename T::Ptr t_pkgd;
+
+  std::vector<double> packages = pkg->GetFillMass(quantity());
+  if (packages.size() == 0) {
+    return ts_pkgd;
+  }
+
+  for (int i = 0; i < packages.size(); ++i) {
+    double pkg_fill = packages[i];
+    t_pkgd =
+        boost::dynamic_pointer_cast<T>(PackageExtract(pkg_fill, pkg->name()));
+    ts_pkgd.push_back(t_pkgd);
+  }
+
+  return ts_pkgd;
 }
 
 }  // namespace cyclus

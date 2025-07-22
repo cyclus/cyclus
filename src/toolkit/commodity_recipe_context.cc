@@ -14,7 +14,7 @@ void CommodityRecipeContext::AddInCommod(std::string in_commod,
   out_commods_.insert(out_commod);
   out_commod_map_[in_commod] = out_commod;
   in_recipes_[in_commod] = in_recipe;
-  out_recipes_[in_commod]  = out_recipe;
+  out_recipes_[in_commod] = out_recipe;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -28,7 +28,8 @@ void CommodityRecipeContext::RemoveRsrc(Resource::Ptr rsrc) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void CommodityRecipeContext::UpdateRsrc(std::string commod, Resource::Ptr rsrc) {
+void CommodityRecipeContext::UpdateRsrc(std::string commod,
+                                        Resource::Ptr rsrc) {
   rsrc_commod_map_[rsrc->obj_id()] = commod;
 }
 
@@ -66,7 +67,9 @@ void CommodityRecipeContext::InitFrom(QueryableBackend* b) {
 
   try {
     qr = b->Query("CommodityRecipeContext_resmap", NULL);
-  } catch(std::exception err) { return; }  // Table doesn't exist (okay)
+  } catch (std::exception err) {
+    return;
+  }  // Table doesn't exist (okay)
 
   for (int i = 0; i < qr.rows.size(); ++i) {
     std::string commod = qr.GetVal<std::string>("commod", i);
@@ -80,11 +83,11 @@ void CommodityRecipeContext::Snapshot(DbInit di) {
   for (it2 = in_commods_.begin(); it2 != in_commods_.end(); ++it2) {
     std::string c = *it2;
     di.NewDatum("CommodityRecipeContext_inoutmap")
-      ->AddVal("in_commod", c)
-      ->AddVal("in_recipe", in_recipes_[c])
-      ->AddVal("out_commod", out_commod_map_[c])
-      ->AddVal("out_recipe", out_recipes_[c])
-      ->Record();
+        ->AddVal("in_commod", c)
+        ->AddVal("in_recipe", in_recipes_[c])
+        ->AddVal("out_commod", out_commod_map_[c])
+        ->AddVal("out_recipe", out_recipes_[c])
+        ->Record();
   }
 
   std::map<int, std::string>::iterator it = rsrc_commod_map_.begin();
@@ -97,15 +100,14 @@ void CommodityRecipeContext::Snapshot(DbInit di) {
 }
 
 std::string CommodityRecipeContext::schema() {
-  return
-      "  <oneOrMore>                                 \n"
-      "  <element name=\"fuel\">                     \n"
-      "    <element name=\"incommodity\"><text/></element>\n"
-      "    <element name=\"inrecipe\"><text/></element>\n"
-      "    <element name=\"outcommodity\"><text/></element>\n"
-      "    <element name=\"outrecipe\"><text/></element>\n"
-      "  </element>                                  \n"
-      "  </oneOrMore>                                \n";
+  return "  <oneOrMore>                                 \n"
+         "  <element name=\"fuel\">                     \n"
+         "    <element name=\"incommodity\"><text/></element>\n"
+         "    <element name=\"inrecipe\"><text/></element>\n"
+         "    <element name=\"outcommodity\"><text/></element>\n"
+         "    <element name=\"outrecipe\"><text/></element>\n"
+         "  </element>                                  \n"
+         "  </oneOrMore>                                \n";
 }
 
 }  // namespace toolkit

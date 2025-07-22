@@ -175,18 +175,18 @@ Command Line Interface
 ======================
 You may launch the cyclus server by running::
 
-    $ python -m cyclus.server input.xml
+    $ python3 -m cyclus.server input.xml
 
 Most of the arguments are relatively self-explanatory. However, the CLI here
 also allows you to load initial and repeating actions. The syntax for this
 is an event name followed by parameter tokens (which must contain an equals
 sign)::
 
-    $ python -m cyclus.server input.xml --repeating-actions sleep n=1
+    $ python3 -m cyclus.server input.xml --repeating-actions sleep n=1
 
 You may load many actions by repeating the name-params pattern:
 
-    $ python -m cyclus.server input.xml --repeating-actions \
+    $ python3 -m cyclus.server input.xml --repeating-actions \
         sleep n=1 \
         table_data table="TimeSeriesPower"
 

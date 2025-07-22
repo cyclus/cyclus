@@ -1,8 +1,9 @@
+#include "position.h"
+
 #include <math.h>
 #include <stdio.h>
+#include <iomanip>
 #include <sstream>
-
-#include "position.h"
 
 namespace cyclus {
 namespace toolkit {
@@ -10,10 +11,8 @@ namespace toolkit {
 Position::Position() : latitude_(0), longitude_(0) {}
 
 Position::Position(double decimal_lat, double decimal_lon) {
-  LatCheck(decimal_lat);
-  LonCheck(decimal_lon);
-  latitude_ = SetPrecision(decimal_lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
-  longitude_ = SetPrecision(decimal_lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
+  latitude(decimal_lat);
+  longitude(decimal_lon);
 }
 
 Position::~Position() {}
@@ -27,40 +26,58 @@ double Position::longitude() const {
 }
 
 void Position::latitude(double lat) {
-  LatCheck(lat);
-  latitude_ = SetPrecision(lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
+  if (!ValidLatitude(lat)) {
+    latitude_ = kInvalidLatitude;
+    std::stringstream msg;
+    msg << "The provided latitude (" << lat
+        << ") is outside the acceptable range "
+        << "[-90, 90]. Latitude has been set to " << latitude_;
+    cyclus::Warn<cyclus::VALUE_WARNING>(msg.str());
+  } else {
+    latitude_ = SetPrecision(lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
+  }
 }
 
 void Position::longitude(double lon) {
-  LonCheck(lon);
-  longitude_ = SetPrecision(lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
+  if (!ValidLongitude(lon)) {
+    longitude_ = kInvalidLongitude;
+    std::stringstream msg;
+    msg << "The provided longitude (" << lon
+        << ") is outside the acceptable range "
+        << "[-180, 180]. Longitude has been set to " << longitude_;
+    cyclus::Warn<cyclus::VALUE_WARNING>(msg.str());
+  } else {
+    longitude_ = SetPrecision(lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
+  }
 }
 
 void Position::set_position(double lat, double lon) {
-  LatCheck(lat);
-  LonCheck(lon);
-  latitude_ = SetPrecision(lat * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
-  longitude_ = SetPrecision(lon * CYCLUS_DECIMAL_SECOND_MULTIPLIER, 1);
+  latitude(lat);
+  longitude(lon);
 }
 
-void Position::LatCheck(double lat) {
-  if (lat > 90 || lat < -90){
-    std::stringstream msg;
-    msg << "The provided latitude (" << lat
-        << ") is outside the acceptable range. "
-        << "[-90, 90]";
-    throw ValueError(msg.str());
+void Position::RecordPosition(Agent* agent) {
+  agent->context()
+      ->NewDatum("AgentPosition")
+      ->AddVal("Spec", agent->spec())
+      ->AddVal("Prototype", agent->prototype())
+      ->AddVal("AgentId", agent->id())
+      ->AddVal("Latitude", latitude_ / CYCLUS_DECIMAL_SECOND_MULTIPLIER)
+      ->AddVal("Longitude", longitude_ / CYCLUS_DECIMAL_SECOND_MULTIPLIER)
+      ->Record();
+}
+bool Position::ValidLatitude(double lat) {
+  if (lat > 90 || lat < -90) {
+    return false;
   }
+  return true;
 }
 
-void Position::LonCheck(double lon) {
-  if (lon > 180 || lon < -180){
-    std::stringstream msg;
-    msg << "The provided longitude (" << lon
-        << ") is outside the acceptable range."
-        << "[-180, 180]";
-    throw ValueError(msg.str());
+bool Position::ValidLongitude(double lon) {
+  if (lon > 180 || lon < -180) {
+    return false;
   }
+  return true;
 }
 
 double Position::Distance(Position target) const {
@@ -72,9 +89,9 @@ double Position::Distance(Position target) const {
   double dlong = tarlongitude - curr_longitude;
   double dlat = tarlatitude - curr_latitude;
 
-  double half_chord_length_sq =
-      pow(sin(dlat / 2), 2) +
-      pow(sin(dlong / 2), 2) * cos(curr_latitude) * cos(tarlatitude);
+  double half_chord_length_sq = pow(sin(dlat / 2), 2) + pow(sin(dlong / 2), 2) *
+                                                            cos(curr_latitude) *
+                                                            cos(tarlatitude);
 
   double angular_distance =
       2 * atan2(sqrt(half_chord_length_sq), sqrt(1 - half_chord_length_sq));

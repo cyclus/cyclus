@@ -62,8 +62,8 @@ class GreedyPreconditioner {
   /// @brief the order of commodity weights
   enum WgtOrder {
     REVERSE,  /// a flag for commodity weights given in the reverse order,
-             /// i.e, lightest first
-    END  /// default flag, indicating heaviest-first ordering
+              /// i.e, lightest first
+    END       /// default flag, indicating heaviest-first ordering
   };
 
   /// @brief constructor if weights are given in heaviest-first order
@@ -84,17 +84,14 @@ class GreedyPreconditioner {
 
   /// @brief a comparitor for ordering containers of ExchangeNode::Ptrs in
   /// descending order based on their commodity's weight
-  inline bool NodeComp(const ExchangeNode::Ptr l,
-                       const ExchangeNode::Ptr r) {
-    return
-        NodeWeight(l, &commod_weights_, avg_prefs_[l]) >
-        NodeWeight(r, &commod_weights_, avg_prefs_[r]);
+  inline bool NodeComp(const ExchangeNode::Ptr l, const ExchangeNode::Ptr r) {
+    return NodeWeight(l, &commod_weights_, avg_prefs_[l]) >
+           NodeWeight(r, &commod_weights_, avg_prefs_[r]);
   }
 
   /// @brief a comparitor for ordering containers of Request::Ptrs in
   /// descending order based on their average commodity weight
-  inline bool GroupComp(const RequestGroup::Ptr l,
-                        const RequestGroup::Ptr r) {
+  inline bool GroupComp(const RequestGroup::Ptr l, const RequestGroup::Ptr r) {
     return group_weights_[l] > group_weights_[r];
   }
 

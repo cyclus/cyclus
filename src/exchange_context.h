@@ -15,22 +15,19 @@
 
 // Undefines isnan from pyne
 #ifdef isnan
-  #undef isnan
+#undef isnan
 #endif
-
 
 namespace cyclus {
 
-template <class T>
-struct PrefMap {
-  typedef std::map<Request<T>*, std::map<Bid<T>*, double> > type;
+template <class T> struct PrefMap {
+  typedef std::map<Request<T>*, std::map<Bid<T>*, double>> type;
   typedef Request<T>* request_ptr;
   typedef Bid<T>* bid_ptr;
 };
 
-template <class T>
-struct CommodMap {
-  typedef std::map<std::string, std::vector<Request<T>*> > type;
+template <class T> struct CommodMap {
+  typedef std::map<std::string, std::vector<Request<T>*>> type;
   typedef Request<T>* request_ptr;
 };
 
@@ -46,8 +43,7 @@ struct CommodMap {
 /// Exchange. The second phase, Response to Request for Bids, is assisted by
 /// grouping requests by commodity type. The third phase, preference adjustment,
 /// is assisted by grouping bids by the requester being responded to.
-template <class T>
-struct ExchangeContext {
+template <class T> struct ExchangeContext {
  public:
   /// @brief adds a request to the context
   void AddRequestPortfolio(const typename RequestPortfolio<T>::Ptr port) {
@@ -91,7 +87,8 @@ struct ExchangeContext {
 
     double bid_pref = pb->preference();
     trader_prefs[pb->request()->requester()][pb->request()].insert(
-        std::make_pair(pb, std::isnan(bid_pref) ? pb->request()->preference() : bid_pref));
+        std::make_pair(
+            pb, std::isnan(bid_pref) ? pb->request()->preference() : bid_pref));
   }
 
   /// @brief a reference to an exchange's set of requests
@@ -110,8 +107,7 @@ struct ExchangeContext {
   typename CommodMap<T>::type commod_requests;
 
   /// @brief maps request to all bids for request
-  std::map< Request<T>*, std::vector<Bid<T>*> >
-      bids_by_request;
+  std::map<Request<T>*, std::vector<Bid<T>*>> bids_by_request;
 
   /// @brief maps commodity name to requests for that commodity
   std::map<Trader*, typename PrefMap<T>::type> trader_prefs;

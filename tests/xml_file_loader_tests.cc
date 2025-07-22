@@ -243,10 +243,15 @@ std::string XMLFileLoaderTests::PackageSequence() {
           " <control>"
           "  <package>"
           "    <name>TestPackage</name>"
+          "    <fill_min>1.1</fill_min>"
+          "    <fill_max>2.1</fill_max>"
+          "    <strategy>First</strategy>"
+          "  </package>"
+          "  <transportunit>"
+          "    <name>TestTransport</name>"
           "    <fill_min>1</fill_min>"
           "    <fill_max>2</fill_max>"
           "    <strategy>First</strategy>"
-          "  </package>"
           " </control>"
           "</simulation>";
 }

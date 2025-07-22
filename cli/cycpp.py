@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """The cyclus preprocessor.
 
 cycpp is a 3-pass preprocessor which adds reflection-like semantics to cyclus
@@ -37,8 +37,8 @@ following handy table!
        is great for. Any variables defined here are kept in a separate
        namespace from the classes.  Since this gives you direct access to the
        Python interpreter, try to be a little careful.
-:note: Merges the argument (which like with var must evalutae to a dict) with the
-       current class level annotations. Enrties here overwrite previous entries.
+:note: Merges the argument (which like with var must evaluate to a dict) with the
+       current class level annotations. Entries here overwrite previous entries.
 
 cycpp is implemented entirely in this file and with tools from the Python standard
 library. It requires Python 2.7+ or Python 3.3+ to run.
@@ -57,7 +57,7 @@ from argparse import ArgumentParser, RawDescriptionHelpFormatter
 from pprint import pprint, pformat
 import textwrap
 import difflib
-import xml.dom.minidom
+import xml.dom.expatbuilder
 
 try:
     import simplejson as json
@@ -96,8 +96,7 @@ CYCNS = 'cyclus'
 PRIMITIVES = {'bool', 'int', 'float', 'double', 'std::string', 'cyclus::Blob',
               'boost::uuids::uuid', }
 
-BUFFERS = {'{0}::toolkit::ResourceBuff'.format(CYCNS),
-           '{0}::toolkit::ResBuf'.format(CYCNS),
+BUFFERS = {'{0}::toolkit::ResBuf'.format(CYCNS),
            ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Resource'),
            ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Product'),
            ('{0}::toolkit::ResBuf'.format(CYCNS), CYCNS + '::Material'),
@@ -125,7 +124,7 @@ ENTITIES = [('cyclus::Region', 'region'), ('cyclus::Institution', 'institution')
 def escape_xml(s, ind='    '):
     """Escapes xml string s, prettifies it and puts in c++ string lit form."""
 
-    s = xml.dom.minidom.parseString(s)
+    s = xml.dom.expatbuilder.parseString(s, False)
     s = s.toprettyxml(indent='    ')
     s = s.replace('"', '\\"')
 
@@ -1078,8 +1077,6 @@ class InitFromCopyFilter(CodeGeneratorFilter):
         return impl
 
     res_impl = {
-        CYCNS + '::toolkit::ResourceBuff': ("{var}.set_capacity("
-                                            "m->{var}.capacity());\n"),
         CYCNS + '::toolkit::ResBuf': "{var}.capacity(m->{var}.capacity());\n",
         CYCNS + '::toolkit::ResMap': '{var}.obj_ids(m->obj_ids());\n',
         CYCNS + '::toolkit::TotalInvTracker': "{var}.capacity();\n",
@@ -1145,7 +1142,6 @@ class InitFromDbFilter(CodeGeneratorFilter):
         return impl
 
     res_impl = {
-        CYCNS + '::toolkit::ResourceBuff': '{var}.set_capacity({capacity});\n',
         CYCNS + '::toolkit::ResBuf': '{var}.capacity({capacity});\n',
         CYCNS + '::toolkit::ResMap': (
             '{var}.obj_ids(qr.GetVal<{tstr}>("{var}"))\n;'),
@@ -1684,6 +1680,12 @@ class SchemaFilter(CodeGeneratorFilter):
         'recipe': None,
         'inrecipe': None,
         'outrecipe': None,
+        'package': None,
+        'inpackage': None,
+        'outpackage': None,
+        'transportunit': None,
+        'intransportunit': None,
+        'outtransportunit': None,
         'none': None,
         None: None,
         '': None,
@@ -1702,7 +1704,7 @@ class SchemaFilter(CodeGeneratorFilter):
             raise TypeError(msg.format(cs, given))
         return self.default_types[cpp]
 
-    def _buildschema(self, cpptype, schematype=None, uitype=None, names=None):
+    def _buildschema(self, cpptype, schematype=None, uitype=None, names=None, docs=None):
         schematype = prepare_type(cpptype, schematype)
         uitype = prepare_type(cpptype, uitype)
         names = prepare_type(cpptype, names)
@@ -1715,6 +1717,8 @@ class SchemaFilter(CodeGeneratorFilter):
                 name = names
             d_type = self._type(t, schematype or uitype)
             impl += '<element name="{0}">'.format(name)
+            if docs:
+                impl += '<a:documentation>' + docs + '</a:documentation>'
             impl += '<data type="{0}" />'.format(d_type)
             impl += '</element>'
         elif t in ['std::list', 'std::set', 'std::vector']:
@@ -1805,8 +1809,8 @@ class SchemaFilter(CodeGeneratorFilter):
             opt = info.get('default', None) is not None
             if opt:
                 xml += '<optional>'
-
-            xml += self._buildschema(t, schematype, uitype, labels)
+            docs = info.get('doc', None)
+            xml += self._buildschema(t, schematype, uitype, labels, docs)
 
             if opt:
                 xml += '</optional>'
@@ -1895,7 +1899,6 @@ class SnapshotFilter(CodeGeneratorFilter):
         return impl
 
     res_exprs = {
-        CYCNS + '::toolkit::ResourceBuff': None,
         CYCNS + '::toolkit::ResBuf': None,
         CYCNS + '::toolkit::ResMap': '{var}.obj_ids()',
         CYCNS + '::toolkit::TotalInvTracker': None,
@@ -1946,9 +1949,6 @@ class SnapshotInvFilter(CodeGeneratorFilter):
         return impl
 
     res_impl = {
-        CYCNS + '::toolkit::ResourceBuff': (
-            'invs[\"{var}\"] = {var}.PopN({var}.count());\n'
-            '{var}.PushAll(invs["{var}"]);\n'),
         CYCNS + '::toolkit::ResBuf': (
             'invs[\"{var}\"] = {var}.PopNRes({var}.count());\n'
             '{var}.Push(invs["{var}"]);\n'),
@@ -1999,7 +1999,6 @@ class InitInvFilter(CodeGeneratorFilter):
         return impl
 
     res_impl = {
-        CYCNS + '::toolkit::ResourceBuff': "{var}.PushAll(inv[\"{var}\"]);\n",
         CYCNS + '::toolkit::ResBuf': "{var}.Push(inv[\"{var}\"]);\n",
         CYCNS + '::toolkit::ResMap': "{var}.ResValues(inv[\"{var}\"]);\n",
         CYCNS + '::toolkit::TotalInvTracker': ";\n",

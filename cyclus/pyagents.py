@@ -3,6 +3,7 @@ from __future__ import unicode_literals, print_function
 
 from cyclus.agents import Region, Institution, Facility
 from cyclus import typesystem as ts
+from cyclus.system import CY_LARGE_DOUBLE
 
 class NullRegion(Region):
     """A simple do nothing region."""
@@ -31,7 +32,7 @@ class Sink(Facility):
         uitype="recipe",
         )
     max_inv_size = ts.Double(
-        default=1e299,
+        default=CY_LARGE_DOUBLE,
         doc="total maximum inventory size of sink facility",
         uilabel= "Maximum Inventory",
         tooltip="sink maximum inventory size",
@@ -42,7 +43,7 @@ class Sink(Facility):
         tooltip="sink capacity",
         default=100.0,
         )
-    inventory = ts.ResourceBuffInv(capacity='max_inv_size')
+    inventory = ts.ResBufProduct()
 
     def get_material_requests(self):
         if len(self.recipe) == 0:

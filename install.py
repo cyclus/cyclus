@@ -79,8 +79,8 @@ def install_cyclus(args):
                           ]
         if args.build_type:
             cmake_cmd += ['-DCMAKE_BUILD_TYPE=' + args.build_type]
-        if args.core_version:
-            cmake_cmd += ['-DCORE_VERSION=' + args.core_version]
+        if args.data_model_version:
+            cmake_cmd += ['-DDATA_MODEL_VERSION=' + args.data_model_version]
         if args.D is not None:
             cmake_cmd += ['-D' + x for x in args.D]
         if args.cmake_debug:
@@ -90,6 +90,8 @@ def install_cyclus(args):
         if args.fast is not None:
             fast = 'TRUE' if args.fast else 'FALSE'
             cmake_cmd.append('-DCYCLUS_FAST_COMPILE=' + fast)
+        if args.parallel is not None:
+            cmake_cmd +=  ['-DPARALLEL=' + ('TRUE' if args.parallel else 'FALSE')]
 
         check_windows_cmake(cmake_cmd)
         rtn = subprocess.check_call(cmake_cmd, cwd=args.build_dir,
@@ -132,7 +134,7 @@ def main():
     parser = ap.ArgumentParser(description=description)
 
     build_dir = 'where to place the build directory'
-    parser.add_argument('--build_dir', help=build_dir, default='build')
+    parser.add_argument('--build-dir', help=build_dir, default='build')
 
     uninst = 'uninstall'
     parser.add_argument('--uninstall', action='store_true', help=uninst, default=False)
@@ -175,7 +177,7 @@ def main():
     parser.add_argument('--coin-root', '--coin_root', help=coin)
 
     boost = "the relative path to the Boost libraries directory"
-    parser.add_argument('--boost_root', help=boost)
+    parser.add_argument('--boost-root', help=boost)
 
     hdf5 = "the path to the HDF5 libraries directory"
     parser.add_argument('--hdf5_root', help=hdf5)
@@ -185,13 +187,14 @@ def main():
 
     cmake_prefix_path = "the cmake prefix path for use with FIND_PACKAGE, " + \
         "FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros"
-    parser.add_argument('--cmake_prefix_path', help=cmake_prefix_path)
+    parser.add_argument('--cmake-prefix-path', help=cmake_prefix_path)
 
     build_type = "the CMAKE_BUILD_TYPE"
-    parser.add_argument('--build-type', '--build_type', help=build_type)
+    parser.add_argument('--build-type', '--build_type', help=build_type,
+                        default='Release')
 
-    parser.add_argument('--core-version', dest='core_version', default=None,
-                        help='Sets the core version number.')
+    parser.add_argument('--data-model-version', dest='data_model_version', default=None,
+                        help='Sets the data model version number.')
 
     parser.add_argument('-D', metavar='VAR', action='append',
                         help='Set enviornment variable(s).')
@@ -200,7 +203,7 @@ def main():
                                                  'when dealing with build system issues.')
 
     code_coverage = "Enable code coverage analysis using gcov/lcov"
-    parser.add_argument('--code_coverage', help=code_coverage, default=False, action="store_true")
+    parser.add_argument('--code-coverage', help=code_coverage, default=False, action="store_true")
 
     parser.add_argument('--fast', default=None, dest='fast',
                         action='store_true', help="Will try to compile "
@@ -210,6 +213,10 @@ def main():
                         action='store_false', help="Will NOT try to compile "
                         "from assembly, if possible. This is slower as it "
                         "must compile from source.")
+    
+    parser.add_argument('--parallel', dest='parallel',
+                        action='store_true', help="Will compile with -fopenmp flag to "
+                        "enable multithreaded simulation support.")
 
     args = parser.parse_args()
     # modify roots as needed

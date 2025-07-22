@@ -1,196 +1,336 @@
 <grammar xmlns="http://relaxng.org/ns/structure/1.0"
-datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  xmlns:a="http://relaxng.org/ns/annotation/1.0"
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 <start>
 
 <element name="simulation">
-  <optional><element name="schematype"><text/></element></optional>
-<interleave>
+  <a:documentation>A complete Cyclus simulation</a:documentation>
+  <optional><element name="schematype">
+    <a:documentation>Select between a hierarchical schema (default) and a flat schema.</a:documentation>
+    <text/></element></optional>
 
-  <optional><element name="ui"><text/></element></optional>
-  
-  <element name ="control">
-    <interleave>
-      <optional>
-        <element name="simhandle"> <data type="string"/> </element>
-      </optional>
-      <element name="duration"> <data type="nonNegativeInteger"/> </element>
-      <element name="startmonth"> <data type="nonNegativeInteger"/> </element>
-      <element name="startyear"> <data type="nonNegativeInteger"/> </element>
-      <optional>
-        <element name="decay"> <text/> </element>
-      </optional>
-      <optional> 
-        <element name="dt"><data type="nonNegativeInteger"/></element> 
-      </optional>
-      <optional>
-        <element name="explicit_inventory"> <data type="boolean"/> </element>
-      </optional>
-      <optional>
-        <element name="explicit_inventory_compact"> <data type="boolean"/> </element>
-      </optional>
-      <optional>
-          <element name="tolerance_generic"><data type="double"/></element>
-      </optional>
-      <optional>
-          <element name="tolerance_resource"><data type="double"/></element>
-      </optional>
-      <optional>
-          <element name="seed"><data type="positiveInteger" /></element>
-      </optional>
-      <optional>
-          <element name="stride"><data type="positiveInteger" /></element>
-      </optional>
-      <optional>
-        <element name="solver"> 
-          <interleave>
-            <optional><element name="config">
-            <choice>
-              <element name="greedy">
-                <interleave>
-                  <optional>
-                    <element name="preconditioner"> <text/> </element>
-                  </optional>
-                </interleave>
-              </element>
-              <element name="coin-or">
-                <interleave>
-                  <optional>
-                    <element name="timeout">  <data type="positiveInteger"/>  </element>
-                  </optional>
-                  <optional><element name="verbose"><data type="boolean"/></element></optional>
-                  <optional><element name="mps"><data type="boolean"/></element></optional>
-                </interleave>
-              </element>
-            </choice>
-            </element></optional>
-            <optional>
-              <element name="allow_exclusive_orders">
-                <data type="boolean" />
-              </element>
-            </optional>
-            <optional><!--deprecated. @TODO remove in release 1.5 -->
-              <element name="exclusive_orders_only">
-                <data type="boolean" />
-              </element>
-            </optional>
-          </interleave>
-        </element>
-      </optional>
-    </interleave>
-  </element>
+  <interleave>
 
-  <zeroOrMore>
-    <element name="commodity">
-      <interleave>
-        <element name="name"> <text/> </element>
-        <element name="solution_priority"> <data type="double"/> </element>
-      </interleave>
-    </element>
-  </zeroOrMore>
+    <optional><element name="ui"><text/></element></optional>
     
-  <element name="archetypes"> 
-    <oneOrMore>
-      <element name="spec">
-        <interleave>
-          <optional><element name="path"><text/></element></optional>
-          <optional><element name="lib"><text/></element></optional>
-          <element name="name"><text/></element>
-          <optional><element name="alias"><text/></element></optional>
-        </interleave>
-      </element>
-    </oneOrMore>
-  </element>
-
-  <oneOrMore>
-    <element name="facility">
+    <element name="control">
+      <a:documentation>Block to define control parameters of simulation.</a:documentation>
       <interleave>
-        <element name="name"> <text/> </element>
         <optional>
-          <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
+          <element name="simhandle">
+            <a:documentation>A user-defined simulation handle. Default is to generate a long random UUID.</a:documentation>
+            <data type="string"/> </element>
         </optional>
-
-        <element name="config">
-          <choice>
-          @Facility_REFS@
-          </choice>
-        </element>
-      </interleave>
-    </element>
-  </oneOrMore>
-
-  <oneOrMore>
-    <element name="region"> <interleave>
-      <element name="name"> <text/> </element>
-      <optional>
-        <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
-      </optional>
-
-      <element name="config">
-        <choice>
-        @Region_REFS@
-        </choice>
-      </element>
-
-      <oneOrMore>
-        <element name="institution"> <interleave>
-          <element name="name"> <text/> </element>
-          <optional>
-            <element name="lifetime"> <data type="nonNegativeInteger"/> </element>
-          </optional>
-
-          <optional>
-            <element name="initialfacilitylist">
-              <oneOrMore>
-                <element name="entry">
+        <element name="duration"> 
+          <a:documentation>Simulation duration in units of time steps. Default time steps
+            are 1 month. See `dt` to change default time step length.</a:documentation>
+          <data type="nonNegativeInteger"/> </element>
+        <element name="startyear"> 
+          <a:documentation>First year of simulation, e.g. 2015 (integer)</a:documentation>
+          <data type="nonNegativeInteger"/> </element>
+        <element name="startmonth"> 
+          <a:documentation>First month of the simulation, e.g. 3 for March (integer)</a:documentation>
+          <data type="nonNegativeInteger"/> </element>
+        <optional>
+          <element name="decay"> 
+          <a:documentation>Mode for when radioactive decay occurs. Choose from "never", "manual", "lazy".</a:documentation>
+          <text/> </element>
+        </optional>
+        <optional> 
+          <element name="dt">
+            <a:documentation>Length of a time step in seconds. Default: 1 month = 1 year/12 (i.e. 2,629,846 seconds).</a:documentation>
+            <data type="nonNegativeInteger"/></element> 
+        </optional>
+        <optional>
+          <element name="explicit_inventory">
+            <a:documentation>A Boolean flag to indicate whether the database should include tables that explicitly
+              record the inventory of each resource buffer in each agent at each time step. (Default: False)</a:documentation>
+            <data type="boolean"/> </element>
+        </optional>
+        <optional>
+          <element name="explicit_inventory_compact">
+            <a:documentation>A Boolean flag to indicate whether the database should include compact tables that explicitly
+            record the inventory of each resource buffer in each agent at each time step. (Default: False)</a:documentation>
+            <data type="boolean"/> </element>
+        </optional>
+        <optional>
+            <element name="tolerance_generic">
+              <a:documentation>Value used as tolerance when comparing two generic floating point numbers. (Default: 1e-06)</a:documentation>
+              <data type="double"/></element>
+        </optional>
+        <optional>
+            <element name="tolerance_resource">
+              <a:documentation>Value used as tolerance when comparing two resource quantities. (Default: 1e-06)</a:documentation>              
+              <data type="double"/></element>
+        </optional>
+        <optional>
+            <element name="seed">
+              <a:documentation>Value used for seed in built in random number generator. (Default: 20160212)</a:documentation>              
+              <data type="positiveInteger" /></element>
+        </optional>
+        <optional>
+            <element name="stride">
+              <a:documentation>Value used for stride in built in random number generator. (Default: 10000)</a:documentation>              
+              <data type="positiveInteger" /></element>
+        </optional>
+        <optional>
+          <element name="solver"> 
+            <a:documentation>Input block to select the solver mode and provide solver parameters.</a:documentation>
+            <interleave>
+              <optional><element name="config">
+              <a:documentation>Provide a solver configuration</a:documentation>
+              <choice>
+                <element name="greedy">
+                  <a:documentation>Choose the greedy solver</a:documentation>
                   <interleave>
-                    <element name="prototype"> <text/> </element>
-                    <element name="number"> <data type="nonNegativeInteger"/> </element>
+                    <optional>
+                      <element name="preconditioner"> 
+                        <a:documentation>Select a preconditioner for the greedy solver</a:documentation>
+                        <text/> </element>
+                    </optional>
                   </interleave>
                 </element>
-              </oneOrMore>
-            </element>
-          </optional>
-
-          <element name="config">
-            <choice>
-            @Inst_REFS@
-            </choice>
+                <element name="coin-or">
+                  <a:documentation>Select the COIN-OR mixed integer linear programming library solver</a:documentation>
+                  <interleave>
+                    <optional>
+                      <element name="timeout">
+                        <a:documentation>Select a time limit for how long you are willing to let the solver find a solution</a:documentation>
+                        <data type="positiveInteger"/>  </element>
+                    </optional>
+                    <optional>
+                      <element name="verbose">
+                        <a:documentation>A Boolean variable to determine whether there is verbose output from the COIN-OR solver.</a:documentation>
+                        <data type="boolean"/></element>
+                      </optional>
+                    <optional>
+                      <element name="mps">
+                        <a:documentation>A Boolean variable to determine whether an MPS file is written for each exchange.</a:documentation>
+                        <data type="boolean"/></element></optional>
+                  </interleave>
+                </element>
+              </choice>
+              </element></optional>
+              <optional>
+                <element name="allow_exclusive_orders">
+                  <a:documentation>A Boolean variable to determine whether exclusive orders are allowed (default: True)</a:documentation>
+                  <data type="boolean" />
+                </element>
+              </optional>
+            </interleave>
           </element>
-        </interleave> </element>
-      </oneOrMore>
+        </optional>
+      </interleave>
+    </element>
 
-    </interleave> </element>
-  </oneOrMore>
+    <zeroOrMore>
+      <element name="commodity">
+        <a:documentation>Commodities can be listed in order to provide a priority ordering for solving them in the DRE.</a:documentation>
+        <interleave>
+          <element name="name"> 
+            <a:documentation>The name of a commodity being given priority treatment.</a:documentation>
+            <text/> </element>
+          <element name="solution_priority"> 
+            <a:documentation>The relative solution priority of this commodity. Higher values have higher priorit. (Default: -1)</a:documentation>
+            <data type="double"/> </element>
+        </interleave>
+      </element>
+    </zeroOrMore>
 
-  <zeroOrMore>
-    <element name="recipe">
-      <interleave>
-        <element name="name"><text/></element>
-        <element name="basis"><text/></element>
+    <oneOrMore>  
+      <element name="archetypes"> 
+        <a:documentation>A list of archetypes that will be dynamically loaded for use in Regions, Insitutions, and Facilities.</a:documentation>
         <oneOrMore>
-          <element name="nuclide">
+          <element name="spec">
+            <a:documentation>A complete archetype specification</a:documentation>
             <interleave>
-              <element name="id"><data type="string"/></element>
-              <element name="comp"><data type="double"/></element>
+              <optional>
+                <element name="path">
+                  <a:documentation>An optional path to find this archetype; only needed if not discoverable in the standard locations.</a:documentation>
+                  <text/></element></optional>
+              <optional>
+                <element name="lib">
+                  <a:documentation>An optional name for the library that contains this archetype.</a:documentation>
+                  <text/></element></optional>
+              <element name="name">
+                <a:documentation>The name that will be used to refer to this archetype.</a:documentation>
+                <text/></element>
+              <optional>
+                <element name="alias">
+                  <a:documentation>An optional alias to refer to this archetype by a different name.</a:documentation>
+                  <text/></element></optional>
             </interleave>
           </element>
         </oneOrMore>
-      </interleave>
-    </element>
-  </zeroOrMore>
+      </element>
+    </oneOrMore>
 
-  <zeroOrMore>
-    <element name="package">
-      <interleave>
-        <element name="name"><text/></element>
-        <element name="fill_min"><data type="double"/></element>
-        <element name="fill_max"><data type="double"/></element>
-        <element name="strategy"><text/></element>
-      </interleave>
-    </element>
-  </zeroOrMore>
+    <oneOrMore>
+      <element name="facility">
+        <a:documentation>A Facility prototype specification, with archetype,
+          archetype-specific parameters, and general facility parameters. Must
+          occur once, but may occur many times.</a:documentation> 
+        <interleave>
+          <element name="name">
+            <a:documentation>Prototype name</a:documentation>
+            <text/> </element>
+          <optional>
+            <element name="lifetime"> 
+              <a:documentation>Number of time steps that this archetypes is participating after it is deployed.</a:documentation>
+              <data type="nonNegativeInteger"/> </element>
+          </optional>
 
-</interleave> </element>
+          <element name="config">
+            <a:documentation>Configuration to specify which archetype is being used for this facility, and then 
+              provide parameters to specify a particular prototype.</a:documentation>
+            <choice>
+            @Facility_REFS@
+            </choice>
+          </element>
+        </interleave>
+      </element>
+    </oneOrMore>
+
+    <oneOrMore>
+      <element name="region"> 
+        <a:documentation>A region that represents a geopolitical division of the world and contains one or more institutions.</a:documentation>
+        <interleave>
+          <element name="name">
+            <a:documentation>The name of the region</a:documentation>
+            <text/> </element>
+          <optional>
+            <element name="lifetime">
+              <a:documentation>The number of time steps that this region participates in the simulation once it begins.</a:documentation>
+              <data type="nonNegativeInteger"/> </element>
+          </optional>
+
+          <element name="config">
+            <a:documentation>Configuration to specify which archetype is being used for this region, and then 
+              provide parameters to specify a particular prototype.</a:documentation>
+            <choice>
+            @Region_REFS@
+            </choice>
+          </element>
+
+          <oneOrMore>
+            <element name="institution"> 
+              <a:documentation>An institution that represents an entity that can own/operate facilities within a region.</a:documentation>
+              <interleave>
+                <element name="name">
+                  <a:documentation>The name of the institution</a:documentation>
+                  <text/> </element>
+                <optional>
+                  <element name="lifetime"> 
+                    <a:documentation>The number of time steps that this institution participates in the simulation once it begins.</a:documentation>
+                    <data type="nonNegativeInteger"/> </element>
+                </optional>
+
+                <optional>
+                  <element name="initialfacilitylist">
+                    <a:documentation>A list of facility prototypes that are operating when this institution begins participating in the simulation.</a:documentation>
+                    <oneOrMore>
+                      <element name="entry">
+                        <a:documentation>An entry for each prototype that has some number of initial facilities.</a:documentation>
+                        <interleave>
+                          <element name="prototype"> 
+                            <a:documentation>The name of the prototype that has at least one initial facility.</a:documentation>
+                            <text/> </element>
+                          <element name="number"> 
+                            <a:documentation>The number of this prototype that are operating initially.</a:documentation>
+                            <data type="nonNegativeInteger"/> </element>
+                        </interleave>
+                      </element>
+                    </oneOrMore>
+                  </element>
+                </optional>
+
+                <element name="config">
+                  <a:documentation>Configuration to specify which archetype is being used for this institution, and then 
+                    provide parameters to specify a particular prototype.</a:documentation>
+                  <choice>
+                  @Inst_REFS@
+                  </choice>
+                </element>
+            </interleave> </element>
+          </oneOrMore>
+
+        </interleave> </element>
+    </oneOrMore>
+
+    <zeroOrMore>
+      <element name="recipe">
+        <a:documentation>A material composition recipe that can be reused in other places in the simulation.</a:documentation>
+        <interleave>
+          <element name="name">
+            <a:documentation>The name of the recipe used to refer to it elsewhere.</a:documentation>
+            <text/></element>
+          <element name="basis">
+            <a:documentation>Indicating whether this recipe is defined by mass or atom fraction. Valid values: `mass` or `atom`.</a:documentation>
+            <text/></element>
+          <oneOrMore>
+            <element name="nuclide">
+              <a:documentation>Information about each nuclde in this composition.</a:documentation>
+              <interleave>
+                <element name="id">
+                  <a:documentation>A nuclide identifier in any form allowed by PyNE</a:documentation>
+                  <data type="string"/></element>
+                <element name="comp">
+                  <a:documentation>The relative concentration of this nuclide in the basis defined above.</a:documentation>
+                  <data type="double"/></element>
+              </interleave>
+            </element>
+          </oneOrMore>
+        </interleave>
+      </element>
+    </zeroOrMore>
+
+    <zeroOrMore>
+      <element name="package">
+        <a:documentation>A package that defines how bulk quantities are shipped between facilities.</a:documentation>
+        <interleave>
+          <element name="name">
+            <a:documentation>The name of this package.</a:documentation>
+            <text/></element>
+          <optional>
+            <element name="fill_min">
+              <a:documentation>The minimum amount of material that is allowed to be shipped in this package.</a:documentation>
+              <data type="double"/></element></optional>
+          <optional>
+            <element name="fill_max">
+              <a:documentation>The maximums amount of material that is allowed to be shipped in this package.</a:documentation>            
+              <data type="double"/></element></optional>
+          <optional>
+            <element name="strategy">
+              <a:documentation>The strategy for filling a set of packages.</a:documentation>
+              <text/></element></optional>
+        </interleave>
+      </element>
+    </zeroOrMore>
+
+    <zeroOrMore>
+      <element name="transportunit">
+        <a:documentation>A transport unit that describes how multiple packages may be shipped in some collection.</a:documentation>
+        <interleave>
+          <element name="name">
+            <a:documentation>The name of this transport unit.</a:documentation>
+            <text/></element>
+          <optional>
+            <element name="fill_min">
+              <a:documentation>The minimum number of packages allowed to be shipped in this transport unit.</a:documentation>
+              <data type="nonNegativeInteger"/></element></optional>
+          <optional>
+            <element name="fill_max">
+              <a:documentation>The maximum number of packages allowed to be shipped in this transport unit.</a:documentation>
+              <data type="nonNegativeInteger"/></element></optional>
+          <optional>
+            <element name="strategy">
+              <a:documentation>The strategy for filling multiple transport units</a:documentation>
+              <text/></element></optional>
+        </interleave>
+      </element>
+    </zeroOrMore>
+
+  </interleave> </element>
 
 </start>
 

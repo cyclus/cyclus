@@ -14,10 +14,11 @@
 #include "query_backend.h"
 #include "resource.h"
 #include "state_wrangler.h"
+#include "economic_entity.h"
 
 // Undefines isnan from pyne
 #ifdef isnan
-  #undef isnan
+#undef isnan
 #endif
 
 class SimInitTest;
@@ -35,18 +36,18 @@ class Product;
 /// map<inventory_name, vector<resources_in_inventory> >.  Used by agents in
 /// their #SnapshotInv and #InitInv functions for saving+loading their internal
 /// resource inventories.
-typedef std::map<std::string, std::vector<Resource::Ptr> > Inventories;
+typedef std::map<std::string, std::vector<Resource::Ptr>> Inventories;
 
 /// The abstract base class used by all types of agents
 /// that live and interact in a simulation.
 ///
-/// There are several functions that must be implemented in support of simulation
-/// initialization, snapshotting and restart: #InfileToDb,
+/// There are several functions that must be implemented in support of
+/// simulation initialization, snapshotting and restart: #InfileToDb,
 /// InitFrom(QueryableBackend*), #Snapshot, #SnapshotInv, and #InitInv.  These
 /// functions all do inter-related things.  Notably, the #InfileToDb, #InitFrom,
 /// and #Snapshot functions must all write/read to/from the same database tables
 /// (and table schemas).
-class Agent : public StateWrangler, virtual public Ider {
+class Agent : public StateWrangler, virtual public Ider, public EconomicEntity {
   friend class SimInit;
   friend class ::SimInitTest;
 
@@ -88,8 +89,8 @@ class Agent : public StateWrangler, virtual public Ider {
   /// reading parameters from the passed InfileTree (parsed from xml) and
   /// recording data via the DbInit variable.  The simulation id and agent id
   /// are automatically injected in all data transfered to the database through
-  /// DbInit.  This function must be implemented by all agents.  This function must
-  /// call the superclass' InfileToDb function before doing any other work.
+  /// DbInit.  This function must be implemented by all agents.  This function
+  /// must call the superclass' InfileToDb function before doing any other work.
   ///
   /// Agent parameters in the InfileTree are scoped in the "agent/*/" path.
   /// The superclass InitFrom expects the scope InfileTree passed to it to be
@@ -286,16 +287,16 @@ class Agent : public StateWrangler, virtual public Ider {
   /// @param other the other agent
   bool AncestorOf(Agent* other);
 
-  /// returns true if this agent is an decendent of an other agent (i.e., resides
-  /// below an other agent in the family tree)
+  /// returns true if this agent is an decendent of an other agent (i.e.,
+  /// resides below an other agent in the family tree)
   /// @param other the other agent
   bool DecendentOf(Agent* other);
 
   /// Called when the agent enters the smiulation as an active participant and
   /// is only ever called once.  Agents should NOT register for services (such
-  /// as ticks/tocks and resource exchange) in this function. If agents implement
-  /// this function, they must call their superclass' Build function at the
-  /// BEGINING of their Build function.
+  /// as ticks/tocks and resource exchange) in this function. If agents
+  /// implement this function, they must call their superclass' Build function
+  /// at the BEGINING of their Build function.
   ///
   /// @param parent this agent's parent. NULL if this agent has no parent.
   virtual void Build(Agent* parent);
@@ -317,8 +318,8 @@ class Agent : public StateWrangler, virtual public Ider {
 
   /// Decommissions the agent, removing it from the simulation. Results in
   /// destruction of the agent object. If agents write their own Decommission
-  /// function, they must call their superclass' Decommission function at the END of
-  /// their Decommission function.
+  /// function, they must call their superclass' Decommission function at the
+  /// END of their Decommission function.
   virtual void Decommission();
 
   /// default implementation for material preferences.
@@ -330,16 +331,12 @@ class Agent : public StateWrangler, virtual public Ider {
   /// Returns an agent's xml rng schema for initializing from input files. All
   /// concrete agents should override this function. This must validate the same
   /// xml input that the InfileToDb function receives.
-  virtual std::string schema() {
-    return "<text />\n";
-  }
+  virtual std::string schema() { return "<text />\n"; }
 
   /// Returns an agent's json annotations for all state variables and any other
   /// information the developer wishes to provide. All concrete agents should
   /// override this function.
-  virtual Json::Value annotations() {
-    return Json::Value(Json::objectValue);
-  }
+  virtual Json::Value annotations() { return Json::Value(Json::objectValue); }
 
   /// Returns the agent's prototype.
   inline const std::string prototype() const { return prototype_; }
@@ -376,18 +373,18 @@ class Agent : public StateWrangler, virtual public Ider {
   /// parent.
   inline const int parent_id() const { return parent_id_; }
 
-  /// Returns the time step at which this agent's Build function was called (-1 if
-  /// the agent has never been built).
+  /// Returns the time step at which this agent's Build function was called (-1
+  /// if the agent has never been built).
   inline const int enter_time() const { return enter_time_; }
 
-  ///Sets the number of time steps this agent operates between building and
-  /// decommissioning (-1 if the agent has an infinite lifetime).  This should
-  /// generally only be called BEFORE an agent is added to a context as a
-  /// prototype.  Throws ValueError if the agent has already been deployed.
+  /// Sets the number of time steps this agent operates between building and
+  ///  decommissioning (-1 if the agent has an infinite lifetime).  This should
+  ///  generally only be called BEFORE an agent is added to a context as a
+  ///  prototype.  Throws ValueError if the agent has already been deployed.
   void lifetime(int n_timesteps);
 
   /// Sets the number of time steps this agent operates between building and
-  /// decommissioning (-1 if the agent has an infinite lifetime).  
+  /// decommissioning (-1 if the agent has an infinite lifetime).
   void lifetime_force(int n_timesteps);
 
   /// Returns the number of time steps this agent operates between building and
@@ -403,8 +400,7 @@ class Agent : public StateWrangler, virtual public Ider {
   /// created. Therefore, for agents with non-infinite lifetimes, the exit_time
   /// will be the enter time plus its lifetime less 1.
   inline const int exit_time() const {
-    if (lifetime() == -1)
-      return -1;
+    if (lifetime() == -1) return -1;
     return enter_time_ + lifetime_ - 1;
   }
 
@@ -414,9 +410,9 @@ class Agent : public StateWrangler, virtual public Ider {
  protected:
   /// Initializes a agent by copying parameters from the passed agent m. This
   /// function must be implemented by all agents.  This function must call the
-  /// superclass' InitFrom function. The InitFrom function should only initialize
-  /// this class' members - not inherited state. The superclass InitFrom should
-  /// generally be called before any other work is done.
+  /// superclass' InitFrom function. The InitFrom function should only
+  /// initialize this class' members - not inherited state. The superclass
+  /// InitFrom should generally be called before any other work is done.
   ///
   /// @param m the agent containing state that should be used to initialize this
   /// agent.

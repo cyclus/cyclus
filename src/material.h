@@ -15,9 +15,9 @@ class Context;
 
 namespace units {
 const double kg = 1.0;
-const double g =  kg* .001;
-const double mg = kg* .000001;
-const double ug = kg* .000000001;
+const double g = kg * .001;
+const double mg = kg * .000001;
+const double ug = kg * .000000001;
 }  // namespace units
 
 /// The material class is primarily responsible for enabling basic material
@@ -52,8 +52,8 @@ const double ug = kg* .000000001;
 /// * A reactor transmuting fuel:
 ///
 ///   @code
-///   Composition::Ptr burned_comp = ... // fancy code to calculate burned nuclides
-///   Material::Ptr assembly = core_fuel.Pop();
+///   Composition::Ptr burned_comp = ... // fancy code to calculate burned
+///   nuclides Material::Ptr assembly = core_fuel.Pop();
 ///
 ///   assembly.Transmute(burned_comp);
 ///   @endcode
@@ -68,7 +68,7 @@ const double ug = kg* .000000001;
 ///   Material::Ptr mox = bucket.ExtractComp(qty, comp);
 ///   @endcode
 ///
-class Material: public Resource {
+class Material : public Resource {
   friend class SimInit;
 
  public:
@@ -81,7 +81,8 @@ class Material: public Resource {
   /// pointer to the agent creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
-  static Ptr Create(Agent* creator, double quantity, Composition::Ptr c, int package_id = default_package_id_);
+  static Ptr Create(Agent* creator, double quantity, Composition::Ptr c,
+                    std::string package_name = Package::unpackaged_name());
 
   /// Creates a new material resource that does not actually exist as part of
   /// the simulation and is untracked.
@@ -136,7 +137,7 @@ class Material: public Resource {
   /// not result in an updated material composition.  Does nothing if the
   /// simulation decay mode is set to "never" or none of the nuclides' decay
   /// constants are significant with respect to the time delta.
-  /// @param curr_time current time to use for the decay calculation 
+  /// @param curr_time current time to use for the decay calculation
   ///        (default: -1 forces the decay to the context's current time)
   virtual void Decay(int curr_time = -1);
 
@@ -155,14 +156,19 @@ class Material: public Resource {
   /// DEPRECATED - use non-const comp() function.
   Composition::Ptr comp() const;
 
-  int package_id();
+  virtual std::string package_name();
 
-  /// Changes the package id. Checks that the resource fits the package 
+  virtual Resource::Ptr PackageExtract(
+      double qty, std::string new_package_name = Package::unpackaged_name());
+
+  /// Changes the package id. Checks that the resource fits the package
   /// type minimum and maximum mass criteria.
-  void ChangePackageId(int new_package_id = default_package_id_);
+  virtual void ChangePackage(
+      std::string new_package_name = Package::unpackaged_name());
 
  protected:
-  Material(Context* ctx, double quantity, Composition::Ptr c, int package_id = default_package_id_);
+  Material(Context* ctx, double quantity, Composition::Ptr c,
+           std::string package_name = Package::unpackaged_name());
 
  private:
   Context* ctx_;
@@ -170,7 +176,7 @@ class Material: public Resource {
   Composition::Ptr comp_;
   int prev_decay_time_;
   ResTracker tracker_;
-  int package_id_;
+  std::string package_name_;
 };
 
 /// Creates and returns a new material with the specified quantity and a

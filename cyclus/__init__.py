@@ -1,2 +1,1 @@
-__version__ = '1.5.5'
-import pymodule, eventhooks, pyinfile
+__version__ = 'x.x.x' # will be populated during build

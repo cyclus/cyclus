@@ -42,7 +42,7 @@ MockAgent::MockAgent(Context* ctx, Recorder* rec, SqliteBack* b, bool is_source)
       rec_(rec),
       back_(b),
       source_(is_source),
-      cap_(1e299),
+      cap_(cyclus::CY_LARGE_DOUBLE),
       lifetime_(-1),
       start_(0) {
   std::stringstream ss;
@@ -112,8 +112,7 @@ std::string MockAgent::Finalize() {
 }
 
 ///////// MockSim ////////////
-MockSim::MockSim(int duration)
-    : ctx_(&ti_, &rec_), back_(NULL), agent(NULL) {
+MockSim::MockSim(int duration) : ctx_(&ti_, &rec_), back_(NULL), agent(NULL) {
   Env::SetNucDataPath();
   warn_limit = 0;
   back_ = new SqliteBack(":memory:");
@@ -151,11 +150,9 @@ MockSim::MockSim(AgentSpec spec, std::string config, int duration, int lifetime)
   Agent* a = DynamicModule::Make(&ctx_, spec);
 
   std::stringstream xml;
-  xml << "<facility>"
-      << "<lifetime>" << lifetime << "</lifetime>"
-      << "<name>agent_being_tested</name>"
-      << "<config><foo>" << config << "</foo></config>"
-      << "</facility>";
+  xml << "<facility>" << "<lifetime>" << lifetime << "</lifetime>"
+      << "<name>agent_being_tested</name>" << "<config><foo>" << config
+      << "</foo></config>" << "</facility>";
   InitAgent(a, xml, &rec_, back_);
 
   ctx_.AddPrototype(a->prototype(), a);
@@ -166,25 +163,22 @@ void MockSim::DummyProto(std::string name) {
   Agent* a = DynamicModule::Make(&ctx_, AgentSpec(":agents:Source"));
 
   std::stringstream xml;
-  xml << "<facility><name>" << name << "</name>"
-      << "<config><foo>"
-      << "<commod>alongunusedcommodityname</commod>"
-      << "<capacity>0</capacity>"
+  xml << "<facility><name>" << name << "</name>" << "<config><foo>"
+      << "<commod>alongunusedcommodityname</commod>" << "<capacity>0</capacity>"
       << "</foo></config></facility>";
 
   InitAgent(a, xml, &rec_, back_);
   ctx_.AddPrototype(name, a);
 };
 
-void MockSim::DummyProto(std::string name, std::string commod, double capacity) {
+void MockSim::DummyProto(std::string name, std::string commod,
+                         double capacity) {
   Agent* a = DynamicModule::Make(&ctx_, AgentSpec(":agents:Source"));
 
   std::stringstream xml;
-  xml << "<facility><name>" << name << "</name>"
-      << "<config><foo>"
-      << "<commod>" << "commod" << "</commod>"
-      << "<capacity>" << capacity << "</capacity>"
-      << "</foo></config></facility>";
+  xml << "<facility><name>" << name << "</name>" << "<config><foo>"
+      << "<commod>" << "commod" << "</commod>" << "<capacity>" << capacity
+      << "</capacity>" << "</foo></config></facility>";
 
   InitAgent(a, xml, &rec_, back_);
   ctx_.AddPrototype(name, a);
@@ -233,6 +227,8 @@ Product::Ptr MockSim::GetProduct(int resid) {
   return SimInit::BuildProduct(back_, resid);
 }
 
-SqliteBack& MockSim::db() { return *back_; }
+SqliteBack& MockSim::db() {
+  return *back_;
+}
 
 }  // namespace cyclus

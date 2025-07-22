@@ -10,12 +10,12 @@
 
 namespace cyclus {
 
-#if LIBXMLXX_MAJOR_VERSION == 2 
-  typedef xmlpp::NodeSet NodeSet;
-  typedef xmlpp::Node::NodeList const_NodeList;
+#if LIBXMLXX_MAJOR_VERSION == 2
+typedef xmlpp::NodeSet NodeSet;
+typedef xmlpp::Node::NodeList const_NodeList;
 #else
-  typedef xmlpp::Node::NodeSet NodeSet;
-  typedef xmlpp::Node::const_NodeList const_NodeList;
+typedef xmlpp::Node::NodeSet NodeSet;
+typedef xmlpp::Node::const_NodeList const_NodeList;
 #endif
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -60,9 +60,9 @@ int InfileTree::NMatches(std::string query) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string InfileTree::GetString(std::string query, int index) {
+  using xmlpp::Element;
   using xmlpp::Node;
   using xmlpp::TextNode;
-  using xmlpp::Element;
   const NodeSet nodeset = current_node_->find(query);
   if (nodeset.empty()) {
     throw KeyError("Could not find a node by the name: " + query);
@@ -72,11 +72,10 @@ std::string InfileTree::GetString(std::string query, int index) {
     throw ValueError("Index exceeds number of nodes in query: " + query);
   }
 
-  const Element* element =
-    dynamic_cast<const Element*>(nodeset.at(index));
+  const Element* element = dynamic_cast<const Element*>(nodeset.at(index));
 
   if (!element) {
-    throw CastError("Node: " + element->get_name() +
+    throw CastError("Node: " + nodeset.at(index)->get_name() +
                     " is not an Element node.");
   }
 
@@ -87,10 +86,10 @@ std::string InfileTree::GetString(std::string query, int index) {
   }
 
   const TextNode* text =
-    dynamic_cast<const xmlpp::TextNode*>(element->get_children().front());
+      dynamic_cast<const xmlpp::TextNode*>(element->get_children().front());
 
   if (!text) {
-    throw CastError("Node: " + text->get_name() + " is not a Text node.");
+    throw CastError("Node: " + element->get_name() + " is not a Text node.");
   }
 
   return text->get_content();
@@ -110,8 +109,8 @@ std::string InfileTree::GetElementName(int index) {
     }
   }
   if (elements.size() < index + 1) {
-    throw ValueError("Index exceeds number of elements in node: "
-                     + current_node_->get_name());
+    throw ValueError("Index exceeds number of elements in node: " +
+                     current_node_->get_name());
   }
   return elements.at(index)->get_name();
 }
@@ -129,7 +128,7 @@ InfileTree* InfileTree::GetEngineFromQuery(std::string query, int index) {
   xmlpp::Element* element = dynamic_cast<xmlpp::Element*>(nodeset.at(index));
 
   if (!element) {
-    throw CastError("Node: " + element->get_name() +
+    throw CastError("Node: " + nodeset.at(index)->get_name() +
                     " is not an Element node.");
   }
 
@@ -137,8 +136,7 @@ InfileTree* InfileTree::GetEngineFromQuery(std::string query, int index) {
 }
 
 InfileTree* InfileTree::SubTree(std::string query, int index) {
-  InfileTree* qe_child =
-    GetEngineFromQuery(query, index);
+  InfileTree* qe_child = GetEngineFromQuery(query, index);
   spawned_children_.insert(qe_child);
   return qe_child;
 }

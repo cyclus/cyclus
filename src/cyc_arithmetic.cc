@@ -23,10 +23,12 @@ double CycArithmetic::KahanSum(std::vector<double> input) {
     t = sum + y;
     // Alas, sum is big, y small, so low-order digits of y are lost.
     c = (t - sum) - y;
-    // (t - sum) recovers the high-order part of y; subtracting y recovers -(low part of y)
+    // (t - sum) recovers the high-order part of y; subtracting y recovers -(low
+    // part of y)
     sum = t;
-    // Algebraically, c should always be zero. Beware eagerly optimizing compilers!
-    // Next time around, the lost low part will be added to y in a fresh attempt.
+    // Algebraically, c should always be zero. Beware eagerly optimizing
+    // compilers! Next time around, the lost low part will be added to y in a
+    // fresh attempt.
   }
   return sum;
 }
@@ -43,8 +45,8 @@ std::vector<double> CycArithmetic::sort_ascending(std::vector<double> to_sort) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<double> CycArithmetic::sort_ascending(std::map<int, double>
-                                                  to_sort) {
+std::vector<double> CycArithmetic::sort_ascending(
+    std::map<int, double> to_sort) {
   std::vector<double> vec_to_sort;
   std::map<int, double>::const_iterator it;
   for (it = to_sort.begin(); it != to_sort.end(); ++it) {

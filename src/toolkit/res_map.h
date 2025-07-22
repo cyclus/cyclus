@@ -20,7 +20,8 @@ namespace toolkit {
 
 /// ResMap container for the management of resources. It allows you to associate
 /// keys with individual resources. The keys are often strings or ints and the
-/// ResMap enables you to add whatever semantic meaning that you want to these keys.
+/// ResMap enables you to add whatever semantic meaning that you want to these
+/// keys.
 ///
 /// Typically, a ResMap will be a member variable of an archetype class.
 /// Resources can be added, removed, and retrieved from it as needed.
@@ -37,12 +38,12 @@ namespace toolkit {
 ///   cyclus::toolkit::ResMap<std::string, cyclus::Material> inventory_;
 /// };
 /// @endcode
-template <class K, class R>
-class ResMap {
+template <class K, class R> class ResMap {
  public:
   ResMap() : dirty_quantity_(true), quantity_(0) {
-    Warn<EXPERIMENTAL_WARNING>("ResMap is experimental and its API may be "
-                               "subject to change");
+    Warn<EXPERIMENTAL_WARNING>(
+        "ResMap is experimental and its API may be "
+        "subject to change");
   }
 
   virtual ~ResMap() {}
@@ -64,8 +65,7 @@ class ResMap {
 
   /// Returns the total quantity of resources in the map.
   inline double quantity() {
-    if (dirty_quantity_)
-      UpdateQuantity();
+    if (dirty_quantity_) UpdateQuantity();
     return quantity_;
   };
 
@@ -160,7 +160,7 @@ class ResMap {
   std::vector<typename R::Ptr> Values() {
     int i = 0;
     int n = resources_.size();
-    std::vector<typename R::Ptr> vals (n);
+    std::vector<typename R::Ptr> vals(n);
     iterator it = resources_.begin();
     while (it != resources_.end()) {
       vals[i] = it->second;
@@ -190,9 +190,9 @@ class ResMap {
     dirty_quantity_ = true;
   }
 
-  /// Sets the resource values of map based on their object ids. Thus the objs_ids
-  /// member must be set.  This is primarily for restart capabilities and is
-  /// not recomended for day-to-day use.
+  /// Sets the resource values of map based on their object ids. Thus the
+  /// objs_ids member must be set.  This is primarily for restart capabilities
+  /// and is not recomended for day-to-day use.
   void ResValues(std::vector<Resource::Ptr> vals) {
     Values(cyclus::template ResCast<R>(vals));
   }
@@ -221,7 +221,7 @@ class ResMap {
     if (n == 0) {
       quantity_ = 0.0;
     } else {
-      vector<double> qtys (n, 0.0);
+      vector<double> qtys(n, 0.0);
       while (it != resources_.end()) {
         qtys[i] = (*(it->second)).quantity();
         ++i;
@@ -233,7 +233,7 @@ class ResMap {
   }
 
   /// Whether quantity_ should be recomputed or not.
-  bool dirty_quantity_;
+  mutable bool dirty_quantity_;
 
   /// Current total quantity of all resources in the mapping.
   double quantity_;

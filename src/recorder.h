@@ -94,10 +94,10 @@ class Recorder {
 
   /// Creates a new datum namespaced under the specified title.
   ///
-  /// @warning choose title carefully to not conflict with Datum objects from other
-  /// agents. Also note that a static title (e.g. an unchanging string) will
-  /// result in multiple instances of this agent storing datum data together
-  /// (e.g. the same table).
+  /// @warning choose title carefully to not conflict with Datum objects from
+  /// other agents. Also note that a static title (e.g. an unchanging string)
+  /// will result in multiple instances of this agent storing datum data
+  /// together (e.g. the same table).
   Datum* NewDatum(std::string title);
 
   /// Registers b to receive Datum notifications for all Datum objects collected

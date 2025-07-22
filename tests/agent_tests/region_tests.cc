@@ -4,6 +4,8 @@
 
 #include <gtest/gtest.h>
 
+GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(RegionTests);
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_P(RegionTests, Print) {
   int time = 1;

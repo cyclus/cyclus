@@ -51,7 +51,8 @@ double UraniumAssayAtom(Material::Ptr mat);
 /// those of the given material
 double UraniumQty(Material::Ptr mat);
 
-/// inline double UraniumQty(Material::Ptr mat) { return UraniumQty(mat.get()); }
+/// inline double UraniumQty(Material::Ptr mat) { return UraniumQty(mat.get());
+/// }
 
 /// @param product_qty the amount of product Uranium,
 /// assuming feed is comprised of only U-235 and U-238

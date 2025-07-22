@@ -77,6 +77,11 @@ class Composition {
   /// not done previously).
   void Record(Context* ctx);
 
+  /// @brief Transforms a composition into a printable string, primarily for
+  /// debugging and logging.
+  /// @return A String represented as a CompMap
+  static std::string ToString(CompMap v);
+
  protected:
   /// a chain containing compositions that are a result of decay from a common
   /// ancestor composition. The key is the total amount of time a composition
@@ -103,7 +108,8 @@ class Composition {
   CompMap atom_;
   CompMap mass_;
 
-  /// the total time delta this composition has been decayed from its root ancestor.
+  /// the total time delta this composition has been decayed from its root
+  /// ancestor.
   int prev_decay_;
 };
 

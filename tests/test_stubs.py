@@ -19,57 +19,66 @@ def tmplog(fname):
     yield file_ptr
     os.remove(fname)
 
-def test_stubs():
-    flavors = ['facility', 'inst', 'region']
-    pth = 'foo'
+@pytest.mark.parametrize("pth", ['stubtest', 'stub_test', 'stubTest', 'StubTest'])
+def test_stubs(pth):
+    log = f'stub_test_{pth}.log'
+    agent_name_prefix = 'tmp'
+
+    stub_cmd = f'cycstub --type {{0}} {pth}:{pth}:{{1}}'
+    inst_cmd = 'python3 install.py --build_dir {0} --prefix {1}'
+    tst_cmd = f'./bin/{pth}_unit_tests'
+    run_cmd = f'cyclus example_{agent_name_prefix}_facility.xml'
+
     with tmpdir() as d:
         src = os.path.join(d, pth)
         bld = os.path.join(d, 'bar')
         inst = os.path.join(d, 'baz')
 
-        stub_cmd = 'cycstub --type {0} {1}:{1}:{2}'
-        inst_cmd = 'python install.py --build_dir {0} --prefix {1}'
-        tst_cmd = './bin/{}_unit_tests'
+        with tmplog(log) as f:
 
-        log = 'stub_test.log'
-        msg = '**Error, check the log in {}**'.format(log)
-        os.mkdir(src)
-        for flav in flavors:
-            # generate stub
-            cmd = stub_cmd.format(flav, pth, 'tmp' + flav.capitalize())
+            msg = f'**Error, check the log in {log}**'
+            os.mkdir(src)
+
+            for flav in ['facility', 'inst', 'region']:
+                # generate stub
+                cmd = stub_cmd.format(flav, agent_name_prefix + flav.capitalize())
+                print(cmd)
+                try:
+                    subprocess.check_call(cmd.split(), shell=(os.name=='nt'),
+                                            cwd=src, stdout=f, stderr=f)
+                except subprocess.CalledProcessError as e:
+                    print(msg)
+                    raise e
+
+            # build/install stub
+            cmd = inst_cmd.format(bld, inst)
             print(cmd)
             try:
-                with tmplog(log) as f:
-                    subprocess.check_call(cmd.split(), shell=(os.name=='nt'),
-                                          cwd=src, stdout=f, stderr=f)
+                subprocess.check_call(cmd.split(), shell=(os.name=='nt'),
+                                        cwd=src, stdout=f, stderr=f)
+            except subprocess.CalledProcessError as e:
+                print(msg)
+                pytest.skip(msg)  # skip if we can't install for some reason.
+
+            # run unit tests for stub
+            cmd = tst_cmd
+            print(cmd)
+            try:
+                subprocess.check_call(cmd.split(), shell=(os.name=='nt'), cwd=inst,
+                                        stdout=f, stderr=f)
             except subprocess.CalledProcessError as e:
                 print(msg)
                 raise e
 
-        # build/install stub
-        cmd = inst_cmd.format(bld, inst)
-        print(cmd)
-        try:
-            with tmplog(log) as f:
-                subprocess.check_call(cmd.split(), shell=(os.name=='nt'),
-                                      cwd=src, stdout=f, stderr=f)
-        except subprocess.CalledProcessError as e:
-            print(msg)
-            pytest.skip(msg)  # skip if we can't install for some reason.
+            # run sample file for stub
+            my_env = os.environ.copy()
+            my_env["CYCLUS_PATH"] = f"{inst}/lib/cyclus"
 
-        # run unit tests for stub
-        cmd = tst_cmd.format(pth)
-        print(cmd)
-        try:
-            with tmplog(log) as f:
-                subprocess.check_call(cmd.split(), shell=(os.name=='nt'), cwd=inst,
-                                      stdout=f, stderr=f)
-        except subprocess.CalledProcessError as e:
-            print(msg)
-            raise e
-
-if __name__ == '__main__':
-    test_stubs()
-
-
-
+            cmd = run_cmd
+            print(cmd)
+            try:
+                subprocess.check_call(cmd.split(), shell=(os.name=='nt'), cwd=src,
+                                        stdout=f, stderr=f, env=my_env)
+            except subprocess.CalledProcessError as e:
+                print(msg)
+                raise e

@@ -70,8 +70,8 @@ static int cyclus_agent_tests_connected = ConnectAgentTests();
 #endif  // CYCLUS_AGENT_TESTS_CONNECTED
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(SinkFac, FacilityTests,
+INSTANTIATE_TEST_SUITE_P(SinkFac, FacilityTests,
                         ::testing::Values(&SinkConstructor));
 
-INSTANTIATE_TEST_CASE_P(SinkFac, AgentTests,
+INSTANTIATE_TEST_SUITE_P(SinkFac, AgentTests,
                         ::testing::Values(&SinkConstructor));

@@ -14,8 +14,8 @@ namespace toolkit {
 
 void AddJsonToXml(Json::Value& node, std::stringstream& ss,
                   std::string parent_name, std::string indent) {
-  using std::string;
   using Json::Value;
+  using std::string;
   if (node.isObject()) {
     bool indent_child;
     string name;
@@ -31,11 +31,9 @@ void AddJsonToXml(Json::Value& node, std::stringstream& ss,
       if (!indent_child && node[name].isArray())
         indent_child = node[name][0].isObject() || node[name][0].isArray();
       ss << indent << "<" << name << ">";
-      if (indent_child)
-        ss << "\n";
+      if (indent_child) ss << "\n";
       AddJsonToXml(node[name], ss, name, newindent);
-      if (indent_child)
-        ss << indent;
+      if (indent_child) ss << indent;
       ss << "</" << name << ">\n";
     }
   } else if (node.isArray()) {
@@ -51,13 +49,11 @@ void AddJsonToXml(Json::Value& node, std::stringstream& ss,
       indent_child = node[n].isObject() || node[n].isArray();
       if (n > 0) {
         ss << indent << "<" << parent_name << ">";
-        if (indent_child)
-          ss << "\n";
+        if (indent_child) ss << "\n";
       }
       AddJsonToXml(node[n], ss, parent_name, newindent);
       if (n < nchildren - 1) {
-        if (indent_child)
-          ss << indent;
+        if (indent_child) ss << indent;
         ss << "</" << parent_name << ">\n";
       }
     }
@@ -79,9 +75,9 @@ void AddJsonToXml(Json::Value& node, std::stringstream& ss,
 
 // Converts a JSON string into an equivalent XML string
 std::string JsonToXml(std::string s) {
+  using Json::Value;
   using std::string;
   using std::stringstream;
-  using Json::Value;
 
   stringstream x;
 
@@ -90,7 +86,7 @@ std::string JsonToXml(std::string s) {
   Json::Reader reader;
   bool parsed = reader.parse(s, root, false);
   if (!parsed) {
-    string msg = "Failed to parse JSON file into XML:\n" + \
+    string msg = "Failed to parse JSON file into XML:\n" +
                  reader.getFormattedErrorMessages();
     throw ValidationError(msg);
   }
@@ -102,8 +98,8 @@ std::string JsonToXml(std::string s) {
 
 // inserts a value, or appends to an array
 void JsonInsertOrAppend(Json::Value& node, std::string key, Json::Value& val) {
-  using std::string;
   using Json::Value;
+  using std::string;
   if (node.isMember(key)) {
     if (node[key].isArray()) {
       node[key].append(val);
@@ -121,8 +117,8 @@ void JsonInsertOrAppend(Json::Value& node, std::string key, Json::Value& val) {
 
 void AddXmlToJson(InfileTree* xnode, Json::Value& jnode,
                   std::string parent_name) {
-  using std::string;
   using Json::Value;
+  using std::string;
   int n = xnode->NElements();
   for (int i = 0; i < n; ++i) {
     string name = xnode->GetElementName(i);
@@ -144,20 +140,20 @@ void AddXmlToJson(InfileTree* xnode, Json::Value& jnode,
 
 // Converts an XML string into an equivalent JSON string
 std::string XmlToJson(std::string s) {
+  using Json::Value;
   using std::string;
   using std::stringstream;
-  using Json::Value;
-  stringstream ss (s);
-  boost::shared_ptr<XMLParser> parser = boost::shared_ptr<XMLParser>(
-                                                            new XMLParser());
+  stringstream ss(s);
+  boost::shared_ptr<XMLParser> parser =
+      boost::shared_ptr<XMLParser>(new XMLParser());
   parser->Init(ss);
   InfileTree xroot(*parser);
   Value jroot(Json::objectValue);
   string rootname = parser->Document()->get_root_node()->get_name();
   jroot[rootname] = Value(Json::objectValue);
   AddXmlToJson(&xroot, jroot[rootname], rootname);
-  Json::CustomWriter writer = Json::CustomWriter("{", "}", "[", "]", ": ",
-                                                 ",", " ", 1);
+  Json::CustomWriter writer =
+      Json::CustomWriter("{", "}", "[", "]", ": ", ",", " ", 1);
   return writer.write(jroot);
 }
 

@@ -53,8 +53,8 @@ class ProgTranslator {
   ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface, bool exclusive);
   ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
                  double pseudo_cost);
-  ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
-                 bool exclusive, double pseudo_cost);
+  ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface, bool exclusive,
+                 double pseudo_cost);
 
   /// @brief translates the graph, filling the translators Context
   void Translate();

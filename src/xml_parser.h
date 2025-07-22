@@ -4,9 +4,9 @@
 #include <sstream>
 
 namespace xmlpp {
-  class DomParser;
-  class Document;
-}
+class DomParser;
+class Document;
+}  // namespace xmlpp
 
 namespace cyclus {
 

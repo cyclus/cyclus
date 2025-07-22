@@ -101,8 +101,8 @@ std::string Hdf5Back::VLRead<std::string, VL_STRING>(const char* rawkey) {
   using std::string;
   // key is used as offset
   Digest key;
-  memcpy(key.val, rawkey, CYCLUS_SHA1_SIZE);
-  const std::vector<hsize_t> idx = key.cast<hsize_t>();
+  memcpy(key.data(), rawkey, CYCLUS_SHA1_SIZE);
+  const std::vector<hsize_t> idx(key.begin(), key.end());
   hid_t dset = VLDataset(VL_STRING, false);
   hid_t dspace = H5Dget_space(dset);
   hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, vlchunk_, NULL);
@@ -134,8 +134,8 @@ template <>
 Blob Hdf5Back::VLRead<Blob, BLOB>(const char* rawkey) {
   // key is used as offset
   Digest key;
-  memcpy(key.val, rawkey, CYCLUS_SHA1_SIZE);
-  const std::vector<hsize_t> idx = key.cast<hsize_t>();
+  memcpy(key.data(), rawkey, CYCLUS_SHA1_SIZE);
+  const std::vector<hsize_t> idx(key.begin(), key.end());
   hid_t dset = VLDataset(BLOB, false);
   hid_t dspace = H5Dget_space(dset);
   hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, vlchunk_, NULL);
@@ -661,8 +661,8 @@ template <typename T, DbTypes U>
 T Hdf5Back::VLRead(const char* rawkey) {
   // key is used as offset
   Digest key;
-  memcpy(key.val, rawkey, CYCLUS_SHA1_SIZE);
-  const std::vector<hsize_t> idx = key.cast<hsize_t>();
+  memcpy(key.data(), rawkey, CYCLUS_SHA1_SIZE);
+  const std::vector<hsize_t> idx(key.begin(), key.end());
   hid_t dset = VLDataset(U, false);
   hid_t dspace = H5Dget_space(dset);
   hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, vlchunk_, NULL);
@@ -723,7 +723,7 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
         throw IOError("failed to read in keys for " + name);
       for (int n = 0; n < nkeys; ++n) {
         Digest d = Digest();
-        memcpy(d.val, buf + (n * CYCLUS_SHA1_SIZE), CYCLUS_SHA1_SIZE);
+        memcpy(d.data(), buf + (n * CYCLUS_SHA1_SIZE), CYCLUS_SHA1_SIZE);
         vlkeys_[dbtype].insert(d);
       }
       H5Sclose(dspace);
@@ -753,8 +753,10 @@ hid_t Hdf5Back::VLDataset(DbTypes dbtype, bool forkeys) {
     if (status < 0)
       throw IOError("could not create HDF5 array " + name);
   } else {
-    hsize_t dims[CYCLUS_SHA1_NINT] = {UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX, UINT_MAX};
-    hsize_t chunkdims[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};  // this is a single element
+    hsize_t dims[CYCLUS_SHA1_NINT];
+    std::fill(std::begin(dims), std::end(dims), UINT_MAX);
+    hsize_t chunkdims[CYCLUS_SHA1_NINT];  // this is a single element
+    std::fill(std::begin(chunkdims), std::end(chunkdims), 1);
     dt = vldts_[dbtype];
     dspace = H5Screate_simple(CYCLUS_SHA1_NINT, dims, dims);
     prop = H5Pcreate(H5P_DATASET_CREATE);
@@ -782,7 +784,7 @@ void Hdf5Back::AppendVLKey(hid_t dset, DbTypes dbtype, const Digest& key) {
   if (status < 0)
     throw IOError("could not select hyperslab of key array "
                   "in the database '" + path_ + "'.");
-  status = H5Dwrite(dset, sha1_type_, mspace, dspace, H5P_DEFAULT, key.val);
+  status = H5Dwrite(dset, sha1_type_, mspace, dspace, H5P_DEFAULT, key.data());
   if (status < 0)
     throw IOError("could not write digest to key array "
                   "in the database '" + path_ + "'.");
@@ -794,9 +796,10 @@ void Hdf5Back::AppendVLKey(hid_t dset, DbTypes dbtype, const Digest& key) {
 void Hdf5Back::InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key,
                            const std::string& val) {
   hid_t dspace = H5Dget_space(dset);
-  hsize_t extent[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
+  hsize_t extent[CYCLUS_SHA1_NINT];
+  std::fill(std::begin(extent), std::end(extent), 1);
   hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, extent, NULL);
-  const std::vector<hsize_t> idx = key.cast<hsize_t>();
+  const std::vector<hsize_t> idx(key.begin(), key.end());
   herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) &idx[0],
                                       NULL, extent, NULL);
   if (status < 0)
@@ -814,9 +817,10 @@ void Hdf5Back::InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key,
 void Hdf5Back::InsertVLVal(hid_t dset, DbTypes dbtype, const Digest& key,
                            hvl_t buf) {
   hid_t dspace = H5Dget_space(dset);
-  hsize_t extent[CYCLUS_SHA1_NINT] = {1, 1, 1, 1, 1};
+  hsize_t extent[CYCLUS_SHA1_NINT];
+  std::fill(std::begin(extent), std::end(extent), 1);
   hid_t mspace = H5Screate_simple(CYCLUS_SHA1_NINT, extent, NULL);
-  const std::vector<hsize_t> idx = key.cast<hsize_t>();
+  const std::vector<hsize_t> idx(key.begin(), key.end());
   herr_t status = H5Sselect_hyperslab(dspace, H5S_SELECT_SET, (const hsize_t*) &idx[0],
                                       NULL, extent, NULL);
   if (status < 0)

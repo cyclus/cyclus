@@ -41,8 +41,8 @@ double SqlStatement::GetDouble(int col) {
 }
 
 char* SqlStatement::GetText(int col, int* n) {
-  char* v = const_cast<char*>(reinterpret_cast<const char *>(
-                                  sqlite3_column_text(stmt_, col)));
+  char* v = const_cast<char*>(
+      reinterpret_cast<const char*>(sqlite3_column_text(stmt_, col)));
   if (n != NULL) {
     *n = sqlite3_column_bytes(stmt_, col);
   }
@@ -66,9 +66,7 @@ void SqlStatement::BindBlob(int i, const void* val, int n) {
 }
 
 SqlStatement::SqlStatement(sqlite3* db, std::string zSql)
-    : db_(db),
-      zSql_(zSql),
-      stmt_(NULL) {
+    : db_(db), zSql_(zSql), stmt_(NULL) {
   Must(sqlite3_prepare_v2(db_, zSql.c_str(), -1, &stmt_, NULL));
 }
 
@@ -140,8 +138,7 @@ void SqliteDb::Execute(std::string sql) {
   open();
 
   sqlite3_stmt* statement;
-  int result =
-    sqlite3_prepare_v2(db_, sql.c_str(), -1, &statement, NULL);
+  int result = sqlite3_prepare_v2(db_, sql.c_str(), -1, &statement, NULL);
   if (result != SQLITE_OK) {
     std::string error = sqlite3_errmsg(db_);
     throw IOError("SQL error: " + sql + " " + error);
@@ -161,8 +158,7 @@ std::vector<StrList> SqliteDb::Query(std::string sql) {
   open();
   sqlite3_stmt* statement;
   // query the database
-  int check_query =
-    sqlite3_prepare_v2(db_, sql.c_str(), -1, &statement, NULL);
+  int check_query = sqlite3_prepare_v2(db_, sql.c_str(), -1, &statement, NULL);
   if (check_query != SQLITE_OK) {
     std::string error = sqlite3_errmsg(db_);
     throw IOError("SQL error: " + error);
@@ -179,7 +175,7 @@ std::vector<StrList> SqliteDb::Query(std::string sql) {
 
     StrList values;
     for (int col = 0; col < cols; col++) {
-      std::string  val;
+      std::string val;
       char* ptr = (char*)sqlite3_column_text(statement, col);
       if (ptr) {
         val = ptr;

@@ -1,7 +1,10 @@
 *.sw*
 *.orig
 build
+.DS_Store
 debug
+core
+packages.xml
 doxygen.conf
 platform.h
 *.pdf
@@ -24,8 +27,10 @@ platform.h
 src/Core/Utility/Env.cpp
 src/cyclus_nuc_data.h5
 stubs/stub_version.h
+src/cyc_limits.h
 src/env.cc
 src/version.cc
+src/version.h
 share/cyclus_nuc_data.h5
 src/pyne_decay.h
 src/pyne_decay.cc
@@ -41,6 +46,7 @@ tests/db.h5
 cyclus/cpp_typesystem.pxd
 cyclus/typesystem.pxd
 cyclus/typesystem.pyx
+cyclus/system.py
 tests/libcyclus-orig.h5
 tests/libcyclus-orig.sqlite
 tests/libcyclus-test.h5
@@ -62,13 +68,17 @@ Debug/
 # generated cython ignores
 *.cc.gen
 *.cc.h
+*.cc_api.h
 *.h.gen
 src/eventhooks.cc
 src/eventhooks.h
+src/eventhooks_api.h
 src/pyinfile.cc
 src/pyinfile.h
+src/pyinfile_api.h
 src/pymodule.cc
 src/pymodule.h
+src/pymodule_api.h
 
 # this is copied over by the installer
 cyclus/cycpp.py

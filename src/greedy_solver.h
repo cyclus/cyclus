@@ -31,7 +31,8 @@ inline bool ReqPrefComp(const Arc& l, const Arc& r) {
   int rv = r.vnode()->agent_id;
   double lpref = l.unode()->prefs[l];
   double rpref = r.unode()->prefs[r];
-  return (lpref != rpref) ? (lpref > rpref) : (lu > ru || (lu == ru && lv > rv));
+  return (lpref != rpref) ? (lpref > rpref)
+                          : (lu > ru || (lu == ru && lv > rv));
 }
 
 /// @brief A comparison function for sorting a container of Nodes by the nodes
@@ -40,7 +41,7 @@ inline bool ReqPrefComp(const Arc& l, const Arc& r) {
 inline bool AvgPrefComp(ExchangeNode::Ptr l, ExchangeNode::Ptr r) {
   int lid = l->agent_id;
   int rid = r->agent_id;
-  double lpref =  AvgPref(l);
+  double lpref = AvgPref(l);
   double rpref = AvgPref(r);
   return (lpref != rpref) ? (lpref > rpref) : (lid > rid);
 }
@@ -61,7 +62,7 @@ class GreedyPreconditioner;
 ///   2) All SupplySets are at capacity
 ///
 /// @warning the GreedySolver is responsible for deleting is conditioner!
-class GreedySolver: public ExchangeSolver {
+class GreedySolver : public ExchangeSolver {
  public:
   /// GreedySolver constructor
   /// @param exclusive_orders a flag for enforcing integral, quantized orders
@@ -90,7 +91,8 @@ class GreedySolver: public ExchangeSolver {
 
   /// @brief the capacity of the arc
   ///
-  /// @throws StateError if either ExchangeNode does not have a ExchangeNodeGroup
+  /// @throws StateError if either ExchangeNode does not have a
+  /// ExchangeNodeGroup
   /// @param a the arc
   /// @param u_curr_qty the current quantity assigned to the unode (if solving
   /// piecemeal)
@@ -106,11 +108,13 @@ class GreedySolver: public ExchangeSolver {
   ///
   /// @throws StateError if ExchangeNode does not have a ExchangeNodeGroup
   /// @param n the node
-  /// @param min_cap whether to use the minimum or maximum capacity value. In general,
-  /// nodes that represent bids use the minimum (i.e., the capacities represents a
-  /// less-than constraint) and nodes that represent requests use the maximum
-  /// value (i.e., the capacities represents a greater-than constraint).
-  /// @param curr_qty the currently allocated node quantity (if solving piecemeal)
+  /// @param min_cap whether to use the minimum or maximum capacity value. In
+  /// general, nodes that represent bids use the minimum (i.e., the capacities
+  /// represents a less-than constraint) and nodes that represent requests use
+  /// the maximum value (i.e., the capacities represents a greater-than
+  /// constraint).
+  /// @param curr_qty the currently allocated node quantity (if solving
+  /// piecemeal)
   /// @return The minimum of the node's nodegroup capacities / the node's unit
   /// capacities, or the ExchangeNode's remaining qty -- whichever is smaller.
   /// @{
@@ -129,13 +133,14 @@ class GreedySolver: public ExchangeSolver {
 
  protected:
   /// @brief the GreedySolver solves an ExchangeGraph by iterating over each
-  /// RequestGroup and matching requests with the minimum bids possible, starting
-  /// from the beginning of the the respective request and bid containers.
+  /// RequestGroup and matching requests with the minimum bids possible,
+  /// starting from the beginning of the the respective request and bid
+  /// containers.
   virtual double SolveGraph();
 
  private:
-  /// @brief updates the capacity of a given ExchangeNode (i.e., its max_qty and the
-  /// capacities of its ExchangeNodeGroup)
+  /// @brief updates the capacity of a given ExchangeNode (i.e., its max_qty and
+  /// the capacities of its ExchangeNodeGroup)
   ///
   /// @throws StateError if ExchangeNode does not have a ExchangeNodeGroup
   /// @throws ValueError if the update results in a negative ExchangeNodeGroup
@@ -149,7 +154,7 @@ class GreedySolver: public ExchangeSolver {
 
   GreedyPreconditioner* conditioner_;
   std::map<ExchangeNode::Ptr, double> n_qty_;
-  std::map<ExchangeNodeGroup*, std::vector<double> > grp_caps_;
+  std::map<ExchangeNodeGroup*, std::vector<double>> grp_caps_;
   double obj_;
   double unmatched_;
 };

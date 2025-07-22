@@ -1,25 +1,22 @@
 #ifndef CYCLUS_SRC_QUERY_BACKEND_H_
 #define CYCLUS_SRC_QUERY_BACKEND_H_
 
-#include <climits>
+#include <limits>
 #include <list>
 #include <map>
 #include <set>
 #include <boost/version.hpp>
 
-#if BOOST_VERSION / 100 % 1000 <= 67
-  #include <boost/uuid/sha1.hpp>
-#else
-  #include <boost/uuid/detail/sha1.hpp>
-#endif
+#include <boost/uuid/detail/sha1.hpp>
 
 #include "blob.h"
 #include "rec_backend.h"
 #include "any.hpp"
 
-#define CYCLUS_UUID_SIZE 16
-#define CYCLUS_SHA1_SIZE 20
 #define CYCLUS_SHA1_NINT 5
+using CYCLUS_SHA1_ELEM_TYPE = unsigned int;
+#define CYCLUS_SHA1_SIZE (sizeof(CYCLUS_SHA1_ELEM_TYPE) * CYCLUS_SHA1_NINT)
+#define CYCLUS_UUID_SIZE 16
 
 namespace cyclus {
 
@@ -313,7 +310,6 @@ enum DbTypes {
   // Resource Tools
   MATERIAL,  // ["cyclus::Material", 0, [], "MATERIAL", false]
   PRODUCT,  // ["cyclus::Product", 0, [], "PRODUCT", false]
-  RESOURCE_BUFF,  // ["cyclus::toolkit::ResourceBuff", 0, [], "RESOURCE_BUFF", false]
   RES_BUF_MATERIAL,  // ["cyclus::toolkit::ResBuf<cyclus::Material>", 1, [], ["RES_BUF", "MATERIAL"], false]
   RES_BUF_PRODUCT,  // ["cyclus::toolkit::ResBuf<cyclus::Product>", 1, [], ["RES_BUF", "PRODUCT"], false]
   RES_MAP_INT_MATERIAL,  // ["cyclus::toolkit::ResMap<int, cyclus::Material>", 2, [], ["RES_MAP", "INT", "MATERIAL"], false]
@@ -629,81 +625,7 @@ inline bool CmpConds(T* x, std::vector<Cond*>* conds) {
 }
 
 /// The digest type for SHA1s.
-///
-/// This class is a hack around a language deficiency in C++. You cannot pass
-/// around an array (unsinged int[5]) between function calls. You can only
-/// pass pointers, which would involve lost of new/free and heap shenanigans
-/// that are not needed for a dumb container. Therefore Sha1::Digest() cannot
-/// return what would be most natural. The second most natural thing would be
-/// a std::array<unsigned int, 5>. However, std::array is a C++11 feature and
-/// we are not yet ready to go down that road.
-///
-/// To pass an array into and out of a function it has to be inside of struct
-/// or a class. I chose a class here since there are many member functions.
-///
-/// The reason why this is public is that it needs to be directly writable
-/// from buffers coming from HDF5. In the future, this really should just be
-/// a std::array.
-class Digest {
- public:
-  unsigned int val[CYCLUS_SHA1_NINT];
-
-  /// Casts the value of this digest to a vector of the templated type.
-  template <typename T>
-  inline std::vector<T> cast() const {
-    std::vector<T> rtn = std::vector<T>(CYCLUS_SHA1_NINT);
-    for (unsigned int i = 0; i < CYCLUS_SHA1_NINT; ++i)
-      rtn[i] = static_cast<T>(val[i]);
-    return rtn;
-  }
-
-  // operators
-  inline std::ostream& operator<<(std::ostream& out) const {
-    return out << "[" << val[0] << ", " << val[1] << ", " <<  val[2] << \
-                  ", " << val[3] << ", " << val[4] << "]";
-  }
-
-  inline bool operator< (const cyclus::Digest& rhs) const {
-    bool rtn = false;
-    for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
-      if (val[i] < rhs.val[i]) {
-        rtn = true;
-        break;
-      } else if (val[i] > rhs.val[i]) {
-        rtn = false;
-        break;
-      }  // else they are equal and we need to check the next index
-    }
-    return rtn;
-  }
-
-  inline bool operator> (const cyclus::Digest& rhs) const {
-    return !operator<(rhs) && !operator==(rhs);
-  }
-
-  inline bool operator<=(const cyclus::Digest& rhs) const {
-    return !operator>(rhs);
-  }
-
-  inline bool operator>=(const cyclus::Digest& rhs) const {
-    return !operator<(rhs);
-  }
-
-  inline bool operator==(const cyclus::Digest& rhs) const {
-    bool rtn = true;
-    for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
-      if (val[i] != rhs.val[i]) {
-        rtn = false;
-        break;
-      }  // else they are equal and we need to check the next index.
-    }
-    return rtn;
-  }
-
-  inline bool operator!=(const cyclus::Digest& rhs) const {
-    return !operator==(rhs);
-  }
-};
+using Digest = std::array<CYCLUS_SHA1_ELEM_TYPE, CYCLUS_SHA1_NINT>;
 
 class Sha1 {
  public:
@@ -1083,11 +1005,35 @@ class Sha1 {
     }
   }
 
-  /// \}
 
   Digest digest() {
     Digest d;
-    hash_.get_digest(d.val);
+    const unsigned int block_size = sizeof(CYCLUS_SHA1_ELEM_TYPE);
+    const unsigned int bits_per_byte = std::numeric_limits<unsigned char>::digits;
+    #if BOOST_VERSION_MINOR < 86
+        unsigned int tmp[CYCLUS_SHA1_NINT];
+    #else
+        unsigned char tmp[CYCLUS_SHA1_NINT * block_size];
+    #endif
+    hash_.get_digest(tmp);
+
+    for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
+        #if BOOST_VERSION_MINOR < 86
+            d[i] = tmp[i];
+        #else
+            CYCLUS_SHA1_ELEM_TYPE elem = 0;
+            unsigned int shift_amount;
+            for (size_t byte = 0; byte < block_size; ++byte) {
+                #if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+                    shift_amount = byte * bits_per_byte; 
+                #else
+                    shift_amount = (block_size - byte - 1) * bits_per_byte;
+                #endif
+                elem |= tmp[i*block_size + byte] << shift_amount;
+            }
+            d[i] = elem;
+        #endif
+    }
     return d;
   }
 

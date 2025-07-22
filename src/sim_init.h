@@ -80,6 +80,8 @@ class SimInit {
 
   void LoadInfo();
   void LoadRecipes();
+  void LoadPackages();
+  void LoadTransportUnits();
   void LoadSolverInfo();
   void LoadPrototypes();
   void LoadInitialAgents();
@@ -89,10 +91,13 @@ class SimInit {
   void LoadNextIds();
 
   void* LoadPreconditioner(std::string name);
-  ExchangeSolver* LoadGreedySolver(bool exclusive, std::set<std::string> tables);
+  ExchangeSolver* LoadGreedySolver(bool exclusive,
+                                   std::set<std::string> tables);
   ExchangeSolver* LoadCoinSolver(bool exclusive, std::set<std::string> tables);
-  static Resource::Ptr LoadResource(Context* ctx, QueryableBackend* b, int resid);
-  static Material::Ptr LoadMaterial(Context* ctx, QueryableBackend* b, int resid);
+  static Resource::Ptr LoadResource(Context* ctx, QueryableBackend* b,
+                                    int resid);
+  static Material::Ptr LoadMaterial(Context* ctx, QueryableBackend* b,
+                                    int resid);
   static Product::Ptr LoadProduct(Context* ctx, QueryableBackend* b, int resid);
   static Composition::Ptr LoadComposition(QueryableBackend* b, int stateid);
 

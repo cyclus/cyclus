@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+GTEST_ALLOW_UNINSTANTIATED_PARAMETERIZED_TEST(FacilityTests);
 
 // The FacilityTests initialization does not honor the normal initialization
 // guarantees for archetypes.  And so any type of remotely sophisticated

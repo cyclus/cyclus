@@ -10,8 +10,7 @@ double CommodityProducerManager::TotalCapacity(Commodity& commodity) {
   CommodityProducer* p;
   for (it = producers_.begin(); it != producers_.end(); ++it) {
     p = *it;
-    if (p->Produces(commodity))
-      total += p->Capacity(commodity);
+    if (p->Produces(commodity)) total += p->Capacity(commodity);
   }
   return total;
 }

@@ -29,8 +29,7 @@ class SupplyDemandManager : public AgentManaged {
   /// necessary information.
   /// @param commodity the commodity
   /// @param demand a smart pointer to the demand function
-  inline void RegisterCommodity(Commodity& commodity,
-                                SymFunction::Ptr demand) {
+  inline void RegisterCommodity(Commodity& commodity, SymFunction::Ptr demand) {
     demand_functions_.insert(std::make_pair(commodity, demand));
   }
 

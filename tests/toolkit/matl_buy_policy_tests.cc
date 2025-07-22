@@ -7,7 +7,6 @@
 #include "material.h"
 #include "request.h"
 #include "error.h"
-#include "toolkit/resource_buff.h"
 #include "random_number_generator.h"
 
 #include "test_context.h"
@@ -140,6 +139,39 @@ TEST_F(MatlBuyPolicyTests, Init_RQ) {
   buff.Push(Material::CreateUntracked(R, c));
   p.Init(fac1, &buff, "", &buff_tracker, "RQ", Q, R);  
   ASSERT_FALSE(p.MakeReq());
+}
+TEST_F(MatlBuyPolicyTests, ResetBehavior) {
+  double cap = 10;
+  ResBuf<Material> buff;
+  buff.capacity(cap);
+  TotalInvTracker buff_tracker({&buff});
+  MatlBuyPolicy p;
+
+  double amt;
+
+  // Setup up initially with sS policy
+  double S = 4, s = 2;
+  p.Init(fac1, &buff, "", &buff_tracker, "sS", S, s);
+  ASSERT_TRUE(p.MakeReq());
+  amt = p.TotalAvailable();
+  ASSERT_FLOAT_EQ(amt, S);
+  ASSERT_FLOAT_EQ(p.ReqQty(amt), S);
+  ASSERT_EQ(p.NReq(amt), 1);
+
+  // Attempt to reinitialize with no strategy WITHOUT reset
+  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max()); 
+  amt = p.TotalAvailable();
+  ASSERT_NE(amt, cap);
+  ASSERT_NE(p.ReqQty(amt), cap);
+
+  // reset and initialize with no strategy
+  p.ResetBehavior();
+  p.Init(fac1, &buff, "", &buff_tracker, std::numeric_limits<double>::max()); 
+  amt = p.TotalAvailable();
+  ASSERT_FLOAT_EQ(amt, cap);
+  ASSERT_FLOAT_EQ(p.ReqQty(amt), cap);
+  ASSERT_EQ(p.NReq(amt), 1);
+
 }
 
 TEST_F(MatlBuyPolicyTests, StartStop) {
@@ -483,10 +515,92 @@ TEST_F(MatlBuyPolicyTests, NormalActiveDormant) {
   delete a;
 }
 
+TEST_F(MatlBuyPolicyTests, BinomialActiveDormant) {
+  using cyclus::QueryResult;
+
+  boost::shared_ptr<NegativeBinomialIntDist> a_dist = boost::shared_ptr<NegativeBinomialIntDist>(new NegativeBinomialIntDist(1, 0.2));
+  boost::shared_ptr<NegativeBinomialIntDist> d_dist = boost::shared_ptr<NegativeBinomialIntDist>(new NegativeBinomialIntDist(1, 0.5));
+  
+  int dur = 12;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  TotalInvTracker buf_tracker({&inbuf});
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput, a_dist, d_dist, NULL)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  // Sampled active period is 6
+  EXPECT_EQ(0, qr.GetVal<int>("Time", 0));
+  EXPECT_EQ(1, qr.GetVal<int>("Time", 1));
+  // ...
+  EXPECT_EQ(6, qr.GetVal<int>("Time", 6));
+  // second cycle should start on time 8 (dormant length 1)
+  int second_cycle = qr.GetVal<int>("Time", 7);
+  EXPECT_EQ(8, second_cycle);
+
+  delete a;
+}
+
+TEST_F(MatlBuyPolicyTests, BinaryActiveDormant) {
+  using cyclus::QueryResult;
+
+  boost::shared_ptr<BinaryIntDist> a_dist = boost::shared_ptr<BinaryIntDist>(new BinaryIntDist(0.5, 4, 1));
+  boost::shared_ptr<BinaryIntDist> d_dist = boost::shared_ptr<BinaryIntDist>(new BinaryIntDist(0.5, 1, 6));
+  
+  int dur = 100;
+  double throughput = 1;
+
+  cyclus::MockSim sim(dur);
+  cyclus::Agent* a = new TestFacility(sim.context());
+  sim.context()->AddPrototype(a->prototype(), a);
+  sim.agent = sim.context()->CreateAgent<cyclus::Agent>(a->prototype());
+  sim.AddSource("commod1").Finalize();
+
+  TestFacility* fac = dynamic_cast<TestFacility*>(sim.agent);
+
+  cyclus::toolkit::ResBuf<cyclus::Material> inbuf;
+  TotalInvTracker buf_tracker({&inbuf});
+  cyclus::toolkit::MatlBuyPolicy policy;
+  policy.Init(fac, &inbuf, "inbuf", &buf_tracker, throughput, a_dist, d_dist, NULL)
+        .Set("commod1").Start();
+
+  EXPECT_NO_THROW(sim.Run());
+
+  QueryResult qr = sim.db().Query("Transactions", NULL);
+  // sampled cycles: 
+  // * active for 1 step, dormant for 6
+  // * active for 1 step, dormant for 1
+  // * active for 4 steps, dormant for 1 step
+  // therefore first 7 trades occur on time steps:
+  //  0, 7, 9, 10, 11, 12, 14
+  // first trade at time 0, next trade at time 7
+  EXPECT_EQ(0, qr.GetVal<int>("Time", 0));
+  EXPECT_EQ(7, qr.GetVal<int>("Time", 1));
+  EXPECT_EQ(9, qr.GetVal<int>("Time", 2));
+  EXPECT_EQ(10, qr.GetVal<int>("Time", 3));
+  EXPECT_EQ(11, qr.GetVal<int>("Time", 4));
+  EXPECT_EQ(12, qr.GetVal<int>("Time", 5));
+  EXPECT_EQ(14, qr.GetVal<int>("Time", 6));
+
+  delete a;
+}
+
 TEST_F(MatlBuyPolicyTests, MixedActiveDormant) {
   using cyclus::QueryResult;
   
-  boost::shared_ptr<NormalIntDist> a_dist = boost::shared_ptr<NormalIntDist>(new NormalIntDist(5, 1, 0, 1e299));
+  boost::shared_ptr<NormalIntDist> a_dist = boost::shared_ptr<NormalIntDist>(new NormalIntDist(5, 1, 0, cyclus::CY_LARGE_INT));
   boost::shared_ptr<UniformIntDist> d_dist = boost::shared_ptr<UniformIntDist>(new UniformIntDist(1, 3));
   
   int dur = 12;

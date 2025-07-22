@@ -21,6 +21,7 @@ class Agent;
 /// Controls simulation timestepping and inter-timestep phases.
 class Timer {
   friend class ::SimInitTest;
+
  public:
   Timer();
 
@@ -42,7 +43,6 @@ class Timer {
   /// Removes an agent from receiving tick/tock notifications.
   /// Agents should unregister from their Decommission method.
   void UnregisterTimeListener(TimeListener* tl);
-
 
   /// Schedules the named prototype to be built for the specified parent at
   /// timestep t.
@@ -108,12 +108,16 @@ class Timer {
 
   /// Concrete agents that desire to receive tick and tock notifications
   std::map<int, TimeListener*> tickers_;
+  /// The union of these two vectors should produce tickers_.
+  /// Keeping C++ and Python agents separate helps support parallelization.
+  std::vector<TimeListener*> cpp_tickers_;
+  std::vector<TimeListener*> py_tickers_;
 
   // std::map<time,std::vector<std::pair<prototype, parent> > >
-  std::map<int, std::vector<std::pair<std::string, Agent*> > > build_queue_;
+  std::map<int, std::vector<std::pair<std::string, Agent*>>> build_queue_;
 
   // std::map<time,std::vector<config> >
-  std::map<int, std::vector<Agent*> > decom_queue_;
+  std::map<int, std::vector<Agent*>> decom_queue_;
 };
 
 }  // namespace cyclus

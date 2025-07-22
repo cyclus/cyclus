@@ -1,5 +1,19 @@
 #ifndef CYCLUS_SRC_CYCLUS_H_
 #define CYCLUS_SRC_CYCLUS_H_
+
+// For Doxygen mainpage
+/*!
+ * \mainpage Cyclus API Reference
+ *
+ * Welcome to the Cyclus API reference! Below are some helpful links for
+ * learning more:
+ *   - Cyclus Homepage: https://fuelcycle.org
+ *   - GitHub repository: https://github.com/cyclus/cyclus
+ *   - Kernel developer guide: https://fuelcycle.org/kernel
+ *   - Archetype developer guide: https://fuelcycle.org/arche
+ *
+ */
+
 // platform needs to be before all other includes
 #include "platform.h"
 
@@ -58,7 +72,6 @@ extern "C" {
 #include "toolkit/infile_converters.h"
 #include "toolkit/mat_query.h"
 #include "toolkit/position.h"
-#include "toolkit/resource_buff.h"
 #include "toolkit/res_buf.h"
 #include "toolkit/res_manip.h"
 #include "toolkit/res_map.h"
@@ -69,7 +82,7 @@ extern "C" {
 
 // Undefines isnan from pyne
 #ifdef isnan
-  #undef isnan
+#undef isnan
 #endif
 
 #endif  // CYCLUS_SRC_CYCLUS_H_
