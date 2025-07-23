@@ -83,6 +83,42 @@ std::unordered_map<std::string, double> GenerateParamList() const override {
   return econ_params;
 }
 
+  /// @brief Calculates the levelized unit cost of production, accounting for
+  /// capital depreciation, O&M, labor, property taxes, and input costs.
+  ///
+  /// This function estimates the cost to produce a single unit of output using:
+  /// - Capital cost amortized over operational life, adjusted for tax shield
+  /// - Annual fixed costs (O&M, labor)
+  /// - Property taxes as a percent of capital cost
+  /// - Input cost allocated per unit in the batch
+  ///
+  /// The cost model assumes:
+  /// - Straight-line depreciation over the taxable lifetime
+  /// - Discounting via the minimum acceptable return rate
+  /// - Property tax as a simple annual percent of capital cost
+  /// - All values are in real (non-inflated) terms
+  ///
+  /// Equations used (where applicable):
+  ///   - Annual production: Q = P_cap * Y, with Y = (cyclusYear / dt)
+  ///   - Property tax: T_prop = t_prop * C_cap
+  ///   - Tax shield from depreciation:
+  ///       TaxShield = PV(n=L_tax, i=r, F=0, A=(C_cap * t_corp / L_tax))
+  ///   - Annualized net capital cost:
+  ///       A_depr = PMT(n=L_op, i=r, P=(C_cap - TaxShield), F=0)
+  ///   - Total annualized cost:
+  ///       C_annual = A_depr + C_O&M + C_labor + T_prop
+  ///   - Unit cost: C_unit = (C_annual / Q) + (C_input / u)
+  ///
+  /// If a cost override is specified, the function returns:
+  ///   C_unit = cost_override + (C_input / u)
+  ///
+  /// If the computed unit cost is zero (e.g., divide-by-zero), a default
+  /// value kDefaultUnitCost is returned instead.
+  ///
+  /// @param production_capacity Maximum throughput per timestep
+  /// @param units_to_produce Number of units produced in the batch
+  /// @param input_cost (Optional) Total cost of input materials used in the batch
+  /// @return Estimated levelized cost to produce one unit
 double CalculateUnitCost(double production_capacity, double units_to_produce,
                          double input_cost = 0.0) const {
   // Check if there's a cost override, and if so, use that
