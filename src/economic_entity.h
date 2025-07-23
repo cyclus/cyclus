@@ -127,7 +127,7 @@ class EconomicEntity {
   }
 
  protected:
-  static constexpr int kDefaultBidCost = 1;
+  static constexpr int kDefaultUnitCost = 1;
 
  private:
   std::unordered_map<std::string, double> financial_data_;
