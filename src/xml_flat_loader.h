@@ -9,8 +9,8 @@ namespace cyclus {
 /// prototype and instance structure that includes the sub-schemas defined by
 /// the vector of specs.
 /// This is used internally by other BuildFlatMasterSchema.
-std::string BuildFlatMasterSchema(std::string schema_path,
-                                  std::vector<AgentSpec> specs);
+std::string BuildFlatMasterSchema(
+    std::string schema_path, std::vector<AgentSpec> specs);
 
 /// Builds and returns a master cyclus input xml schema defining a flat
 /// prototype and instance structure that includes the sub-schemas defined by
