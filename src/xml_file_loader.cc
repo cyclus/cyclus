@@ -97,8 +97,8 @@ std::vector<AgentSpec> ParseSpecs(std::string infile, std::string format) {
   return specs;
 }
 
-std::string BuildMasterSchema(std::string schema_path,
-                              std::vector<AgentSpec> specs) {
+std::string BuildMasterSchema(
+    std::string schema_path, std::vector<AgentSpec> specs) {
   Timer ti;
   Recorder rec;
   Context ctx(&ti, &rec);

@@ -11107,8 +11107,8 @@ bool Reader::readObject(Token & /*tokenStart*/) {
 
     Token colon;
     if (!readToken(colon) || colon.type_ != tokenMemberSeparator) {
-      return addErrorAndRecover(
-          "Missing ':' after object member name", colon, tokenObjectEnd);
+      return addErrorAndRecover("Missing ':' after object member name", colon,
+                                tokenObjectEnd);
     }
     Value &value = currentValue()[name];
     nodes_.push(&value);
@@ -11121,16 +11121,16 @@ bool Reader::readObject(Token & /*tokenStart*/) {
     if (!readToken(comma) ||
         (comma.type_ != tokenObjectEnd && comma.type_ != tokenArraySeparator &&
          comma.type_ != tokenComment)) {
-      return addErrorAndRecover(
-          "Missing ',' or '}' in object declaration", comma, tokenObjectEnd);
+      return addErrorAndRecover("Missing ',' or '}' in object declaration",
+                                comma, tokenObjectEnd);
     }
     bool finalizeTokenOk = true;
     while (comma.type_ == tokenComment && finalizeTokenOk)
       finalizeTokenOk = readToken(comma);
     if (comma.type_ == tokenObjectEnd) return true;
   }
-  return addErrorAndRecover(
-      "Missing '}' or object member name", tokenName, tokenObjectEnd);
+  return addErrorAndRecover("Missing '}' or object member name", tokenName,
+                            tokenObjectEnd);
 }
 
 bool Reader::readArray(Token & /*tokenStart*/) {
@@ -11159,8 +11159,8 @@ bool Reader::readArray(Token & /*tokenStart*/) {
     bool badTokenType =
         (token.type_ != tokenArraySeparator && token.type_ != tokenArrayEnd);
     if (!ok || badTokenType) {
-      return addErrorAndRecover(
-          "Missing ',' or ']' in array declaration", token, tokenArrayEnd);
+      return addErrorAndRecover("Missing ',' or ']' in array declaration",
+                                token, tokenArrayEnd);
     }
     if (token.type_ == tokenArrayEnd) break;
   }
@@ -15552,7 +15552,8 @@ void pyne::Material::from_atom_frac(std::map<int, double> atom_fracs) {
   atoms_per_molecule = 0.0;
 
   for (std::map<int, double>::iterator afi = atom_fracs.begin();
-       afi != atom_fracs.end(); afi++) {
+       afi != atom_fracs.end();
+       afi++) {
     comp[afi->first] = (afi->second) * pyne::atomic_mass(afi->first);
     atoms_per_molecule += (afi->second);
   }
@@ -15899,7 +15900,8 @@ void pyne_enr::_recompute_prod_tail_mats(pyne_enr::Cascade &casc) {
       tail_per_feed(casc.mat_feed.comp[casc.j], casc.x_prod_j, casc.x_tail_j);
 
   for (pyne::comp_iter i = casc.mat_feed.comp.begin();
-       i != casc.mat_feed.comp.end(); i++) {
+       i != casc.mat_feed.comp.end();
+       i++) {
     nuc = (i->first);
     astar_i = alphastar_i(casc.alpha, casc.Mstar, pyne::atomic_mass(nuc));
 
@@ -16071,7 +16073,8 @@ pyne_enr::Cascade pyne_enr::solve_numeric(pyne_enr::Cascade &orig_casc,
   double temp_numer = 0.0;
 
   for (pyne::comp_iter i = casc.mat_feed.comp.begin();
-       i != casc.mat_feed.comp.end(); i++) {
+       i != casc.mat_feed.comp.end();
+       i++) {
     nuc = (i->first);
     temp_numer = (ppf * casc.mat_prod.comp[nuc] * log(rprod) +
                   tpf * casc.mat_tail.comp[nuc] * log(rtail) -
@@ -16450,7 +16453,8 @@ pyne::enrichment::Cascade pyne::enrichment::solve_symbolic(
   xF[0] = casc.mat_feed.comp[j];
   xF[1] = casc.mat_feed.comp[k];
   for (pyne::comp_iter ci = casc.mat_feed.comp.begin();
-       ci != casc.mat_feed.comp.end(); ci++) {
+       ci != casc.mat_feed.comp.end();
+       ci++) {
     nuc = (*ci).first;
     if (nuc == j || nuc == k) continue;
     MW[i] = pyne::atomic_mass(nuc);
@@ -43150,7 +43154,8 @@ pyne::enrichment::Cascade pyne::enrichment::solve_symbolic(
   casc.mat_tail.comp[j] = xT[0];
   casc.mat_tail.comp[k] = xT[1];
   for (pyne::comp_iter ci = casc.mat_feed.comp.begin();
-       ci != casc.mat_feed.comp.end(); ci++) {
+       ci != casc.mat_feed.comp.end();
+       ci++) {
     nuc = (*ci).first;
     if (nuc == j || nuc == k) continue;
     casc.mat_prod.comp[nuc] = xP[i];

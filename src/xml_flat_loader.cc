@@ -12,8 +12,8 @@
 
 namespace cyclus {
 
-std::string BuildFlatMasterSchema(std::string schema_path,
-                                  std::vector<AgentSpec> specs) {
+std::string BuildFlatMasterSchema(
+    std::string schema_path, std::vector<AgentSpec> specs) {
   Timer ti;
   Recorder rec;
   Context ctx(&ti, &rec);

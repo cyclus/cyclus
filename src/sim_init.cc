@@ -265,8 +265,8 @@ void* SimInit::LoadPreconditioner(std::string name) {
   return precon;
 }
 
-ExchangeSolver* SimInit::LoadGreedySolver(
-    bool exclusive, std::set<std::string> tables) {
+ExchangeSolver* SimInit::LoadGreedySolver(bool exclusive,
+                                          std::set<std::string> tables) {
   using std::set;
   using std::string;
   ExchangeSolver* solver;
@@ -291,8 +291,8 @@ ExchangeSolver* SimInit::LoadGreedySolver(
   return solver;
 }
 
-ExchangeSolver* SimInit::LoadCoinSolver(
-    bool exclusive, std::set<std::string> tables) {
+ExchangeSolver* SimInit::LoadCoinSolver(bool exclusive,
+                                        std::set<std::string> tables) {
 #if CYCLUS_HAS_COIN
   ExchangeSolver* solver;
   double timeout;
