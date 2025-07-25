@@ -26,7 +26,7 @@ class Resource {
  public:
   typedef boost::shared_ptr<Resource> Ptr;
 
-  Resource() : state_id_(nextstate_id_++), obj_id_(nextobj_id_++) {}
+  Resource() : state_id_(nextstate_id_++), unit_value_(0.0), obj_id_(nextobj_id_++) {}
 
   virtual ~Resource() {}
 
@@ -34,6 +34,12 @@ class Resource {
   /// to track and/or associate other information with this resource object.
   /// You should NOT track resources by pointer.
   const int obj_id() const { return obj_id_; }
+
+  /// Returns the unit value of this resource.
+  double UnitValue() const { return unit_value_; }
+
+  /// Sets the unit value of this resource.
+  void SetUnitValue(double unit_value) { unit_value_ = unit_value; }
 
   /// Returns the unique id corresponding to this resource and its current
   /// state.  All resource id's are unique - even across different resource
@@ -112,6 +118,8 @@ class Resource {
   static int nextstate_id_;
   static int nextobj_id_;
   int state_id_;
+  // Unit value of the resource.
+  double unit_value_;
   // Setting the state id should only be done when extracting one resource
   void state_id(int st_id) { state_id_ = st_id; }
 

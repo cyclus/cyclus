@@ -50,7 +50,10 @@ void Product::Absorb(Product::Ptr other) {
   if (other->quality() != quality()) {
     throw ValueError("incompatible resource types.");
   }
-  quantity_ += other->quantity();
+  double tot_qty = quantity_ + other->quantity();
+  double avg_unit_value = (quantity_ * UnitValue() + other->quantity() * other->UnitValue()) / tot_qty;
+  SetUnitValue(avg_unit_value);
+  quantity_ = tot_qty;
   other->quantity_ = 0;
 
   tracker_.Absorb(&other->tracker_);
