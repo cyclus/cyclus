@@ -117,8 +117,10 @@ void Material::Absorb(Material::Ptr mat) {
   if (qty_ < mat->qty_) {
     prev_decay_time_ = mat->prev_decay_time_;
   }
-
-  qty_ += mat->qty_;
+  double tot_mass = qty_ + mat->quantity();
+  double avg_unit_value = (qty_ * UnitValue() + mat->quantity() * mat->UnitValue()) / tot_mass;
+  SetUnitValue(avg_unit_value);
+  qty_ = tot_mass;
   mat->qty_ = 0;
   tracker_.Absorb(&mat->tracker_);
 }
