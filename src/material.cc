@@ -15,14 +15,17 @@ const ResourceType Material::kType = "Material";
 Material::~Material() {}
 
 Material::Ptr Material::Create(Agent* creator, double quantity,
-                               Composition::Ptr c, std::string package_name) {
-  Material::Ptr m(new Material(creator->context(), quantity, c, package_name));
+                               Composition::Ptr c, std::string package_name,
+                               double unit_value) {
+  Material::Ptr m(
+      new Material(creator->context(), quantity, c, package_name, unit_value));
   m->tracker_.Create(creator);
   return m;
 }
 
 Material::Ptr Material::CreateUntracked(double quantity, Composition::Ptr c) {
-  Material::Ptr m(new Material(NULL, quantity, c, Package::unpackaged_name()));
+  Material::Ptr m(
+      new Material(NULL, quantity, c, Package::unpackaged_name(), 0.0));
   return m;
 }
 
@@ -86,7 +89,8 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
   }
 
   qty_ -= qty;
-  Material::Ptr other(new Material(ctx_, qty, c, Package::unpackaged_name()));
+  Material::Ptr other(
+      new Material(ctx_, qty, c, Package::unpackaged_name(), UnitValue()));
 
   // Decay called on the extracted material should have the same dt as for
   // this material regardless of composition.
@@ -117,8 +121,11 @@ void Material::Absorb(Material::Ptr mat) {
   if (qty_ < mat->qty_) {
     prev_decay_time_ = mat->prev_decay_time_;
   }
-
-  qty_ += mat->qty_;
+  double tot_mass = qty_ + mat->quantity();
+  double avg_unit_value =
+      (qty_ * UnitValue() + mat->quantity() * mat->UnitValue()) / tot_mass;
+  SetUnitValue(avg_unit_value);
+  qty_ = tot_mass;
   mat->qty_ = 0;
   tracker_.Absorb(&mat->tracker_);
 }
@@ -263,13 +270,14 @@ Composition::Ptr Material::comp() {
 }
 
 Material::Material(Context* ctx, double quantity, Composition::Ptr c,
-                   std::string package_name)
+                   std::string package_name, double unit_value)
     : qty_(quantity),
       comp_(c),
       tracker_(ctx, this),
       ctx_(ctx),
       prev_decay_time_(0),
       package_name_(package_name) {
+  SetUnitValue(unit_value);
   if (ctx != NULL) {
     prev_decay_time_ = ctx->time();
   } else {

@@ -82,7 +82,8 @@ class Material : public Resource {
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
   static Ptr Create(Agent* creator, double quantity, Composition::Ptr c,
-                    std::string package_name = Package::unpackaged_name());
+                    std::string package_name = Package::unpackaged_name(),
+                    double unit_value = 0.0);
 
   /// Creates a new material resource that does not actually exist as part of
   /// the simulation and is untracked.
@@ -168,7 +169,8 @@ class Material : public Resource {
 
  protected:
   Material(Context* ctx, double quantity, Composition::Ptr c,
-           std::string package_name = Package::unpackaged_name());
+           std::string package_name = Package::unpackaged_name(),
+           double unit_value = 0.0);
 
  private:
   Context* ctx_;
