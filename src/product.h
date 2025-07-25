@@ -28,7 +28,8 @@ class Product : public Resource {
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
   static Ptr Create(Agent* creator, double quantity, std::string quality,
-                    std::string package_name = Package::unpackaged_name());
+                    std::string package_name = Package::unpackaged_name(),
+                    double unit_value = 0.0);
 
   /// Creates a new product that does not actually exist as part of
   /// the simulation and is untracked.
@@ -79,7 +80,8 @@ class Product : public Resource {
   /// @param quantity is a double indicating the quantity
   /// @param quality the resource quality
   Product(Context* ctx, double quantity, std::string quality,
-          std::string package_name = Package::unpackaged_name());
+          std::string package_name = Package::unpackaged_name(),
+          double unit_value = 0.0);
 
   // map<quality, quality_id>
   static std::map<std::string, int> qualids_;
