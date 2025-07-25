@@ -26,7 +26,8 @@ class Resource {
  public:
   typedef boost::shared_ptr<Resource> Ptr;
 
-  Resource() : state_id_(nextstate_id_++), unit_value_(0.0), obj_id_(nextobj_id_++) {}
+  Resource()
+      : state_id_(nextstate_id_++), unit_value_(0.0), obj_id_(nextobj_id_++) {}
 
   virtual ~Resource() {}
 
