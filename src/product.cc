@@ -13,7 +13,8 @@ int Product::next_qualid_ = 1;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Product::Ptr Product::Create(Agent* creator, double quantity,
-                             std::string quality, std::string package_name) {
+                             std::string quality, std::string package_name, 
+                             double unit_value) {
   if (qualids_.count(quality) == 0) {
     qualids_[quality] = next_qualid_++;
     creator->context()
@@ -25,14 +26,14 @@ Product::Ptr Product::Create(Agent* creator, double quantity,
 
   // the next lines must come after qual id setting
   Product::Ptr r(
-      new Product(creator->context(), quantity, quality, package_name));
+      new Product(creator->context(), quantity, quality, package_name, unit_value));
   r->tracker_.Create(creator);
   return r;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Product::Ptr Product::CreateUntracked(double quantity, std::string quality) {
-  Product::Ptr r(new Product(NULL, quantity, quality));
+  Product::Ptr r(new Product(NULL, quantity, quality, Package::unpackaged_name(), 0.0));
   r->tracker_.DontTrack();
   return r;
 }
@@ -67,7 +68,7 @@ Product::Ptr Product::Extract(double quantity) {
 
   quantity_ -= quantity;
 
-  Product::Ptr other(new Product(ctx_, quantity, quality_, package_name_));
+  Product::Ptr other(new Product(ctx_, quantity, quality_, package_name_, UnitValue()));
   tracker_.Extract(&other->tracker_);
   return other;
 }
@@ -81,6 +82,7 @@ std::string Product::package_name() {
   return package_name_;
 }
 
+// Not sure what to do here with the unit value and packaging...
 Resource::Ptr Product::PackageExtract(double qty,
                                       std::string new_package_name) {
   if (qty > quantity_) {
@@ -122,11 +124,13 @@ void Product::ChangePackage(std::string new_package_name) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Product::Product(Context* ctx, double quantity, std::string quality,
-                 std::string package_name)
+                 std::string package_name, double unit_value)
     : quality_(quality),
       quantity_(quantity),
       tracker_(ctx, this),
       ctx_(ctx),
-      package_name_(package_name) {}
+      package_name_(package_name) {
+  SetUnitValue(unit_value);
+}
 
 }  // namespace cyclus
