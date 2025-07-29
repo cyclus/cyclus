@@ -76,17 +76,17 @@ TEST_F(ResourceTest, MaterialAbsorbGraphid) {
 
 TEST_F(ResourceTest, MaterialExtractTrackid) {
   int obj_id = m1->obj_id();
-  Material::Ptr m4 = m1->ExtractQty(2);
+  Material::Ptr lm1 = m1->ExtractQty(2);
   EXPECT_EQ(obj_id, m1->obj_id());
-  EXPECT_LT(obj_id, m4->obj_id());
+  EXPECT_LT(obj_id, lm1->obj_id());
 }
 
 TEST_F(ResourceTest, MaterialExtractGraphid) {
   int state_id = m1->state_id();
-  Material::Ptr m4 = m1->ExtractQty(2);
+  Material::Ptr lm1 = m1->ExtractQty(2);
   EXPECT_LT(state_id, m1->state_id());
-  EXPECT_LT(state_id, m4->state_id());
-  EXPECT_NE(m1->state_id(), m4->state_id());
+  EXPECT_LT(state_id, lm1->state_id());
+  EXPECT_NE(m1->state_id(), lm1->state_id());
 }
 
 TEST_F(ResourceTest, MaterialUnitValue) {
@@ -95,10 +95,10 @@ TEST_F(ResourceTest, MaterialUnitValue) {
   m1->Absorb(m2);
   EXPECT_EQ(m1->UnitValue(), 17);
   EXPECT_EQ(m3->UnitValue(), 0.0);
-  Material::Ptr m4 = boost::dynamic_pointer_cast<Material>(m1->Clone());
-  EXPECT_EQ(m4->UnitValue(), 17);
-  Material::Ptr m5 = m1->ExtractQty(1);
-  EXPECT_EQ(m5->UnitValue(), 17);
+  Material::Ptr lm1 = boost::dynamic_pointer_cast<Material>(m1->Clone());
+  EXPECT_EQ(lm1->UnitValue(), 17);
+  Material::Ptr lm2 = m1->ExtractQty(1);
+  EXPECT_EQ(lm2->UnitValue(), 17);
 }
 
 TEST_F(ResourceTest, ProductAbsorbTrackid) {
@@ -115,17 +115,17 @@ TEST_F(ResourceTest, ProductAbsorbGraphid) {
 
 TEST_F(ResourceTest, ProductExtractTrackid) {
   int obj_id = p1->obj_id();
-  Product::Ptr p4 = p1->Extract(2);
+  Product::Ptr lp1 = p1->Extract(2);
   EXPECT_EQ(obj_id, p1->obj_id());
-  EXPECT_LT(obj_id, p4->obj_id());
+  EXPECT_LT(obj_id, lp1->obj_id());
 }
 
 TEST_F(ResourceTest, ProductExtractGraphid) {
   int state_id = p1->state_id();
-  Product::Ptr p4 = p1->Extract(2);
+  Product::Ptr lp1 = p1->Extract(2);
   EXPECT_LT(state_id, p1->state_id());
-  EXPECT_LT(state_id, p4->state_id());
-  EXPECT_NE(p1->state_id(), p4->state_id());
+  EXPECT_LT(state_id, lp1->state_id());
+  EXPECT_NE(p1->state_id(), lp1->state_id());
 }
 
 TEST_F(ResourceTest, ProductUnitValue) {
@@ -134,10 +134,10 @@ TEST_F(ResourceTest, ProductUnitValue) {
   p1->Absorb(p2);
   EXPECT_EQ(p1->UnitValue(), 17);
   EXPECT_EQ(p3->UnitValue(), 0.0);
-  Product::Ptr p4 = boost::dynamic_pointer_cast<Product>(p1->Clone());
-  EXPECT_EQ(p4->UnitValue(), 17);
-  Product::Ptr p5 = p1->Extract(1);
-  EXPECT_EQ(p5->UnitValue(), 17);
+  Product::Ptr lp1 = boost::dynamic_pointer_cast<Product>(p1->Clone());
+  EXPECT_EQ(lp1->UnitValue(), 17);
+  Product::Ptr lp2 = p1->Extract(1);
+  EXPECT_EQ(lp2->UnitValue(), 17);
 }
 
 TEST_F(ResourceTest, DefaultPackageId) {
@@ -146,8 +146,8 @@ TEST_F(ResourceTest, DefaultPackageId) {
   EXPECT_EQ(p1->package_name(), Package::unpackaged_name());
   EXPECT_EQ(p2->package_name(), Package::unpackaged_name());
 
-  Product::Ptr p4 = p1->Extract(2);
-  EXPECT_EQ(p4->package_name(), Package::unpackaged_name());
+  Product::Ptr lp1 = p1->Extract(2);
+  EXPECT_EQ(lp1->package_name(), Package::unpackaged_name());
 }
 
 TEST_F(ResourceTest, ChangePackage) {
@@ -155,9 +155,9 @@ TEST_F(ResourceTest, ChangePackage) {
   Package::Ptr pkg = ctx->GetPackage("foo");
   std::string pkg_name = pkg->name();
 
-  Product::Ptr p4 = p1->Extract(2);
-  p4->ChangePackage(pkg_name);
-  EXPECT_EQ(p4->package_name(), pkg_name);
+  Product::Ptr lp1 = p1->Extract(2);
+  lp1->ChangePackage(pkg_name);
+  EXPECT_EQ(lp1->package_name(), pkg_name);
   EXPECT_EQ(p1->package_name(), Package::unpackaged_name());
 
   m1->ChangePackage(pkg_name);
@@ -170,12 +170,12 @@ TEST_F(ResourceTest, PackageResource) {
   std::string pkg_name = pkg->name();
 
   // nothing packaged
-  Product::Ptr p4 = p1->Extract(0.5);
-  std::vector<Product::Ptr> p4_pkgd = p4->Package<Product>(pkg);
+  Product::Ptr lp1 = p1->Extract(0.5);
+  std::vector<Product::Ptr> lp1_pkgd = lp1->Package<Product>(pkg);
 
   // everything stays in old product, with same (default) package id
-  EXPECT_EQ(p4->package_name(), Package::unpackaged_name());
-  EXPECT_EQ(p4->quantity(), 0.5);
+  EXPECT_EQ(lp1->package_name(), Package::unpackaged_name());
+  EXPECT_EQ(lp1->quantity(), 0.5);
 
   // all packaged
   std::vector<Product::Ptr> p1_pkgd = p1->Package<Product>(pkg);
@@ -192,13 +192,13 @@ TEST_F(ResourceTest, PackageResource) {
   EXPECT_EQ(p2_pkgd[0]->package_name(), pkg_name);
   EXPECT_EQ(p2_pkgd[1]->package_name(), pkg_name);
 
-  Material::Ptr m4 = m2->ExtractQty(5.5);
-  std::vector<Material::Ptr> m4_pkgd = m4->Package<Material>(pkg);
-  EXPECT_EQ(m4->package_name(), Package::unpackaged_name());
-  EXPECT_EQ(m4->quantity(), 0.5);
-  EXPECT_EQ(m4_pkgd.size(), 1);
-  EXPECT_EQ(m4_pkgd[0]->package_name(), pkg_name);
-  EXPECT_EQ(m4_pkgd[0]->quantity(), 5);
+  Material::Ptr lm1 = m2->ExtractQty(5.5);
+  std::vector<Material::Ptr> lm1_pkgd = lm1->Package<Material>(pkg);
+  EXPECT_EQ(lm1->package_name(), Package::unpackaged_name());
+  EXPECT_EQ(lm1->quantity(), 0.5);
+  EXPECT_EQ(lm1_pkgd.size(), 1);
+  EXPECT_EQ(lm1_pkgd[0]->package_name(), pkg_name);
+  EXPECT_EQ(lm1_pkgd[0]->quantity(), 5);
 }
 
 TEST_F(ResourceTest, RepackageLimit) {
