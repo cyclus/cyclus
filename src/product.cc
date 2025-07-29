@@ -94,7 +94,8 @@ Resource::Ptr Product::PackageExtract(double qty,
   }
 
   quantity_ -= qty;
-  Product::Ptr other(new Product(ctx_, qty, quality_, new_package_name));
+  Product::Ptr other(
+      new Product(ctx_, qty, quality_, new_package_name, UnitValue()));
 
   // this call to res_tracker must come first before the parent resource
   // state id gets modified
