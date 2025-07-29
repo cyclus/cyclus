@@ -116,11 +116,10 @@ class Resource {
   template <class T> std::vector<typename T::Ptr> Package(Package::Ptr pkg);
 
  private:
+  double unit_value_;
   static int nextstate_id_;
   static int nextobj_id_;
   int state_id_;
-  // Unit value of the resource.
-  double unit_value_;
   // Setting the state id should only be done when extracting one resource
   void state_id(int st_id) { state_id_ = st_id; }
 

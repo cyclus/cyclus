@@ -153,7 +153,8 @@ Resource::Ptr Material::PackageExtract(double qty,
   }
 
   qty_ -= qty;
-  Material::Ptr other(new Material(ctx_, qty, comp_, new_package_name));
+  Material::Ptr other(
+      new Material(ctx_, qty, comp_, new_package_name, UnitValue()));
 
   // Decay called on the extracted material should have the same dt as for
   // this material regardless of composition.
