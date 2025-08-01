@@ -83,11 +83,20 @@ template <class T> class TradeExecutor {
          ++m_it) {
       Agent* supplier = m_it->first.first->manager();
       Agent* requester = m_it->first.second->manager();
+
       typename std::vector<std::pair<Trade<T>, typename T::Ptr>>& trades =
           m_it->second;
       typename std::vector<std::pair<Trade<T>, typename T::Ptr>>::iterator v_it;
       for (v_it = trades.begin(); v_it != trades.end(); ++v_it) {
         Trade<T>& trade = v_it->first;
+
+        // Catch self-trading behavior and warn the user
+        if (supplier == requester) {
+          cyclus::Warn<cyclus::STATE_WARNING>(
+            "Facility " + std::to_string(supplier->id()) + 
+            " is trading with itself for commodity " + trade.request->commodity());
+        }
+
         typename T::Ptr rsrc = v_it->second;
         if (rsrc->quantity() > cyclus::eps_rsrc()) {
           ctx->NewDatum("Transactions")
