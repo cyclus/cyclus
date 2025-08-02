@@ -93,8 +93,9 @@ template <class T> class TradeExecutor {
         // Catch self-trading behavior and warn the user
         if (supplier == requester) {
           cyclus::Warn<cyclus::STATE_WARNING>(
-            "Facility " + std::to_string(supplier->id()) + 
-            " is trading with itself for commodity " + trade.request->commodity());
+              "Facility " + std::to_string(supplier->id()) +
+              " is trading with itself for commodity " +
+              trade.request->commodity());
         }
 
         typename T::Ptr rsrc = v_it->second;
