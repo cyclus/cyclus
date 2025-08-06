@@ -120,7 +120,7 @@ Workflow
 ^^^^^^^^
 
 Now, for the workflow! This is by no means the only way to perform this type of
-workflow, but we assume that you wish to handle conflicts as often as possible
+workflow, but we assume that you wish to handle conflicts as soon as possible
 (so as to keep their total number small). 
 
 As time passes, you make some changes to files, and you commit those changes (to
@@ -140,13 +140,15 @@ doing this regularly, you'll want to do it before you initiate a pull request.
 
   $ git checkout main
   $ git pull upstream main
+  $ git push origin main
   $ git checkout work
   $ git rebase main
   $ git push origin work
 
-Note: you may need to force the push of the rebased ``work`` branch to your fork (i.e., `git push -f origin work`).
+Note: you may need to force the push of the rebased ``work`` branch to your fork
+(i.e., `git push -f origin work`).
 
-In any case, you've performed the final commit to your ``work`` branch, so it's
+Once you've performed the final commit to your ``work`` branch it's
 time to make a pull request online and wait for our main friends to review and
 accept it.  
 
