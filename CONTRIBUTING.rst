@@ -109,6 +109,7 @@ your fork of this repository referred to as ``origin``.
 First, let's make our ``work`` branch.  Assuming that you are in the ``cyclus`` directory:
 ::
     $ git branch work
+    $ git checkout work
     $ git push origin work
 
 We now have the following situation: there exists the mainline copy of the ``main``
@@ -143,7 +144,7 @@ doing this regularly, you'll want to do it before you initiate a pull request.
   $ git rebase main
   $ git push origin work
 
-Note: you may need to force the push of the rebased ``work`` branch to your fork.
+Note: you may need to force the push of the rebased ``work`` branch to your fork (i.e., `git push -f origin work`).
 
 In any case, you've performed the final commit to your ``work`` branch, so it's
 time to make a pull request online and wait for our main friends to review and
@@ -151,7 +152,7 @@ accept it.
 
 Sometimes, your pull request will be held by the reviewer until
 further changes are made to appease the reviewer's concerns. This may be
-frustrating, but please act rationally, discuss the issues on the GitHub space
+frustrating, but please act rationally; discuss the issues on the GitHub space
 made for your pull request, consult the `style guide
 <http://cyclus.github.com/devdoc/style_guide.html>`_, reach out on `slack
 <https://cyclus-nuclear.slack.com>`_ for further advice, and make changes to
