@@ -91,9 +91,6 @@ yet pass tests or even compile, but where we also want to save our progress. Let
 call this branch ``work``. So, when all is said and done, in our fork there will be
 two branches: ``main`` and ``work``
 
-Acquiring Cyclus and Workflow
------------------------------
-
 We begin with a fork of the mainline Cyclus repository. After initially forking
 the repo, we will have the ``main`` branch in your fork.
 
@@ -184,6 +181,7 @@ This may also be a good time to ensure your ``work`` branch is up-to-date with t
 
   $ git chekout main
   $ git pull upstream main
+  $ git push origin main
   $ git checkout work
   $ git rebase main
   $ git push origin work
