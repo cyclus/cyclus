@@ -3,10 +3,12 @@
 
 #include <map>
 #include <set>
+#include <stdexcept>
 #include <utility>
 #include <vector>
 
 #include "context.h"
+#include "exchange_context.h"
 #include "trade.h"
 #include "trader.h"
 #include "trader_management.h"
@@ -69,11 +71,30 @@ template <class T> class TradeExecutor {
     SendTradeResources(trade_ctx_);
   }
 
+  /// @brief execute all trades with access to exchange context for adjusted preferences
+  void ExecuteTrades(Context* ctx, ExchangeContext<T>* ex_ctx) {
+    GroupTradesBySupplier(trade_ctx_, trades_);
+    GetTradeResponses(trade_ctx_);
+    if (ctx != NULL) {
+      RecordTrades(ctx, ex_ctx);
+    }
+    SendTradeResources(trade_ctx_);
+  }
+
   /// @brief Record all trades with the appropriate backends
   ///
   /// @param ctx the Context through which communication with backends will
   /// occur
   void RecordTrades(Context* ctx) {
+    RecordTrades(ctx, NULL);
+  }
+
+  /// @brief Record all trades with the appropriate backends, using adjusted preferences
+  ///
+  /// @param ctx the Context through which communication with backends will
+  /// occur
+  /// @param ex_ctx the ExchangeContext containing the adjusted preferences used by the solver
+  void RecordTrades(Context* ctx, ExchangeContext<T>* ex_ctx) {
     // record all trades
     typename std::map<
         std::pair<Trader*, Trader*>,
@@ -90,6 +111,25 @@ template <class T> class TradeExecutor {
         Trade<T>& trade = v_it->first;
         typename T::Ptr rsrc = v_it->second;
         if (rsrc->quantity() > cyclus::eps_rsrc()) {
+          // Calculate the adjusted preference that was actually used by the solver
+          double adjusted_preference = trade.bid->preference();
+          
+          // If the bid has NaN preference, use the request preference
+          if (std::isnan(adjusted_preference)) {
+            adjusted_preference = trade.request->preference();
+          }
+          
+          // If we have access to the exchange context, use the adjusted preference
+          // that was actually used by the solver
+          if (ex_ctx != NULL) {
+            try {
+              adjusted_preference = ex_ctx->trader_prefs.at(trade.request->requester())[trade.request][trade.bid];
+            } catch (const std::out_of_range&) {
+              // If the preference is not found in the exchange context, fall back to the bid preference
+              // This could happen if the trade was not part of the original exchange
+            }
+          }
+          
           ctx->NewDatum("Transactions")
               ->AddVal("TransactionId", ctx->NextTransactionID())
               ->AddVal("SenderId", supplier->id())
@@ -97,7 +137,7 @@ template <class T> class TradeExecutor {
               ->AddVal("ResourceId", rsrc->state_id())
               ->AddVal("Commodity", trade.request->commodity())
               ->AddVal("Time", ctx->time())
-              ->AddVal("Cost", 1 / trade.bid->preference())
+              ->AddVal("Cost", 1 / adjusted_preference)
               ->Record();
         }
       }
