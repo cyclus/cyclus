@@ -33,6 +33,7 @@ Since last release
 
 **Changed:**
 
+* Changed TradeExecutor to use adjusted preferences from ExchangeContext (#1897)
 * Ran clang-format on src directory (#1881, #1893)
 * Changed README.rst installation instructions, tested on fresh Ubuntu-22.04 system with Python3.11 (#1744)
 * Rely on ``python3`` in environment instead of ``python`` (#1747)
