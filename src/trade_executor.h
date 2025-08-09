@@ -62,21 +62,14 @@ template <class T> class TradeExecutor {
 
   /// @brief execute all trades, collecting responders from bidders and sending
   /// responses to requesters
-  void ExecuteTrades(Context* ctx) {
-    GroupTradesBySupplier(trade_ctx_, trades_);
-    GetTradeResponses(trade_ctx_);
-    if (ctx != NULL) {
-      RecordTrades(ctx);
-    }
-    SendTradeResources(trade_ctx_);
-  }
+  void ExecuteTrades(Context* ctx) { ExecuteTrades(ctx, NULL); }
 
   /// @brief execute all trades with access to exchange context for adjusted
   /// preferences
   void ExecuteTrades(Context* ctx, ExchangeContext<T>* ex_ctx) {
     GroupTradesBySupplier(trade_ctx_, trades_);
     GetTradeResponses(trade_ctx_);
-    if (ctx != NULL) {
+    if (ctx) {
       RecordTrades(ctx, ex_ctx);
     }
     SendTradeResources(trade_ctx_);
@@ -123,7 +116,7 @@ template <class T> class TradeExecutor {
 
           // If we have access to the exchange context, use the adjusted
           // preference that was actually used by the solver
-          if (ex_ctx != NULL) {
+          if (ex_ctx) {
             try {
               adjusted_preference = ex_ctx->trader_prefs.at(
                   trade.request->requester())[trade.request][trade.bid];
