@@ -105,14 +105,16 @@ template <class T> class TradeExecutor {
         Trade<T>& trade = v_it->first;
         typename T::Ptr rsrc = v_it->second;
         if (rsrc->quantity() > cyclus::eps_rsrc()) {
-          // Calculate the adjusted preference that was actually used by the
-          // solver
-          double adjusted_preference = trade.bid->preference();
+          // Get the original bid preference
+          double original_preference = trade.bid->preference();
 
           // If the bid has NaN preference, use the request preference
-          if (std::isnan(adjusted_preference)) {
-            adjusted_preference = trade.request->preference();
+          if (std::isnan(original_preference)) {
+            original_preference = trade.request->preference();
           }
+
+          // Start with the original preference as the adjusted preference
+          double adjusted_preference = original_preference;
 
           // If we have access to the exchange context, use the adjusted
           // preference that was actually used by the solver
@@ -122,7 +124,7 @@ template <class T> class TradeExecutor {
                   trade.request->requester())[trade.request][trade.bid];
             } catch (const std::out_of_range&) {
               // If the preference is not found in the exchange context, fall
-              // back to the bid preference This could happen if the trade was
+              // back to the original preference This could happen if the trade was
               // not part of the original exchange
             }
           }
@@ -134,7 +136,8 @@ template <class T> class TradeExecutor {
               ->AddVal("ResourceId", rsrc->state_id())
               ->AddVal("Commodity", trade.request->commodity())
               ->AddVal("Time", ctx->time())
-              ->AddVal("Cost", 1 / adjusted_preference)
+              ->AddVal("BidCost", 1 / original_preference)
+              ->AddVal("AdjustedCost", 1 / adjusted_preference)
               ->Record();
         }
       }
