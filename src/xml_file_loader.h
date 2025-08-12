@@ -42,8 +42,8 @@ std::vector<AgentSpec> ParseSpecs(std::string infile,
 /// Builds and returns a master cyclus input xml schema that includes the
 /// sub-schemas defined by the provided list of agent specifications.
 /// This is used but other versions of BuildMasterSchema.
-std::string BuildMasterSchema(std::string schema_path,
-                              std::vector<AgentSpec> specs);
+std::string BuildMasterSchema(
+    std::string schema_path, std::vector<AgentSpec> specs);
 
 /// Builds and returns a master cyclus input xml schema that includes the
 /// sub-schemas from all the installed modules.

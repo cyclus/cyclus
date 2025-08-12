@@ -83,11 +83,11 @@ std::unordered_map<std::string, double> GenerateParamList() const override {
   return econ_params;
 }
 
-double CalculateBidCost(double production_capacity, double units_to_produce,
-                        double input_cost = 0.0) const {
+double CalculateUnitCost(double production_capacity, double units_to_produce,
+                         double input_cost = 0.0) const {
   // Check if there's a cost override, and if so, use that
   if (cost_override > 0) {
-    return cost_override * units_to_produce + input_cost;
+    return cost_override + input_cost / units_to_produce;
   }
 
   // Economic Parameters (declared like this because of scoping with try{})
@@ -112,9 +112,9 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
     taxable_lifetime =
         static_cast<int>(GetEconParameter("facility_taxable_lifetime"));
   } catch (const std::exception& e) {
-    LOG(cyclus::LEV_INFO1, "CalculateBidCost")
+    LOG(cyclus::LEV_INFO1, "CalculateUnitCost")
         << prototype() << "failed to get financial_data_: " << e.what();
-    return kDefaultBidCost;
+    return kDefaultUnitCost;
   }
 
   try {
@@ -122,22 +122,22 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
     corporate_tax_rate =
         parent()->GetEconParameter("corporate_income_tax_rate");
   } catch (const std::exception& e) {
-    LOG(cyclus::LEV_INFO1, "CalculateBidCost")
+    LOG(cyclus::LEV_INFO1, "CalculateUnitCost")
         << prototype()
         << "failed to get financial_data_ from: " << parent()->prototype()
         << e.what();
-    return kDefaultBidCost;
+    return kDefaultUnitCost;
   }
 
   try {
     property_tax_rate =
         parent()->parent()->GetEconParameter("property_tax_rate");
   } catch (const std::exception& e) {
-    LOG(cyclus::LEV_INFO1, "CalculateBidCost")
+    LOG(cyclus::LEV_INFO1, "CalculateUnitCost")
         << prototype() << "failed to get financial_data_ from: "
         << parent()->parent()->prototype() << e.what();
 
-    return kDefaultBidCost;
+    return kDefaultUnitCost;
   }
 
   double timesteps_per_year = cyclusYear / context()->dt();
@@ -158,20 +158,20 @@ double CalculateBidCost(double production_capacity, double units_to_produce,
   double annualized_depreciable =
       PMT(operational_lifetime, return_rate, total_dep - tax_shield, 0);
 
-  double unit_cost = (annualized_depreciable + total_annual_fixed +
-                      total_annual_variable + property_tax) /
-                     annual_production;
+  double unit_production_cost = (annualized_depreciable + total_annual_fixed +
+                                 total_annual_variable + property_tax) /
+                                annual_production;
 
-  double bid_cost = unit_cost * units_to_produce + input_cost;
+  double unit_cost = unit_production_cost + input_cost / units_to_produce;
 
-  // Protects against divide by zero in pref = 1/BidCost
-  return bid_cost != 0 ? bid_cost : kDefaultBidCost;
+  // Protects against divide by zero in pref = 1/unit_cost
+  return unit_cost != 0 ? unit_cost : kDefaultUnitCost;
 }
 
-double CalculateBidPrice(double production_capacity, double units_to_produce,
-                         double input_cost = 0.0) const {
+double CalculateUnitPrice(double production_capacity, double units_to_produce,
+                          double input_cost = 0.0) const {
   // Default implementation
-  return CalculateBidCost(production_capacity, units_to_produce, input_cost);
+  return CalculateUnitCost(production_capacity, units_to_produce, input_cost);
 }
 
 // Required for compilation but not added by the cycpp preprocessor. Do not
