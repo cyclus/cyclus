@@ -306,10 +306,10 @@ void XMLFileLoader::LoadSolver() {
 
 void XMLFileLoader::ProcessCommodities(
     std::map<std::string, double>* commod_priority) {
-  double max = std::max_element(commod_priority->begin(),
-                                commod_priority->end(),
-                                SecondLT<std::pair<std::string, double>>())
-                   ->second;
+  double max =
+      std::max_element(commod_priority->begin(), commod_priority->end(),
+                       SecondLT<std::pair<std::string, double>>())
+          ->second;
   if (max < 1) {
     max = 0;  // in case no priorities are specified
   }

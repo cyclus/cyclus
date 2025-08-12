@@ -364,8 +364,7 @@ void SqliteBack::Bind(boost::spirit::hold_any v, DbTypes type,
 #undef CYCLUS_COMMA
 }
 
-boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt,
-                                             int col,
+boost::spirit::hold_any SqliteBack::ColAsVal(SqlStatement::Ptr stmt, int col,
                                              DbTypes type) {
   boost::spirit::hold_any v;
 

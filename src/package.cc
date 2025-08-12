@@ -32,11 +32,9 @@ void Package::SetDistribution() {
   if (strategy_ == "uniform") {
     dist_ = UniformDoubleDist::Ptr(new UniformDoubleDist(fill_min_, fill_max_));
   } else if (strategy_ == "normal") {
-    dist_ =
-        NormalDoubleDist::Ptr(new NormalDoubleDist((fill_min_ + fill_max_) / 2,
-                                                   (fill_max_ - fill_min_) / 6,
-                                                   fill_min_,
-                                                   fill_max_));
+    dist_ = NormalDoubleDist::Ptr(new NormalDoubleDist(
+        (fill_min_ + fill_max_) / 2, (fill_max_ - fill_min_) / 6, fill_min_,
+        fill_max_));
   }
 }
 

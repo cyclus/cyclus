@@ -69,20 +69,16 @@ template <class T> class ResourceExchange {
   /// @brief queries traders and collects all requests for bids
   void AddAllRequests() {
     InitTraders();
-    std::for_each(traders_.begin(),
-                  traders_.end(),
-                  std::bind(&cyclus::ResourceExchange<T>::AddRequests_,
-                            this,
+    std::for_each(traders_.begin(), traders_.end(),
+                  std::bind(&cyclus::ResourceExchange<T>::AddRequests_, this,
                             std::placeholders::_1));
   }
 
   /// @brief queries traders and collects all responses to requests for bids
   void AddAllBids() {
     InitTraders();
-    std::for_each(traders_.begin(),
-                  traders_.end(),
-                  std::bind(&cyclus::ResourceExchange<T>::AddBids_,
-                            this,
+    std::for_each(traders_.begin(), traders_.end(),
+                  std::bind(&cyclus::ResourceExchange<T>::AddBids_, this,
                             std::placeholders::_1));
   }
 
@@ -90,10 +86,8 @@ template <class T> class ResourceExchange {
   void AdjustAll() {
     InitTraders();
     std::set<Trader*> traders = ex_ctx_.requesters;
-    std::for_each(traders.begin(),
-                  traders.end(),
-                  std::bind(&cyclus::ResourceExchange<T>::AdjustPrefs_,
-                            this,
+    std::for_each(traders.begin(), traders.end(),
+                  std::bind(&cyclus::ResourceExchange<T>::AdjustPrefs_, this,
                             std::placeholders::_1));
   }
 

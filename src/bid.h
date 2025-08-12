@@ -31,13 +31,10 @@ template <class T> class Bid {
   ///        WARNING: This should only be set by the bidder using the
   ///        requests callback cost function. Bidders should not
   ///        arbitrarily set this preference.
-  inline static Bid<T>* Create(Request<T>* request,
-                               boost::shared_ptr<T>
-                                   offer,
+  inline static Bid<T>* Create(Request<T>* request, boost::shared_ptr<T> offer,
                                Trader* bidder,
                                typename BidPortfolio<T>::Ptr portfolio,
-                               bool exclusive,
-                               double preference) {
+                               bool exclusive, double preference) {
     return new Bid<T>(request, offer, bidder, portfolio, exclusive, preference);
   }
 
@@ -47,9 +44,7 @@ template <class T> class Bid {
   /// @param bidder the bidder
   /// @param portfolio the porftolio of which this bid is a part
   /// @param exclusive flag for whether the bid is exclusive
-  inline static Bid<T>* Create(Request<T>* request,
-                               boost::shared_ptr<T>
-                                   offer,
+  inline static Bid<T>* Create(Request<T>* request, boost::shared_ptr<T> offer,
                                Trader* bidder,
                                typename BidPortfolio<T>::Ptr portfolio,
                                bool exclusive = false,

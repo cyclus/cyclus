@@ -34,8 +34,7 @@ template <class T> struct QtyCoeffConverter : public Converter<T> {
       : coeffs(coeffs) {}
 
   inline virtual double convert(
-      boost::shared_ptr<T> offer,
-      Arc const* a,
+      boost::shared_ptr<T> offer, Arc const* a,
       ExchangeTranslationContext<T> const* ctx) const {
     return offer->quantity() * coeffs.at(ctx->node_to_request.at(a->unode()));
   }

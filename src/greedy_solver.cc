@@ -44,8 +44,7 @@ void GreedySolver::Init() {
                 graph_->request_groups().end(),
                 std::bind(&GreedySolver::GetCaps, this, std::placeholders::_1));
 
-  std::for_each(graph_->supply_groups().begin(),
-                graph_->supply_groups().end(),
+  std::for_each(graph_->supply_groups().begin(), graph_->supply_groups().end(),
                 std::bind(&GreedySolver::GetCaps, this, std::placeholders::_1));
 }
 
@@ -58,11 +57,10 @@ double GreedySolver::SolveGraph() {
 
   Init();
 
-  std::for_each(
-      graph_->request_groups().begin(),
-      graph_->request_groups().end(),
-      std::bind(
-          &GreedySolver::GreedilySatisfySet, this, std::placeholders::_1));
+  std::for_each(graph_->request_groups().begin(),
+                graph_->request_groups().end(),
+                std::bind(&GreedySolver::GreedilySatisfySet, this,
+                          std::placeholders::_1));
 
   obj_ += unmatched_ * pseudo_cost;
   return obj_;

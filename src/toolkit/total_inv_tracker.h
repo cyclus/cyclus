@@ -41,14 +41,14 @@ class TotalInvTracker {
   /// Creates an uninitialized tracker. The Init function MUST be called before
   /// the tracker is used.
   TotalInvTracker()
-      : max_inv_size_(std::numeric_limits<double>::max()), qty_(0){};
+      : max_inv_size_(std::numeric_limits<double>::max()), qty_(0) {};
 
   TotalInvTracker(std::vector<ResBuf<Material>*> bufs,
                   double max_inv_size = std::numeric_limits<double>::max()) {
     Init(bufs, max_inv_size);
   }
 
-  ~TotalInvTracker(){};
+  ~TotalInvTracker() {};
 
   /// Initializes the tracker with the given ResBufs. The tracker will have
   /// infinite capacity unless explicitly changed.

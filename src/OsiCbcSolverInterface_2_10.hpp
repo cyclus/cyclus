@@ -384,8 +384,7 @@ class OsiCbcSolverInterface : virtual public OsiSolverInterface {
       <em>either</em> bound changes
       @param boundList the new lower/upper bound pairs for the variables
   */
-  virtual void setColSetBounds(const int* indexFirst,
-                               const int* indexLast,
+  virtual void setColSetBounds(const int* indexFirst, const int* indexLast,
                                const double* boundList);
 
   /** Set a single row lower bound<br>
@@ -411,8 +410,7 @@ class OsiCbcSolverInterface : virtual public OsiSolverInterface {
       <em>either</em> bound changes
       @param boundList the new lower/upper bound pairs for the constraints
   */
-  virtual void setRowSetBounds(const int* indexFirst,
-                               const int* indexLast,
+  virtual void setRowSetBounds(const int* indexFirst, const int* indexLast,
                                const double* boundList);
 
   /** Set the type of a number of rows simultaneously<br>
@@ -425,10 +423,8 @@ class OsiCbcSolverInterface : virtual public OsiSolverInterface {
       @param rhsList   the new right hand sides
       @param rangeList the new ranges
   */
-  virtual void setRowSetTypes(const int* indexFirst,
-                              const int* indexLast,
-                              const char* senseList,
-                              const double* rhsList,
+  virtual void setRowSetTypes(const int* indexFirst, const int* indexLast,
+                              const char* senseList, const double* rhsList,
                               const double* rangeList);
   //@}
 
@@ -617,8 +613,7 @@ class OsiCbcSolverInterface : virtual public OsiSolverInterface {
       If objSense is non zero then -1.0 forces the code to write a
       maximization objective and +1.0 to write a minimization one.
       If 0.0 then solver can do what it wants */
-  virtual void writeMps(const char* filename,
-                        const char* extension = "mps",
+  virtual void writeMps(const char* filename, const char* extension = "mps",
                         double objSense = 0.0) const;
   /** Write the problem into an mps file of the given filename,
       names may be null.  formatType is
