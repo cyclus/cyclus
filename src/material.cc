@@ -23,9 +23,10 @@ Material::Ptr Material::Create(Agent* creator, double quantity,
   return m;
 }
 
-Material::Ptr Material::CreateUntracked(double quantity, Composition::Ptr c) {
+Material::Ptr Material::CreateUntracked(double quantity, Composition::Ptr c,
+                                        double unit_value) {
   Material::Ptr m(
-      new Material(NULL, quantity, c, Package::unpackaged_name(), 0.0));
+      new Material(NULL, quantity, c, Package::unpackaged_name(), unit_value));
   return m;
 }
 
