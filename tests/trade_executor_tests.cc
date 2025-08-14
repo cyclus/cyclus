@@ -21,18 +21,7 @@
 #include "trader.h"
 #include "pyne.h"
 
-using cyclus::Bid;
-using cyclus::Context;
-using cyclus::Material;
-using cyclus::Agent;
-using cyclus::Request;
-using cyclus::TestContext;
-using cyclus::TestObjFactory;
-using cyclus::TestTrader;
-using cyclus::Trade;
-using cyclus::TradeExecutor;
-using cyclus::Trader;
-using cyclus::SelfTradingTestFacility;
+using namespace cyclus;
 using pyne::nucname::id;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -199,7 +188,7 @@ class SelfTradingWarningTest : public ::testing::Test {
  public:
   virtual void SetUp() {
     // Create a test context
-    tc_ = std::make_unique<cyclus::TestContext>();
+    tc_ = std::make_unique<TestContext>();
     
     // Create a test facility that can trade with itself
     facility_ = new SelfTradingTestFacility(tc_->get());
@@ -209,12 +198,12 @@ class SelfTradingWarningTest : public ::testing::Test {
     facility_->EnterNotify();
     
     // Create test material using pyne::nucname::id() for isotope IDs
-    cyclus::CompMap v;
+    CompMap v;
     v[id("u235")] = 1;  // U-235
     v[id("u238")] = 2;  // U-238
     double trade_amt = 100;
-    test_comp_ = cyclus::Composition::CreateFromAtom(v);
-    test_mat_ = cyclus::Material::CreateUntracked(trade_amt, test_comp_);
+    test_comp_ = Composition::CreateFromAtom(v);
+    test_mat_ = Material::CreateUntracked(trade_amt, test_comp_);
   }
 
   virtual void TearDown() {
@@ -222,10 +211,10 @@ class SelfTradingWarningTest : public ::testing::Test {
   }
 
  protected:
-  std::unique_ptr<cyclus::TestContext> tc_;
+  std::unique_ptr<TestContext> tc_;
   SelfTradingTestFacility* facility_;
-  cyclus::Composition::Ptr test_comp_;
-  cyclus::Material::Ptr test_mat_;
+  Composition::Ptr test_comp_;
+  Material::Ptr test_mat_;
   
   // Test constants
   static constexpr double kTestTradeAmount = 50.0;
@@ -238,17 +227,17 @@ TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
   std::cerr.rdbuf(captured_stderr.rdbuf());
   
   // Create a trade where the same facility is both supplier and requester
-  cyclus::Request<cyclus::Material>* req = 
-      cyclus::Request<cyclus::Material>::Create(test_mat_, facility_, "NaturalUranium");
-  cyclus::Bid<cyclus::Material>* bid = 
-      cyclus::Bid<cyclus::Material>::Create(req, test_mat_, facility_);
+  Request<Material>* req = 
+      Request<Material>::Create(test_mat_, facility_, "NaturalUranium");
+  Bid<Material>* bid = 
+      Bid<Material>::Create(req, test_mat_, facility_);
   
-  cyclus::Trade<cyclus::Material> trade(req, bid, kTestTradeAmount);
-  std::vector<cyclus::Trade<cyclus::Material>> trades;
+  Trade<Material> trade(req, bid, kTestTradeAmount);
+  std::vector<Trade<Material>> trades;
   trades.push_back(trade);
   
   // Execute the trade - this should trigger the warning
-  cyclus::TradeExecutor<cyclus::Material> executor(trades);
+  TradeExecutor<Material> executor(trades);
   executor.ExecuteTrades(tc_->get());
   
   // Restore stderr
@@ -277,17 +266,17 @@ TEST_F(SelfTradingWarningTest, NoWarningForDifferentAgents) {
   std::cerr.rdbuf(captured_stderr.rdbuf());
   
   // Create a trade between different facilities
-  cyclus::Request<cyclus::Material>* req = 
-      cyclus::Request<cyclus::Material>::Create(test_mat_, facility2, "NaturalUranium");
-  cyclus::Bid<cyclus::Material>* bid = 
-      cyclus::Bid<cyclus::Material>::Create(req, test_mat_, facility_);
+  Request<Material>* req = 
+      Request<Material>::Create(test_mat_, facility2, "NaturalUranium");
+  Bid<Material>* bid = 
+      Bid<Material>::Create(req, test_mat_, facility_);
   
-  cyclus::Trade<cyclus::Material> trade(req, bid, kTestTradeAmount);
-  std::vector<cyclus::Trade<cyclus::Material>> trades;
+  Trade<Material> trade(req, bid, kTestTradeAmount);
+  std::vector<Trade<Material>> trades;
   trades.push_back(trade);
   
   // Execute the trade - this should NOT trigger the warning
-  cyclus::TradeExecutor<cyclus::Material> executor(trades);
+  TradeExecutor<Material> executor(trades);
   executor.ExecuteTrades(tc_->get());
   
   // Restore stderr
@@ -310,17 +299,17 @@ TEST_F(SelfTradingWarningTest, WarningIncludesCorrectAgentId) {
   std::cerr.rdbuf(captured_stderr.rdbuf());
   
   // Create a trade where the same facility is both supplier and requester
-  cyclus::Request<cyclus::Material>* req = 
-      cyclus::Request<cyclus::Material>::Create(test_mat_, facility_, "NaturalUranium");
-  cyclus::Bid<cyclus::Material>* bid = 
-      cyclus::Bid<cyclus::Material>::Create(req, test_mat_, facility_);
+  Request<Material>* req = 
+      Request<Material>::Create(test_mat_, facility_, "NaturalUranium");
+  Bid<Material>* bid = 
+      Bid<Material>::Create(req, test_mat_, facility_);
   
-  cyclus::Trade<cyclus::Material> trade(req, bid, kTestTradeAmount);
-  std::vector<cyclus::Trade<cyclus::Material>> trades;
+  Trade<Material> trade(req, bid, kTestTradeAmount);
+  std::vector<Trade<Material>> trades;
   trades.push_back(trade);
   
   // Execute the trade
-  cyclus::TradeExecutor<cyclus::Material> executor(trades);
+  TradeExecutor<Material> executor(trades);
   executor.ExecuteTrades(tc_->get());
   
   // Restore stderr
