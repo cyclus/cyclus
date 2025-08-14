@@ -221,11 +221,8 @@ class SelfTradingWarningTest : public ::testing::Test {
 };
 
 TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
-  // Capture stderr to check for warning messages
-  std::stringstream captured_stderr;
-  std::streambuf* original_stderr = std::cerr.rdbuf();
-  std::cerr.rdbuf(captured_stderr.rdbuf());
-  
+  cyclus::warn_as_error = true;
+
   // Create a trade where the same facility is both supplier and requester
   Request<Material>* req = 
       Request<Material>::Create(test_mat_, facility_, "NaturalUranium");
@@ -238,18 +235,10 @@ TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
   
   // Execute the trade - this should trigger the warning
   TradeExecutor<Material> executor(trades);
-  executor.ExecuteTrades(tc_->get());
-  
-  // Restore stderr
-  std::cerr.rdbuf(original_stderr);
-  
-  // Check that the warning was issued
-  std::string stderr_output = captured_stderr.str();
-  EXPECT_TRUE(stderr_output.find("State Warning") != std::string::npos);
-  EXPECT_TRUE(stderr_output.find("is trading with itself") != std::string::npos);
-  EXPECT_TRUE(stderr_output.find("NaturalUranium") != std::string::npos);
-  
+  EXPECT_THROW(executor.ExecuteTrades(tc_->get()), cyclus::StateError);
+
   // Clean up
+  cyclus::warn_as_error = false;
   delete bid;
   delete req;
 }
