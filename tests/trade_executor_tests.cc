@@ -15,9 +15,11 @@
 #include "test_context.h"
 #include "test_agents/test_facility.h"
 #include "test_trader.h"
+#include "self_trading_test_facility.h"
 #include "trade.h"
 #include "trade_executor.h"
 #include "trader.h"
+#include "pyne.h"
 
 using cyclus::Bid;
 using cyclus::Context;
@@ -30,6 +32,8 @@ using cyclus::TestTrader;
 using cyclus::Trade;
 using cyclus::TradeExecutor;
 using cyclus::Trader;
+using cyclus::SelfTradingTestFacility;
+using pyne::nucname::id;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class TradeExecutorTests : public ::testing::Test {
@@ -190,78 +194,6 @@ TEST_F(TradeExecutorTests, NoThrowWriting) {
 // }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Simple test facility for self-trading tests
-class SelfTradingTestFacility : public cyclus::Facility {
- public:
-  SelfTradingTestFacility(cyclus::Context* ctx) : cyclus::Facility(ctx) {}
-  virtual ~SelfTradingTestFacility() {}
-
-  virtual cyclus::Agent* Clone() { 
-    return new SelfTradingTestFacility(context()); 
-  }
-  
-  virtual void InitInv(cyclus::Inventories& inv) {}
-  virtual cyclus::Inventories SnapshotInv() { 
-    return cyclus::Inventories(); 
-  }
-
-  void Tick() {}
-  void Tock() {}
-
-  // Simple implementation to support trading
-  virtual std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>
-      GetMatlRequests() {
-    std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr> ports;
-    cyclus::RequestPortfolio<cyclus::Material>::Ptr port(
-        new cyclus::RequestPortfolio<cyclus::Material>());
-    
-    cyclus::Material::Ptr mat = cyclus::NewBlankMaterial(100);
-    port->AddRequest(mat, this, "NaturalUranium");
-    ports.insert(port);
-    return ports;
-  }
-
-  virtual std::set<cyclus::BidPortfolio<cyclus::Material>::Ptr>
-      GetMatlBids(cyclus::CommodMap<cyclus::Material>::type& commod_requests) {
-    std::set<cyclus::BidPortfolio<cyclus::Material>::Ptr> ports;
-    
-    if (commod_requests.count("NaturalUranium") > 0) {
-      cyclus::BidPortfolio<cyclus::Material>::Ptr port(
-          new cyclus::BidPortfolio<cyclus::Material>());
-      
-      std::vector<cyclus::Request<cyclus::Material>*>& requests = 
-          commod_requests.at("NaturalUranium");
-      
-      for (std::vector<cyclus::Request<cyclus::Material>*>::iterator it = 
-               requests.begin(); it != requests.end(); ++it) {
-        cyclus::Request<cyclus::Material>* req = *it;
-        cyclus::Material::Ptr offer = cyclus::NewBlankMaterial(100);
-        port->AddBid(req, offer, this);
-      }
-      ports.insert(port);
-    }
-    return ports;
-  }
-
-  virtual void GetMatlTrades(
-      const std::vector<cyclus::Trade<cyclus::Material>>& trades,
-      std::vector<std::pair<cyclus::Trade<cyclus::Material>, 
-                           cyclus::Material::Ptr>>& responses) {
-    for (std::vector<cyclus::Trade<cyclus::Material>>::const_iterator it = 
-             trades.begin(); it != trades.end(); ++it) {
-      cyclus::Material::Ptr response = cyclus::NewBlankMaterial(it->amt);
-      responses.push_back(std::make_pair(*it, response));
-    }
-  }
-
-  virtual void AcceptMatlTrades(
-      const std::vector<std::pair<cyclus::Trade<cyclus::Material>,
-                                 cyclus::Material::Ptr>>& responses) {
-    // Simple acceptance - just ignore the materials
-  }
-};
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Test for self-trading warning functionality
 class SelfTradingWarningTest : public ::testing::Test {
  public:
@@ -275,6 +207,14 @@ class SelfTradingWarningTest : public ::testing::Test {
     // Set up the facility
     facility_->Build(nullptr);
     facility_->EnterNotify();
+    
+    // Create test material using pyne::nucname::id() for isotope IDs
+    cyclus::CompMap v;
+    v[id("u235")] = 1;  // U-235
+    v[id("u238")] = 2;  // U-238
+    double trade_amt = 100;
+    test_comp_ = cyclus::Composition::CreateFromAtom(v);
+    test_mat_ = cyclus::Material::CreateUntracked(trade_amt, test_comp_);
   }
 
   virtual void TearDown() {
@@ -284,6 +224,11 @@ class SelfTradingWarningTest : public ::testing::Test {
  protected:
   std::unique_ptr<cyclus::TestContext> tc_;
   SelfTradingTestFacility* facility_;
+  cyclus::Composition::Ptr test_comp_;
+  cyclus::Material::Ptr test_mat_;
+  
+  // Test constants
+  static constexpr double kTestTradeAmount = 50.0;
 };
 
 TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
@@ -292,20 +237,13 @@ TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
   std::streambuf* original_stderr = std::cerr.rdbuf();
   std::cerr.rdbuf(captured_stderr.rdbuf());
   
-  // Create a material for testing
-  cyclus::CompMap v;
-  v[922350000] = 1;  // U-235
-  v[922380000] = 2;  // U-238
-  cyclus::Composition::Ptr comp = cyclus::Composition::CreateFromAtom(v);
-  cyclus::Material::Ptr mat = cyclus::Material::CreateUntracked(100, comp);
-  
   // Create a trade where the same facility is both supplier and requester
   cyclus::Request<cyclus::Material>* req = 
-      cyclus::Request<cyclus::Material>::Create(mat, facility_, "NaturalUranium");
+      cyclus::Request<cyclus::Material>::Create(test_mat_, facility_, "NaturalUranium");
   cyclus::Bid<cyclus::Material>* bid = 
-      cyclus::Bid<cyclus::Material>::Create(req, mat, facility_);
+      cyclus::Bid<cyclus::Material>::Create(req, test_mat_, facility_);
   
-  cyclus::Trade<cyclus::Material> trade(req, bid, 50.0);
+  cyclus::Trade<cyclus::Material> trade(req, bid, kTestTradeAmount);
   std::vector<cyclus::Trade<cyclus::Material>> trades;
   trades.push_back(trade);
   
@@ -339,18 +277,12 @@ TEST_F(SelfTradingWarningTest, NoWarningForDifferentAgents) {
   std::cerr.rdbuf(captured_stderr.rdbuf());
   
   // Create a trade between different facilities
-  cyclus::CompMap v;
-  v[922350000] = 1;
-  v[922380000] = 2;
-  cyclus::Composition::Ptr comp = cyclus::Composition::CreateFromAtom(v);
-  cyclus::Material::Ptr mat = cyclus::Material::CreateUntracked(100, comp);
-  
   cyclus::Request<cyclus::Material>* req = 
-      cyclus::Request<cyclus::Material>::Create(mat, facility2, "NaturalUranium");
+      cyclus::Request<cyclus::Material>::Create(test_mat_, facility2, "NaturalUranium");
   cyclus::Bid<cyclus::Material>* bid = 
-      cyclus::Bid<cyclus::Material>::Create(req, mat, facility_);
+      cyclus::Bid<cyclus::Material>::Create(req, test_mat_, facility_);
   
-  cyclus::Trade<cyclus::Material> trade(req, bid, 50.0);
+  cyclus::Trade<cyclus::Material> trade(req, bid, kTestTradeAmount);
   std::vector<cyclus::Trade<cyclus::Material>> trades;
   trades.push_back(trade);
   
@@ -377,20 +309,13 @@ TEST_F(SelfTradingWarningTest, WarningIncludesCorrectAgentId) {
   std::streambuf* original_stderr = std::cerr.rdbuf();
   std::cerr.rdbuf(captured_stderr.rdbuf());
   
-  // Create a material for testing
-  cyclus::CompMap v;
-  v[922350000] = 1;
-  v[922380000] = 2;
-  cyclus::Composition::Ptr comp = cyclus::Composition::CreateFromAtom(v);
-  cyclus::Material::Ptr mat = cyclus::Material::CreateUntracked(100, comp);
-  
   // Create a trade where the same facility is both supplier and requester
   cyclus::Request<cyclus::Material>* req = 
-      cyclus::Request<cyclus::Material>::Create(mat, facility_, "NaturalUranium");
+      cyclus::Request<cyclus::Material>::Create(test_mat_, facility_, "NaturalUranium");
   cyclus::Bid<cyclus::Material>* bid = 
-      cyclus::Bid<cyclus::Material>::Create(req, mat, facility_);
+      cyclus::Bid<cyclus::Material>::Create(req, test_mat_, facility_);
   
-  cyclus::Trade<cyclus::Material> trade(req, bid, 50.0);
+  cyclus::Trade<cyclus::Material> trade(req, bid, kTestTradeAmount);
   std::vector<cyclus::Trade<cyclus::Material>> trades;
   trades.push_back(trade);
   
