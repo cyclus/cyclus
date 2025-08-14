@@ -8,6 +8,7 @@
 #include "request_portfolio.h"
 #include "resource_helpers.h"
 #include "test_agents/test_facility.h"
+#include "test_trader.h"
 #include "trade.h"
 #include "pyne.h"
 
@@ -16,7 +17,8 @@ namespace cyclus {
 // Simple test facility for self-trading tests
 class SelfTradingTestFacility : public TestFacility {
  public:
-  SelfTradingTestFacility(Context* ctx) : TestFacility(ctx) {}
+  SelfTradingTestFacility(Context* ctx, TestObjFactory* fac = NULL) 
+      : obj_fac(fac), TestFacility(ctx) {}
   virtual ~SelfTradingTestFacility() {}
 
   virtual Agent* Clone() { 
@@ -27,20 +29,23 @@ class SelfTradingTestFacility : public TestFacility {
 
   void InitFrom(SelfTradingTestFacility* m) {
     TestFacility::InitFrom(m);
-    trade_amt = m->trade_amt;
+    obj_fac = m->obj_fac;
     context()->RegisterTimeListener(this);
   }
 
-  double trade_amt = 100;
+  TestObjFactory* obj_fac;
   // Simple implementation to support trading
   virtual std::set<RequestPortfolio<Material>::Ptr>
       GetMatlRequests() {
     std::set<RequestPortfolio<Material>::Ptr> ports;
+    if (obj_fac == NULL) {
+      return ports;
+    }
+    
     RequestPortfolio<Material>::Ptr port(
         new RequestPortfolio<Material>());
     
-    Material::Ptr mat = NewBlankMaterial(trade_amt);
-    port->AddRequest(mat, this, "NaturalUranium");
+    port->AddRequest(obj_fac->mat, this, obj_fac->commod);
     ports.insert(port);
     return ports;
   }
@@ -49,21 +54,22 @@ class SelfTradingTestFacility : public TestFacility {
       GetMatlBids(CommodMap<Material>::type& commod_requests) {
     std::set<BidPortfolio<Material>::Ptr> ports;
     
-    if (commod_requests.count("NaturalUranium") > 0) {
-      BidPortfolio<Material>::Ptr port(
-          new BidPortfolio<Material>());
-      
-      std::vector<Request<Material>*>& requests = 
-          commod_requests.at("NaturalUranium");
-      
-      for (std::vector<Request<Material>*>::iterator it = 
-               requests.begin(); it != requests.end(); ++it) {
-        Request<Material>* req = *it;
-        Material::Ptr offer = NewBlankMaterial(trade_amt);
-        port->AddBid(req, offer, this);
-      }
-      ports.insert(port);
+    if (obj_fac == NULL || commod_requests.count(obj_fac->commod) == 0) {
+      return ports;
     }
+    
+    BidPortfolio<Material>::Ptr port(
+        new BidPortfolio<Material>());
+    
+    std::vector<Request<Material>*>& requests = 
+        commod_requests.at(obj_fac->commod);
+    
+    for (std::vector<Request<Material>*>::iterator it = 
+             requests.begin(); it != requests.end(); ++it) {
+      Request<Material>* req = *it;
+      port->AddBid(req, obj_fac->mat, this);
+    }
+    ports.insert(port);
     return ports;
   }
 
@@ -73,7 +79,7 @@ class SelfTradingTestFacility : public TestFacility {
                            Material::Ptr>>& responses) {
     for (std::vector<Trade<Material>>::const_iterator it = 
              trades.begin(); it != trades.end(); ++it) {
-      Material::Ptr response = NewBlankMaterial(it->amt);
+      Material::Ptr response = (obj_fac != NULL) ? obj_fac->mat : NewBlankMaterial(it->amt);
       responses.push_back(std::make_pair(*it, response));
     }
   }
