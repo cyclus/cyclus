@@ -73,8 +73,8 @@ class SelfTradingTestFacility : public TestFacility {
   virtual void AcceptMatlTrades(
       const std::vector<std::pair<Trade<Material>,
                                  Material::Ptr>>& responses) {
-    // Simple acceptance - just ignore the materials
-    // Does this work?
+    // Note: since we're just testing that the warning is issued,
+    // we don't need to do anything here.
   }
 };
 
