@@ -221,7 +221,7 @@ class SelfTradingWarningTest : public ::testing::Test {
 };
 
 TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
-  cyclus::warn_as_error = true;
+  warn_as_error = true;
 
   // Create a trade where the same facility is both supplier and requester
   Request<Material>* req = 
@@ -238,7 +238,7 @@ TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
   EXPECT_THROW(executor.ExecuteTrades(tc_->get()), cyclus::StateError);
 
   // Clean up
-  cyclus::warn_as_error = false;
+  warn_as_error = false;
   delete bid;
   delete req;
 }

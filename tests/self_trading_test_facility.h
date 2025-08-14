@@ -20,7 +20,15 @@ class SelfTradingTestFacility : public TestFacility {
   virtual ~SelfTradingTestFacility() {}
 
   virtual Agent* Clone() { 
-    return new SelfTradingTestFacility(context()); 
+    SelfTradingTestFacility* m = new SelfTradingTestFacility(context());
+    m->InitFrom(this);
+    return m;
+  }
+
+  void InitFrom(SelfTradingTestFacility* m) {
+    TestFacility::InitFrom(m);
+    trade_amt = m->trade_amt;
+    context()->RegisterTimeListener(this);
   }
 
   double trade_amt = 100;
