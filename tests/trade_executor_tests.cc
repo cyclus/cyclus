@@ -162,46 +162,22 @@ TEST_F(TradeExecutorTests, NoThrowWriting) {
   EXPECT_NO_THROW(exec.RecordTrades(tc.get()));
 }
 
-// This test was a part of a previous iteration of Trade testing, but its not
-// clear if this throwing behavior is what we want. I'm leaving it here for now
-// in case it needs to be picked up again. MJG - 11/26/13
-// // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TEST(TradeTests, OfferThrow) {
-//   TestContext tc;
-
-//   Material::Ptr mat = get_mat();
-//   Receiver* r = new Receiver(tc.get(), mat);
-//   Request<Material>* req = Request<Material>::Create(mat, r);
-
-//   Sender* s = new Sender(tc.get(), true);
-//   Bid<Material>* bid = Bid<Material>::Create(req, mat, s);
-
-//   Trade<Material> trade(req, bid, mat->quantity());
-//   EXPECT_THROW(cyclus::ExecuteTrade(trade), cyclus::ValueError);
-//   delete s;
-//   delete r;
-// }
-
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// Test for self-trading warning functionality
 class SelfTradingWarningTest : public ::testing::Test {
  public:
   virtual void SetUp() {
-    // Create a test context
+
     tc_ = std::make_unique<TestContext>();
     
-    // Create a test facility that can trade with itself
     facility_ = new SelfTradingTestFacility(tc_->get());
     
-    // Set up the facility
     facility_->Build(nullptr);
     facility_->EnterNotify();
     
-    // Create test material using pyne::nucname::id() for isotope IDs
     CompMap v;
-    v[id("u235")] = 1;  // U-235
-    v[id("u238")] = 2;  // U-238
+    v[id("u235")] = 1;
     double trade_amt = 100;
+
     test_comp_ = Composition::CreateFromAtom(v);
     test_mat_ = Material::CreateUntracked(trade_amt, test_comp_);
   }
@@ -220,12 +196,13 @@ class SelfTradingWarningTest : public ::testing::Test {
   static constexpr double kTestTradeAmount = 50.0;
 };
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
   warn_as_error = true;
 
   // Create a trade where the same facility is both supplier and requester
   Request<Material>* req = 
-      Request<Material>::Create(test_mat_, facility_, "NaturalUranium");
+      Request<Material>::Create(test_mat_, facility_, "Uranium");
   Bid<Material>* bid = 
       Bid<Material>::Create(req, test_mat_, facility_);
   
@@ -243,20 +220,18 @@ TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
   delete req;
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SelfTradingWarningTest, NoWarningForDifferentAgents) {
   // Create a second test facility
   SelfTradingTestFacility* facility2 = new SelfTradingTestFacility(tc_->get());
   facility2->Build(nullptr);
   facility2->EnterNotify();
   
-  // Capture stderr
-  std::stringstream captured_stderr;
-  std::streambuf* original_stderr = std::cerr.rdbuf();
-  std::cerr.rdbuf(captured_stderr.rdbuf());
+  warn_as_error = true;
   
   // Create a trade between different facilities
   Request<Material>* req = 
-      Request<Material>::Create(test_mat_, facility2, "NaturalUranium");
+      Request<Material>::Create(test_mat_, facility2, "Uranium");
   Bid<Material>* bid = 
       Bid<Material>::Create(req, test_mat_, facility_);
   
@@ -266,30 +241,23 @@ TEST_F(SelfTradingWarningTest, NoWarningForDifferentAgents) {
   
   // Execute the trade - this should NOT trigger the warning
   TradeExecutor<Material> executor(trades);
-  executor.ExecuteTrades(tc_->get());
-  
-  // Restore stderr
-  std::cerr.rdbuf(original_stderr);
-  
-  // Check that no self-trading warning was issued
-  std::string stderr_output = captured_stderr.str();
-  EXPECT_TRUE(stderr_output.find("is trading with itself") == std::string::npos);
+  EXPECT_NO_THROW(executor.ExecuteTrades(tc_->get()));
   
   // Clean up
+  warn_as_error = false;
   delete bid;
   delete req;
   delete facility2;
 }
 
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SelfTradingWarningTest, WarningIncludesCorrectAgentId) {
-  // Capture stderr
-  std::stringstream captured_stderr;
-  std::streambuf* original_stderr = std::cerr.rdbuf();
-  std::cerr.rdbuf(captured_stderr.rdbuf());
+  
+  warn_as_error = true;
   
   // Create a trade where the same facility is both supplier and requester
   Request<Material>* req = 
-      Request<Material>::Create(test_mat_, facility_, "NaturalUranium");
+      Request<Material>::Create(test_mat_, facility_, "Uranium");
   Bid<Material>* bid = 
       Bid<Material>::Create(req, test_mat_, facility_);
   
@@ -297,19 +265,21 @@ TEST_F(SelfTradingWarningTest, WarningIncludesCorrectAgentId) {
   std::vector<Trade<Material>> trades;
   trades.push_back(trade);
   
-  // Execute the trade
+  
   TradeExecutor<Material> executor(trades);
+
+  // Use a try/catch to check for the error message
+  try {
   executor.ExecuteTrades(tc_->get());
-  
-  // Restore stderr
-  std::cerr.rdbuf(original_stderr);
-  
-  // Check that the warning includes the correct agent ID
-  std::string stderr_output = captured_stderr.str();
-  std::string expected_id = std::to_string(facility_->id());
-  EXPECT_TRUE(stderr_output.find(expected_id) != std::string::npos);
+  FAIL() << "Expected error to be thrown";
+  }
+  catch (const cyclus::StateError& e) {
+    std::string expected_id = std::to_string(facility_->id());
+    EXPECT_TRUE(std::string(e.what()).find(expected_id) != std::string::npos);
+  }
   
   // Clean up
+  warn_as_error = false;
   delete bid;
   delete req;
 }
