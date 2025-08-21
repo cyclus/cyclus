@@ -94,7 +94,7 @@ TEST_F(ResourceTest, MaterialUnitValue) {
   EXPECT_EQ(m2->UnitValue(), 20);
   m1->Absorb(m2);
   EXPECT_EQ(m1->UnitValue(), 17);
-  EXPECT_EQ(m3->UnitValue(), 0.0);
+  EXPECT_TRUE(std::isnan(m3->UnitValue()));
   Material::Ptr lm1 = boost::dynamic_pointer_cast<Material>(m1->Clone());
   EXPECT_EQ(lm1->UnitValue(), 17);
   Material::Ptr lm2 = m1->ExtractQty(1);
@@ -133,7 +133,7 @@ TEST_F(ResourceTest, ProductUnitValue) {
   EXPECT_EQ(p2->UnitValue(), 20);
   p1->Absorb(p2);
   EXPECT_EQ(p1->UnitValue(), 17);
-  EXPECT_EQ(p3->UnitValue(), 0.0);
+  EXPECT_TRUE(std::isnan(p3->UnitValue()));
   Product::Ptr lp1 = boost::dynamic_pointer_cast<Product>(p1->Clone());
   EXPECT_EQ(lp1->UnitValue(), 17);
   Product::Ptr lp2 = p1->Extract(1);

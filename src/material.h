@@ -83,11 +83,11 @@ class Material : public Resource {
   /// creator's context.
   static Ptr Create(Agent* creator, double quantity, Composition::Ptr c,
                     std::string package_name = Package::unpackaged_name(),
-                    double unit_value = 0.0);
+                    double unit_value = kUnsetUnitValue);
 
   /// Creates a new material resource that does not actually exist as part of
   /// the simulation and is untracked.
-  static Ptr CreateUntracked(double quantity, Composition::Ptr c, 
+  static Ptr CreateUntracked(double quantity, Composition::Ptr c,
                              double unit_value = kUnsetUnitValue);
 
   /// Returns the id of the material's internal nuclide composition.
@@ -171,7 +171,7 @@ class Material : public Resource {
  protected:
   Material(Context* ctx, double quantity, Composition::Ptr c,
            std::string package_name = Package::unpackaged_name(),
-           double unit_value = 0.0);
+           double unit_value = kUnsetUnitValue);
 
  private:
   Context* ctx_;

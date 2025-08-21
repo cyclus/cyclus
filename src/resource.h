@@ -116,7 +116,8 @@ class Resource {
   template <class T> std::vector<typename T::Ptr> Package(Package::Ptr pkg);
 
  protected:
-  constexpr static double kUnsetUnitValue = std::numeric_limits<double>::quiet_NaN();
+  constexpr static double kUnsetUnitValue =
+      std::numeric_limits<double>::quiet_NaN();
 
  private:
   double unit_value_;
