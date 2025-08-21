@@ -34,7 +34,7 @@ Product::Ptr Product::Create(Agent* creator, double quantity,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Product::Ptr Product::CreateUntracked(double quantity, std::string quality) {
   Product::Ptr r(
-      new Product(NULL, quantity, quality, Package::unpackaged_name(), 0.0));
+      new Product(NULL, quantity, quality, Package::unpackaged_name(), kUnsetUnitValue));
   r->tracker_.DontTrack();
   return r;
 }

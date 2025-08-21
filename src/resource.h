@@ -115,6 +115,9 @@ class Resource {
   /// restrictions, the remainder is left in the resource object.
   template <class T> std::vector<typename T::Ptr> Package(Package::Ptr pkg);
 
+ protected:
+  constexpr static double kUnsetUnitValue = std::numeric_limits<double>::quiet_NaN();
+
  private:
   double unit_value_;
   static int nextstate_id_;
