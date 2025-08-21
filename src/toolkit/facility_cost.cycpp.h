@@ -189,13 +189,12 @@ double CalculateUnitCost(double production_capacity, double units_to_produce,
 
   // c_j = F_bar/U + V_bar + (I_0/U) * [p + (1/(1-τ)) * PMT(N,x,1,0) - (1/N) * (τ/(1-τ))]
   double fixed_cost_per_unit = levelized_fixed_costs / units_produced_annually;
-  double variable_cost_per_unit = levelized_variable_costs;
   double capital_investment_per_unit = initial_investment / units_produced_annually;
 
   double depreciation_tax_shield = income_tax_rate / (1.0 - income_tax_rate) / facility_lifetime;
   double capital_recovery_factor = PMT(facility_lifetime, tax_modified_rate_of_return, 1.0, 0.0) / (1.0 - income_tax_rate);
   double capital_cost_per_unit = capital_investment_per_unit * (property_and_insurance_rate + capital_recovery_factor - depreciation_tax_shield);
-  double production_cost = fixed_cost_per_unit + variable_cost_per_unit + capital_cost_per_unit;
+  double production_cost = fixed_cost_per_unit + levelized_variable_costs + capital_cost_per_unit;
 
   // c_u = c_j + c_M = production_cost + input_cost_per_unit
   double unit_cost = production_cost + input_cost_per_unit;
