@@ -65,9 +65,10 @@ RUN mamba install -y "python<3.13" --no-pin && \
                git \
                glib \
                libxml2 \
-               "libblas=3.11.0" \
+               "libblas=3.9.0" \
+               "libcblas=3.9.0" \
                libxmlpp-4.0 \
-               liblapack \
+               "liblapack=3.9.0" \
                pkg-config \
                coincbc \
                libboost-devel \
