@@ -15,6 +15,7 @@ RUN apt update -y && apt install -y \
         make \
         libxml2-dev \
         libxml++2.6-dev \
+        libblas-dev \
         liblapack-dev \
         pkg-config \
         coinor-libcbc-dev \
@@ -66,6 +67,8 @@ RUN mamba install -y "python<3.13" --no-pin && \
                glib \
                libxml2 \
                libxmlpp-4.0 \
+               libblas=3.9.0=33_h59b9bed_openblas \
+               libcblas\
                liblapack \
                pkg-config \
                coincbc \
