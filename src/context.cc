@@ -315,6 +315,10 @@ int Context::time() {
   return ti_->time();
 }
 
+int Context::timeshift(int year, int month) {
+  return ti_->timeshift(year, month);
+}
+
 int Context::random() {
   return rng_->random();
 }
