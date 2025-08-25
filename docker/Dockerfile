@@ -1,6 +1,6 @@
 ARG pkg_mgr=apt
 ARG ubuntu_version=24.04
-# Test
+
 FROM ubuntu:${ubuntu_version} AS common-base
 
 ENV TZ=America/Chicago
