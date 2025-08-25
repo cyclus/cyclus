@@ -115,6 +115,48 @@ class TimerTestsFixture : public ::testing::TestWithParam<int> {
     #endif // CYCLUS_IS_PARALLEL
 };
 
+
+TEST_P(TimerTestsFixture, TimeShiftTest) {
+  cyclus::PyStart();
+  cyclus::Recorder rec;
+  cyclus::Timer ti;
+  cyclus::Context ctx(&ti, &rec);
+
+  ti.Initialize(&ctx, cyclus::SimInfo(5));
+
+  int obs = ti.timeshift(-1,-1);
+  int exp = 0;
+  EXPECT_EQ(exp, obs);
+
+  obs = ti.timeshift(0,0);
+  EXPECT_EQ(exp, obs);
+
+  obs = ti.timeshift(2010, 2);
+  exp = 1;
+  EXPECT_EQ(exp, obs);
+
+  obs = ti.timeshift(2011,1);
+  exp = 12;
+  EXPECT_EQ(exp, obs);
+
+  obs = ti.timeshift(2011,5);
+  exp = 16;
+  EXPECT_EQ(exp, obs);
+
+  obs = ti.timeshift(2009,1);
+  exp = -12;
+  EXPECT_EQ(exp, obs);
+
+  obs = ti.timeshift(2009,11);
+  exp = -2;
+  EXPECT_EQ(exp, obs);
+
+  obs = ti.timeshift(2008,6);
+  exp = -19;
+  EXPECT_EQ(exp, obs);
+
+}
+
 TEST_P(TimerTestsFixture, BareSim) {
   cyclus::PyStart();
   cyclus::Recorder rec;
