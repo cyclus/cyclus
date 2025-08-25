@@ -60,7 +60,7 @@ RUN mamba install -y "python<3.13" --no-pin && \
     mamba update -y --all && \
     mamba install -y \
                compilers \
-               "cmake<4.1" \
+               cmake<4.1 \
                make \
                git \
                glib \
