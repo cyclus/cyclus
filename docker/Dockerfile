@@ -69,7 +69,8 @@ RUN mamba install -y "python<3.13" --no-pin && \
                liblapack \
                pkg-config \
                coincbc \
-               libboost-devel \
+               boost \
+               boost-cpp \
                hdf5 \
                sqlite \
                pcre \
