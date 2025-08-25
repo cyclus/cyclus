@@ -283,16 +283,26 @@ int Timer::dur() {
 
 int Timer::timeshift(int year, int month) {
 
-  int timeshift = 0;
+  int timeshift_ = 0;
   if (year > si_.y0) {
-    timeshift += (year - si_.y0) * kMonthsPerYear;
+    timeshift_ += (year - si_.y0) * kMonthsPerYear;
   }
   
   if (month >=0) {
-    timeshift += si_.m0 - month;
+    timeshift_ += si_.m0 - month;
   }
 
-  return timeshift;
+  if (timeshift_ < 0) {
+    Warn<VALUE_WARNING>(
+      "Timeshifting is only allowed for alternate timestamps "
+      "that occur after the simulation start time.  This call "
+      "resulted in a negative time shift.  Returning 0 timeshift "
+      "instead."
+    )
+    timeshift_ = 0;
+  }
+
+  return timeshift_;
 
 }
 

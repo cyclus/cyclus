@@ -70,12 +70,13 @@ class Timer {
   int dur();
 
   /// Returns the number of months between the simulation start
-  /// time and another time stamp
+  /// time and another time stamp.  
   ///
   /// @param year of alternate time stamp
   /// @param month of alternate time stamp
   ///
   /// @return the timeshift between two times, in months
+  /// @warning Only valid for times that occur after the simulation start time.
   int timeshift(int year, int month);
 
  private:
