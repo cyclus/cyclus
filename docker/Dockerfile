@@ -60,15 +60,12 @@ RUN mamba install -y "python<3.13" --no-pin && \
     mamba update -y --all && \
     mamba install -y \
                compilers \
-               "cmake=4.0.3" \
+               "cmake<4.1" \
                make \
                git \
                glib \
                libxml2 \
-               "libblas=3.11.0" \
-               "libcblas=3.9.0" \
                libxmlpp-4.0 \
-               "liblapack=3.9.0" \
                pkg-config \
                coincbc \
                libboost-devel \
