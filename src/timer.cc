@@ -281,6 +281,22 @@ int Timer::dur() {
   return si_.duration;
 }
 
+int Timer::timeshift(int year, int month) {
+
+  int timeshift = 0;
+  if (year > si_.y0) {
+    timeshift += (year - si_.y0) * kMonthsPerYear;
+  }
+  
+  if (month >=0) {
+    timeshift += si_.m0 - month;
+  }
+
+  return timeshift;
+
+}
+
+
 Timer::Timer() : time_(0), si_(0), want_snapshot_(false), want_kill_(false) {}
 
 }  // namespace cyclus

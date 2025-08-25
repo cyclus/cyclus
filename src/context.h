@@ -24,7 +24,9 @@
 // a round number)
 const uint64_t cyclusYear = 31558200;
 
-const uint64_t kDefaultTimeStepDur = cyclusYear / 12;
+const uint64_t kMonthsPerYear = 12;
+
+const uint64_t kDefaultTimeStepDur = cyclusYear / kMonthsPerYear;
 
 const uint64_t kDefaultSeed = 20160212;
 
@@ -249,6 +251,9 @@ class Context {
 
   /// Returns the current simulation timestep.
   virtual int time();
+
+  /// Returns a time shift between the simulation start time and another time stamp
+  int timeshift(int year, int month);
 
   /// Adds a package type to a simulation-wide accessible list.
   /// Agents should NOT add their own packages.
