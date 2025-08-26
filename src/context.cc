@@ -315,8 +315,8 @@ int Context::time() {
   return ti_->time();
 }
 
-int Context::timeshift(int year, int month) {
-  return ti_->timeshift(year, month);
+int Context::CalcTimeDiff(int year, int month) {
+  return ti_->CalcTimeDiff(year, month);
 }
 
 int Context::random() {

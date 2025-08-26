@@ -75,9 +75,9 @@ class Timer {
   /// @param year of alternate time stamp
   /// @param month of alternate time stamp
   ///
-  /// @return the timeshift between two times, in months
+  /// @return the difference between the simulation start time and another time
   /// @warning Only valid for times that occur after the simulation start time.
-  int timeshift(int year, int month);
+  int CalcTimeDiff(int year, int month);
 
  private:
   /// builds all agents queued for the current timestep.

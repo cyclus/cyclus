@@ -281,18 +281,18 @@ int Timer::dur() {
   return si_.duration;
 }
 
-int Timer::timeshift(int year, int month) {
+int Timer::CalcTimeDiff(int year, int month) {
 
-  int timeshift_ = 0;
+  int timediff_ = 0;
   if (year >= 0) {
-    timeshift_ += (year - si_.y0) * kMonthsPerYear;
+    timediff_ += (year - si_.y0) * kMonthsPerYear;
   }
   
   if (month >= 0) {
-    timeshift_ += si_.m0 - month;
+    timediff_ += si_.m0 - month;
   }
 
-  return timeshift_;
+  return timediff_;
 
 }
 
