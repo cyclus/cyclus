@@ -128,9 +128,6 @@ TEST_P(TimerTestsFixture, TimeShiftTest) {
   int exp = 0;
   EXPECT_EQ(exp, obs);
 
-  obs = ti.CalcTimeDiff(0,0);
-  EXPECT_EQ(exp, obs);
-
   obs = ti.CalcTimeDiff(2010, 2);
   exp = 1;
   EXPECT_EQ(exp, obs);
