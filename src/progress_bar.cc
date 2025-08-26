@@ -13,13 +13,13 @@ bool ProgressBar::enabled_ = true;
 namespace {
   bool CheckProgressBarEnabled() {
     const char* env_var = std::getenv("CYCLUS_PROGRESS_BAR");
-    if (env_var != NULL) {
+    if (env_var) {
       std::string val(env_var);
-      return (val == "1" || val == "true" || val == "yes" || val == "on");
+      // Only disable if explicitly set to disable values
+      return !(val == "0" || val == "false" || val == "no" || val == "off");
     }
     
-    // Check if verbose logging is enabled - disable progress bar if so
-    // LEV_INFO1 is the default level, so if we're above that, we're in verbose mode
+    // Check if verbose logging is enabled - disable progress bar if above WARN
     if (cyclus::Logger::ReportLevel() > cyclus::LEV_WARN) {
       return false;
     }
@@ -63,10 +63,6 @@ void ProgressBar::Update(int current) {
   }
 }
 
-void ProgressBar::Increment() {
-  Update(current_ + 1);
-}
-
 void ProgressBar::SetTotal(int total) {
   if (total <= 0) {
     total = 1;  // Prevent division by zero
@@ -77,16 +73,12 @@ void ProgressBar::SetTotal(int total) {
   }
 }
 
-void ProgressBar::SetCurrent(int current) {
-  Update(current);
-}
-
 void ProgressBar::Clear() {
   if (!IsEnabled() || !is_drawn_) {
     return;
   }
 
-  // Clear the line and move to next line
+  // Clear the line and move to next line with ASCII escape codes
   std::cout << "\r\033[K" << std::endl;
   is_drawn_ = false;
 }
@@ -95,7 +87,7 @@ double ProgressBar::GetPercentage() const {
   if (total_ <= 0) {
     return 0.0;
   }
-  return (static_cast<double>(current_) / total_) * 100.0;
+  return (static_cast<double>(current_) / total_) * 100.0; //100%
 }
 
 bool ProgressBar::IsEnabled() {
@@ -165,16 +157,6 @@ void ProgressBar::Draw() {
   }
 }
 
-void ProgressBar::MoveUp() {
-  std::cout << "\033[A" << std::flush;
-}
 
-void ProgressBar::MoveDown() {
-  std::cout << "\033[B" << std::flush;
-}
-
-void ProgressBar::ClearLine() {
-  std::cout << "\r\033[K" << std::flush;
-}
 
 }  // namespace cyclus
