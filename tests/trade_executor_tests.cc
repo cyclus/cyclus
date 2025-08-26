@@ -2,6 +2,7 @@
 #include <set>
 #include <utility>
 #include <vector>
+#include <sstream>
 
 #include <gtest/gtest.h>
 
@@ -14,21 +15,14 @@
 #include "test_context.h"
 #include "test_agents/test_facility.h"
 #include "test_trader.h"
+#include "self_trading_test_facility.h"
 #include "trade.h"
 #include "trade_executor.h"
 #include "trader.h"
+#include "pyne.h"
 
-using cyclus::Bid;
-using cyclus::Context;
-using cyclus::Material;
-using cyclus::Agent;
-using cyclus::Request;
-using cyclus::TestContext;
-using cyclus::TestObjFactory;
-using cyclus::TestTrader;
-using cyclus::Trade;
-using cyclus::TradeExecutor;
-using cyclus::Trader;
+using namespace cyclus;
+using pyne::nucname::id;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class TradeExecutorTests : public ::testing::Test {
@@ -168,22 +162,124 @@ TEST_F(TradeExecutorTests, NoThrowWriting) {
   EXPECT_NO_THROW(exec.RecordTrades(tc.get()));
 }
 
-// This test was a part of a previous iteration of Trade testing, but its not
-// clear if this throwing behavior is what we want. I'm leaving it here for now
-// in case it needs to be picked up again. MJG - 11/26/13
-// // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TEST(TradeTests, OfferThrow) {
-//   TestContext tc;
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class SelfTradingWarningTest : public ::testing::Test {
+ public:
+  virtual void SetUp() {
 
-//   Material::Ptr mat = get_mat();
-//   Receiver* r = new Receiver(tc.get(), mat);
-//   Request<Material>* req = Request<Material>::Create(mat, r);
+    tc_ = std::make_unique<TestContext>();
+    
+    facility_ = new SelfTradingTestFacility(tc_->get());
+    
+    facility_->Build(nullptr);
+    facility_->EnterNotify();
+    
+    CompMap v;
+    v[id("u235")] = 1;
+    double trade_amt = 100;
 
-//   Sender* s = new Sender(tc.get(), true);
-//   Bid<Material>* bid = Bid<Material>::Create(req, mat, s);
+    test_comp_ = Composition::CreateFromAtom(v);
+    test_mat_ = Material::CreateUntracked(trade_amt, test_comp_);
+  }
 
-//   Trade<Material> trade(req, bid, mat->quantity());
-//   EXPECT_THROW(cyclus::ExecuteTrade(trade), cyclus::ValueError);
-//   delete s;
-//   delete r;
-// }
+  virtual void TearDown() {
+    delete facility_;
+  }
+
+ protected:
+  std::unique_ptr<TestContext> tc_;
+  SelfTradingTestFacility* facility_;
+  Composition::Ptr test_comp_;
+  Material::Ptr test_mat_;
+  
+  // Test constants
+  static constexpr double kTestTradeAmount = 50.0;
+};
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
+  warn_as_error = true;
+
+  // Create a trade where the same facility is both supplier and requester
+  Request<Material>* req = 
+      Request<Material>::Create(test_mat_, facility_, "Uranium");
+  Bid<Material>* bid = 
+      Bid<Material>::Create(req, test_mat_, facility_);
+  
+  Trade<Material> trade(req, bid, kTestTradeAmount);
+  std::vector<Trade<Material>> trades;
+  trades.push_back(trade);
+  
+  // Execute the trade - this should trigger the warning
+  TradeExecutor<Material> executor(trades);
+  EXPECT_THROW(executor.ExecuteTrades(tc_->get()), cyclus::StateError);
+
+  // Clean up
+  warn_as_error = false;
+  delete bid;
+  delete req;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(SelfTradingWarningTest, NoWarningForDifferentAgents) {
+  // Create a second test facility
+  SelfTradingTestFacility* facility2 = new SelfTradingTestFacility(tc_->get());
+  facility2->Build(nullptr);
+  facility2->EnterNotify();
+  
+  warn_as_error = true;
+  
+  // Create a trade between different facilities
+  Request<Material>* req = 
+      Request<Material>::Create(test_mat_, facility2, "Uranium");
+  Bid<Material>* bid = 
+      Bid<Material>::Create(req, test_mat_, facility_);
+  
+  Trade<Material> trade(req, bid, kTestTradeAmount);
+  std::vector<Trade<Material>> trades;
+  trades.push_back(trade);
+  
+  // Execute the trade - this should NOT trigger the warning
+  TradeExecutor<Material> executor(trades);
+  EXPECT_NO_THROW(executor.ExecuteTrades(tc_->get()));
+  
+  // Clean up
+  warn_as_error = false;
+  delete bid;
+  delete req;
+  delete facility2;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(SelfTradingWarningTest, WarningIncludesCorrectAgentId) {
+  
+  warn_as_error = true;
+  
+  // Create a trade where the same facility is both supplier and requester
+  Request<Material>* req = 
+      Request<Material>::Create(test_mat_, facility_, "Uranium");
+  Bid<Material>* bid = 
+      Bid<Material>::Create(req, test_mat_, facility_);
+  
+  Trade<Material> trade(req, bid, kTestTradeAmount);
+  std::vector<Trade<Material>> trades;
+  trades.push_back(trade);
+  
+  
+  TradeExecutor<Material> executor(trades);
+
+  // Use a try/catch to check for the error message
+  try {
+  executor.ExecuteTrades(tc_->get());
+  FAIL() << "Expected error to be thrown";
+  }
+  catch (const cyclus::StateError& e) {
+    std::string expected_id = std::to_string(facility_->id());
+    EXPECT_TRUE(std::string(e.what()).find(expected_id) != std::string::npos);
+  }
+  
+  // Clean up
+  warn_as_error = false;
+  delete bid;
+  delete req;
+}
