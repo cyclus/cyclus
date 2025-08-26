@@ -25,7 +25,7 @@ void Timer::RunSim() {
   ExchangeManager<Product> genrsrc_manager(ctx_);
   
   // Initialize progress bar if not already done
-  if (progress_bar_ == NULL) {
+  if (!progress_bar_) {
     progress_bar_ = new ProgressBar(si_.duration, 50, true, true);
     // Set update frequency based on simulation duration
     if (si_.duration > 100) {
@@ -38,7 +38,7 @@ void Timer::RunSim() {
   
   while (time_ < si_.duration) {
     // Update progress bar
-    if (progress_bar_ != NULL) {
+    if (progress_bar_) {
       progress_bar_->Update(time_);
     }
     
@@ -73,7 +73,7 @@ void Timer::RunSim() {
   }
 
   // Finalize progress bar
-  if (progress_bar_ != NULL) {
+  if (progress_bar_) {
     progress_bar_->Update(time_ - 1);  // Update to final time
     progress_bar_->Clear();  // Clear the progress bar
   }
@@ -285,7 +285,7 @@ void Timer::Reset() {
   decom_queue_.clear();
   si_ = SimInfo(0);
   
-  if (progress_bar_ != NULL) {
+  if (progress_bar_) {
     delete progress_bar_;
     progress_bar_ = NULL;
   }
@@ -306,7 +306,7 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   }
 
   // Initialize progress bar
-  if (progress_bar_ != NULL) {
+  if (progress_bar_) {
     delete progress_bar_;
   }
   progress_bar_ = new ProgressBar(si.duration, 50, true, true);
