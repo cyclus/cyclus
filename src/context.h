@@ -253,7 +253,7 @@ class Context {
   virtual int time();
 
   /// Returns a time shift between the simulation start time and another time stamp
-  int timeshift(int year, int month);
+  int CalcTimeDiff(int year, int month);
 
   /// Adds a package type to a simulation-wide accessible list.
   /// Agents should NOT add their own packages.
