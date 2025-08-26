@@ -6,7 +6,7 @@ Since last release
 ====================
 
 **Added:**
-
+* Added progress bar to the simulation loop (#1912)
 * Added clang-format protections to .cycpp.h and query_backend.h files, modified .clang-format file (#1880)
 * Added a function to facility_cost.cycpp.h to calculate unit price of a DRE bid (#1870 ,#1877, #1884, #1889)
 * Added code injection for matl_buy/sell_policy (#1866)
