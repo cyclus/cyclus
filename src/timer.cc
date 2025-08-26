@@ -299,7 +299,7 @@ int Timer::CalcTimeDiff(int year, int month) {
   }
   
   if (month >= 0) {
-    timediff_ += si_.m0 - month;
+    timediff_ += month - si_.m0;
   }
 
   return timediff_;
