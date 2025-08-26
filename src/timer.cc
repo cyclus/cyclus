@@ -23,7 +23,27 @@ void Timer::RunSim() {
 
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
+
+  // Initialize progress bar if not already done
+  if (!progress_bar_) {
+    progress_bar_ = new ProgressBar(si_.duration, 50, true, true);
+    // Set update frequency based on simulation duration
+    if (si_.duration > 100) {
+      progress_bar_->SetUpdateFrequency(
+          10);  // Update every 10 timesteps for long simulations
+    } else if (si_.duration > 20) {
+      progress_bar_->SetUpdateFrequency(
+          5);  // Update every 5 timesteps for medium simulations
+    }
+    // For short simulations, update every timestep (frequency = 1)
+  }
+
   while (time_ < si_.duration) {
+    // Update progress bar
+    if (progress_bar_) {
+      progress_bar_->Update(time_);
+    }
+
     CLOG(LEV_INFO1) << "Current time: " << time_;
 
     if (want_snapshot_) {
@@ -52,6 +72,12 @@ void Timer::RunSim() {
     if (want_kill_) {
       break;
     }
+  }
+
+  // Finalize progress bar
+  if (progress_bar_) {
+    progress_bar_->Update(time_ - 1);  // Update to final time
+    progress_bar_->Clear();            // Clear the progress bar
   }
 
   ctx_->NewDatum("Finish")
@@ -260,6 +286,11 @@ void Timer::Reset() {
   build_queue_.clear();
   decom_queue_.clear();
   si_ = SimInfo(0);
+
+  if (progress_bar_) {
+    delete progress_bar_;
+    progress_bar_ = NULL;
+  }
 }
 
 void Timer::Initialize(Context* ctx, SimInfo si) {
@@ -275,12 +306,39 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   if (si.branch_time > -1) {
     time_ = si.branch_time;
   }
+
+  // Initialize progress bar
+  if (progress_bar_) {
+    delete progress_bar_;
+  }
+  progress_bar_ = new ProgressBar(si.duration, 50, true, true);
+  // Set update frequency based on simulation duration
+  if (si.duration > 100) {
+    progress_bar_->SetUpdateFrequency(
+        10);  // Update every 10 timesteps for long simulations
+  } else if (si.duration > 20) {
+    progress_bar_->SetUpdateFrequency(
+        5);  // Update every 5 timesteps for medium simulations
+  }
+  // For short simulations, update every timestep (frequency = 1)
 }
 
 int Timer::dur() {
   return si_.duration;
 }
 
-Timer::Timer() : time_(0), si_(0), want_snapshot_(false), want_kill_(false) {}
+Timer::Timer()
+    : time_(0),
+      si_(0),
+      want_snapshot_(false),
+      want_kill_(false),
+      progress_bar_(NULL) {}
+
+Timer::~Timer() {
+  if (progress_bar_ != NULL) {
+    delete progress_bar_;
+    progress_bar_ = NULL;
+  }
+}
 
 }  // namespace cyclus

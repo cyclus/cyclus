@@ -11,6 +11,7 @@
 #include "infile_tree.h"
 #include "time_listener.h"
 #include "comp_math.h"
+#include "progress_bar.h"
 
 class SimInitTest;
 
@@ -24,6 +25,7 @@ class Timer {
 
  public:
   Timer();
+  ~Timer();
 
   /// Sets intial time-related parameters for the simulation.
   ///
@@ -118,6 +120,9 @@ class Timer {
 
   // std::map<time,std::vector<config> >
   std::map<int, std::vector<Agent*>> decom_queue_;
+
+  /// Progress bar for simulation progress
+  ProgressBar* progress_bar_;
 };
 
 }  // namespace cyclus
