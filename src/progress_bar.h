@@ -7,10 +7,11 @@
 
 namespace cyclus {
 
-/// @brief A progress bar class that displays progress at the bottom of the terminal
-/// while allowing other output to print above it.
+/// @brief A progress bar class that displays progress at the bottom of the
+/// terminal while allowing other output to print above it.
 ///
-/// The ProgressBar provides visual feedback on simulation progress with features like:
+/// The ProgressBar provides visual feedback on simulation progress with
+/// features like:
 /// - Visual progress bar with percentage and fraction display
 /// - Smart update frequency based on simulation duration
 /// - Automatic disabling when verbose logging is enabled
@@ -60,9 +61,9 @@ class ProgressBar {
   /// @param show_fraction Whether to show fraction (default: true)
   ///
   /// Creates a new progress bar with the specified parameters. The progress bar
-  /// will automatically check environment variables and verbose logging settings
-  /// to determine if it should be enabled.
-  ProgressBar(int total, int width = 50, bool show_percentage = true, 
+  /// will automatically check environment variables and verbose logging
+  /// settings to determine if it should be enabled.
+  ProgressBar(int total, int width = 50, bool show_percentage = true,
               bool show_fraction = true);
 
   /// @brief Destructor - ensures the progress bar is cleared from the terminal
@@ -114,7 +115,8 @@ class ProgressBar {
   static void SetEnabled(bool enabled);
 
   /// @brief Set the update frequency (only update every N calls)
-  /// @param frequency Update frequency (1 = every call, 10 = every 10th call, etc.)
+  /// @param frequency Update frequency (1 = every call, 10 = every 10th call,
+  /// etc.)
   ///
   /// Controls how often the progress bar updates its display. Higher values
   /// reduce output noise but make the progress bar less responsive. The Timer

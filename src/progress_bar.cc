@@ -11,24 +11,25 @@ bool ProgressBar::enabled_ = true;
 
 // Check environment variable for progress bar control
 namespace {
-  bool CheckProgressBarEnabled() {
-    const char* env_var = std::getenv("CYCLUS_PROGRESS_BAR");
-    if (env_var) {
-      std::string val(env_var);
-      // Only disable if explicitly set to disable values
-      return !(val == "0" || val == "false" || val == "no" || val == "off");
-    }
-    
-    // Check if verbose logging is enabled - disable progress bar if above WARN
-    if (cyclus::Logger::ReportLevel() > cyclus::LEV_WARN) {
-      return false;
-    }
-    
-    return true;  // Default to enabled
+bool CheckProgressBarEnabled() {
+  const char* env_var = std::getenv("CYCLUS_PROGRESS_BAR");
+  if (env_var) {
+    std::string val(env_var);
+    // Only disable if explicitly set to disable values
+    return !(val == "0" || val == "false" || val == "no" || val == "off");
   }
-}
 
-ProgressBar::ProgressBar(int total, int width, bool show_percentage, bool show_fraction)
+  // Check if verbose logging is enabled - disable progress bar if above WARN
+  if (cyclus::Logger::ReportLevel() > cyclus::LEV_WARN) {
+    return false;
+  }
+
+  return true;  // Default to enabled
+}
+}  // namespace
+
+ProgressBar::ProgressBar(int total, int width, bool show_percentage,
+                         bool show_fraction)
     : total_(total),
       current_(0),
       width_(width),
@@ -40,7 +41,7 @@ ProgressBar::ProgressBar(int total, int width, bool show_percentage, bool show_f
   if (total_ <= 0) {
     total_ = 1;  // Prevent division by zero
   }
-  
+
   // Check environment variable
   enabled_ = CheckProgressBarEnabled();
 }
@@ -55,7 +56,7 @@ void ProgressBar::Update(int current) {
   }
 
   current_ = std::max(0, std::min(current, total_));
-  
+
   // Check if we should update based on frequency
   update_counter_++;
   if (update_counter_ % update_frequency_ == 0 || current_ == total_) {
@@ -87,7 +88,7 @@ double ProgressBar::GetPercentage() const {
   if (total_ <= 0) {
     return 0.0;
   }
-  return (static_cast<double>(current_) / total_) * 100.0; //100%
+  return (static_cast<double>(current_) / total_) * 100.0;  // 100%
 }
 
 bool ProgressBar::IsEnabled() {
@@ -116,16 +117,16 @@ void ProgressBar::Draw() {
   // Calculate progress
   double percentage = GetPercentage();
   int filled_width = static_cast<int>((percentage / 100.0) * width_);
-  
+
   // Build the progress bar string
   std::stringstream ss;
   ss << "\r[";
-  
+
   // Add filled portion
   for (int i = 0; i < filled_width; ++i) {
     ss << "=";
   }
-  
+
   // Add current position indicator
   if (filled_width < width_) {
     ss << ">";
@@ -134,20 +135,20 @@ void ProgressBar::Draw() {
       ss << " ";
     }
   }
-  
+
   ss << "]";
-  
+
   // Add percentage and fraction if requested
   if (show_percentage_) {
     ss << " " << std::fixed << std::setprecision(1) << percentage << "%";
   }
-  
+
   if (show_fraction_) {
     ss << " (" << current_ << "/" << total_ << ")";
   }
-  
+
   std::string bar = ss.str();
-  
+
   // Only redraw if the bar has changed
   if (bar != last_bar_) {
     // Print the new bar and flush immediately
@@ -156,7 +157,5 @@ void ProgressBar::Draw() {
     last_bar_ = bar;
   }
 }
-
-
 
 }  // namespace cyclus
