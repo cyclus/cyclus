@@ -124,34 +124,34 @@ TEST_P(TimerTestsFixture, TimeShiftTest) {
 
   ti.Initialize(&ctx, cyclus::SimInfo(5));
 
-  int obs = ti.timeshift(-1,-1);
+  int obs = ti.CalcTimeDiff(-1,-1);
   int exp = 0;
   EXPECT_EQ(exp, obs);
 
-  obs = ti.timeshift(0,0);
+  obs = ti.CalcTimeDiff(0,0);
   EXPECT_EQ(exp, obs);
 
-  obs = ti.timeshift(2010, 2);
+  obs = ti.CalcTimeDiff(2010, 2);
   exp = 1;
   EXPECT_EQ(exp, obs);
 
-  obs = ti.timeshift(2011,1);
+  obs = ti.CalcTimeDiff(2011,1);
   exp = 12;
   EXPECT_EQ(exp, obs);
 
-  obs = ti.timeshift(2011,5);
+  obs = ti.CalcTimeDiff(2011,5);
   exp = 16;
   EXPECT_EQ(exp, obs);
 
-  obs = ti.timeshift(2009,1);
+  obs = ti.CalcTimeDiff(2009,1);
   exp = -12;
   EXPECT_EQ(exp, obs);
 
-  obs = ti.timeshift(2009,11);
+  obs = ti.CalcTimeDiff(2009,11);
   exp = -2;
   EXPECT_EQ(exp, obs);
 
-  obs = ti.timeshift(2008,6);
+  obs = ti.CalcTimeDiff(2008,6);
   exp = -19;
   EXPECT_EQ(exp, obs);
 
