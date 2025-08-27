@@ -14,6 +14,7 @@ namespace cyclus {
 // forward declare Material class to avoid full inclusion and dependency
 class Material;
 class Institution;
+class Region;
 
 /// @class Facility
 /// The Facility class is the abstract class/interface used by all
@@ -156,6 +157,14 @@ class Facility : public TimeListener, public Agent, public Trader {
   /// @brief default implementation for product trade acceptance
   virtual void AcceptProductTrades(
       const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {}
+
+  /// @brief Returns the region that contains this facility by traversing up the parent hierarchy
+  /// @return Pointer to the region containing this facility, or nullptr if no region is found
+  cyclus::Region* GetRegion();
+
+  /// @brief Returns the institution that contains this facility by traversing up the parent hierarchy
+  /// @return Pointer to the institution containing this facility, or nullptr if no institution is found
+  cyclus::Institution* GetInstitution();
 };
 
 }  // namespace cyclus

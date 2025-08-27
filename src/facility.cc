@@ -54,4 +54,30 @@ bool Facility::CheckDecommissionCondition() {
   return true;
 }
 
+cyclus::Region* Facility::GetRegion() {
+  cyclus::Region* region = nullptr;
+  cyclus::Agent* current = this;
+  while (current) {
+    region = dynamic_cast<cyclus::Region*>(current);
+    if (region) {
+      break;  // Found a region
+    }
+    current = current->parent();
+  }
+  return region;
+}
+
+cyclus::Institution* Facility::GetInstitution() {
+  cyclus::Institution* institution = nullptr;
+  cyclus::Agent* current = this;
+  while (current) {
+    institution = dynamic_cast<cyclus::Institution*>(current);
+    if (institution) {
+      break;  // Found an institution
+    }
+    current = current->parent();
+  }
+  return institution;
+}
+
 }  // namespace cyclus

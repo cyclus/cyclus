@@ -65,6 +65,10 @@ class Institution : public Agent, public TimeListener {
 
   virtual void Tock();
 
+  /// @brief Returns the region that contains this institution by traversing up the parent hierarchy
+  /// @return Pointer to the region containing this institution, or nullptr if no region is found
+  Region* GetRegion();
+
  protected:
   void InitFrom(Institution* m);
 };

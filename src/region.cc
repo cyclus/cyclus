@@ -46,4 +46,9 @@ std::string Region::str() {
   return s;
 }
 
+Region* Region::GetRegion() {
+  // For a region, return itself since it is a region
+  return this;
+}
+
 }  // namespace cyclus

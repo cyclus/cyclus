@@ -20,3 +20,5 @@ TEST_P(InstitutionTests, Entity) {
   Json::Value a = institution_->annotations();
   EXPECT_STREQ("institution", a["entity"].asCString());
 }
+
+
