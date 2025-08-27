@@ -48,8 +48,7 @@ inline std::set<BidPortfolio<Product>::Ptr> QueryBids<Product>(
 
 template <class T>
 inline static void PopulateTradeResponses(
-    Trader* trader,
-    const std::vector<Trade<T>>& trades,
+    Trader* trader, const std::vector<Trade<T>>& trades,
     std::vector<std::pair<Trade<T>, typename T::Ptr>>& responses) {
   throw StateError(
       "Non-specialized version of "
@@ -58,16 +57,14 @@ inline static void PopulateTradeResponses(
 
 template <>
 inline void PopulateTradeResponses<Material>(
-    Trader* trader,
-    const std::vector<Trade<Material>>& trades,
+    Trader* trader, const std::vector<Trade<Material>>& trades,
     std::vector<std::pair<Trade<Material>, Material::Ptr>>& responses) {
   dynamic_cast<Trader*>(trader)->GetMatlTrades(trades, responses);
 }
 
 template <>
 inline void PopulateTradeResponses<Product>(
-    Trader* trader,
-    const std::vector<Trade<Product>>& trades,
+    Trader* trader, const std::vector<Trade<Product>>& trades,
     std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {
   trader->GetProductTrades(trades, responses);
 }

@@ -22,8 +22,7 @@ struct CommodInfo {
 class CommodityProducer : public AgentManaged {
  public:
   CommodityProducer(double default_capacity = 0,
-                    double default_cost = kModifierLimit,
-                    Agent* agent = NULL);
+                    double default_cost = kModifierLimit, Agent* agent = NULL);
   virtual ~CommodityProducer();
 
   /// @param commodity the commodity in question

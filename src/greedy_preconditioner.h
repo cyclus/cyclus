@@ -9,13 +9,11 @@
 namespace cyclus {
 
 /// @returns the node's weight given the node and commodity weight
-double NodeWeight(ExchangeNode::Ptr n,
-                  std::map<std::string, double>* weights,
+double NodeWeight(ExchangeNode::Ptr n, std::map<std::string, double>* weights,
                   double avg_pref);
 
 /// @returns average RequestGroup weight
-double GroupWeight(RequestGroup::Ptr g,
-                   std::map<std::string, double>* weights,
+double GroupWeight(RequestGroup::Ptr g, std::map<std::string, double>* weights,
                    std::map<ExchangeNode::Ptr, double>* avg_prefs);
 
 /// @returns the average preference across arcs for a node
