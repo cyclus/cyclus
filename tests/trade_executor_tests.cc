@@ -271,8 +271,7 @@ TEST_F(SelfTradingWarningTest, WarningIncludesCorrectAgentId) {
 
   // Use a try/catch to check for the error message
   try {
-  executor.ExecuteTrades(tc_->get());
-  FAIL() << "Expected error to be thrown";
+  EXPECT_THROW(executor.ExecuteTrades(tc_->get()), cyclus::StateError);
   }
   catch (const cyclus::StateError& e) {
     std::string expected_id = std::to_string(facility_->id());
