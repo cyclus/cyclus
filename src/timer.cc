@@ -281,6 +281,22 @@ int Timer::dur() {
   return si_.duration;
 }
 
+int Timer::CalcTimeDiff(int year, int month) {
+
+  int timediff_ = 0;
+  if (year >= 0) {
+    timediff_ += (year - si_.y0) * kMonthsPerYear;
+  }
+  
+  if (month >= 0) {
+    timediff_ += month - si_.m0;
+  }
+
+  return timediff_;
+
+}
+
+
 Timer::Timer() : time_(0), si_(0), want_snapshot_(false), want_kill_(false) {}
 
 }  // namespace cyclus
