@@ -158,12 +158,16 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual void AcceptProductTrades(
       const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {}
 
-  /// @brief Returns the region that contains this facility by traversing up the parent hierarchy
-  /// @return Pointer to the region containing this facility, or nullptr if no region is found
+  /// @brief Returns the region that contains this facility by traversing up the
+  /// parent hierarchy
+  /// @return Pointer to the region containing this facility, or nullptr if no
+  /// region is found
   cyclus::Region* GetRegion();
 
-  /// @brief Returns the institution that contains this facility by traversing up the parent hierarchy
-  /// @return Pointer to the institution containing this facility, or nullptr if no institution is found
+  /// @brief Returns the institution that contains this facility by traversing
+  /// up the parent hierarchy
+  /// @return Pointer to the institution containing this facility, or nullptr if
+  /// no institution is found
   cyclus::Institution* GetInstitution();
 };
 
