@@ -173,23 +173,29 @@ class SelfTradingWarningTest : public ::testing::Test {
     
     facility_->Build(nullptr);
     facility_->EnterNotify();
+
+    // Create a second test facility
+    facility2_ = new SelfTradingTestFacility(tc_->get());
+    facility2_->Build(nullptr);
+    facility2_->EnterNotify();
     
     CompMap v;
     v[id("u235")] = 1;
     double trade_amt = 100;
 
-    test_comp_ = Composition::CreateFromAtom(v);
+    Composition::Ptr test_comp_ = Composition::CreateFromAtom(v);
     test_mat_ = Material::CreateUntracked(trade_amt, test_comp_);
   }
 
   virtual void TearDown() {
     delete facility_;
+    delete facility2_;
   }
 
  protected:
   std::unique_ptr<TestContext> tc_;
   SelfTradingTestFacility* facility_;
-  Composition::Ptr test_comp_;
+  SelfTradingTestFacility* facility2_;
   Material::Ptr test_mat_;
   
   // Test constants
@@ -222,16 +228,10 @@ TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SelfTradingWarningTest, NoWarningForDifferentAgents) {
-  // Create a second test facility
-  SelfTradingTestFacility* facility2 = new SelfTradingTestFacility(tc_->get());
-  facility2->Build(nullptr);
-  facility2->EnterNotify();
-  
-  warn_as_error = true;
   
   // Create a trade between different facilities
   Request<Material>* req = 
-      Request<Material>::Create(test_mat_, facility2, "Uranium");
+      Request<Material>::Create(test_mat_, facility2_, "Uranium");
   Bid<Material>* bid = 
       Bid<Material>::Create(req, test_mat_, facility_);
   
@@ -239,7 +239,9 @@ TEST_F(SelfTradingWarningTest, NoWarningForDifferentAgents) {
   std::vector<Trade<Material>> trades;
   trades.push_back(trade);
   
+  
   // Execute the trade - this should NOT trigger the warning
+  warn_as_error = true;
   TradeExecutor<Material> executor(trades);
   EXPECT_NO_THROW(executor.ExecuteTrades(tc_->get()));
   
@@ -247,13 +249,12 @@ TEST_F(SelfTradingWarningTest, NoWarningForDifferentAgents) {
   warn_as_error = false;
   delete bid;
   delete req;
-  delete facility2;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SelfTradingWarningTest, WarningIncludesCorrectAgentId) {
   
-  warn_as_error = true;
+  
   
   // Create a trade where the same facility is both supplier and requester
   Request<Material>* req = 
@@ -265,7 +266,7 @@ TEST_F(SelfTradingWarningTest, WarningIncludesCorrectAgentId) {
   std::vector<Trade<Material>> trades;
   trades.push_back(trade);
   
-  
+  warn_as_error = true;
   TradeExecutor<Material> executor(trades);
 
   // Use a try/catch to check for the error message
