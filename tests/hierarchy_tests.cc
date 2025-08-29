@@ -181,4 +181,56 @@ TEST_F(NestedHierarchyTests, DefaultLayerBehavior) {
   EXPECT_EQ(default_inst, converdyn_);
 }
 
+TEST_F(NestedHierarchyTests, FacilityLayerAPI) {
+  // Test the new layer API for facilities
+  // Default (layer 1) should return closest region/institution
+  Region* default_region = conversion_facility_->GetRegion();
+  EXPECT_EQ(default_region, metropolis_);
+  
+  Institution* default_inst = conversion_facility_->GetInstitution();
+  EXPECT_EQ(default_inst, converdyn_);
+  
+  // Layer 2 should return second closest
+  Region* layer2_region = conversion_facility_->GetRegion(2);
+  EXPECT_EQ(layer2_region, illinois_);
+  
+  Institution* layer2_inst = conversion_facility_->GetInstitution(2);
+  EXPECT_EQ(layer2_inst, honeywell_);
+  
+  // Layer 3 should return third closest
+  Region* layer3_region = conversion_facility_->GetRegion(3);
+  EXPECT_EQ(layer3_region, usa_);
+  
+  // Layer -1 should return most distant
+  Region* last_region = conversion_facility_->GetRegion(-1);
+  EXPECT_EQ(last_region, usa_);
+  
+  Institution* last_inst = conversion_facility_->GetInstitution(-1);
+  EXPECT_EQ(last_inst, honeywell_);
+}
+
+TEST_F(NestedHierarchyTests, RegionGetRegion) {
+  // Test that regions can find their parent regions
+  // Metropolis should find Illinois as its parent region (layer 1)
+  Region* metropolis_parent = metropolis_->GetRegion(1);
+  EXPECT_EQ(metropolis_parent, illinois_);
+  
+  // Illinois should find USA as its parent region (layer 1)
+  Region* illinois_parent = illinois_->GetRegion(1);
+  EXPECT_EQ(illinois_parent, usa_);
+  
+  // USA should find nullptr (no parent region)
+  Region* usa_parent = usa_->GetRegion(1);
+  EXPECT_EQ(usa_parent, nullptr);
+  
+  // Test layer functionality for regions
+  // From Metropolis, layer 2 should find USA
+  Region* metropolis_grandparent = metropolis_->GetRegion(2);
+  EXPECT_EQ(metropolis_grandparent, usa_);
+  
+  // From Metropolis, layer -1 should find USA (most distant)
+  Region* metropolis_root = metropolis_->GetRegion(-1);
+  EXPECT_EQ(metropolis_root, usa_);
+}
+
 }  // namespace cyclus

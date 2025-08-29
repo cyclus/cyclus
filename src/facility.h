@@ -158,17 +158,19 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual void AcceptProductTrades(
       const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {}
 
-  /// @brief Returns the region that contains this facility by traversing up the
+  /// @brief Returns the nth region that contains this facility by traversing up the
   /// parent hierarchy
-  /// @return Pointer to the region containing this facility, or nullptr if no
+  /// @param layer The layer to find (1-indexed). Use -1 for the last/most distant region
+  /// @return Pointer to the nth region containing this facility, or nullptr if no
   /// region is found
-  Region* GetRegion();
+  Region* GetRegion(int layer = 1);
 
-  /// @brief Returns the institution that contains this facility by traversing
+  /// @brief Returns the nth institution that contains this facility by traversing
   /// up the parent hierarchy
-  /// @return Pointer to the institution containing this facility, or nullptr if
+  /// @param layer The layer to find (1-indexed). Use -1 for the last/most distant institution
+  /// @return Pointer to the nth institution containing this facility, or nullptr if
   /// no institution is found
-  Institution* GetInstitution();
+  Institution* GetInstitution(int layer = 1);
 };
 
 }  // namespace cyclus

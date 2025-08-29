@@ -95,6 +95,13 @@ class Region : public Agent, public TimeListener {
 
   virtual void Tock() {}
 
+  /// @brief Returns the nth region that contains this region by traversing up the
+  /// parent hierarchy
+  /// @param layer The layer to find (1-indexed). Use -1 for the last/most distant region
+  /// @return Pointer to the nth region containing this region, or nullptr if no
+  /// region is found
+  Region* GetRegion(int layer = 1);
+
  protected:
   void InitFrom(Region* m);
 };

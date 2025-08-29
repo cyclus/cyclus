@@ -65,11 +65,12 @@ class Institution : public Agent, public TimeListener {
 
   virtual void Tock();
 
-  /// @brief Returns the region that contains this institution by traversing up
+  /// @brief Returns the nth region that contains this institution by traversing up
   /// the parent hierarchy
-  /// @return Pointer to the region containing this institution, or nullptr if
+  /// @param layer The layer to find (1-indexed). Use -1 for the last/most distant region
+  /// @return Pointer to the nth region containing this institution, or nullptr if
   /// no region is found
-  Region* GetRegion();
+  Region* GetRegion(int layer = 1);
 
  protected:
   void InitFrom(Institution* m);

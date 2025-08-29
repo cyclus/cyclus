@@ -59,8 +59,8 @@ void Institution::Tock() {
   }
 }
 
-Region* Institution::GetRegion() {
-  return dynamic_cast<Region*>(GetAncestorOfKind("Region"));
+Region* Institution::GetRegion(int layer) {
+  return dynamic_cast<Region*>(GetAncestorOfKind("Region", layer));
 }
 
 }  // namespace cyclus

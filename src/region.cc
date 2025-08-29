@@ -46,4 +46,8 @@ std::string Region::str() {
   return s;
 }
 
+Region* Region::GetRegion(int layer) {
+  return dynamic_cast<Region*>(GetAncestorOfKind("Region", layer));
+}
+
 }  // namespace cyclus

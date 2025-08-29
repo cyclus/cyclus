@@ -54,12 +54,12 @@ bool Facility::CheckDecommissionCondition() {
   return true;
 }
 
-Region* Facility::GetRegion() {
-  return dynamic_cast<Region*>(GetAncestorOfKind("Region"));
+Region* Facility::GetRegion(int layer) {
+  return dynamic_cast<Region*>(GetAncestorOfKind("Region", layer));
 }
 
-Institution* Facility::GetInstitution() {
-  return dynamic_cast<Institution*>(GetAncestorOfKind("Inst"));
+Institution* Facility::GetInstitution(int layer) {
+  return dynamic_cast<Institution*>(GetAncestorOfKind("Inst", layer));
 }
 
 }  // namespace cyclus

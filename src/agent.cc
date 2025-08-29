@@ -228,7 +228,8 @@ void Agent::AddToTable() {
 }
 
 Agent* Agent::GetAncestorOfKind(std::string kind, int layer) {
-  Agent* current = this;
+  // start from parent to avoid self in sub-hierarchy
+  Agent* current = parent(); 
   std::vector<Agent*> matches;
   
   // Collect all ancestors of the specified kind (closest to farthest)
