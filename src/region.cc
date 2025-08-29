@@ -46,7 +46,7 @@ std::string Region::str() {
   return s;
 }
 
-Region* Region::GetRegion(int layer) {
+Region* Region::GetParentRegion(int layer) {
   return dynamic_cast<Region*>(GetAncestorOfKind("Region", layer));
 }
 

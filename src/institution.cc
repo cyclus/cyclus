@@ -59,7 +59,7 @@ void Institution::Tock() {
   }
 }
 
-Region* Institution::GetRegion(int layer) {
+Region* Institution::GetParentRegion(int layer) {
   return dynamic_cast<Region*>(GetAncestorOfKind("Region", layer));
 }
 
@@ -69,6 +69,10 @@ std::vector<Region*> Institution::GetAllParentRegions() {
 
 std::vector<Institution*> Institution::GetAllParentInstitutions() {
   return GetAllAncestorsOfType<Institution>("Inst");
+}
+
+Institution* Institution::GetParentInstitution(int layer) {
+  return dynamic_cast<Institution*>(GetAncestorOfKind("Inst", layer));
 }
 
 }  // namespace cyclus

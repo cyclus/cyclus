@@ -65,12 +65,10 @@ class Institution : public Agent, public TimeListener {
 
   virtual void Tock();
 
-  /// @brief Returns the nth region that contains this institution by traversing up
-  /// the parent hierarchy
+  /// @brief Returns the nth parent region by traversing up the parent hierarchy
   /// @param layer The layer to find (1-indexed). Use -1 for the last/most distant region
-  /// @return Pointer to the nth region containing this institution, or nullptr if
-  /// no region is found
-  Region* GetRegion(int layer = 1);
+  /// @return Pointer to the nth parent region, or nullptr if no parent region is found
+  Region* GetParentRegion(int layer = 1);
 
   /// @brief Returns all parent regions by traversing up the hierarchy
   /// @return Vector of all parent regions, ordered from closest to farthest
@@ -79,6 +77,11 @@ class Institution : public Agent, public TimeListener {
   /// @brief Returns all parent institutions by traversing up the hierarchy
   /// @return Vector of all parent institutions, ordered from closest to farthest
   std::vector<Institution*> GetAllParentInstitutions();
+
+  /// @brief Returns the nth parent institution by traversing up the parent hierarchy
+  /// @param layer The layer to find (1-indexed). Use -1 for the last/most distant institution
+  /// @return Pointer to the nth parent institution, or nullptr if no parent institution is found
+  Institution* GetParentInstitution(int layer = 1);
 
  protected:
   void InitFrom(Institution* m);

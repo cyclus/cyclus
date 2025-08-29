@@ -158,19 +158,15 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual void AcceptProductTrades(
       const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {}
 
-  /// @brief Returns the nth region that contains this facility by traversing up the
-  /// parent hierarchy
+  /// @brief Returns the nth parent region by traversing up the parent hierarchy
   /// @param layer The layer to find (1-indexed). Use -1 for the last/most distant region
-  /// @return Pointer to the nth region containing this facility, or nullptr if no
-  /// region is found
-  Region* GetRegion(int layer = 1);
+  /// @return Pointer to the nth parent region, or nullptr if no parent region is found
+  Region* GetParentRegion(int layer = 1);
 
-  /// @brief Returns the nth institution that contains this facility by traversing
-  /// up the parent hierarchy
+  /// @brief Returns the nth parent institution by traversing up the parent hierarchy
   /// @param layer The layer to find (1-indexed). Use -1 for the last/most distant institution
-  /// @return Pointer to the nth institution containing this facility, or nullptr if
-  /// no institution is found
-  Institution* GetInstitution(int layer = 1);
+  /// @return Pointer to the nth parent institution, or nullptr if no parent institution is found
+  Institution* GetParentInstitution(int layer = 1);
 
   /// @brief Returns all parent regions by traversing up the hierarchy
   /// @return Vector of all parent regions, ordered from closest to farthest
@@ -183,6 +179,11 @@ class Facility : public TimeListener, public Agent, public Trader {
   /// @brief Returns all parent facilities by traversing up the hierarchy
   /// @return Vector of all parent facilities, ordered from closest to farthest
   std::vector<Facility*> GetAllParentFacilities();
+
+  /// @brief Returns the nth parent facility by traversing up the parent hierarchy
+  /// @param layer The layer to find (1-indexed). Use -1 for the last/most distant facility
+  /// @return Pointer to the nth parent facility, or nullptr if no parent facility is found
+  Facility* GetParentFacility(int layer = 1);
 };
 
 }  // namespace cyclus
