@@ -60,16 +60,7 @@ void Institution::Tock() {
 }
 
 Region* Institution::GetRegion() {
-  cyclus::Region* region = nullptr;
-  cyclus::Agent* current = this;
-  while (current) {
-    region = dynamic_cast<cyclus::Region*>(current);
-    if (region) {
-      break;  // Found a region
-    }
-    current = current->parent();
-  }
-  return region;
+  return dynamic_cast<Region*>(GetAncestorOfKind("Region"));
 }
 
 }  // namespace cyclus

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "context.h"
 #include "error.h"
@@ -224,5 +225,22 @@ void Agent::AddToTable() {
       ->AddVal("Lifetime", lifetime_)
       ->AddVal("EnterTime", enter_time_)
       ->Record();
+}
+
+Agent* Agent::GetAncestorOfKind(std::string kind, int layer) {
+  Agent* current = this;
+  std::vector<Agent*> matches;
+  
+  // Collect all ancestors of the specified kind (closest to farthest)
+  while (current) {
+    if (current->kind() == kind) {
+      matches.push_back(current);
+    }
+    current = current->parent();
+  }
+  
+  // Handle layer access: -1 = last, 1+ = nth ancestor (1-indexed)
+  int index = (layer == -1) ? matches.size() - 1 : layer - 1;
+  return (index >= 0 && index < static_cast<int>(matches.size())) ? matches[index] : nullptr;
 }
 }  // namespace cyclus

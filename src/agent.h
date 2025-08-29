@@ -407,6 +407,22 @@ class Agent : public StateWrangler, virtual public Ider, public EconomicEntity {
   /// Returns a list of children this agent has
   inline const std::set<Agent*>& children() const { return children_; }
 
+  /// @brief Walks up the hierarchy to find the nth ancestor that matches `kind`
+  /// @param kind The kind string to search for (e.g., "Region", "Inst", "Facility")
+  /// @param layer The layer to find (1-indexed). Use -1 for the last/most distant ancestor
+  /// @return Pointer to the nth ancestor of the specified kind, or nullptr if none found
+  ///
+  /// @example
+  /// For hierarchy: USA -> Illinois -> Metropolis -> Honeywell -> ConverDyn -> ConversionFacility
+  /// From ConversionFacility:
+  /// - GetAncestorOfKind("Region", 1) returns Metropolis (closest region)
+  /// - GetAncestorOfKind("Region", 2) returns Illinois (second closest region)
+  /// - GetAncestorOfKind("Region", 3) returns USA (third closest region)
+  /// - GetAncestorOfKind("Region", -1) returns USA (most distant region)
+  /// - GetAncestorOfKind("Inst", 1) returns ConverDyn (closest institution)
+  /// - GetAncestorOfKind("Inst", 2) returns Honeywell (second closest institution)
+  Agent* GetAncestorOfKind(std::string kind, int layer = 1);
+
  protected:
   /// Initializes a agent by copying parameters from the passed agent m. This
   /// function must be implemented by all agents.  This function must call the

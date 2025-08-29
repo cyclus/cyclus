@@ -95,12 +95,6 @@ class Region : public Agent, public TimeListener {
 
   virtual void Tock() {}
 
-  /// @brief Returns the region that contains this region by traversing up the
-  /// parent hierarchy
-  /// @return Pointer to the region containing this region, or nullptr if no
-  /// region is found
-  Region* GetRegion();
-
  protected:
   void InitFrom(Region* m);
 };

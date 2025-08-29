@@ -55,29 +55,11 @@ bool Facility::CheckDecommissionCondition() {
 }
 
 Region* Facility::GetRegion() {
-  Region* region = nullptr;
-  Agent* current = this;
-  while (current) {
-    region = dynamic_cast<Region*>(current);
-    if (region) {
-      break;  // Found a region
-    }
-    current = current->parent();
-  }
-  return region;
+  return dynamic_cast<Region*>(GetAncestorOfKind("Region"));
 }
 
 Institution* Facility::GetInstitution() {
-  Institution* institution = nullptr;
-  Agent* current = this;
-  while (current) {
-    institution = dynamic_cast<Institution*>(current);
-    if (institution) {
-      break;  // Found an institution
-    }
-    current = current->parent();
-  }
-  return institution;
+  return dynamic_cast<Institution*>(GetAncestorOfKind("Inst"));
 }
 
 }  // namespace cyclus
