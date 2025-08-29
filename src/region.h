@@ -102,6 +102,10 @@ class Region : public Agent, public TimeListener {
   /// region is found
   Region* GetRegion(int layer = 1);
 
+  /// @brief Returns all parent regions by traversing up the hierarchy
+  /// @return Vector of all parent regions, ordered from closest to farthest
+  std::vector<Region*> GetAllParentRegions();
+
  protected:
   void InitFrom(Region* m);
 };

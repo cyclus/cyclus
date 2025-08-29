@@ -234,6 +234,7 @@ Agent* Agent::GetAncestorOfKind(std::string kind, int layer) {
   
   // Collect all ancestors of the specified kind (closest to farthest)
   while (current) {
+    // we need the if statement because of potential super-facilities
     if (current->kind() == kind) {
       matches.push_back(current);
     }
@@ -241,7 +242,26 @@ Agent* Agent::GetAncestorOfKind(std::string kind, int layer) {
   }
   
   // Handle layer access: -1 = last, 1+ = nth ancestor (1-indexed)
-  int index = (layer == -1) ? matches.size() - 1 : layer - 1;
-  return (index >= 0 && index < static_cast<int>(matches.size())) ? matches[index] : nullptr;
+  // Note: size_t is cleaner since that's what size() gives
+  size_t index = (layer == -1) ? matches.size() - 1 : layer - 1;
+  return (index < matches.size()) ? matches[index] : nullptr;
 }
+
+std::vector<Agent*> Agent::GetAllAncestorsOfKind(std::string kind) {
+  // start from parent to avoid self in sub-hierarchy
+  Agent* current = parent(); 
+  std::vector<Agent*> matches;
+  
+  // Collect all ancestors of the specified kind (closest to farthest)
+  while (current) {
+    if (current->kind() == kind) {
+      matches.push_back(current);
+    }
+    current = current->parent();
+  }
+  
+  return matches;
+}
+
+
 }  // namespace cyclus

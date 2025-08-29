@@ -171,6 +171,18 @@ class Facility : public TimeListener, public Agent, public Trader {
   /// @return Pointer to the nth institution containing this facility, or nullptr if
   /// no institution is found
   Institution* GetInstitution(int layer = 1);
+
+  /// @brief Returns all parent regions by traversing up the hierarchy
+  /// @return Vector of all parent regions, ordered from closest to farthest
+  std::vector<Region*> GetAllParentRegions();
+
+  /// @brief Returns all parent institutions by traversing up the hierarchy
+  /// @return Vector of all parent institutions, ordered from closest to farthest
+  std::vector<Institution*> GetAllParentInstitutions();
+
+  /// @brief Returns all parent facilities by traversing up the hierarchy
+  /// @return Vector of all parent facilities, ordered from closest to farthest
+  std::vector<Facility*> GetAllParentFacilities();
 };
 
 }  // namespace cyclus

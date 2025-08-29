@@ -62,4 +62,16 @@ Institution* Facility::GetInstitution(int layer) {
   return dynamic_cast<Institution*>(GetAncestorOfKind("Inst", layer));
 }
 
+std::vector<Region*> Facility::GetAllParentRegions() {
+  return GetAllAncestorsOfType<Region>("Region");
+}
+
+std::vector<Institution*> Facility::GetAllParentInstitutions() {
+  return GetAllAncestorsOfType<Institution>("Inst");
+}
+
+std::vector<Facility*> Facility::GetAllParentFacilities() {
+  return GetAllAncestorsOfType<Facility>("Facility");
+}
+
 }  // namespace cyclus

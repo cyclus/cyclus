@@ -40,9 +40,9 @@ class HierarchyTests : public ::testing::Test {
 class NestedHierarchyTests : public ::testing::Test {
  protected:
   virtual void SetUp() {
-    // Create a nested hierarchy: USA -> Illinois -> Metropolis -> Honeywell -> ConverDyn -> ConversionFacility
-    // This simulates the example: USA (region) -> Illinois (region) -> Metropolis (region) -> 
-    // Honeywell (institution) -> ConverDyn (institution) -> ConversionFacility (facility)
+    // Create a hierarchy with sub-facilities: 
+    // USA -> Illinois -> Metropolis -> Honeywell -> ConverDyn -> ConversionFacility -> StorageFacility
+    // This simulates: Region -> Region -> Region -> Institution -> Institution -> Facility -> SubFacility
     
     usa_ = new TestRegion(tc_.get());
     illinois_ = new TestRegion(tc_.get());
@@ -50,17 +50,20 @@ class NestedHierarchyTests : public ::testing::Test {
     honeywell_ = new TestInst(tc_.get());
     converdyn_ = new TestInst(tc_.get());
     conversion_facility_ = new TestFacility(tc_.get());
+    storage_facility_ = new TestFacility(tc_.get());
     
-    // Build the nested hierarchy
+    // Build the hierarchy with sub-facilities
     usa_->Build(nullptr);
     illinois_->Build(usa_);
     metropolis_->Build(illinois_);
     honeywell_->Build(metropolis_);
     converdyn_->Build(honeywell_);
     conversion_facility_->Build(converdyn_);
+    storage_facility_->Build(conversion_facility_);
   }
 
   virtual void TearDown() {
+    delete storage_facility_;
     delete conversion_facility_;
     delete converdyn_;
     delete honeywell_;
@@ -76,141 +79,135 @@ class NestedHierarchyTests : public ::testing::Test {
   TestInst* honeywell_;
   TestInst* converdyn_;
   TestFacility* conversion_facility_;
+  TestFacility* storage_facility_;
 };
 
-TEST_F(HierarchyTests, FacilityGetRegion) {
+TEST_F(HierarchyTests, BasicHierarchyTraversal) {
+  // Test basic hierarchy traversal for different entity types
+  
   // Test that a facility can find its region
   cyclus::Region* found_region = facility_->GetRegion();
   EXPECT_EQ(found_region, region_);
-}
-
-TEST_F(HierarchyTests, FacilityGetInstitution) {
+  
   // Test that a facility can find its institution
   cyclus::Institution* found_institution = facility_->GetInstitution();
   EXPECT_EQ(found_institution, institution_);
-}
-
-TEST_F(HierarchyTests, InstitutionGetRegion) {
+  
   // Test that an institution can find its region
-  cyclus::Region* found_region = institution_->GetRegion();
-  EXPECT_EQ(found_region, region_);
+  cyclus::Region* inst_region = institution_->GetRegion();
+  EXPECT_EQ(inst_region, region_);
 }
 
-TEST_F(HierarchyTests, GetAncestorOfKindLayer) {
-  // Test the new layer functionality
+TEST_F(HierarchyTests, LayerFunctionality) {
+  // Test layer functionality including valid and invalid layer numbers
+  
+  // Test valid layer functionality
   // Default layer (1) should return the closest ancestor
-  Agent* closest_region = facility_->GetAncestorOfKind("Region");
+  Region* closest_region = facility_->GetRegion();
   EXPECT_EQ(closest_region, region_);
   
   // Layer 1 should be the same as default
-  Agent* layer1_region = facility_->GetAncestorOfKind("Region", 1);
+  Region* layer1_region = facility_->GetRegion(1);
   EXPECT_EQ(layer1_region, region_);
   
   // Layer -1 should return the most distant ancestor (same as closest in this case)
-  Agent* last_region = facility_->GetAncestorOfKind("Region", -1);
+  Region* last_region = facility_->GetRegion(-1);
   EXPECT_EQ(last_region, region_);
   
   // Layer 2 should return nullptr since there's only one region
-  Agent* layer2_region = facility_->GetAncestorOfKind("Region", 2);
+  Region* layer2_region = facility_->GetRegion(2);
   EXPECT_EQ(layer2_region, nullptr);
-}
-
-TEST_F(HierarchyTests, GetAncestorOfKindInvalidLayer) {
+  
   // Test invalid layer numbers
-  Agent* invalid_layer = facility_->GetAncestorOfKind("Region", 0);
+  Region* invalid_layer = facility_->GetRegion(0);
   EXPECT_EQ(invalid_layer, nullptr);
   
-  Agent* negative_invalid = facility_->GetAncestorOfKind("Region", -2);
+  Region* negative_invalid = facility_->GetRegion(-2);
   EXPECT_EQ(negative_invalid, nullptr);
   
-  Agent* too_large = facility_->GetAncestorOfKind("Region", 999);
+  Region* too_large = facility_->GetRegion(999);
   EXPECT_EQ(too_large, nullptr);
 }
 
-TEST_F(NestedHierarchyTests, NestedRegionLayers) {
-  // Test the nested region scenario from the example
-  // From ConversionFacility, test different region layers
+TEST_F(NestedHierarchyTests, NestedLayerAccess) {
+  // Test nested layer access for different entity types in complex hierarchy
   
+  // Test nested region layers from StorageFacility
   // Layer 1: closest region (Metropolis)
-  Agent* layer1_region = conversion_facility_->GetAncestorOfKind("Region", 1);
+  Region* layer1_region = storage_facility_->GetRegion(1);
   EXPECT_EQ(layer1_region, metropolis_);
   
   // Layer 2: second closest region (Illinois)
-  Agent* layer2_region = conversion_facility_->GetAncestorOfKind("Region", 2);
+  Region* layer2_region = storage_facility_->GetRegion(2);
   EXPECT_EQ(layer2_region, illinois_);
   
   // Layer 3: third closest region (USA)
-  Agent* layer3_region = conversion_facility_->GetAncestorOfKind("Region", 3);
+  Region* layer3_region = storage_facility_->GetRegion(3);
   EXPECT_EQ(layer3_region, usa_);
   
   // Layer -1: most distant region (USA)
-  Agent* last_region = conversion_facility_->GetAncestorOfKind("Region", -1);
+  Region* last_region = storage_facility_->GetRegion(-1);
   EXPECT_EQ(last_region, usa_);
   
   // Layer 4: should be nullptr (no 4th region)
-  Agent* layer4_region = conversion_facility_->GetAncestorOfKind("Region", 4);
+  Region* layer4_region = storage_facility_->GetRegion(4);
   EXPECT_EQ(layer4_region, nullptr);
-}
-
-TEST_F(NestedHierarchyTests, NestedInstitutionLayers) {
-  // Test nested institution layers
   
+  // Test nested institution layers
   // Layer 1: closest institution (ConverDyn)
-  Agent* layer1_inst = conversion_facility_->GetAncestorOfKind("Inst", 1);
+  Institution* layer1_inst = storage_facility_->GetInstitution(1);
   EXPECT_EQ(layer1_inst, converdyn_);
   
   // Layer 2: second closest institution (Honeywell)
-  Agent* layer2_inst = conversion_facility_->GetAncestorOfKind("Inst", 2);
+  Institution* layer2_inst = storage_facility_->GetInstitution(2);
   EXPECT_EQ(layer2_inst, honeywell_);
   
   // Layer -1: most distant institution (Honeywell)
-  Agent* last_inst = conversion_facility_->GetAncestorOfKind("Inst", -1);
+  Institution* last_inst = storage_facility_->GetInstitution(-1);
   EXPECT_EQ(last_inst, honeywell_);
   
   // Layer 3: should be nullptr (no 3rd institution)
-  Agent* layer3_inst = conversion_facility_->GetAncestorOfKind("Inst", 3);
+  Institution* layer3_inst = storage_facility_->GetInstitution(3);
   EXPECT_EQ(layer3_inst, nullptr);
-}
-
-TEST_F(NestedHierarchyTests, DefaultLayerBehavior) {
+  
   // Test that default layer (1) works correctly
-  Agent* default_region = conversion_facility_->GetAncestorOfKind("Region");
+  Region* default_region = storage_facility_->GetRegion();
   EXPECT_EQ(default_region, metropolis_);
   
-  Agent* default_inst = conversion_facility_->GetAncestorOfKind("Inst");
+  Institution* default_inst = storage_facility_->GetInstitution();
   EXPECT_EQ(default_inst, converdyn_);
 }
 
-TEST_F(NestedHierarchyTests, FacilityLayerAPI) {
-  // Test the new layer API for facilities
+TEST_F(NestedHierarchyTests, FacilityAPI) {
+  // Test facility and region layer API functionality
+  
+  // Test facility layer API
   // Default (layer 1) should return closest region/institution
-  Region* default_region = conversion_facility_->GetRegion();
+  Region* default_region = storage_facility_->GetRegion();
   EXPECT_EQ(default_region, metropolis_);
   
-  Institution* default_inst = conversion_facility_->GetInstitution();
+  Institution* default_inst = storage_facility_->GetInstitution();
   EXPECT_EQ(default_inst, converdyn_);
   
   // Layer 2 should return second closest
-  Region* layer2_region = conversion_facility_->GetRegion(2);
+  Region* layer2_region = storage_facility_->GetRegion(2);
   EXPECT_EQ(layer2_region, illinois_);
   
-  Institution* layer2_inst = conversion_facility_->GetInstitution(2);
+  Institution* layer2_inst = storage_facility_->GetInstitution(2);
   EXPECT_EQ(layer2_inst, honeywell_);
   
   // Layer 3 should return third closest
-  Region* layer3_region = conversion_facility_->GetRegion(3);
+  Region* layer3_region = storage_facility_->GetRegion(3);
   EXPECT_EQ(layer3_region, usa_);
   
   // Layer -1 should return most distant
-  Region* last_region = conversion_facility_->GetRegion(-1);
+  Region* last_region = storage_facility_->GetRegion(-1);
   EXPECT_EQ(last_region, usa_);
   
-  Institution* last_inst = conversion_facility_->GetInstitution(-1);
+  Institution* last_inst = storage_facility_->GetInstitution(-1);
   EXPECT_EQ(last_inst, honeywell_);
-}
-
-TEST_F(NestedHierarchyTests, RegionGetRegion) {
-  // Test that regions can find their parent regions
+  
+  // Test region-to-region relationships
   // Metropolis should find Illinois as its parent region (layer 1)
   Region* metropolis_parent = metropolis_->GetRegion(1);
   EXPECT_EQ(metropolis_parent, illinois_);
@@ -231,6 +228,55 @@ TEST_F(NestedHierarchyTests, RegionGetRegion) {
   // From Metropolis, layer -1 should find USA (most distant)
   Region* metropolis_root = metropolis_->GetRegion(-1);
   EXPECT_EQ(metropolis_root, usa_);
+}
+
+TEST_F(NestedHierarchyTests, GetAllAPI) {
+  // Test the GetAllParent* methods from various perspectives in the hierarchy
+  
+  // Test from storage facility (deepest level)
+  std::vector<Region*> all_regions = storage_facility_->GetAllParentRegions();
+  EXPECT_EQ(all_regions.size(), 3);
+  EXPECT_EQ(all_regions[0], metropolis_);   // closest
+  EXPECT_EQ(all_regions[1], illinois_);     // second closest
+  EXPECT_EQ(all_regions[2], usa_);          // farthest
+  
+  std::vector<Institution*> all_institutions = storage_facility_->GetAllParentInstitutions();
+  EXPECT_EQ(all_institutions.size(), 2);
+  EXPECT_EQ(all_institutions[0], converdyn_);  // closest
+  EXPECT_EQ(all_institutions[1], honeywell_);  // farthest
+  
+  std::vector<Facility*> all_facilities = storage_facility_->GetAllParentFacilities();
+  EXPECT_EQ(all_facilities.size(), 1);
+  EXPECT_EQ(all_facilities[0], conversion_facility_);  // closest parent facility
+  
+  // Test from institution perspective
+  std::vector<Region*> inst_regions = converdyn_->GetAllParentRegions();
+  EXPECT_EQ(inst_regions.size(), 3);
+  EXPECT_EQ(inst_regions[0], metropolis_);
+  EXPECT_EQ(inst_regions[1], illinois_);
+  EXPECT_EQ(inst_regions[2], usa_);
+  
+  // Test institution's GetAllParentInstitutions
+  std::vector<Institution*> inst_institutions = converdyn_->GetAllParentInstitutions();
+  EXPECT_EQ(inst_institutions.size(), 1);
+  EXPECT_EQ(inst_institutions[0], honeywell_);
+  
+  // Test from region perspective
+  std::vector<Region*> metropolis_regions = metropolis_->GetAllParentRegions();
+  EXPECT_EQ(metropolis_regions.size(), 2);
+  EXPECT_EQ(metropolis_regions[0], illinois_);
+  EXPECT_EQ(metropolis_regions[1], usa_);
+  
+  std::vector<Region*> illinois_regions = illinois_->GetAllParentRegions();
+  EXPECT_EQ(illinois_regions.size(), 1);
+  EXPECT_EQ(illinois_regions[0], usa_);
+  
+  std::vector<Region*> usa_regions = usa_->GetAllParentRegions();
+  EXPECT_EQ(usa_regions.size(), 0);  // USA has no parent regions
+  
+  // Test from conversion facility perspective
+  std::vector<Facility*> conversion_parent_facilities = conversion_facility_->GetAllParentFacilities();
+  EXPECT_EQ(conversion_parent_facilities.size(), 0);  // Conversion facility has no parent facilities
 }
 
 }  // namespace cyclus

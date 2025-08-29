@@ -50,4 +50,8 @@ Region* Region::GetRegion(int layer) {
   return dynamic_cast<Region*>(GetAncestorOfKind("Region", layer));
 }
 
+std::vector<Region*> Region::GetAllParentRegions() {
+  return GetAllAncestorsOfType<Region>("Region");
+}
+
 }  // namespace cyclus

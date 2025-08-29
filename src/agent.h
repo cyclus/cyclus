@@ -423,6 +423,26 @@ class Agent : public StateWrangler, virtual public Ider, public EconomicEntity {
   /// - GetAncestorOfKind("Inst", 2) returns Honeywell (second closest institution)
   Agent* GetAncestorOfKind(std::string kind, int layer = 1);
 
+  /// @brief Returns all ancestors of the specified kind in order from closest to farthest
+  /// @param kind The kind string to search for (e.g., "Region", "Inst", "Facility")
+  /// @return Vector of all ancestors of the specified kind, ordered from closest to farthest
+  std::vector<Agent*> GetAllAncestorsOfKind(std::string kind);
+
+  /// @brief Template helper for getting all ancestors of a specific type
+  /// @tparam T The type to cast to (Region, Institution, or Facility)
+  /// @param kind The kind string to search for
+  /// @return Vector of all ancestors of the specified type
+  template<typename T>
+  std::vector<T*> GetAllAncestorsOfType(std::string kind) {
+    // Note: must be done in header file because of template instantiation
+    std::vector<Agent*> ancestors = GetAllAncestorsOfKind(kind);
+    std::vector<T*> typed_ancestors(ancestors.size());
+    for (size_t i = 0; i < ancestors.size(); ++i) {
+      typed_ancestors[i] = dynamic_cast<T*>(ancestors[i]);
+    }
+    return typed_ancestors;
+  }
+
  protected:
   /// Initializes a agent by copying parameters from the passed agent m. This
   /// function must be implemented by all agents.  This function must call the
