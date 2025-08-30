@@ -159,13 +159,18 @@ class Facility : public TimeListener, public Agent, public Trader {
       const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {}
 
   /// @brief Returns the nth parent region by traversing up the parent hierarchy
-  /// @param layer The layer to find (1-indexed). Use -1 for the last/most distant region
-  /// @return Pointer to the nth parent region, or nullptr if no parent region is found
+  /// @param layer The layer to find (1-indexed). Use -1 for the last/most
+  /// distant region
+  /// @return Pointer to the nth parent region, or nullptr if no parent region
+  /// is found
   Region* GetParentRegion(int layer = 1);
 
-  /// @brief Returns the nth parent institution by traversing up the parent hierarchy
-  /// @param layer The layer to find (1-indexed). Use -1 for the last/most distant institution
-  /// @return Pointer to the nth parent institution, or nullptr if no parent institution is found
+  /// @brief Returns the nth parent institution by traversing up the parent
+  /// hierarchy
+  /// @param layer The layer to find (1-indexed). Use -1 for the last/most
+  /// distant institution
+  /// @return Pointer to the nth parent institution, or nullptr if no parent
+  /// institution is found
   Institution* GetParentInstitution(int layer = 1);
 
   /// @brief Returns all parent regions by traversing up the hierarchy
@@ -173,16 +178,20 @@ class Facility : public TimeListener, public Agent, public Trader {
   std::vector<Region*> GetAllParentRegions();
 
   /// @brief Returns all parent institutions by traversing up the hierarchy
-  /// @return Vector of all parent institutions, ordered from closest to farthest
+  /// @return Vector of all parent institutions, ordered from closest to
+  /// farthest
   std::vector<Institution*> GetAllParentInstitutions();
 
   /// @brief Returns all parent facilities by traversing up the hierarchy
   /// @return Vector of all parent facilities, ordered from closest to farthest
   std::vector<Facility*> GetAllParentFacilities();
 
-  /// @brief Returns the nth parent facility by traversing up the parent hierarchy
-  /// @param layer The layer to find (1-indexed). Use -1 for the last/most distant facility
-  /// @return Pointer to the nth parent facility, or nullptr if no parent facility is found
+  /// @brief Returns the nth parent facility by traversing up the parent
+  /// hierarchy
+  /// @param layer The layer to find (1-indexed). Use -1 for the last/most
+  /// distant facility
+  /// @return Pointer to the nth parent facility, or nullptr if no parent
+  /// facility is found
   Facility* GetParentFacility(int layer = 1);
 };
 

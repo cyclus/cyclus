@@ -229,9 +229,9 @@ void Agent::AddToTable() {
 
 Agent* Agent::GetAncestorOfKind(std::string kind, int layer) {
   // start from parent to avoid self in sub-hierarchy
-  Agent* current = parent(); 
+  Agent* current = parent();
   std::vector<Agent*> matches;
-  
+
   // Collect all ancestors of the specified kind (closest to farthest)
   while (current) {
     // we need the if statement because of potential super-facilities
@@ -240,7 +240,7 @@ Agent* Agent::GetAncestorOfKind(std::string kind, int layer) {
     }
     current = current->parent();
   }
-  
+
   // Handle layer access: -1 = last, 1+ = nth ancestor (1-indexed)
   // Note: size_t is cleaner since that's what size() gives
   size_t index = (layer == -1) ? matches.size() - 1 : layer - 1;
@@ -249,9 +249,9 @@ Agent* Agent::GetAncestorOfKind(std::string kind, int layer) {
 
 std::vector<Agent*> Agent::GetAllAncestorsOfKind(std::string kind) {
   // start from parent to avoid self in sub-hierarchy
-  Agent* current = parent(); 
+  Agent* current = parent();
   std::vector<Agent*> matches;
-  
+
   // Collect all ancestors of the specified kind (closest to farthest)
   while (current) {
     if (current->kind() == kind) {
@@ -259,9 +259,8 @@ std::vector<Agent*> Agent::GetAllAncestorsOfKind(std::string kind) {
     }
     current = current->parent();
   }
-  
+
   return matches;
 }
-
 
 }  // namespace cyclus

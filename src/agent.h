@@ -408,31 +408,38 @@ class Agent : public StateWrangler, virtual public Ider, public EconomicEntity {
   inline const std::set<Agent*>& children() const { return children_; }
 
   /// @brief Walks up the hierarchy to find the nth ancestor that matches `kind`
-  /// @param kind The kind string to search for (e.g., "Region", "Inst", "Facility")
-  /// @param layer The layer to find (1-indexed). Use -1 for the last/most distant ancestor
-  /// @return Pointer to the nth ancestor of the specified kind, or nullptr if none found
+  /// @param kind The kind string to search for (e.g., "Region", "Inst",
+  /// "Facility")
+  /// @param layer The layer to find (1-indexed). Use -1 for the last/most
+  /// distant ancestor
+  /// @return Pointer to the nth ancestor of the specified kind, or nullptr if
+  /// none found
   ///
   /// @example
-  /// For hierarchy: USA -> Illinois -> Metropolis -> Honeywell -> ConverDyn -> ConversionFacility
-  /// From ConversionFacility:
+  /// For hierarchy: USA -> Illinois -> Metropolis -> Honeywell -> ConverDyn ->
+  /// ConversionFacility From ConversionFacility:
   /// - GetAncestorOfKind("Region", 1) returns Metropolis (closest region)
   /// - GetAncestorOfKind("Region", 2) returns Illinois (second closest region)
   /// - GetAncestorOfKind("Region", 3) returns USA (third closest region)
   /// - GetAncestorOfKind("Region", -1) returns USA (most distant region)
   /// - GetAncestorOfKind("Inst", 1) returns ConverDyn (closest institution)
-  /// - GetAncestorOfKind("Inst", 2) returns Honeywell (second closest institution)
+  /// - GetAncestorOfKind("Inst", 2) returns Honeywell (second closest
+  /// institution)
   Agent* GetAncestorOfKind(std::string kind, int layer = 1);
 
-  /// @brief Returns all ancestors of the specified kind in order from closest to farthest
-  /// @param kind The kind string to search for (e.g., "Region", "Inst", "Facility")
-  /// @return Vector of all ancestors of the specified kind, ordered from closest to farthest
+  /// @brief Returns all ancestors of the specified kind in order from closest
+  /// to farthest
+  /// @param kind The kind string to search for (e.g., "Region", "Inst",
+  /// "Facility")
+  /// @return Vector of all ancestors of the specified kind, ordered from
+  /// closest to farthest
   std::vector<Agent*> GetAllAncestorsOfKind(std::string kind);
 
   /// @brief Template helper for getting all ancestors of a specific type
   /// @tparam T The type to cast to (Region, Institution, or Facility)
   /// @param kind The kind string to search for
   /// @return Vector of all ancestors of the specified type
-  template<typename T>
+  template <typename T>
   std::vector<T*> GetAllAncestorsOfType(std::string kind) {
     // Note: must be done in header file because of template instantiation
     std::vector<Agent*> ancestors = GetAllAncestorsOfKind(kind);
