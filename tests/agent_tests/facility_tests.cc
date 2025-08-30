@@ -23,11 +23,11 @@ TEST_P(FacilityTests, Entity) {
   EXPECT_STREQ("facility", a["entity"].asCString());
 }
 
-TEST_P(FacilityTests, GetRegionAndInstitution) {
-  // Test that GetRegion and GetInstitution work correctly
+TEST_P(FacilityTests, GetParentRegionAndInstitution) {
+  // Test that GetParentRegion and GetParentInstitution work correctly
   // These methods should return nullptr when the facility is not in a hierarchy
-  cyclus::Region* region = facility_->GetRegion();
-  cyclus::Institution* institution = facility_->GetInstitution();
+  cyclus::Region* region = facility_->GetParentRegion();
+  cyclus::Institution* institution = facility_->GetParentInstitution();
   
   // When not in a hierarchy, both should return nullptr
   EXPECT_EQ(region, nullptr);
