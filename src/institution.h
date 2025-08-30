@@ -72,6 +72,14 @@ class Institution : public Agent, public TimeListener {
   /// is found
   Region* GetParentRegion(int layer = 1);
 
+  /// @brief Returns the nth parent institution by traversing up the parent
+  /// hierarchy
+  /// @param layer The layer to find (1-indexed). Use -1 for the last/most
+  /// distant institution
+  /// @return Pointer to the nth parent institution, or nullptr if no parent
+  /// institution is found
+  Institution* GetParentInstitution(int layer = 1);
+
   /// @brief Returns all parent regions by traversing up the hierarchy
   /// @return Vector of all parent regions, ordered from closest to farthest
   std::vector<Region*> GetAllParentRegions();
@@ -80,14 +88,6 @@ class Institution : public Agent, public TimeListener {
   /// @return Vector of all parent institutions, ordered from closest to
   /// farthest
   std::vector<Institution*> GetAllParentInstitutions();
-
-  /// @brief Returns the nth parent institution by traversing up the parent
-  /// hierarchy
-  /// @param layer The layer to find (1-indexed). Use -1 for the last/most
-  /// distant institution
-  /// @return Pointer to the nth parent institution, or nullptr if no parent
-  /// institution is found
-  Institution* GetParentInstitution(int layer = 1);
 
  protected:
   void InitFrom(Institution* m);

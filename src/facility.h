@@ -173,6 +173,14 @@ class Facility : public TimeListener, public Agent, public Trader {
   /// institution is found
   Institution* GetParentInstitution(int layer = 1);
 
+  /// @brief Returns the nth parent facility by traversing up the parent
+  /// hierarchy
+  /// @param layer The layer to find (1-indexed). Use -1 for the last/most
+  /// distant facility
+  /// @return Pointer to the nth parent facility, or nullptr if no parent
+  /// facility is found
+  Facility* GetParentFacility(int layer = 1);
+
   /// @brief Returns all parent regions by traversing up the hierarchy
   /// @return Vector of all parent regions, ordered from closest to farthest
   std::vector<Region*> GetAllParentRegions();
@@ -185,14 +193,6 @@ class Facility : public TimeListener, public Agent, public Trader {
   /// @brief Returns all parent facilities by traversing up the hierarchy
   /// @return Vector of all parent facilities, ordered from closest to farthest
   std::vector<Facility*> GetAllParentFacilities();
-
-  /// @brief Returns the nth parent facility by traversing up the parent
-  /// hierarchy
-  /// @param layer The layer to find (1-indexed). Use -1 for the last/most
-  /// distant facility
-  /// @return Pointer to the nth parent facility, or nullptr if no parent
-  /// facility is found
-  Facility* GetParentFacility(int layer = 1);
 };
 
 }  // namespace cyclus
