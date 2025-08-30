@@ -95,6 +95,17 @@ class Region : public Agent, public TimeListener {
 
   virtual void Tock() {}
 
+  /// @brief Returns the nth parent region by traversing up the parent hierarchy
+  /// @param layer The layer to find (1-indexed). Use -1 for the last/most
+  /// distant region
+  /// @return Pointer to the nth parent region, or nullptr if no parent region
+  /// is found
+  Region* GetParentRegion(int layer = 1);
+
+  /// @brief Returns all parent regions by traversing up the hierarchy
+  /// @return Vector of all parent regions, ordered from closest to farthest
+  std::vector<Region*> GetAllParentRegions();
+
  protected:
   void InitFrom(Region* m);
 };
