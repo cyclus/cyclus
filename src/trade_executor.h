@@ -119,14 +119,18 @@ template <class T> class TradeExecutor {
           // If we have access to the exchange context, use the adjusted
           // preference that was actually used by the solver
           if (ex_ctx) {
-            try {
-              adjusted_preference = ex_ctx->trader_prefs.at(
-                  trade.request->requester())[trade.request][trade.bid];
-            } catch (const std::out_of_range&) {
-              // If the preference is not found in the exchange context, fall
-              // back to the original preference This could happen if the trade was
-              // not part of the original exchange
+            auto trader_it = ex_ctx->trader_prefs.find(trade.request->requester());
+            if (trader_it != ex_ctx->trader_prefs.end()) {
+              auto request_it = trader_it->second.find(trade.request);
+              if (request_it != trader_it->second.end()) {
+                auto bid_it = request_it->second.find(trade.bid);
+                if (bid_it != request_it->second.end()) {
+                  adjusted_preference = bid_it->second;
+                }
+              }
             }
+            // If any of the keys are not found, adjusted_preference remains
+            // the original preference
           }
 
           ctx->NewDatum("Transactions")
