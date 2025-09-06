@@ -44,8 +44,7 @@ void GreedySolver::Init() {
                 graph_->request_groups().end(),
                 std::bind(&GreedySolver::GetCaps, this, std::placeholders::_1));
 
-  std::for_each(graph_->supply_groups().begin(),
-                graph_->supply_groups().end(),
+  std::for_each(graph_->supply_groups().begin(), graph_->supply_groups().end(),
                 std::bind(&GreedySolver::GetCaps, this, std::placeholders::_1));
 }
 

@@ -39,8 +39,7 @@ std::string Region::str() {
 
   s += " has insts: ";
   for (std::set<Agent*>::const_iterator inst = children().begin();
-       inst != children().end();
-       inst++) {
+       inst != children().end(); inst++) {
     s += (*inst)->prototype() + ", ";
   }
   return s;
