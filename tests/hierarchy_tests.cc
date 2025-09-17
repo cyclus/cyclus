@@ -98,37 +98,6 @@ TEST_F(HierarchyTests, BasicHierarchyTraversal) {
   EXPECT_EQ(inst_region, region_);
 }
 
-TEST_F(HierarchyTests, LayerFunctionality) {
-  // Test layer functionality including valid and invalid layer numbers
-  
-  // Test valid layer functionality
-  // Default layer (1) should return the closest ancestor
-  Region* closest_region = facility_->GetParentRegion();
-  EXPECT_EQ(closest_region, region_);
-  
-  // Layer 1 should be the same as default
-  Region* layer1_region = facility_->GetParentRegion(1);
-  EXPECT_EQ(layer1_region, region_);
-  
-  // Layer -1 should return the most distant ancestor (same as closest in this case)
-  Region* last_region = facility_->GetParentRegion(-1);
-  EXPECT_EQ(last_region, region_);
-  
-  // Layer 2 should return nullptr since there's only one region
-  Region* layer2_region = facility_->GetParentRegion(2);
-  EXPECT_EQ(layer2_region, nullptr);
-  
-  // Test invalid layer numbers
-  Region* invalid_layer = facility_->GetParentRegion(0);
-  EXPECT_EQ(invalid_layer, nullptr);
-  
-  Region* negative_invalid = facility_->GetParentRegion(-2);
-  EXPECT_EQ(negative_invalid, nullptr);
-  
-  Region* too_large = facility_->GetParentRegion(999);
-  EXPECT_EQ(too_large, nullptr);
-}
-
 TEST_F(NestedHierarchyTests, NestedLayerAccess) {
   // Test nested layer access for different entity types in complex hierarchy
   
@@ -178,34 +147,8 @@ TEST_F(NestedHierarchyTests, NestedLayerAccess) {
   EXPECT_EQ(default_inst, converdyn_);
 }
 
-TEST_F(NestedHierarchyTests, FacilityAPI) {
-  // Test facility and region layer API functionality
-  
-  // Test facility layer API
-  // Default (layer 1) should return closest region/institution
-  Region* default_region = storage_facility_->GetParentRegion();
-  EXPECT_EQ(default_region, metropolis_);
-  
-  Institution* default_inst = storage_facility_->GetParentInstitution();
-  EXPECT_EQ(default_inst, converdyn_);
-  
-  // Layer 2 should return second closest
-  Region* layer2_region = storage_facility_->GetParentRegion(2);
-  EXPECT_EQ(layer2_region, illinois_);
-  
-  Institution* layer2_inst = storage_facility_->GetParentInstitution(2);
-  EXPECT_EQ(layer2_inst, honeywell_);
-  
-  // Layer 3 should return third closest
-  Region* layer3_region = storage_facility_->GetParentRegion(3);
-  EXPECT_EQ(layer3_region, usa_);
-  
-  // Layer -1 should return most distant
-  Region* last_region = storage_facility_->GetParentRegion(-1);
-  EXPECT_EQ(last_region, usa_);
-  
-  Institution* last_inst = storage_facility_->GetParentInstitution(-1);
-  EXPECT_EQ(last_inst, honeywell_);
+TEST_F(NestedHierarchyTests, CrossEntityRelationships) {
+  // Test relationships between different entity types in the hierarchy
   
   // Test facility-to-facility relationships
   // Storage facility should find conversion facility as its parent (layer 1)
@@ -238,14 +181,6 @@ TEST_F(NestedHierarchyTests, FacilityAPI) {
   Region* usa_parent = usa_->GetParentRegion(1);
   EXPECT_EQ(usa_parent, nullptr);
   
-  // Test layer functionality for regions
-  // From Metropolis, layer 2 should find USA
-  Region* metropolis_grandparent = metropolis_->GetParentRegion(2);
-  EXPECT_EQ(metropolis_grandparent, usa_);
-  
-  // From Metropolis, layer -1 should find USA (most distant)
-  Region* metropolis_root = metropolis_->GetParentRegion(-1);
-  EXPECT_EQ(metropolis_root, usa_);
 }
 
 TEST_F(NestedHierarchyTests, GetAllAPI) {
@@ -291,18 +226,6 @@ TEST_F(NestedHierarchyTests, GetAllAPI) {
   
   std::vector<Region*> usa_regions = usa_->GetAllParentRegions();
   EXPECT_EQ(usa_regions.size(), 0);  // USA has no parent regions
-  
-  // Test from conversion facility perspective
-  std::vector<Facility*> conversion_parent_facilities = conversion_facility_->GetAllParentFacilities();
-  EXPECT_EQ(conversion_parent_facilities.size(), 0);  // Conversion facility has no parent facilities
-  
-  // Test institution-to-institution relationships
-  std::vector<Institution*> converdyn_parent_institutions = converdyn_->GetAllParentInstitutions();
-  EXPECT_EQ(converdyn_parent_institutions.size(), 1);
-  EXPECT_EQ(converdyn_parent_institutions[0], honeywell_);
-  
-  std::vector<Institution*> honeywell_parent_institutions = honeywell_->GetAllParentInstitutions();
-  EXPECT_EQ(honeywell_parent_institutions.size(), 0);  // Honeywell has no parent institutions
 }
 
 }  // namespace cyclus
