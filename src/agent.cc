@@ -230,17 +230,8 @@ void Agent::AddToTable() {
 Agent* Agent::GetAncestorOfKind(std::string kind, int layer) {
   // start from parent to avoid self in sub-hierarchy
   Agent* current = parent();
-  std::vector<Agent*> matches;
-
-  // Collect all ancestors of the specified kind (closest to farthest)
-  while (current) {
-    // we need the if statement because of potential super-facilities
-    if (current->kind() == kind) {
-      matches.push_back(current);
-    }
-    current = current->parent();
-  }
-
+  std::vector<Agent*> matches = GetAllAncestorsOfKind(kind);
+  
   // Handle layer access: -1 = last, 1+ = nth ancestor (1-indexed)
   // Note: size_t is cleaner since that's what size() gives
   size_t index = (layer == -1) ? matches.size() - 1 : layer - 1;
