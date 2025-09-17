@@ -9,6 +9,7 @@
 #include "agent.h"
 #include "bid.h"
 #include "context.h"
+#include "exchange_context.h"
 #include "material.h"
 #include "request.h"
 #include "resource_helpers.h"
@@ -86,6 +87,53 @@ class TradeExecutorTests : public ::testing::Test {
     delete s1;
   }
 };
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+class TradeExecutorDatabaseTests : public ::testing::Test {
+  protected:
+   virtual void SetUp() {
+     // Set up database backend for testing. NOTE, this approach gives us more
+     // fine grained control over the database than mock_sim, which would not
+     // allow the same kind of targeted function testing that we do here.
+     path_ = ":memory:";  // In-memory database
+     backend_ = new cyclus::SqliteBack(path_);
+     recorder_.RegisterBackend(backend_);
+     
+     timer_ = new cyclus::Timer();
+     ctx_ = new cyclus::Context(timer_, &recorder_);
+     
+     // Create test objects (s = supplier, r = requester)
+     s1_ = new TestTrader(ctx_, &fac_);
+     s2_ = new TestTrader(ctx_, &fac_);
+     r1_ = new TestTrader(ctx_, &fac_);
+     r2_ = new TestTrader(ctx_, &fac_);
+   }
+ 
+   virtual void TearDown() {
+     delete r2_;
+     delete r1_;
+     delete s2_;
+     delete s1_;
+     delete ctx_;
+     delete timer_;
+     recorder_.Close();
+     delete backend_;
+   }
+ 
+   // Database setup
+   std::string path_;
+   cyclus::SqliteBack* backend_;
+   cyclus::Recorder recorder_;
+   cyclus::Timer* timer_;
+   cyclus::Context* ctx_;
+   
+   // Test objects
+   TestObjFactory fac_;
+   TestTrader* s1_;
+   TestTrader* s2_;
+   TestTrader* r1_;
+   TestTrader* r2_;
+ };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(TradeExecutorTests, SupplierGrouping) {
@@ -242,5 +290,132 @@ TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
 
   // Clean up
   delete bid;
+  delete req;
+}
+
+TEST_F(TradeExecutorDatabaseTests, WrapperFunctionAndBasicRecording) {
+  
+  double orig_pref = 3.14;
+  double test_trade_amt = 1.0;
+  Request<Material>* req = Request<Material>::Create(fac_.mat, r1_);
+  Bid<Material>* bid = Bid<Material>::Create(req, fac_.mat, s1_, false, orig_pref);
+  
+  Trade<Material> trade(req, bid, test_trade_amt);
+  std::vector<Trade<Material>> trades;
+  trades.push_back(trade);
+  
+  TradeExecutor<Material> exec(trades);
+  
+  // Test wrapper function - should not throw (this also records trades automatically)
+  EXPECT_NO_THROW(exec.ExecuteTrades(ctx_));
+  recorder_.Flush();
+  
+  // Verify bid object retains original preference
+  EXPECT_DOUBLE_EQ(bid->preference(), orig_pref);
+  
+  // Query database and verify both preferences are the same (no ExchangeContext)
+  cyclus::QueryResult qr = backend_->Query("Transactions", NULL);
+  EXPECT_EQ(1, qr.rows.size()) << "Expected 1 transaction, got " << qr.rows.size();
+  
+  if (qr.rows.size() > 0) {
+    double recorded_orig_cost = qr.GetVal<double>("BidCost", 0);
+    double recorded_adj_cost = qr.GetVal<double>("AdjustedCost", 0);
+    
+    EXPECT_DOUBLE_EQ(recorded_orig_cost, 1.0 / orig_pref);
+    EXPECT_DOUBLE_EQ(recorded_adj_cost, 1.0 / orig_pref); 
+  }
+  
+  // Cleanup
+  delete bid;
+  delete req;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedPreferences) {
+  // Create one trade to test ExchangeContext functionality
+  double orig_pref = 2.5;
+  double trade_amt = 2.0;
+  
+  Request<Material>* req = Request<Material>::Create(fac_.mat, r1_);
+  Bid<Material>* bid = Bid<Material>::Create(req, fac_.mat, s1_, false, orig_pref);
+  
+  std::vector<Trade<Material>> trades;
+  trades.push_back(Trade<Material>(req, bid, trade_amt));
+  
+  // Create ExchangeContext with adjusted preferences
+  ExchangeContext<Material> ex_ctx;
+  ex_ctx.AddRequest(req);
+  ex_ctx.AddBid(bid);
+  
+  // Set different adjusted preference
+  double adj_pref = 4.2;
+  
+  // change the preference manually to new value
+  ex_ctx.trader_prefs[r1_][req][bid] = adj_pref;
+  
+  TradeExecutor<Material> exec(trades);
+  
+  // should not throw (this also records trades automatically)
+  EXPECT_NO_THROW(exec.ExecuteTrades(ctx_, &ex_ctx));
+  recorder_.Flush();
+  
+  // Verify original bid preference is preserved
+  EXPECT_DOUBLE_EQ(bid->preference(), orig_pref);
+  
+  // Verify adjusted preference in ExchangeContext
+  EXPECT_DOUBLE_EQ(ex_ctx.trader_prefs[r1_][req][bid], adj_pref);
+  
+  // Query database and verify different original vs adjusted preferences
+  cyclus::QueryResult qr = backend_->Query("Transactions", NULL);
+  EXPECT_EQ(1, qr.rows.size()) << "Expected 1 transaction, got " << qr.rows.size();
+  
+  if (qr.rows.size() > 0) {
+    double recorded_orig_cost = qr.GetVal<double>("BidCost", 0);
+    double recorded_adj_cost = qr.GetVal<double>("AdjustedCost", 0);
+    
+    // Verify the costs match the expected preferences
+    EXPECT_DOUBLE_EQ(recorded_orig_cost, 1.0 / orig_pref);
+    EXPECT_DOUBLE_EQ(recorded_adj_cost, 1.0 / adj_pref);
+    EXPECT_NE(recorded_orig_cost, recorded_adj_cost);  // Should be different
+  }
+  
+  // Cleanup
+  delete bid;
+  delete req;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(TradeExecutorDatabaseTests, MixedPreferenceScenarios) {
+  
+  double explicit_pref = 2.8;
+  double trade_amt = 1.0;
+  Request<Material>* req = Request<Material>::Create(fac_.mat, r1_);
+  
+  // One bid with explicit preference, one with NaN (default)
+  Bid<Material>* bid_explicit = Bid<Material>::Create(req, fac_.mat, s1_, false, explicit_pref);
+  Bid<Material>* bid_nan = Bid<Material>::Create(req, fac_.mat, s2_);  // Default NaN preference
+  
+  std::vector<Trade<Material>> trades;
+  trades.push_back(Trade<Material>(req, bid_explicit, trade_amt));
+  trades.push_back(Trade<Material>(req, bid_nan, trade_amt));
+  
+  TradeExecutor<Material> exec(trades);
+  
+  // Test wrapper function with mixed preferences - should not throw (this also records trades automatically)
+  EXPECT_NO_THROW(exec.ExecuteTrades(ctx_));
+  recorder_.Flush();
+  
+  // Verify preference preservation
+  EXPECT_DOUBLE_EQ(bid_explicit->preference(), explicit_pref);
+  EXPECT_TRUE(std::isnan(bid_nan->preference()));
+  
+  // Query database
+  cyclus::QueryResult qr = backend_->Query("Transactions", NULL);
+  EXPECT_EQ(2, qr.rows.size()) << "Expected 2 transactions, got " 
+            << qr.rows.size();
+  
+  // Cleanup
+  delete bid_nan;
+  delete bid_explicit;
   delete req;
 }

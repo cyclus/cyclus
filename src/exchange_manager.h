@@ -61,7 +61,7 @@ template <class T> class ExchangeManager {
 
     // execute trades!
     TradeExecutor<T> exec(trades);
-    exec.ExecuteTrades(ctx_);
+    exec.ExecuteTrades(ctx_, &exchng.ex_ctx());
   }
 
  private:

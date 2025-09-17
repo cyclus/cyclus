@@ -68,6 +68,14 @@ double annual_labor_cost;
     "units": "Dimensionless" \
     }
 double cost_override;
+
+#pragma cyclus var { \
+    "default": 0.0, \
+    "uilabel": "Property Insurance Rate as decimal", \
+    "range": [0.0, 1.0], \
+    "doc": "Property insurance rate for this facility as decimal (1% --> 0.01)" \
+    }
+double property_insurance_rate;
 // clang-format on
 
 // Must be done in a function so that we can access the user-defined values
@@ -78,100 +86,127 @@ std::unordered_map<std::string, double> GenerateParamList() const override {
       {"annual_operations_and_maintenance", annual_operations_and_maintenance},
       {"facility_operational_lifetime", facility_operational_lifetime},
       {"facility_depreciation_lifetime", facility_depreciation_lifetime},
-      {"annual_labor_cost", annual_labor_cost}};
+      {"annual_labor_cost", annual_labor_cost},
+      {"property_insurance_rate", property_insurance_rate}};
 
   return econ_params;
 }
 
+/// @brief Calculates the levelized unit cost of production, accounting for
+/// capital depreciation, O&M, labor, property taxes, and input costs.
+/// 
+/// unit_cost = cost_override if cost_override > 0, otherwise unit_cost = production_cost + material_cost
+/// 
+/// Where:
+/// - production_cost = levelized_fixed_costs/units_produced_annually + levelized_variable_costs + (initial_investment/units_produced_annually) * [property_tax_insurance_rate + (1/(1-income_tax_rate)) * PMT(facility_lifetime, tax_modified_rate_of_return, 1, 0) - (1/facility_lifetime) * (income_tax_rate/(1-income_tax_rate))]
+/// - material_cost = Unit Cost of Material (weighted average of input material unit values)
+/// - units_produced_annually = production_capacity * timesteps_per_year
+/// - levelized_fixed_costs = annual_operations_and_maintenance
+/// - levelized_variable_costs = annual_labor_cost
+/// - initial_investment = capital_cost
+/// - property_and_insurance_rate = property_tax_rate + property_insurance_rate
+/// - tax_modified_rate_of_return = (1-income_tax_rate)*bond_rate*bond_fraction + shareholder_rate*shareholder_fraction
+/// - income_tax_rate = Income Tax Rate
+/// - facility_lifetime = facility_depreciation_lifetime
+///
+/// The model assumes straight-line depreciation over the facility lifetime.
+///
+/// @param production_capacity Maximum throughput per timestep
+/// @param units_to_produce Number of units produced in the batch
+/// @param input_cost (Optional) Total cost of input materials used in the batch
+/// @return Estimated levelized cost to produce one unit
 double CalculateUnitCost(double production_capacity, double units_to_produce,
-                         double input_cost = 0.0) const {
+                         double input_cost_per_unit = 0.0) const {
   // Check if there's a cost override, and if so, use that
   if (cost_override > 0) {
-    return cost_override + input_cost / units_to_produce;
+    return cost_override + input_cost_per_unit;
   }
 
-  // Economic Parameters (declared like this because of scoping with try{})
-  double return_rate;
-  double cap_cost;
-  double annual_operations_and_maintenance;
-  double annual_labor_cost;
-  int operational_lifetime;
-  int taxable_lifetime;
-  double corporate_tax_rate;
-  double property_tax_rate;
+  // Economic Parameters (required for the try catch block)
+  double initial_investment;
+  double facility_lifetime;
+  double levelized_fixed_costs;
+  double levelized_variable_costs;
+  double property_and_insurance_rate;
+  double tax_modified_rate_of_return;
+  double income_tax_rate;
+  double bond_rate;
+  double bond_fraction;
+  double shareholder_rate;
+  double shareholder_fraction;
+  double property_insurance_rate;
 
-  // This allows us to exit gracefully if we can't find parameters. Separated
-  // by Facility/Institution/Region for more verbose errors.
+  // Get facility-level parameters
   try {
-    cap_cost = GetEconParameter("capital_cost");
-    annual_operations_and_maintenance =
-        GetEconParameter("annual_operations_and_maintenance");
-    annual_labor_cost = GetEconParameter("annual_labor_cost");
-    operational_lifetime =
-        static_cast<int>(GetEconParameter("facility_operational_lifetime"));
-    taxable_lifetime =
-        static_cast<int>(GetEconParameter("facility_taxable_lifetime"));
+    initial_investment = GetEconParameter("capital_cost");
+    facility_lifetime = GetEconParameter("facility_depreciation_lifetime");
+    property_insurance_rate = GetEconParameter("property_insurance_rate");
+
+    // Note: Since our fixed and variable costs are the same every timestep, we
+    // call them levelized here. If that changes in the future, we need to 
+    // change this to reflect actual levelization. Additionally, if more
+    // fixed and variable costs are added in the future, we need to change this
+    // to reflect that as well.
+    levelized_fixed_costs = GetEconParameter("annual_operations_and_maintenance");
+    levelized_variable_costs = GetEconParameter("annual_labor_cost");
+    
   } catch (const std::exception& e) {
     LOG(cyclus::LEV_INFO1, "CalculateUnitCost")
-        << prototype() << "failed to get financial_data_: " << e.what();
+        << prototype() << "failed to get facility financial_data_: " << e.what();
     return kDefaultUnitCost;
   }
 
+  // Get institution-level parameters
   try {
-    return_rate = parent()->GetEconParameter("minimum_acceptable_return_rate");
-    corporate_tax_rate =
-        parent()->GetEconParameter("corporate_income_tax_rate");
+    income_tax_rate = parent()->GetEconParameter("corporate_income_tax_rate");
+    bond_rate = parent()->GetEconParameter("bond_holders_rate_of_return");
+    bond_fraction = parent()->GetEconParameter("fraction_bond_financing");
+    shareholder_rate = parent()->GetEconParameter("share_holders_rate_of_return");
+    shareholder_fraction = parent()->GetEconParameter("fraction_private_capital");
   } catch (const std::exception& e) {
     LOG(cyclus::LEV_INFO1, "CalculateUnitCost")
         << prototype()
-        << "failed to get financial_data_ from: " << parent()->prototype()
-        << e.what();
+        << "failed to get institution financial_data_: " << e.what();
     return kDefaultUnitCost;
   }
 
+  // Get region-level parameters
   try {
-    property_tax_rate =
-        parent()->parent()->GetEconParameter("property_tax_rate");
+    double property_tax_rate = parent()->parent()->GetEconParameter("property_tax_rate");
+    property_and_insurance_rate = property_tax_rate + property_insurance_rate;
   } catch (const std::exception& e) {
     LOG(cyclus::LEV_INFO1, "CalculateUnitCost")
-        << prototype() << "failed to get financial_data_ from: "
-        << parent()->parent()->prototype() << e.what();
-
+        << prototype() << "failed to get region financial_data_: " << e.what();
     return kDefaultUnitCost;
   }
 
+  // U = throughput * timesteps_per_year
   double timesteps_per_year = cyclusYear / context()->dt();
-  double annual_production = production_capacity * timesteps_per_year;
+  double units_produced_annually = production_capacity * timesteps_per_year;
 
-  // This is my way of keeping the categories. New costs can be added to these
-  // as needed and it should be "easy" to do, but still require some thinking
-  double total_dep = cap_cost;
-  double total_annual_fixed = annual_operations_and_maintenance;
-  double total_annual_variable = annual_labor_cost;
+  // x = (1-τ)*r_b*f_b + r_s*f_s
+  tax_modified_rate_of_return = (1 - income_tax_rate) * bond_rate * bond_fraction + shareholder_rate * shareholder_fraction;
 
-  double property_tax = property_tax_rate * cap_cost;
+  // c_j = F_bar/U + V_bar + (I_0/U) * [p + (1/(1-τ)) * PMT(N,x,1,0) - (1/N) * (τ/(1-τ))]
+  double fixed_cost_per_unit = levelized_fixed_costs / units_produced_annually;
+  double capital_investment_per_unit = initial_investment / units_produced_annually;
 
-  // Adjust for Corp. Income Tax and Depreciation
-  double tax_shield = PV(taxable_lifetime, return_rate, 0,
-                         total_dep * corporate_tax_rate / taxable_lifetime);
+  double depreciation_tax_shield = income_tax_rate / (1.0 - income_tax_rate) / facility_lifetime;
+  double capital_recovery_factor = PMT(facility_lifetime, tax_modified_rate_of_return, 1.0, 0.0) / (1.0 - income_tax_rate);
+  double capital_cost_per_unit = capital_investment_per_unit * (property_and_insurance_rate + capital_recovery_factor - depreciation_tax_shield);
+  double production_cost = fixed_cost_per_unit + levelized_variable_costs + capital_cost_per_unit;
 
-  double annualized_depreciable =
-      PMT(operational_lifetime, return_rate, total_dep - tax_shield, 0);
-
-  double unit_production_cost = (annualized_depreciable + total_annual_fixed +
-                                 total_annual_variable + property_tax) /
-                                annual_production;
-
-  double unit_cost = unit_production_cost + input_cost / units_to_produce;
+  // c_u = c_j + c_M = production_cost + input_cost_per_unit
+  double unit_cost = production_cost + input_cost_per_unit;
 
   // Protects against divide by zero in pref = 1/unit_cost
   return unit_cost != 0 ? unit_cost : kDefaultUnitCost;
 }
 
 double CalculateUnitPrice(double production_capacity, double units_to_produce,
-                          double input_cost = 0.0) const {
+                          double input_cost_per_unit = 0.0) const {
   // Default implementation
-  return CalculateUnitCost(production_capacity, units_to_produce, input_cost);
+  return CalculateUnitCost(production_capacity, units_to_produce, input_cost_per_unit);
 }
 
 // Required for compilation but not added by the cycpp preprocessor. Do not
@@ -183,3 +218,4 @@ std::vector<int> cycpp_shape_facility_operational_lifetime = {0};
 std::vector<int> cycpp_shape_facility_depreciation_lifetime = {0};
 std::vector<int> cycpp_shape_annual_labor_cost = {0};
 std::vector<int> cycpp_shape_cost_override = {0};
+std::vector<int> cycpp_shape_property_insurance_rate = {0};
