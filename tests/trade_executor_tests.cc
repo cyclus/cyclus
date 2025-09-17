@@ -21,6 +21,14 @@
 #include "trader.h"
 #include "pyne.h"
 
+// Testing macro to simplify warning-as-error tests
+#define EXPECT_WARN(statement, exception_type) \
+  do { \
+    warn_as_error = true; \
+    EXPECT_THROW(statement, exception_type); \
+    warn_as_error = false; \
+  } while(0)
+
 using namespace cyclus;
 using pyne::nucname::id;
 
@@ -160,6 +168,12 @@ TEST_F(TradeExecutorTests, NoThrowWriting) {
   TradeExecutor<Material> exec(trades);
   exec.ExecuteTrades();
   EXPECT_NO_THROW(exec.RecordTrades(tc.get()));
+  
+  // Test that trades between different agents don't trigger warnings
+  warn_as_error = true;
+  TradeExecutor<Material> warning_exec(trades);
+  EXPECT_NO_THROW(warning_exec.ExecuteTrades(tc.get()));
+  warn_as_error = false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -204,8 +218,6 @@ class SelfTradingWarningTest : public ::testing::Test {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
-  warn_as_error = true;
-
   // Create a trade where the same facility is both supplier and requester
   Request<Material>* req = 
       Request<Material>::Create(test_mat_, facility_, "Uranium");
@@ -218,68 +230,17 @@ TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
   
   // Execute the trade - this should trigger the warning
   TradeExecutor<Material> executor(trades);
-  EXPECT_THROW(executor.ExecuteTrades(tc_->get()), cyclus::StateError);
-
-  // Clean up
-  warn_as_error = false;
-  delete bid;
-  delete req;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SelfTradingWarningTest, NoWarningForDifferentAgents) {
   
-  // Create a trade between different facilities
-  Request<Material>* req = 
-      Request<Material>::Create(test_mat_, facility2_, "Uranium");
-  Bid<Material>* bid = 
-      Bid<Material>::Create(req, test_mat_, facility_);
-  
-  Trade<Material> trade(req, bid, kTestTradeAmount);
-  std::vector<Trade<Material>> trades;
-  trades.push_back(trade);
-  
-  
-  // Execute the trade - this should NOT trigger the warning
-  warn_as_error = true;
-  TradeExecutor<Material> executor(trades);
-  EXPECT_NO_THROW(executor.ExecuteTrades(tc_->get()));
-  
-  // Clean up
-  warn_as_error = false;
-  delete bid;
-  delete req;
-}
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(SelfTradingWarningTest, WarningIncludesCorrectAgentId) {
-  
-  
-  
-  // Create a trade where the same facility is both supplier and requester
-  Request<Material>* req = 
-      Request<Material>::Create(test_mat_, facility_, "Uranium");
-  Bid<Material>* bid = 
-      Bid<Material>::Create(req, test_mat_, facility_);
-  
-  Trade<Material> trade(req, bid, kTestTradeAmount);
-  std::vector<Trade<Material>> trades;
-  trades.push_back(trade);
-  
-  warn_as_error = true;
-  TradeExecutor<Material> executor(trades);
-
-  // Use a try/catch to check for the error message
+  // Use the macro to test warning and verify it contains the correct agent ID
   try {
-    EXPECT_THROW(executor.ExecuteTrades(tc_->get()), cyclus::StateError);
+    EXPECT_WARN(executor.ExecuteTrades(tc_->get()), cyclus::StateError);
   }
   catch (const cyclus::StateError& e) {
     std::string expected_id = std::to_string(facility_->id());
     EXPECT_TRUE(std::string(e.what()).find(expected_id) != std::string::npos);
   }
-  
+
   // Clean up
-  warn_as_error = false;
   delete bid;
   delete req;
 }
