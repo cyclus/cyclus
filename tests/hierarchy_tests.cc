@@ -145,6 +145,46 @@ TEST_F(NestedHierarchyTests, NestedLayerAccess) {
   
   Institution* default_inst = storage_facility_->GetParentInstitution();
   EXPECT_EQ(default_inst, converdyn_);
+
+  // Test institutions finding regions at different levels
+  // Layer 1: Metropolis (immediate parent region)
+  Region* converdyn_region1 = converdyn_->GetParentRegion(1);
+  EXPECT_EQ(converdyn_region1, metropolis_);
+  
+  // Layer 2: Illinois (grandparent region)
+  Region* converdyn_region2 = converdyn_->GetParentRegion(2);
+  EXPECT_EQ(converdyn_region2, illinois_);
+  
+  // Layer 3: USA (great-grandparent region)
+  Region* converdyn_region3 = converdyn_->GetParentRegion(3);
+  EXPECT_EQ(converdyn_region3, usa_);
+  
+  // Layer -1: USA (most distant region)
+  Region* converdyn_region_last = converdyn_->GetParentRegion(-1);
+  EXPECT_EQ(converdyn_region_last, usa_);
+  
+  // Layer 4: should be nullptr (no 4th region)
+  Region* converdyn_region4 = converdyn_->GetParentRegion(4);
+  EXPECT_EQ(converdyn_region4, nullptr);
+  
+  // Layer 1: Metropolis (immediate parent region)
+  Region* honeywell_region1 = honeywell_->GetParentRegion(1);
+  EXPECT_EQ(honeywell_region1, metropolis_);
+  
+  // Layer 2: Illinois (grandparent region)
+  Region* honeywell_region2 = honeywell_->GetParentRegion(2);
+  EXPECT_EQ(honeywell_region2, illinois_);
+  
+  // Layer 3: USA (great-grandparent region)
+  Region* honeywell_region3 = honeywell_->GetParentRegion(3);
+  EXPECT_EQ(honeywell_region3, usa_);
+  
+  // Test default behavior (should return layer 1)
+  Region* converdyn_default = converdyn_->GetParentRegion();
+  EXPECT_EQ(converdyn_default, metropolis_);
+  
+  Region* honeywell_default = honeywell_->GetParentRegion();
+  EXPECT_EQ(honeywell_default, metropolis_);
 }
 
 TEST_F(NestedHierarchyTests, CrossEntityRelationships) {
