@@ -22,3 +22,14 @@ TEST_P(FacilityTests, Entity) {
   Json::Value a = facility_->annotations();
   EXPECT_STREQ("facility", a["entity"].asCString());
 }
+
+TEST_P(FacilityTests, GetParentRegionAndInstitution) {
+  // Test that GetParentRegion and GetParentInstitution work correctly
+  // These methods should return nullptr when the facility is not in a hierarchy
+  cyclus::Region* region = facility_->GetParentRegion();
+  cyclus::Institution* institution = facility_->GetParentInstitution();
+  
+  // When not in a hierarchy, both should return nullptr
+  EXPECT_EQ(region, nullptr);
+  EXPECT_EQ(institution, nullptr);
+}

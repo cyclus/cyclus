@@ -148,3 +148,33 @@ TEST_F(ContextTests, DoubleTransportUnitNameThrow) {
   
   delete ctx;
   }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ContextTests, GetAgentList) {
+  Timer ti;
+  Recorder rec;
+  Context* ctx = new Context(&ti, &rec);
+  DonutShop::destruct_count = 0; // reset the destruct count
+
+  // Initially, the agent list should be empty
+  EXPECT_TRUE(ctx->GetAgentList().empty());
+
+  // Create some agents
+  Agent* agent1 = new DonutShop(ctx, "chocolate");
+  Agent* agent2 = new DonutShop(ctx, "vanilla");
+  Agent* agent3 = new DonutShop(ctx, "strawberry");
+
+  // The agent list should now contain all three agents
+  const std::set<Agent*>& agent_list = ctx->GetAgentList();
+  EXPECT_EQ(agent_list.size(), 3);
+  EXPECT_TRUE(agent_list.find(agent1) != agent_list.end());
+  EXPECT_TRUE(agent_list.find(agent2) != agent_list.end());
+  EXPECT_TRUE(agent_list.find(agent3) != agent_list.end());
+
+  // Test that the list is const (read-only access)
+  EXPECT_TRUE(std::is_const<std::remove_reference_t<decltype(agent_list)>>::value);
+
+  // Clean up
+  delete ctx;
+  EXPECT_EQ(3, DonutShop::destruct_count);
+}
