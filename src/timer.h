@@ -69,6 +69,16 @@ class Timer {
   /// @return the duration, in months
   int dur();
 
+  /// Returns the number of months between the simulation start
+  /// time and another time stamp.  
+  ///
+  /// @param year of alternate time stamp
+  /// @param month of alternate time stamp
+  ///
+  /// @return the difference between the simulation start time and another time
+  /// @warning Only valid for times that occur after the simulation start time.
+  int CalcTimeDiff(int year, int month);
+
  private:
   /// builds all agents queued for the current timestep.
   void DoBuild();
