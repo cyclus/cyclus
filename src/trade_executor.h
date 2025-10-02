@@ -94,8 +94,7 @@ template <class T> class TradeExecutor {
         std::pair<Trader*, Trader*>,
         std::vector<std::pair<Trade<T>, typename T::Ptr>>>::iterator m_it;
     for (m_it = trade_ctx_.all_trades.begin();
-         m_it != trade_ctx_.all_trades.end();
-         ++m_it) {
+         m_it != trade_ctx_.all_trades.end(); ++m_it) {
       Agent* supplier = m_it->first.first->manager();
       Agent* requester = m_it->first.second->manager();
       typename std::vector<std::pair<Trade<T>, typename T::Ptr>>& trades =

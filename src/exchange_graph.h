@@ -72,8 +72,7 @@ class Arc {
   Arc() {}
 
   Arc(boost::shared_ptr<ExchangeNode> unode,
-      boost::shared_ptr<ExchangeNode>
-          vnode);
+      boost::shared_ptr<ExchangeNode> vnode);
   Arc(const Arc& other);
 
   inline Arc& operator=(const Arc& other) {
@@ -152,8 +151,7 @@ class ExchangeNodeGroup {
   /// @return true of any nodes have arcs associated with them
   bool HasArcs() {
     for (std::vector<ExchangeNode::Ptr>::iterator it = nodes_.begin();
-         it != nodes_.end();
-         ++it) {
+         it != nodes_.end(); ++it) {
       if (it->get()->prefs.size() > 0) return true;
     }
     return false;
