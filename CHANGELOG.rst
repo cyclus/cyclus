@@ -51,6 +51,7 @@ Since last release
 * Modified Doxygen homepage (#1815)
 * Pin ``python<3.13`` in CI workflows (#1826)
 * Changed the way Position is added to the archetypes (#1510) (#1872)
+* Changed interaction between ``mat::Absorb()`` and ``mat::Decay()`` to ensure all materials being absorbed are decayed first
 
 **Removed:**
 
