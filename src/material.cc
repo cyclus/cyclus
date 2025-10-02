@@ -103,6 +103,11 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
 }
 
 void Material::Absorb(Material::Ptr mat) {
+
+  // force both mateiral objects to decay prior to absorption
+  this->Decay();
+  mat->Decay();
+
   // these calls force lazy evaluation if in lazy decay mode
   Composition::Ptr c0 = comp();
   Composition::Ptr c1 = mat->comp();
@@ -114,19 +119,8 @@ void Material::Absorb(Material::Ptr mat) {
     compmath::Normalize(&otherv, mat->qty_);
     comp_ = Composition::CreateFromMass(compmath::Add(v, otherv));
   }
-
-  // Set the decay time to the value of the material that had the larger
-  // quantity.  This helps avoid inheriting erroneous prev decay times if, for
-  // example, you absorb a material into a zero-quantity material that had a
-  // prev decay time prior to the current simulation time step.
-  if (qty_ < mat->qty_) {
-    prev_decay_time_ = mat->prev_decay_time_;
-  }
-  double tot_mass = qty_ + mat->quantity();
-  double avg_unit_value =
-      (qty_ * UnitValue() + mat->quantity() * mat->UnitValue()) / tot_mass;
-  SetUnitValue(avg_unit_value);
-  qty_ = tot_mass;
+  
+  qty_ += mat->qty_;
   mat->qty_ = 0;
   tracker_.Absorb(&mat->tracker_);
 }
