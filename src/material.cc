@@ -109,8 +109,12 @@ void Material::Absorb(Material::Ptr mat) {
   if (ctx_ != NULL && ctx_->sim_info().decay != "never") {
     common_decay_time = ctx_->time();    
   }
-  this->Decay(common_decay_time);
   mat->Decay(common_decay_time);
+  this->Decay(common_decay_time);
+
+  // manually update decay time in case the change was so small
+  // that no decay was invoked
+  this->prev_decay_time_ = common_decay_time;
 
   // these calls force lazy evaluation if in lazy decay mode
   Composition::Ptr c0 = comp();
