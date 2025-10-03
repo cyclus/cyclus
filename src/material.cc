@@ -104,9 +104,13 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
 
 void Material::Absorb(Material::Ptr mat) {
 
-  // force both mateiral objects to decay prior to absorption
-  this->Decay();
-  mat->Decay();
+  // force both mateiral objects to advance to the same decay time
+  int common_decay_time = std::max(this->prev_decay_time_, mat->prev_decay_time_);
+  if (ctx_ != NULL && ctx_->sim_info().decay != "never") {
+    common_decay_time = ctx_->time();    
+  }
+  this->Decay(common_decay_time);
+  mat->Decay(common_decay_time);
 
   // these calls force lazy evaluation if in lazy decay mode
   Composition::Ptr c0 = comp();
