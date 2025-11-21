@@ -1744,14 +1744,14 @@ class SchemaFilter(CodeGeneratorFilter):
             if names[1] is not None:
                 valnames = names[2]
             impl += '<element name="{0}">'.format(name)
-            impl += '<zeroOrMore>'
+            impl += '<oneOrMore>'
             impl += '<element name="{0}">'.format(itemname)
             impl += '<interleave>'
             impl += self._buildschema(cpptype[1], schematype[1], uitype[1], keynames)
             impl += self._buildschema(cpptype[2], schematype[2], uitype[2], valnames)
             impl += '</interleave>'
             impl += '</element>'
-            impl += '</zeroOrMore>'
+            impl += '</oneOrMore>'
             impl += '</element>'
         elif t == 'std::pair':
             name = 'pair'

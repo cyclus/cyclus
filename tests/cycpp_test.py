@@ -643,7 +643,7 @@ def test_schemafilter():
         '  return ""\n'
         '    "<interleave>\\n"\n'
         '    "    <element name=\\"x\\">\\n"\n'
-        '    "        <zeroOrMore>\\n"\n'
+        '    "        <oneOrMore>\\n"\n'
         '    "            <element name=\\"item\\">\\n"\n'
         '    "                <interleave>\\n"\n'
         '    "                    <element name=\\"key\\">\\n"\n'
@@ -654,7 +654,7 @@ def test_schemafilter():
         '    "                    </element>\\n"\n'
         '    "                </interleave>\\n"\n'
         '    "            </element>\\n"\n'
-        '    "        </zeroOrMore>\\n"\n'
+        '    "        </oneOrMore>\\n"\n'
         '    "    </element>\\n"\n'
         '    "</interleave>\\n";\n')
     assert exp_impl == impl
@@ -744,32 +744,32 @@ def test_schemafilter_buildschema():
 
     cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
     names = ['streams']
-    exp = ('<element name="streams"><zeroOrMore><element name="item">'
+    exp = ('<element name="streams"><oneOrMore><element name="item">'
            '<interleave><element name="key"><data type="string" /></element>'
            '<element name="val"><oneOrMore><element name="val">'
            '<data type="double" /></element></oneOrMore></element>'
-           '</interleave></element></zeroOrMore></element>')
+           '</interleave></element></oneOrMore></element>')
     obs = f._buildschema(cpptype, schematype, uitype, names)
     assert exp == obs
 
     cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
     names = ['streams', 'name', ['efficiencies', 'val']]
-    exp = ('<element name="streams"><zeroOrMore><element name="item">'
+    exp = ('<element name="streams"><oneOrMore><element name="item">'
            '<interleave><element name="name"><data type="string" /></element>'
            '<element name="efficiencies"><oneOrMore><element name="val">'
            '<data type="double" /></element></oneOrMore></element>'
-           '</interleave></element></zeroOrMore></element>')
+           '</interleave></element></oneOrMore></element>')
     obs = f._buildschema(cpptype, schematype, uitype, names)
     assert exp == obs
 
     # test item aliasing
     cpptype = ['std::map', 'std::string', ['std::vector', 'double']]
     names = [['streams', 'entry'], 'name', ['efficiencies', 'val']]
-    exp = ('<element name="streams"><zeroOrMore><element name="entry">'
+    exp = ('<element name="streams"><oneOrMore><element name="entry">'
            '<interleave><element name="name"><data type="string" /></element>'
            '<element name="efficiencies"><oneOrMore><element name="val">'
            '<data type="double" /></element></oneOrMore></element>'
-           '</interleave></element></zeroOrMore></element>')
+           '</interleave></element></oneOrMore></element>')
     obs = f._buildschema(cpptype, schematype, uitype, names)
     assert exp == obs
 
