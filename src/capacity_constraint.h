@@ -22,8 +22,7 @@ template <class T> struct Converter {
   ///
   /// @warning it is up to the user to inherit default parameters
   virtual double convert(
-      boost::shared_ptr<T> offer,
-      Arc const* a = NULL,
+      boost::shared_ptr<T> offer, Arc const* a = NULL,
       ExchangeTranslationContext<T> const* ctx = NULL) const = 0;
 
   /// @brief operator== is available for subclassing, see
@@ -38,8 +37,7 @@ template <class T> struct Converter {
 template <class T> struct TrivialConverter : public Converter<T> {
   /// @returns the quantity of resource offer
   inline virtual double convert(
-      boost::shared_ptr<T> offer,
-      Arc const* a = NULL,
+      boost::shared_ptr<T> offer, Arc const* a = NULL,
       ExchangeTranslationContext<T> const* ctx = NULL) const {
     return offer->quantity();
   }
@@ -84,8 +82,7 @@ template <class T> class CapacityConstraint {
   /// @return the converter
   inline typename Converter<T>::Ptr converter() const { return converter_; }
 
-  inline double convert(boost::shared_ptr<T> offer,
-                        Arc const* a = NULL,
+  inline double convert(boost::shared_ptr<T> offer, Arc const* a = NULL,
                         ExchangeTranslationContext<T> const* ctx = NULL) const {
     return converter_->convert(offer, a, ctx);
   }

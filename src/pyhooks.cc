@@ -121,10 +121,7 @@ std::string JsonToPy(std::string infile) {
   return "";
 };
 
-void PyCallListeners(std::string tsname,
-                     Agent* agent,
-                     void* cpp_ctx,
-                     int time,
+void PyCallListeners(std::string tsname, Agent* agent, void* cpp_ctx, int time,
                      boost::spirit::hold_any value) {};
 
 }  // namespace toolkit

@@ -122,8 +122,7 @@ void Timer::DoTock() {
 
 void Timer::DoDecision() {
   for (std::map<int, TimeListener*>::iterator agent = tickers_.begin();
-       agent != tickers_.end();
-       agent++) {
+       agent != tickers_.end(); agent++) {
     agent->second->Decision();
   }
 }

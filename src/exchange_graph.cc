@@ -46,8 +46,7 @@ bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
-         boost::shared_ptr<ExchangeNode>
-             vnode)
+         boost::shared_ptr<ExchangeNode> vnode)
     : unode_(unode), vnode_(vnode) {
   exclusive_ = unode->exclusive || vnode->exclusive;
   if (exclusive_) {

@@ -112,7 +112,7 @@ class FixedDoubleDist : public DoubleDistribution {
  public:
   typedef boost::shared_ptr<FixedDoubleDist> Ptr;
 
-  FixedDoubleDist(double value_) : value(value_){};
+  FixedDoubleDist(double value_) : value(value_) {};
   virtual double sample() { return value; };
   virtual double max() { return value; };
 };
@@ -124,7 +124,7 @@ class UniformDoubleDist : public DoubleDistribution {
  public:
   typedef boost::shared_ptr<UniformDoubleDist> Ptr;
 
-  UniformDoubleDist(double min = 0, double max = 1) : dist(min, max){};
+  UniformDoubleDist(double min = 0, double max = 1) : dist(min, max) {};
   virtual double sample() { return dist(RandomNumberGenerator::gen_); }
   virtual double max() { return dist.max(); }
 };
@@ -225,7 +225,7 @@ class FixedIntDist : public IntDistribution {
  public:
   typedef boost::shared_ptr<FixedIntDist> Ptr;
 
-  FixedIntDist(int value_) : value(value_){};
+  FixedIntDist(int value_) : value(value_) {};
   virtual int sample() { return value; };
 };
 
@@ -236,7 +236,7 @@ class UniformIntDist : public IntDistribution {
  public:
   typedef boost::shared_ptr<UniformIntDist> Ptr;
 
-  UniformIntDist(int min = 0, int max = 1) : dist(min, max){};
+  UniformIntDist(int min = 0, int max = 1) : dist(min, max) {};
   virtual int sample() { return dist(RandomNumberGenerator::gen_); }
   virtual int max() { return dist.max(); }
 };

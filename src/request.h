@@ -45,8 +45,7 @@ template <class T> class Request {
   inline static Request<T>* Create(boost::shared_ptr<T> target,
                                    Trader* requester,
                                    typename RequestPortfolio<T>::Ptr portfolio,
-                                   std::string commodity,
-                                   double preference,
+                                   std::string commodity, double preference,
                                    bool exclusive,
                                    cost_function_t cost_function) {
     return new Request<T>(target, requester, portfolio, commodity, preference,
@@ -75,10 +74,8 @@ template <class T> class Request {
   /// @brief a factory method for a bid for a bid without a portfolio
   /// @warning this factory should generally only be used for testing
   inline static Request<T>* Create(boost::shared_ptr<T> target,
-                                   Trader* requester,
-                                   std::string commodity,
-                                   double preference,
-                                   bool exclusive,
+                                   Trader* requester, std::string commodity,
+                                   double preference, bool exclusive,
                                    cost_function_t cost_function) {
     return new Request<T>(target, requester, commodity, preference, exclusive,
                           cost_function);

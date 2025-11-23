@@ -225,10 +225,10 @@ void warning(std::string s);
 class FileNotFound : public std::exception {
  public:
   /// default constructor
-  FileNotFound(){};
+  FileNotFound() {};
 
   /// default destructor
-  ~FileNotFound() throw(){};
+  ~FileNotFound() throw() {};
 
   /// constructor with the filename \a fname.
   FileNotFound(std::string fname) { filename = fname; };
@@ -278,8 +278,8 @@ namespace extra_types {
 /// not yet support template function wrapping.
 template <class T> class MemoryKnight {
  public:
-  MemoryKnight(){};   ///< Default constructor
-  ~MemoryKnight(){};  ///< Default Destructor
+  MemoryKnight() {};   ///< Default constructor
+  ~MemoryKnight() {};  ///< Default Destructor
 
   /// Creates a new instance of type T on the heap using
   /// its default constructor.
@@ -359,10 +359,10 @@ class HDF5BoundsError : public std::exception {
 class FileNotHDF5 : public std::exception {
  public:
   /// default constructor
-  FileNotHDF5(){};
+  FileNotHDF5() {};
 
   /// default destructor
-  ~FileNotHDF5() throw(){};
+  ~FileNotHDF5() throw() {};
 
   /// constructor with the filename
   FileNotHDF5(std::string fname) { filename = fname; };
@@ -383,10 +383,10 @@ class FileNotHDF5 : public std::exception {
 class GroupNotFound : public std::exception {
  public:
   /// default constructor
-  GroupNotFound(){};
+  GroupNotFound() {};
 
   /// default destructor
-  ~GroupNotFound() throw(){};
+  ~GroupNotFound() throw() {};
 
   /// constructor with the filename and the groupname
   GroupNotFound(std::string fname, std::string gname) { filename = fname; };
@@ -409,10 +409,10 @@ class GroupNotFound : public std::exception {
 class PathNotFound : public std::exception {
  public:
   /// default constructor
-  PathNotFound(){};
+  PathNotFound() {};
 
   /// default destructor
-  ~PathNotFound() throw(){};
+  ~PathNotFound() throw() {};
 
   /// constructor with the filename and the pathname
   PathNotFound(std::string fname, std::string pname) {
@@ -603,10 +603,10 @@ std::vector<std::vector<std::vector<T>>> h5_array_to_cpp_vector_3d(
 template <typename T> class HomogenousTypeTable {
  public:
   /// default constructor
-  HomogenousTypeTable(){};
+  HomogenousTypeTable() {};
 
   /// default destructor
-  ~HomogenousTypeTable(){};
+  ~HomogenousTypeTable() {};
 
   /// Constructor to load in data upon initialization.  \a T should roughly
   /// match \a dtype.
@@ -799,10 +799,10 @@ extern zz_group fp;          ///< fission product Z number group
 class NotANuclide : public std::exception {
  public:
   /// default constructor
-  NotANuclide(){};
+  NotANuclide() {};
 
   /// default destructor
-  ~NotANuclide() throw(){};
+  ~NotANuclide() throw() {};
 
   /// Constructor given previous and current state of nulide name
   /// \param wasptr Previous state, typically user input.
@@ -859,10 +859,10 @@ class NotANuclide : public std::exception {
 class IndeterminateNuclideForm : public std::exception {
  public:
   /// default constructor
-  IndeterminateNuclideForm(){};
+  IndeterminateNuclideForm() {};
 
   /// default destuctor
-  ~IndeterminateNuclideForm() throw(){};
+  ~IndeterminateNuclideForm() throw() {};
 
   /// Constructor given previous and current state of nulide name
   /// \param wasptr Previous state, typically user input.
@@ -1532,10 +1532,10 @@ int child(std::string nuc, std::string rx, std::string z = "n");
 class NotAReaction : public std::exception {
  public:
   /// default constructor
-  NotAReaction(){};
+  NotAReaction() {};
 
   /// default destructor
-  ~NotAReaction() throw(){};
+  ~NotAReaction() throw() {};
 
   /// Constructor using original reaction (\a wasptr) and the eventual state
   /// that PyNE calculated (\a nowptr).
@@ -1608,10 +1608,10 @@ class NotAReaction : public std::exception {
 class IndeterminateReactionForm : public std::exception {
  public:
   /// default constructor
-  IndeterminateReactionForm(){};
+  IndeterminateReactionForm() {};
 
   /// default destructor
-  ~IndeterminateReactionForm() throw(){};
+  ~IndeterminateReactionForm() throw() {};
 
   /// Constructor using original reaction (\a wasptr) and the eventual state
   /// that PyNE calculated (\a nowptr).
@@ -2409,10 +2409,10 @@ double simple_xs(std::string nuc, std::string rx, std::string energy);
 /// Custom exception for declaring a simple_xs request invalid
 class InvalidSimpleXS : public std::exception {
  public:
-  InvalidSimpleXS(){};
-  ~InvalidSimpleXS() throw(){};
+  InvalidSimpleXS() {};
+  ~InvalidSimpleXS() throw() {};
   /// Exception thrown if energy group or rxname are invalid
-  InvalidSimpleXS(std::string msg) : msg_(msg){};
+  InvalidSimpleXS(std::string msg) : msg_(msg) {};
   /// Exception returns the string passed when thrown.
   virtual const char *what() const throw() { return msg_.c_str(); };
 
@@ -3479,8 +3479,7 @@ class PathArgument {
  */
 class Path {
  public:
-  Path(const std::string &path,
-       const PathArgument &a1 = PathArgument(),
+  Path(const std::string &path, const PathArgument &a1 = PathArgument(),
        const PathArgument &a2 = PathArgument(),
        const PathArgument &a3 = PathArgument(),
        const PathArgument &a4 = PathArgument(),
@@ -3497,10 +3496,8 @@ class Path {
   typedef std::vector<PathArgument> Args;
 
   void makePath(const std::string &path, const InArgs &in);
-  void addPathInArg(const std::string &path,
-                    const InArgs &in,
-                    InArgs::const_iterator &itInArg,
-                    PathArgument::Kind kind);
+  void addPathInArg(const std::string &path, const InArgs &in,
+                    InArgs::const_iterator &itInArg, PathArgument::Kind kind);
   void invalidPath(const std::string &path, int location);
 
   Args args_;
@@ -3639,15 +3636,12 @@ class JSON_API ValueInternalMap {
 
   void remove(const char *key);
 
-  void doActualRemove(ValueInternalLink *link,
-                      BucketIndex index,
+  void doActualRemove(ValueInternalLink *link, BucketIndex index,
                       BucketIndex bucketIndex);
 
   ValueInternalLink *&getLastLinkInBucket(BucketIndex bucketIndex);
 
-  Value &setNewItem(const char *key,
-                    bool isStatic,
-                    ValueInternalLink *link,
+  Value &setNewItem(const char *key, bool isStatic, ValueInternalLink *link,
                     BucketIndex index);
 
   Value &unsafeAdd(const char *key, bool isStatic, HashKey hashedKey);
@@ -3822,8 +3816,7 @@ class JSON_API ValueArrayAllocator {
    * to handle.
    */
   virtual void reallocateArrayPageIndex(
-      Value **&indexes,
-      ValueInternalArray::PageIndex &indexCount,
+      Value **&indexes, ValueInternalArray::PageIndex &indexCount,
       ValueInternalArray::PageIndex minNewIndexCount) = 0;
   virtual void releaseArrayPageIndex(
       Value **indexes, ValueInternalArray::PageIndex indexCount) = 0;
@@ -4059,8 +4052,7 @@ class JSON_API Reader {
    * ignored if Features::allowComments_ is \c false. \return \c true if the
    * document was successfully parsed, \c false if an error occurred.
    */
-  bool parse(const std::string &document,
-             Value &root,
+  bool parse(const std::string &document, Value &root,
              bool collectComments = true);
 
   /** \brief Read a Value from a <a HREF="http://www.json.org">JSON</a>
@@ -4153,24 +4145,18 @@ class JSON_API Reader {
   bool decodeString(Token &token);
   bool decodeString(Token &token, std::string &decoded);
   bool decodeDouble(Token &token);
-  bool decodeUnicodeCodePoint(Token &token,
-                              Location &current,
-                              Location end,
+  bool decodeUnicodeCodePoint(Token &token, Location &current, Location end,
                               unsigned int &unicode);
-  bool decodeUnicodeEscapeSequence(Token &token,
-                                   Location &current,
-                                   Location end,
-                                   unsigned int &unicode);
+  bool decodeUnicodeEscapeSequence(Token &token, Location &current,
+                                   Location end, unsigned int &unicode);
   bool addError(const std::string &message, Token &token, Location extra = 0);
   bool recoverFromError(TokenType skipUntilToken);
-  bool addErrorAndRecover(const std::string &message,
-                          Token &token,
+  bool addErrorAndRecover(const std::string &message, Token &token,
                           TokenType skipUntilToken);
   void skipUntilSpace();
   Value &currentValue();
   Char getNextChar();
-  void getLocationLineAndColumn(Location location,
-                                int &line,
+  void getLocationLineAndColumn(Location location, int &line,
                                 int &column) const;
   std::string getLocationLineAndColumn(Location location) const;
   void addComment(Location begin, Location end, CommentPlacement placement);
@@ -4474,14 +4460,10 @@ namespace Json {
  */
 class JSON_API CustomWriter : public Writer {
  public:
-  CustomWriter(std::string opencurly = "{",
-               std::string closecurly = "}",
-               std::string opensquare = "[",
-               std::string closesquare = "]",
-               std::string colon = ":",
-               std::string comma = ",",
-               std::string indent = "  ",
-               int maxWidth = 74);
+  CustomWriter(std::string opencurly = "{", std::string closecurly = "}",
+               std::string opensquare = "[", std::string closesquare = "]",
+               std::string colon = ":", std::string comma = ",",
+               std::string indent = "  ", int maxWidth = 74);
   virtual ~CustomWriter() {}
 
  public:  // overridden from Writer

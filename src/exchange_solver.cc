@@ -33,8 +33,7 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
   double min_unit_cap = std::numeric_limits<double>::max();
 
   for (sg_it = graph_->supply_groups().begin();
-       sg_it != graph_->supply_groups().end();
-       ++sg_it) {
+       sg_it != graph_->supply_groups().end(); ++sg_it) {
     std::vector<ExchangeNode::Ptr>& nodes = (*sg_it)->nodes();
     for (n_it = nodes.begin(); n_it != nodes.end(); ++n_it) {
       // update min_unit_cap
@@ -51,8 +50,7 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
   }
 
   for (rg_it = graph_->request_groups().begin();
-       rg_it != graph_->request_groups().end();
-       ++rg_it) {
+       rg_it != graph_->request_groups().end(); ++rg_it) {
     std::vector<ExchangeNode::Ptr>& nodes = (*rg_it)->nodes();
     for (n_it = nodes.begin(); n_it != nodes.end(); ++n_it) {
       // update min_unit_cap
