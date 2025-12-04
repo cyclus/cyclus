@@ -32,6 +32,7 @@ Since last release
 * Support for OpenMP parallelized simulations (#1709)
 * Command-line option to make a new blank input file referencing a current schema (#1861)
 * Allow multiple archetype blocks to facilitate includes (#1874)
+* Added ability to calcuate a time shift between the start time and some other time stamp (#1907)
 
 **Changed:**
 
