@@ -17,6 +17,12 @@
 namespace cyclus {
 
 void Timer::RunSim() {
+  LogLevel saved_level = Logger::ReportLevel();
+  if (quiet_) {
+    // Set log level below LEV_ERROR (lowest level) to suppress all CLOG output
+    Logger::SetReportLevel(static_cast<LogLevel>(-1));
+  }
+
   CLOG(LEV_INFO1) << "Simulation set to run from start=" << 0
                   << " to end=" << si_.duration;
   CLOG(LEV_INFO1) << "Beginning simulation";
@@ -61,6 +67,10 @@ void Timer::RunSim() {
 
   SimInit::Snapshot(
       ctx_);  // always do a snapshot at the end of every simulation
+
+  if (quiet_) {
+    Logger::SetReportLevel(saved_level);
+  }
 }
 
 void Timer::DoBuild() {

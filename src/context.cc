@@ -360,4 +360,8 @@ void Context::KillSim() {
   ti_->KillSim();
 }
 
+bool Context::TimerIsQuiet() const {
+  return ti_->IsQuiet();
+}
+
 }  // namespace cyclus

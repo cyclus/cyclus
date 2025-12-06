@@ -334,6 +334,9 @@ class Context {
     solver_->sim_ctx(this);
   }
 
+  /// Returns whether the timer is in quiet mode
+  bool TimerIsQuiet() const;
+
   /// @return the number of agents of a given prototype currently in the
   /// simulation
   inline int n_prototypes(std::string type) { return n_prototypes_[type]; }
