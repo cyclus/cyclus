@@ -34,7 +34,7 @@ Since last release
 * Allow multiple archetype blocks to facilitate includes (#1874)
 
 **Changed:**
-
+* Made the Unit Tests far less verbose by suppressing log output during RunSim (#1927)
 * Changed Dockerfile to use boost and boost-cpp instead of libboost-devel (#1906)
 * Changed TradeExecutor to use adjusted preferences from ExchangeContext (#1897)
 * Ran clang-format on src directory (#1881, #1893)
