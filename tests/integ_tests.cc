@@ -61,6 +61,7 @@ void RunSim(std::string infile, SqliteBack* back) {
     l.LoadSim();
   }
   si.Init(&r, back);
+  si.timer()->SetQuiet(true);
   si.timer()->RunSim();
   r.Flush();
   PyStop();
