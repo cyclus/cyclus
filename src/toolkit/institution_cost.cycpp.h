@@ -18,15 +18,6 @@
 // clang-format off
 #pragma cyclus var { \
     "default": 0.0, \
-    "uilabel": "Minimum acceptable rate of return", \
-    "range": [0.0, 1.0], \
-    "doc": "Minimum acceptable rate of return for the institution", \
-    "units": "Dimensionless" \
-    }
-double minimum_acceptable_return_rate;
-
-#pragma cyclus var { \
-    "default": 0.0, \
     "uilabel": "Corporate Income Tax Rate", \
     "range": [0.0, 1.0], \
     "doc": "Corporate income tax rate as decimal (1% --> 0.01)", \
@@ -82,7 +73,6 @@ double discount_rate_override;
 // Must be done in a function so that we can access the user-defined values
 std::unordered_map<std::string, double> GenerateParamList() const {
     std::unordered_map<std::string, double> econ_params {
-        {"minimum_acceptable_return_rate", minimum_acceptable_return_rate},
         {"corporate_income_tax_rate", corporate_income_tax_rate},
         {"bond_holders_rate_of_return", bond_holders_rate_of_return},
         {"fraction_bond_financing", fraction_bond_financing},
@@ -97,7 +87,6 @@ std::unordered_map<std::string, double> GenerateParamList() const {
     
 // Required for compilation but not added by the cycpp preprocessor. Do not
 // remove. Must be one for each variable.
-std::vector<int> cycpp_shape_minimum_acceptable_return_rate = {0};
 std::vector<int> cycpp_shape_corporate_income_tax_rate = {0};
 std::vector<int> cycpp_shape_bond_holders_rate_of_return = {0};
 std::vector<int> cycpp_shape_fraction_bond_financing = {0};
