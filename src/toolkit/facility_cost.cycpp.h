@@ -29,12 +29,12 @@ double capital_cost;
 double annual_fixed_costs;
 
 #pragma cyclus var { \
-    "default": 1.0, \
-    "uilabel": "Estimated Useful lifetime of facility for economic purposes in years", \
-    "doc": "Estimate on how long the facility will be active for economic purposes", \
-    "units": "years" \
-    }
-double facility_operational_lifetime;
+  "default": 0.0, \
+  "uilabel": "Variable Cost Per Unit", \
+  "doc": "Variable cost per unit of production (labor, materials, etc. that vary with production)", \
+  "units": "Unit of Currency/Unit of Production" \
+  }
+double variable_cost_per_unit;
 
 #pragma cyclus var { \
     "default": 1.0, \
@@ -45,12 +45,12 @@ double facility_operational_lifetime;
 double facility_depreciation_lifetime;
 
 #pragma cyclus var { \
-    "default": 0.0, \
-    "uilabel": "Variable Cost Per Unit", \
-    "doc": "Variable cost per unit of production (labor, materials, etc. that vary with production)", \
-    "units": "Unit of Currency/Unit of Production" \
-    }
-double variable_cost_per_unit;
+  "default": 0.0, \
+  "uilabel": "Property Insurance Rate as decimal", \
+  "range": [0.0, 1.0], \
+  "doc": "Property insurance rate for this facility as decimal (1% --> 0.01)" \
+  }
+double property_insurance_rate;
 
 #pragma cyclus var { \
     "default": -1.0, \
@@ -59,14 +59,6 @@ double variable_cost_per_unit;
     "units": "unit of currency/unit of production (eg. $/kg)" \
     }
 double cost_override;
-
-#pragma cyclus var { \
-    "default": 0.0, \
-    "uilabel": "Property Insurance Rate as decimal", \
-    "range": [0.0, 1.0], \
-    "doc": "Property insurance rate for this facility as decimal (1% --> 0.01)" \
-    }
-double property_insurance_rate;
 // clang-format on
 
 // Must be done in a function so that we can access the user-defined values
@@ -74,101 +66,108 @@ std::unordered_map<std::string, double> GenerateParamList() const override {
   std::unordered_map<std::string, double> econ_params{
       {"capital_cost", capital_cost},
       {"annual_fixed_costs", annual_fixed_costs},
-      {"facility_operational_lifetime", facility_operational_lifetime},
-      {"facility_depreciation_lifetime", facility_depreciation_lifetime},
       {"variable_cost_per_unit", variable_cost_per_unit},
-      {"property_insurance_rate", property_insurance_rate}};
+      {"facility_depreciation_lifetime", facility_depreciation_lifetime},
+      {"property_insurance_rate", property_insurance_rate},
+      {"cost_override", cost_override}};
 
   return econ_params;
 }
 
 // =============================================================================
-// Economic Parameter Retrieval Functions
+// Public API: Marginal Cost Calculation
 // =============================================================================
 
-/// @brief Retrieves facility-level economic parameters
-/// @param initial_investment Output parameter for capital cost
-/// @param facility_lifetime Output parameter for depreciation lifetime
-/// @param property_insurance_rate Output parameter for property insurance rate
-/// @param levelized_fixed_costs Output parameter for annual fixed costs
-/// @param variable_cost_per_unit Output parameter for variable cost per unit
-/// @return true if successful, false otherwise
-bool GetFacilityEconParameters(double& initial_investment,
-                                double& facility_lifetime,
-                                double& property_insurance_rate,
-                                double& levelized_fixed_costs,
-                                double& variable_cost_per_unit) const {
-  try {
-    initial_investment = GetEconParameter("capital_cost");
-    facility_lifetime = GetEconParameter("facility_depreciation_lifetime");
-    property_insurance_rate = GetEconParameter("property_insurance_rate");
-
-    // Note: Since our fixed costs are the same every timestep, we
-    // call them levelized here. If that changes in the future, we need to
-    // change this to reflect actual levelization. Variable costs are provided
-    // directly as per-unit costs.
-    levelized_fixed_costs =
-        GetEconParameter("annual_fixed_costs");
-    variable_cost_per_unit = GetEconParameter("variable_cost_per_unit");
-    return true;
-  } catch (const std::exception& e) {
-    LOG(cyclus::LEV_INFO1, "GetFacilityEconParameters")
-        << prototype()
-        << "failed to get facility financial_data_: " << e.what();
-    return false;
+/// @brief Calculates marginal cost per unit (variable + material, excluding
+/// fixed and capital costs)
+///
+/// Marginal cost represents the cost of producing one additional unit,
+/// excluding fixed and capital costs which are sunk. This is the primary
+/// function for facilities to use when submitting bids to the DRE for
+/// surplus maximization.
+///
+/// If cost_override > 0, returns cost_override + material_cost_per_unit.
+/// Otherwise, returns variable_cost_per_unit + material_cost_per_unit.
+///
+/// Example usage:
+///   double MC = this->CalcMarginalCost(material_cost_per_unit);
+///   // Use MC in bid to DRE
+///
+/// @param material_cost_per_unit Per-unit cost of input materials
+/// @return Marginal cost per unit, or material_cost_per_unit if facility parameters unavailable
+double CalcMarginalCost(double material_cost_per_unit) const {
+  // Validate facility parameters are available
+  if (!ValidateFacilityEconParameters()) {
+    return material_cost_per_unit;
   }
-}
-
-/// @brief Retrieves institution-level economic parameters
-/// @param income_tax_rate Output parameter for corporate income tax rate
-/// @param bond_rate Output parameter for bond holders rate of return
-/// @param bond_fraction Output parameter for fraction bond financing
-/// @param shareholder_rate Output parameter for share holders rate of return
-/// @param shareholder_fraction Output parameter for fraction private capital
-/// @param discount_rate_override Output parameter for discount rate override
-/// @return true if successful, false otherwise
-bool GetInstitutionEconParameters(double& income_tax_rate,
-                                   double& bond_rate,
-                                   double& bond_fraction,
-                                   double& shareholder_rate,
-                                   double& shareholder_fraction,
-                                   double& discount_rate_override) const {
-  try {
-    income_tax_rate = parent()->GetEconParameter("corporate_income_tax_rate");
-    bond_rate = parent()->GetEconParameter("bond_holders_rate_of_return");
-    bond_fraction = parent()->GetEconParameter("fraction_bond_financing");
-    shareholder_rate =
-        parent()->GetEconParameter("share_holders_rate_of_return");
-    shareholder_fraction =
-        parent()->GetEconParameter("fraction_private_capital");
-    discount_rate_override =
-        parent()->GetEconParameter("discount_rate_override");
-    return true;
-  } catch (const std::exception& e) {
-    LOG(cyclus::LEV_INFO1, "GetInstitutionEconParameters")
-        << prototype()
-        << "failed to get institution financial_data_: " << e.what();
-    return false;
+  
+  // Get the values we need
+  double cost_override_val = GetEconParameter("cost_override");
+  if (cost_override_val > 0) {
+    return cost_override_val + material_cost_per_unit;
   }
-}
-
-/// @brief Retrieves region-level economic parameters
-/// @param property_tax_rate Output parameter for property tax rate from region
-/// @return true if successful, false otherwise
-bool GetRegionEconParameters(double& property_tax_rate) const {
-  try {
-    property_tax_rate =
-        parent()->parent()->GetEconParameter("property_tax_rate");
-    return true;
-  } catch (const std::exception& e) {
-    LOG(cyclus::LEV_INFO1, "GetRegionEconParameters")
-        << prototype() << "failed to get region financial_data_: " << e.what();
-    return false;
-  }
+  
+  double variable_cost_per_unit = GetEconParameter("variable_cost_per_unit");
+  return variable_cost_per_unit + material_cost_per_unit;
 }
 
 // =============================================================================
-// Cost Calculation Functions
+// Economic Parameter Validation Functions
+// =============================================================================
+
+/// @brief Validates that all required facility-level economic parameters exist
+/// @return true if all parameters are available, false otherwise
+bool ValidateFacilityEconParameters() const {
+  try {
+    GetEconParameter("capital_cost");
+    GetEconParameter("facility_depreciation_lifetime");
+    GetEconParameter("property_insurance_rate");
+    GetEconParameter("annual_fixed_costs");
+    GetEconParameter("variable_cost_per_unit");
+    GetEconParameter("cost_override");
+    return true;
+  } catch (const std::exception& e) {
+    LOG(cyclus::LEV_INFO1, "ValidateFacilityEconParameters")
+        << prototype()
+        << "failed to validate facility financial_data_: " << e.what();
+    return false;
+  }
+}
+
+/// @brief Validates that all required institution-level economic parameters exist
+/// @return true if all parameters are available, false otherwise
+bool ValidateInstitutionEconParameters() const {
+  try {
+    parent()->GetEconParameter("corporate_income_tax_rate");
+    parent()->GetEconParameter("bond_holders_rate_of_return");
+    parent()->GetEconParameter("fraction_bond_financing");
+    parent()->GetEconParameter("share_holders_rate_of_return");
+    parent()->GetEconParameter("fraction_private_capital");
+    parent()->GetEconParameter("discount_rate_override");
+    return true;
+  } catch (const std::exception& e) {
+    LOG(cyclus::LEV_INFO1, "ValidateInstitutionEconParameters")
+        << prototype()
+        << "failed to validate institution financial_data_: " << e.what();
+    return false;
+  }
+}
+
+/// @brief Validates that all required region-level economic parameters exist
+/// @return true if all parameters are available, false otherwise
+bool ValidateRegionEconParameters() const {
+  try {
+    parent()->parent()->GetEconParameter("property_tax_rate");
+    return true;
+  } catch (const std::exception& e) {
+    LOG(cyclus::LEV_INFO1, "ValidateRegionEconParameters")
+        << prototype() << "failed to validate region financial_data_: " << e.what();
+    return false;
+  }
+}
+
+// =============================================================================
+// Internal Helper Functions (for CalculateUnitCost implementation)
 // =============================================================================
 
 /// @brief Calculates the number of units produced annually
@@ -252,20 +251,8 @@ double CalcCapitalCostPerUnit(double initial_investment,
           depreciation_tax_shield);
 }
 
-/// @brief Calculates marginal cost per unit (variable + material, excluding
-/// fixed and capital costs)
-/// Marginal cost represents the cost of producing one additional unit,
-/// excluding fixed and capital costs which are sunk.
-/// @param variable_cost_per_unit Variable cost per unit
-/// @param material_cost_per_unit Material cost per unit
-/// @return Marginal cost per unit
-double CalcMarginalCost(double variable_cost_per_unit,
-                        double material_cost_per_unit) const {
-  return variable_cost_per_unit + material_cost_per_unit;
-}
-
 // =============================================================================
-// Main Cost Calculation Function
+// Full Unit Cost Calculation Function
 // =============================================================================
 
 /// @brief Calculates the levelized unit cost of production, accounting for
@@ -307,37 +294,32 @@ double CalculateUnitCost(double production_capacity,
     return cost_override + input_cost_per_unit;
   }
 
-  // Get facility-level parameters
-  double initial_investment;
-  double facility_lifetime;
-  double property_insurance_rate;
-  double levelized_fixed_costs;
-  double variable_cost_per_unit;
-  if (!GetFacilityEconParameters(initial_investment, facility_lifetime,
-                                  property_insurance_rate,
-                                  levelized_fixed_costs,
-                                  variable_cost_per_unit)) {
+  // Validate and get facility-level parameters
+  if (!ValidateFacilityEconParameters()) {
     return kDefaultUnitCost;
   }
+  double initial_investment = GetEconParameter("capital_cost");
+  double facility_lifetime = GetEconParameter("facility_depreciation_lifetime");
+  double property_insurance_rate = GetEconParameter("property_insurance_rate");
+  double levelized_fixed_costs = GetEconParameter("annual_fixed_costs");
+  double variable_cost_per_unit = GetEconParameter("variable_cost_per_unit");
 
-  // Get institution-level parameters
-  double income_tax_rate;
-  double bond_rate;
-  double bond_fraction;
-  double shareholder_rate;
-  double shareholder_fraction;
-  double discount_rate_override;
-  if (!GetInstitutionEconParameters(income_tax_rate, bond_rate, bond_fraction,
-                                     shareholder_rate, shareholder_fraction,
-                                     discount_rate_override)) {
+  // Validate and get institution-level parameters
+  if (!ValidateInstitutionEconParameters()) {
     return kDefaultUnitCost;
   }
+  double income_tax_rate = parent()->GetEconParameter("corporate_income_tax_rate");
+  double bond_rate = parent()->GetEconParameter("bond_holders_rate_of_return");
+  double bond_fraction = parent()->GetEconParameter("fraction_bond_financing");
+  double shareholder_rate = parent()->GetEconParameter("share_holders_rate_of_return");
+  double shareholder_fraction = parent()->GetEconParameter("fraction_private_capital");
+  double discount_rate_override = parent()->GetEconParameter("discount_rate_override");
 
-  // Get region-level parameters
-  double property_tax_rate;
-  if (!GetRegionEconParameters(property_tax_rate)) {
+  // Validate and get region-level parameters
+  if (!ValidateRegionEconParameters()) {
     return kDefaultUnitCost;
   }
+  double property_tax_rate = parent()->parent()->GetEconParameter("property_tax_rate");
 
   // Combine property tax (from region) and property insurance (from facility)
   double property_and_insurance_rate = property_tax_rate + property_insurance_rate;
@@ -374,17 +356,10 @@ double CalculateUnitCost(double production_capacity,
   return unit_cost != 0 ? unit_cost : kDefaultUnitCost;
 }
 
-double CalculateUnitPrice(double production_capacity,
-                          double input_cost_per_unit = 0.0) const {
-  // Default implementation
-  return CalculateUnitCost(production_capacity, input_cost_per_unit);
-}
-
 // Required for compilation but not added by the cycpp preprocessor. Do not
 // remove. Must be one for each variable.
 std::vector<int> cycpp_shape_capital_cost = {0};
 std::vector<int> cycpp_shape_annual_fixed_costs = {0};
-std::vector<int> cycpp_shape_facility_operational_lifetime = {0};
 std::vector<int> cycpp_shape_facility_depreciation_lifetime = {0};
 std::vector<int> cycpp_shape_variable_cost_per_unit = {0};
 std::vector<int> cycpp_shape_cost_override = {0};
