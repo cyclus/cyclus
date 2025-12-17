@@ -46,6 +46,7 @@ Since last release
 * Changed the epsilon (eps) in Material::Decay to 1e-4 allowing 1 day decay of tritium (#1946)
 * Changed the schema for recipes to require oneOrMore instead of zeroOrMore (#1940)
 * Made the Unit Tests far less verbose by suppressing log output during RunSim (#1927)
+* Reworked the facility/instituion/region_cost.cycpp.h files to work with MC (#1931)
 * Changed Dockerfile to use boost and boost-cpp instead of libboost-devel (#1906)
 * Changed TradeExecutor to use adjusted preferences from ExchangeContext (#1897)
 * Ran clang-format on src directory (#1881, #1893)
