@@ -55,7 +55,7 @@ double property_insurance_rate;
 #pragma cyclus var { \
     "default": -1.0, \
     "uilabel": "Non-material cost override in dollars of one unit of production", \
-    "doc": "(optional) Hook to bypass LCP calculation and provide a cost in dollars. Should NOT include material costs, which are added later", \
+    "doc": "(optional) Hook to bypass MC calculation and provide a direct cost. Should NOT include material costs, which are added later", \
     "units": "unit of currency/unit of production (eg. $/kg)" \
     }
 double cost_override;
@@ -74,10 +74,6 @@ std::unordered_map<std::string, double> GenerateParamList() const override {
   return econ_params;
 }
 
-// =============================================================================
-// Public API: Marginal Cost Calculation
-// =============================================================================
-
 /// @brief Calculates marginal cost per unit (variable + material, excluding
 /// fixed and capital costs)
 ///
@@ -89,31 +85,23 @@ std::unordered_map<std::string, double> GenerateParamList() const override {
 /// If cost_override > 0, returns cost_override + material_cost_per_unit.
 /// Otherwise, returns variable_cost_per_unit + material_cost_per_unit.
 ///
-/// Example usage:
-///   double MC = this->CalcMarginalCost(material_cost_per_unit);
-///   // Use MC in bid to DRE
-///
 /// @param material_cost_per_unit Per-unit cost of input materials
 /// @return Marginal cost per unit, or material_cost_per_unit if facility parameters unavailable
 double CalcMarginalCost(double material_cost_per_unit) const {
   // Validate facility parameters are available
   if (!ValidateFacilityEconParameters()) {
-    return material_cost_per_unit;
+    return kDefaultUnitCost;
   }
   
   // Get the values we need
-  double cost_override_val = GetEconParameter("cost_override");
-  if (cost_override_val > 0) {
-    return cost_override_val + material_cost_per_unit;
+  double cost_override = GetEconParameter("cost_override");
+  if (cost_override > 0) {
+    return cost_override + material_cost_per_unit;
   }
   
   double variable_cost_per_unit = GetEconParameter("variable_cost_per_unit");
   return variable_cost_per_unit + material_cost_per_unit;
 }
-
-// =============================================================================
-// Economic Parameter Validation Functions
-// =============================================================================
 
 /// @brief Validates that all required facility-level economic parameters exist
 /// @return true if all parameters are available, false otherwise
@@ -166,23 +154,21 @@ bool ValidateRegionEconParameters() const {
   }
 }
 
-// =============================================================================
-// Internal Helper Functions (for CalculateUnitCost implementation)
-// =============================================================================
-
-/// @brief Calculates the number of units produced annually
-/// @param production_capacity Maximum throughput per timestep
-/// @return Units produced annually
-double CalcUnitsProducedAnnually(double production_capacity) const {
-  double timesteps_per_year = cyclusYear / context()->dt();
-  return production_capacity * timesteps_per_year;
-}
-
-/// @brief Calculates the post tax weighted average cost of capital (WACC), also known as
+/// @brief Calculates the weighted average cost of capital (WACC), also known as
 /// tax-modified rate of return
+///
+/// WACC represents the average rate a company is expected to pay to finance its
+/// assets, accounting for the tax benefits of debt financing. This is the discount
+/// rate used in capital cost calculations.
+///
 /// Formula: (1-τ)*r_b*f_b + r_s*f_s
-/// This is the discount rate used in capital cost calculations. Can be overridden
-/// by setting discount_rate_override > 0 at the institution level.
+/// where:
+/// - τ = income_tax_rate (corporate income tax rate)
+/// - r_b = bond_rate (bond holders rate of return)
+/// - f_b = bond_fraction (fraction of bond financing)
+/// - r_s = shareholder_rate (share holders rate of return)
+/// - f_s = shareholder_fraction (fraction of private capital)
+///
 /// @param income_tax_rate Corporate income tax rate
 /// @param bond_rate Bond holders rate of return
 /// @param bond_fraction Fraction of bond financing
@@ -196,18 +182,6 @@ double CalcTaxModifiedRateOfReturn(double income_tax_rate,
                                     double shareholder_fraction) const {
   return (1 - income_tax_rate) * bond_rate * bond_fraction +
          shareholder_rate * shareholder_fraction;
-}
-
-/// @brief Calculates fixed cost per unit
-/// @param levelized_fixed_costs Annual fixed costs
-/// @param units_produced_annually Number of units produced per year
-/// @return Fixed cost per unit
-double CalcFixedCostPerUnit(double levelized_fixed_costs,
-                             double units_produced_annually) const {
-  if (units_produced_annually == 0) {
-    return 0.0;
-  }
-  return levelized_fixed_costs / units_produced_annually;
 }
 
 /// @brief Calculates capital cost per unit
@@ -232,13 +206,6 @@ double CalcCapitalCostPerUnit(double initial_investment,
                                double income_tax_rate,
                                double tax_modified_rate_of_return,
                                double property_and_insurance_rate) const {
-  if (units_produced_annually == 0) {
-    return 0.0;
-  }
-
-  double capital_investment_per_unit =
-      initial_investment / units_produced_annually;
-
   double depreciation_tax_shield =
       income_tax_rate / (1.0 - income_tax_rate) / facility_lifetime;
 
@@ -246,9 +213,19 @@ double CalcCapitalCostPerUnit(double initial_investment,
       PMT(facility_lifetime, tax_modified_rate_of_return, 1.0, 0.0) /
       (1.0 - income_tax_rate);
 
-  return capital_investment_per_unit *
-         (property_and_insurance_rate + capital_recovery_factor -
-          depreciation_tax_shield);
+  double annual_capital_cost_factor =
+      property_and_insurance_rate + capital_recovery_factor -
+      depreciation_tax_shield;
+
+  // If no units produced, capital costs can't be amortized - use annual cost as limit
+  if (units_produced_annually == 0) {
+    return initial_investment * annual_capital_cost_factor;
+  }
+
+  double capital_investment_per_unit =
+      initial_investment / units_produced_annually;
+
+  return capital_investment_per_unit * annual_capital_cost_factor;
 }
 
 // =============================================================================
@@ -286,9 +263,8 @@ double CalcCapitalCostPerUnit(double initial_investment,
 /// @param production_capacity Maximum throughput per timestep
 /// @param input_cost_per_unit (Optional) per-unit cost of input materials used in the batch
 /// @return Estimated levelized cost to produce one unit
-
-double CalculateUnitCost(double production_capacity,
-                         double input_cost_per_unit = 0.0) const {
+double CalcUnitCost(double production_capacity,
+                    double input_cost_per_unit = 0.0) const {
   // Check if there's a cost override, and if so, use that
   if (cost_override > 0) {
     return cost_override + input_cost_per_unit;
@@ -325,10 +301,9 @@ double CalculateUnitCost(double production_capacity,
   double property_and_insurance_rate = property_tax_rate + property_insurance_rate;
 
   // Calculate intermediate values
-  double units_produced_annually =
-      CalcUnitsProducedAnnually(production_capacity);
+  double units_produced_annually = production_capacity * (cyclusYear / context()->dt());
   
-  // Use discount_rate_override if provided, otherwise calculate manually
+  // Use discount_rate_override if provided, otherwise calculate WACC
   double tax_modified_rate_of_return;
   if (discount_rate_override > 0) {
     tax_modified_rate_of_return = discount_rate_override;
@@ -339,21 +314,20 @@ double CalculateUnitCost(double production_capacity,
   }
 
   // Calculate cost components
-  double fixed_cost_per_unit =
-      CalcFixedCostPerUnit(levelized_fixed_costs, units_produced_annually);
+  // If no units produced, fixed costs can't be amortized - use total as limit
+  double fixed_cost_per_unit = (units_produced_annually == 0) ? levelized_fixed_costs :
+                                levelized_fixed_costs / units_produced_annually;
   double capital_cost_per_unit = CalcCapitalCostPerUnit(
       initial_investment, units_produced_annually, facility_lifetime,
       income_tax_rate, tax_modified_rate_of_return,
       property_and_insurance_rate);
-
 
   // Assemble total unit cost
   double production_cost = fixed_cost_per_unit + variable_cost_per_unit 
                             + capital_cost_per_unit;
   double unit_cost = production_cost + input_cost_per_unit;
 
-  // Protects against divide by zero in pref = 1/unit_cost
-  return unit_cost != 0 ? unit_cost : kDefaultUnitCost;
+  return unit_cost;
 }
 
 // Required for compilation but not added by the cycpp preprocessor. Do not
