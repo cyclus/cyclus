@@ -38,11 +38,11 @@ std::vector<double> mu_parameters;
 ///
 /// @param commods Vector of commodity names
 /// @param prefs Vector of preference values
-/// @return Calculated marginal utility value
-double CalcMarginalUtility(std::vector<std::string> commods,
-                          std::vector<double> prefs) const {
+/// @return Vector of pairs (commodity name, marginal utility value) for each commodity
+std::vector<std::pair<std::string, double>> CalcMarginalUtility(
+    std::vector<std::string> commods, std::vector<double> prefs) const {
   // Implementation will be added in Step 3
-  return 0.0;
+  return std::vector<std::pair<std::string, double>>();
 }
 
 // Required for compilation but not added by the cycpp preprocessor. Do not
