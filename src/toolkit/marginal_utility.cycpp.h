@@ -5,6 +5,10 @@
 ///    archetype class (as private)
 /// - The functional form and parameters will be available as state variables
 ///    that can be set in the input file.
+/// - Call `InitializeMarginalUtility(commods, prefs)` in `EnterNotify()` or
+///    `Build()` to calculate and cache marginal utilities for all commodities
+/// - Use `GetMarginalUtility(commodity_name)` when constructing bids to
+///    retrieve the cached marginal utility value for a specific commodity
 
 /// How to add parameters to this file:
 /// 1. Add the pragma. A default value MUST be added to ensure backwards
@@ -16,10 +20,10 @@
 // clang-format off
 #pragma cyclus var { \
     "default": "Linear", \
-    "uilabel": "Marginal Utility Functional Form. Must be one of: Linear, Affine, Exponential, Logarithmic, Piecewise", \
+    "uilabel": "Marginal Utility Functional Form. Must be one of: Linear, Affine, Exponential, Logarithmic", \
     "uitype": "combobox", \
-    "categorical": ["Linear", "Affine", "Exponential", "Logarithmic", "Piecewise"], \
-    "doc": "The functional form to use for calculating marginal utility. Must be one of: Linear, Affine, Exponential, Logarithmic, Piecewise" \
+    "categorical": ["Linear", "Affine", "Exponential", "Logarithmic"], \
+    "doc": "The functional form to use for calculating marginal utility. Must be one of: Linear, Affine, Exponential, Logarithmic" \
     }
 std::string mu_functional_form;
 
@@ -31,18 +35,100 @@ std::string mu_functional_form;
 std::vector<double> mu_parameters;
 // clang-format on
 
+// Cache for marginal utility values (commodity name -> MU value)
+std::map<std::string, double> mu_cache_;
+
 /// @brief Calculates the marginal utility based on the selected functional form
 /// and parameters.
 ///
-/// This function will be implemented in Step 3.
+/// Functional forms:
+/// - Linear: MU = k * P (requires 1 parameter: k)
+/// - Affine: MU = b + k * P (requires 2 parameters: b, k)
+/// - Exponential: MU = B * exp(k * P) (requires 2 parameters: B, k)
+/// - Logarithmic: MU = B * ln(1 + k * P) (requires 2 parameters: B, k)
 ///
 /// @param commods Vector of commodity names
-/// @param prefs Vector of preference values
+/// @param prefs Vector of preference values (must be same length as commods)
 /// @return Vector of pairs (commodity name, marginal utility value) for each commodity
 std::vector<std::pair<std::string, double>> CalcMarginalUtility(
     std::vector<std::string> commods, std::vector<double> prefs) const {
-  // Implementation will be added in Step 3
-  return std::vector<std::pair<std::string, double>>();
+  std::vector<std::pair<std::string, double>> results;
+
+  // Ensure inputs are the same length
+  if (commods.size() != prefs.size()) {
+    return results;  // Return empty vector if sizes don't match
+  }
+
+  // Extract parameters based on functional form
+  if (mu_functional_form == "Linear") {
+    // Linear: MU = k * P
+    double k = mu_parameters.size() > 0 ? mu_parameters[0] : 1.0;
+    for (size_t i = 0; i < commods.size(); ++i) {
+      double mu = k * prefs[i];
+      results.push_back(std::make_pair(commods[i], mu));
+    }
+  } else if (mu_functional_form == "Affine") {
+    // Affine: MU = b + k * P
+    double b = mu_parameters.size() > 0 ? mu_parameters[0] : 0.0;
+    double k = mu_parameters.size() > 1 ? mu_parameters[1] : 1.0;
+    for (size_t i = 0; i < commods.size(); ++i) {
+      double mu = b + k * prefs[i];
+      results.push_back(std::make_pair(commods[i], mu));
+    }
+  } else if (mu_functional_form == "Exponential") {
+    // Exponential: MU = B * exp(k * P)
+    double B = mu_parameters.size() > 0 ? mu_parameters[0] : 1.0;
+    double k = mu_parameters.size() > 1 ? mu_parameters[1] : 1.0;
+    for (size_t i = 0; i < commods.size(); ++i) {
+      double mu = B * std::exp(k * prefs[i]);
+      results.push_back(std::make_pair(commods[i], mu));
+    }
+  } else if (mu_functional_form == "Logarithmic") {
+    // Logarithmic: MU = B * ln(1 + k * P)
+    double B = mu_parameters.size() > 0 ? mu_parameters[0] : 1.0;
+    double k = mu_parameters.size() > 1 ? mu_parameters[1] : 1.0;
+    for (size_t i = 0; i < commods.size(); ++i) {
+      double mu = B * std::log(1.0 + k * prefs[i]);
+      results.push_back(std::make_pair(commods[i], mu));
+    }
+  }
+
+  return results;
+}
+
+/// @brief Initializes and caches marginal utility values for all commodities.
+///
+/// This function should be called once at the beginning of the simulation
+/// (e.g., in EnterNotify() or Build()) to calculate and cache all marginal
+/// utility values. After initialization, use GetMarginalUtility() to retrieve
+/// cached values when constructing bids.
+///
+/// @param commods Vector of commodity names
+/// @param prefs Vector of preference values (must be same length as commods)
+void InitializeMarginalUtility(std::vector<std::string> commods,
+                               std::vector<double> prefs) {
+  mu_cache_.clear();
+  std::vector<std::pair<std::string, double>> mu_results =
+      CalcMarginalUtility(commods, prefs);
+  for (const auto& pair : mu_results) {
+    mu_cache_[pair.first] = pair.second;
+  }
+}
+
+/// @brief Retrieves the cached marginal utility value for a specific commodity.
+///
+/// This function returns the marginal utility value that was previously
+/// calculated and cached by InitializeMarginalUtility(). Use this function
+/// when constructing bids to get the MU for a specific commodity.
+///
+/// @param commodity_name The name of the commodity to look up
+/// @return The marginal utility value for the commodity, or 0.0 if not found
+double GetMarginalUtility(const std::string& commodity_name) const {
+  auto it = mu_cache_.find(commodity_name);
+  if (it != mu_cache_.end()) {
+    return it->second;
+  }
+  return 0.0;  // Return 0.0 if commodity not found in cache
 }
 
 // Required for compilation but not added by the cycpp preprocessor. Do not
