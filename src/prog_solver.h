@@ -24,6 +24,7 @@ class ProgSolver : public ExchangeSolver {
   /// @param tmax the maximum solution time, default kDefaultTimeout
   /// @param exclusive_orders whether all orders must be exclusive or not,
   /// default false
+  /// @param exchange_mode the exchange objective function mode (legacy or welfare)
   /// @param verbose print out a lot to stdout, default false
   /// @param mps dump mps files for every solve, default false
   /// @{
@@ -31,7 +32,7 @@ class ProgSolver : public ExchangeSolver {
   ProgSolver(std::string solver_t, double tmax);
   ProgSolver(std::string solver_t, bool exclusive_orders);
   ProgSolver(std::string solver_t, double tmax, bool exclusive_orders,
-             bool verbose, bool mps);
+             ExchangeMode exchange_mode, bool verbose, bool mps);
   /// @}
   virtual ~ProgSolver();
 

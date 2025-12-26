@@ -81,6 +81,9 @@ class Arc {
     vnode_ = other.vnode();
     exclusive_ = other.exclusive();
     excl_val_ = other.excl_val();
+    pref_ = other.pref();
+    mc_ = other.mc_;
+    mu_ = other.mu_;
     return *this;
   }
 
@@ -99,12 +102,17 @@ class Arc {
   inline double excl_val() const { return excl_val_; }
   inline double pref() const { return pref_; }
   inline void pref(double pref) { pref_ = pref; }
+  inline double mc() const { return mc_; }
+  inline void mc(double mc) { mc_ = mc; }
+  inline double mu() const { return mu_; }
+  inline void mu(double mu) { mu_ = mu; }
 
  private:
   boost::weak_ptr<ExchangeNode> unode_;
   boost::weak_ptr<ExchangeNode> vnode_;
   bool exclusive_;
   double excl_val_, pref_;
+  double mc_, mu_;  // marginal cost (from supplier) and marginal utility (from requester)
 };
 
 /// @brief ExchangeNode-ExchangeNode equality operator

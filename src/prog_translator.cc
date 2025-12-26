@@ -17,6 +17,7 @@ ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface)
     : g_(g),
       iface_(iface),
       excl_(false),
+      exchange_mode_(ExchangeSolver::LEGACY),
       pseudo_cost_(std::numeric_limits<double>::max()) {
   Init();
 }
@@ -26,19 +27,24 @@ ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
     : g_(g),
       iface_(iface),
       excl_(exclusive),
+      exchange_mode_(ExchangeSolver::LEGACY),
       pseudo_cost_(std::numeric_limits<double>::max()) {
   Init();
 }
 
 ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
                                double pseudo_cost)
-    : g_(g), iface_(iface), excl_(false), pseudo_cost_(pseudo_cost) {
+    : g_(g), iface_(iface), excl_(false), exchange_mode_(ExchangeSolver::LEGACY),
+      pseudo_cost_(pseudo_cost) {
   Init();
 }
 
 ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
-                               bool exclusive, double pseudo_cost)
-    : g_(g), iface_(iface), excl_(exclusive), pseudo_cost_(pseudo_cost) {
+                               bool exclusive,
+                               ExchangeSolver::ExchangeMode exchange_mode,
+                               double pseudo_cost)
+    : g_(g), iface_(iface), excl_(exclusive), exchange_mode_(exchange_mode),
+      pseudo_cost_(pseudo_cost) {
   Init();
 }
 
@@ -156,7 +162,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
 
       if (request) {
         CheckPref(a.pref());
-        ctx_.obj_coeffs[arc_id] = ExchangeSolver::Cost(a, excl_);
+        ctx_.obj_coeffs[arc_id] = ExchangeSolver::Cost(a, excl_, exchange_mode_);
         ctx_.col_lbs[arc_id] = 0;
         ctx_.col_ubs[arc_id] =
             (excl_ && a.exclusive()) ? 1 : std::min(nodes[i]->qty, inf);
