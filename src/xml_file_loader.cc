@@ -2,6 +2,7 @@
 #include "xml_file_loader.h"
 
 #include <algorithm>
+#include <cctype>
 #include <fstream>
 #include <set>
 #include <streambuf>
@@ -275,9 +276,27 @@ void XMLFileLoader::LoadSolver() {
     Warn<VALUE_WARNING>(ss.str());
   }
 
+  // get exchange mode (default to legacy)
+  string exchange_mode_str = "legacy";
+  if (xqe.NMatches("/*/control/exchange") == 1) {
+    exchange_mode_str = xqe.GetString("/*/control/exchange");
+    // normalize to lowercase
+    std::transform(exchange_mode_str.begin(), exchange_mode_str.end(),
+                   exchange_mode_str.begin(), ::tolower);
+    // validate: must be "legacy" or "welfare", default to "legacy" if invalid
+    if (exchange_mode_str != "legacy" && exchange_mode_str != "welfare") {
+      std::stringstream ss;
+      ss << "Invalid exchange mode: '" << exchange_mode_str
+         << "'. Must be 'legacy' or 'welfare'. Defaulting to 'legacy'.";
+      Warn<VALUE_WARNING>(ss.str());
+      exchange_mode_str = "legacy";
+    }
+  }
+
   ctx_->NewDatum("SolverInfo")
       ->AddVal("Solver", solver_name)
       ->AddVal("ExclusiveOrders", exclusive)
+      ->AddVal("ExchangeMode", exchange_mode_str)
       ->Record();
 
   // now load the actual solver

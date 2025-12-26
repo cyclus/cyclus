@@ -1,6 +1,7 @@
 #ifndef CYCLUS_SRC_TRADE_EXECUTOR_H_
 #define CYCLUS_SRC_TRADE_EXECUTOR_H_
 
+#include <cmath>
 #include <map>
 #include <set>
 #include <stdexcept>
@@ -9,6 +10,7 @@
 
 #include "context.h"
 #include "exchange_context.h"
+#include "exchange_solver.h"
 #include "trade.h"
 #include "trader.h"
 #include "trader_management.h"
@@ -105,32 +107,25 @@ template <class T> class TradeExecutor {
         Trade<T>& trade = v_it->first;
         typename T::Ptr rsrc = v_it->second;
         if (rsrc->quantity() > cyclus::eps_rsrc()) {
-          // Get the original bid preference
-          double original_preference = trade.bid->preference();
-
-          // If the bid has NaN preference, use the request preference
-          if (std::isnan(original_preference)) {
-            original_preference = trade.request->preference();
+          // Determine exchange mode to know how to record costs
+          ExchangeSolver::ExchangeMode exchange_mode = ExchangeSolver::LEGACY;
+          if (ctx && ctx->solver()) {
+            exchange_mode = ctx->solver()->exchange_mode();
           }
 
-          // Start with the original preference as the adjusted preference
-          double adjusted_preference = original_preference;
-
-          // If we have access to the exchange context, use the adjusted
-          // preference that was actually used by the solver
-          if (ex_ctx) {
-            auto trader_it = ex_ctx->trader_prefs.find(trade.request->requester());
-            if (trader_it != ex_ctx->trader_prefs.end()) {
-              auto request_it = trader_it->second.find(trade.request);
-              if (request_it != trader_it->second.end()) {
-                auto bid_it = request_it->second.find(trade.bid);
-                if (bid_it != request_it->second.end()) {
-                  adjusted_preference = bid_it->second;
-                }
-              }
-            }
-            // If any of the keys are not found, adjusted_preference remains
-            // the original preference
+          double bid_cost, adjusted_cost;
+          if (exchange_mode == ExchangeSolver::WELFARE) {
+            // In welfare mode: record MC (marginal cost) as the cost
+            double mc = trade.bid->preference();
+            bid_cost = mc;
+            adjusted_cost = GetAdjustedPreference(trade, ex_ctx, mc);
+          } else {
+            // Legacy mode:
+            double request_preference = trade.request->preference();
+            double adjusted_preference = GetAdjustedPreference(trade, ex_ctx,
+                                                                request_preference);
+            bid_cost = 1 / request_preference;
+            adjusted_cost = 1 / adjusted_preference;
           }
 
           ctx->NewDatum("Transactions")
@@ -140,8 +135,8 @@ template <class T> class TradeExecutor {
               ->AddVal("ResourceId", rsrc->state_id())
               ->AddVal("Commodity", trade.request->commodity())
               ->AddVal("Time", ctx->time())
-              ->AddVal("BidCost", 1 / original_preference)
-              ->AddVal("AdjustedCost", 1 / adjusted_preference)
+              ->AddVal("BidCost", bid_cost)
+              ->AddVal("AdjustedCost", adjusted_cost)
               ->Record();
         }
       }
@@ -154,6 +149,29 @@ template <class T> class TradeExecutor {
   inline TradeExecutionContext<T>& trade_ctx() { return trade_ctx_; }
 
  private:
+  /// @brief Get the adjusted preference from exchange context if available
+  ///
+  /// @param trade the trade to look up
+  /// @param ex_ctx the exchange context containing adjusted preferences
+  /// @param default_value the default value to return if not found in context
+  /// @return the adjusted preference from context, or default_value if not found
+  double GetAdjustedPreference(const Trade<T>& trade, ExchangeContext<T>* ex_ctx,
+                                double default_value) {
+    if (ex_ctx) {
+      auto trader_it = ex_ctx->trader_prefs.find(trade.request->requester());
+      if (trader_it != ex_ctx->trader_prefs.end()) {
+        auto request_it = trader_it->second.find(trade.request);
+        if (request_it != trader_it->second.end()) {
+          auto bid_it = request_it->second.find(trade.bid);
+          if (bid_it != request_it->second.end()) {
+            return bid_it->second;
+          }
+        }
+      }
+    }
+    return default_value;
+  }
+
   const std::vector<Trade<T>>& trades_;
   TradeExecutionContext<T> trade_ctx_;
 };
