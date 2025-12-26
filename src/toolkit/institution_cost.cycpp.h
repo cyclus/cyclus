@@ -18,15 +18,6 @@
 // clang-format off
 #pragma cyclus var { \
     "default": 0.0, \
-    "uilabel": "Minimum acceptable rate of return", \
-    "range": [0.0, 1.0], \
-    "doc": "Minimum acceptable rate of return for the institution", \
-    "units": "Dimensionless" \
-    }
-double minimum_acceptable_return_rate;
-
-#pragma cyclus var { \
-    "default": 0.0, \
     "uilabel": "Corporate Income Tax Rate", \
     "range": [0.0, 1.0], \
     "doc": "Corporate income tax rate as decimal (1% --> 0.01)", \
@@ -69,17 +60,25 @@ double share_holders_rate_of_return;
     "units": "Dimensionless" \
     }
 double fraction_private_capital;
+
+#pragma cyclus var { \
+    "default": -1.0, \
+    "uilabel": "Discount Rate Override", \
+    "doc": "Optional discount rate (post-tax WACC) override. If > 0, this value overrides the calculated tax_modified_rate_of_return based on bond and shareholder rates of return. If 0, WACC is calculated from financing parameters. As decimal (1% --> 0.01)", \
+    "units": "Dimensionless" \
+    }
+double discount_rate_override;
 // clang-format on    
 
 // Must be done in a function so that we can access the user-defined values
 std::unordered_map<std::string, double> GenerateParamList() const {
     std::unordered_map<std::string, double> econ_params {
-        {"minimum_acceptable_return_rate", minimum_acceptable_return_rate},
         {"corporate_income_tax_rate", corporate_income_tax_rate},
         {"bond_holders_rate_of_return", bond_holders_rate_of_return},
         {"fraction_bond_financing", fraction_bond_financing},
         {"share_holders_rate_of_return", share_holders_rate_of_return},
-        {"fraction_private_capital", fraction_private_capital}
+        {"fraction_private_capital", fraction_private_capital},
+        {"discount_rate_override", discount_rate_override}
     };
 
     return econ_params;
@@ -88,9 +87,9 @@ std::unordered_map<std::string, double> GenerateParamList() const {
     
 // Required for compilation but not added by the cycpp preprocessor. Do not
 // remove. Must be one for each variable.
-std::vector<int> cycpp_shape_minimum_acceptable_return_rate = {0};
 std::vector<int> cycpp_shape_corporate_income_tax_rate = {0};
 std::vector<int> cycpp_shape_bond_holders_rate_of_return = {0};
 std::vector<int> cycpp_shape_fraction_bond_financing = {0};
 std::vector<int> cycpp_shape_share_holders_rate_of_return = {0};
 std::vector<int> cycpp_shape_fraction_private_capital = {0};
+std::vector<int> cycpp_shape_discount_rate_override = {0};

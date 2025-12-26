@@ -35,7 +35,11 @@ Since last release
 * Allow multiple archetype blocks to facilitate includes (#1874)
 
 **Changed:**
+<<<<<<< HEAD
 * Made the Unit Tests far less verbose by suppressing log output during RunSim (#1927)
+=======
+* Reworked the facility/instituion/region_cost.cycpp.h files to work with MC (#1931)
+>>>>>>> origin/mc-injection
 * Changed Dockerfile to use boost and boost-cpp instead of libboost-devel (#1906)
 * Changed TradeExecutor to use adjusted preferences from ExchangeContext (#1897)
 * Ran clang-format on src directory (#1881, #1893)
