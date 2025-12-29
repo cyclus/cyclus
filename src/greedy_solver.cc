@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <cassert>
-#include <cmath>
 #include <functional>
 #include <vector>
 #include <boost/math/special_functions/next.hpp>
@@ -17,19 +16,18 @@ void Capacity(cyclus::Arc const&, double, double) {};
 void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
               double) {};
 
-GreedySolver::GreedySolver(bool exclusive_orders, ExchangeMode exchange_mode,
-                           GreedyPreconditioner* c)
-    : conditioner_(c), ExchangeSolver(exclusive_orders, exchange_mode) {}
+GreedySolver::GreedySolver(bool exclusive_orders, GreedyPreconditioner* c)
+    : conditioner_(c), ExchangeSolver(exclusive_orders) {}
 
-GreedySolver::GreedySolver(bool exclusive_orders, ExchangeMode exchange_mode)
-    : ExchangeSolver(exclusive_orders, exchange_mode) {
+GreedySolver::GreedySolver(bool exclusive_orders)
+    : ExchangeSolver(exclusive_orders) {
   conditioner_ = new cyclus::GreedyPreconditioner();
 }
 
 GreedySolver::GreedySolver(GreedyPreconditioner* c)
-    : conditioner_(c), ExchangeSolver(true, LEGACY) {}
+    : conditioner_(c), ExchangeSolver(true) {}
 
-GreedySolver::GreedySolver() : ExchangeSolver(true, LEGACY) {
+GreedySolver::GreedySolver() : ExchangeSolver(true) {
   conditioner_ = new cyclus::GreedyPreconditioner();
 }
 
@@ -189,7 +187,7 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
           graph_->AddMatch(a, tomatch);
 
           match += tomatch;
-          UpdateObj(tomatch, a);
+          UpdateObj(tomatch, u->prefs[a]);
         }
         ++arc_it;
       }  // while( (match =< target) && (arc_it != arcs.end()) )
@@ -200,25 +198,10 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
   unmatched_ += target - match;
 }
 
-void GreedySolver::UpdateObj(double qty, const Arc& a) {
-  // updates minimizing object
-  if (exchange_mode_ == WELFARE) {
-    // In welfare mode: arc_weight = MC - MU, so objective is (MC - MU) * flow
-    // Clamp to >= 0 since negative arc weights are discarded
-    double mc = a.mc();
-    double mu = a.mu();
-    if (!std::isnan(mc) && !std::isnan(mu)) {
-      double net_marginal_cost = mc - mu;
-      // Clamp to >= 0 (negative means MU > MC, surplus exists, but would be discarded)
-      obj_ += qty * std::max(0.0, net_marginal_cost);
-    } else {
-      // Default to 1.0 if MC or MU not available
-      obj_ += qty * 1.0;
-    }
-  } else {
-    // Legacy mode: arc_weight = 1/pref, so objective is cost * flow
-    obj_ += qty / a.pref();
-  }
+void GreedySolver::UpdateObj(double qty, double pref) {
+  // updates minimizing object (i.e., 1/pref is a cost and the objective is cost
+  // * flow)
+  obj_ += qty / pref;
 }
 
 void GreedySolver::UpdateCapacity(ExchangeNode::Ptr n, const Arc& a,

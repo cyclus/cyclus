@@ -1,7 +1,6 @@
 #ifndef CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_
 #define CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_
 
-#include <cmath>
 #include <sstream>
 
 #include "bid.h"
@@ -232,19 +231,6 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
   Arc arc(unode, vnode);
   arc.pref(pref);
-
-  // Extract MC from bid preference and MU from request preference
-  // In welfare mode, these will be used; in legacy mode, they're ignored
-  // Leave as NaN if not provided (will default to 1.0 in Cost() function)
-  double mc = bid->preference();
-  double mu = req->preference();
-  // Only set if not NaN - if NaN, leave as default NaN so Cost() can handle it
-  if (!std::isnan(mc)) {
-    arc.mc(mc);
-  }
-  if (!std::isnan(mu)) {
-    arc.mu(mu);
-  }
 
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();

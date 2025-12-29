@@ -1,6 +1,5 @@
 #include "exchange_solver.h"
 
-#include <cmath>
 #include <vector>
 #include <map>
 
@@ -9,26 +8,9 @@
 
 namespace cyclus {
 
-double ExchangeSolver::Cost(const Arc& a, bool exclusive_orders,
-                             ExchangeMode mode) {
-  if (mode == WELFARE) {
-    // In welfare mode: arc_weight = MC - MU
-    // Default to 1.0 if either MC or MU is not available (NaN)
-    // Clamp to >= 0 since negative arc weights are discarded
-    double mc = a.mc();
-    double mu = a.mu();
-    if (!std::isnan(mc) && !std::isnan(mu)) {
-      double net_marginal_cost = mc - mu;
-      // Clamp to >= 0 (negative means MU > MC, surplus exists, but would be discarded)
-      return std::max(0.0, net_marginal_cost);
-    } else {
-      return 1.0;
-    }
-  } else {
-    // Legacy mode: arc_weight = 1/pref
-    return (exclusive_orders && a.exclusive()) ? a.excl_val() / a.pref()
-                                               : 1.0 / a.pref();
-  }
+double ExchangeSolver::Cost(const Arc& a, bool exclusive_orders) {
+  return (exclusive_orders && a.exclusive()) ? a.excl_val() / a.pref()
+                                             : 1.0 / a.pref();
 }
 
 double ExchangeSolver::PseudoCost() {
@@ -103,17 +85,11 @@ double ExchangeSolver::PseudoCostByPref(double cost_factor) {
   std::vector<Arc>& arcs = graph_->arcs();
   for (int i = 0; i != arcs.size(); i++) {
     const Arc& a = arcs[i];
-    if (exchange_mode_ == WELFARE) {
-      double cost = ArcCost(a);
-      max_cost = std::max(max_cost, cost);
-    } else {
-      // Legacy mode: remove exclusive value factor from costs for preferences
-      // that are less than unity. otherwise they can artificially raise the
-      // maximum cost.
-      double factor =
-          (a.exclusive() && a.excl_val() < 1) ? 1 / a.excl_val() : 1.0;
-      max_cost = std::max(max_cost, ArcCost(a) * factor);
-    }
+    // remove exclusive value factor from costs for preferences that are less
+    // than unity. otherwise they can artificially raise the maximum cost.
+    double factor =
+        (a.exclusive() && a.excl_val() < 1) ? 1 / a.excl_val() : 1.0;
+    max_cost = std::max(max_cost, ArcCost(a) * factor);
   }
   return max_cost * (1 + cost_factor);
 }

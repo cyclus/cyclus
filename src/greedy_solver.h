@@ -66,17 +66,14 @@ class GreedySolver : public ExchangeSolver {
  public:
   /// GreedySolver constructor
   /// @param exclusive_orders a flag for enforcing integral, quantized orders
-  /// @param exchange_mode the exchange objective function mode (legacy or welfare)
   /// @param c a conditioner to use before solving a graph instance
   /// @warning if a NULL pointer is passed as a conditioner argument,
   /// conditioning will *NOT* occur
   /// @{
   GreedySolver();
-  explicit GreedySolver(bool exclusive_orders,
-                        ExchangeMode exchange_mode = LEGACY);
+  explicit GreedySolver(bool exclusive_orders);
   explicit GreedySolver(GreedyPreconditioner* c);
-  GreedySolver(bool exclusive_orders, ExchangeMode exchange_mode,
-                GreedyPreconditioner* c);
+  GreedySolver(bool exclusive_orders, GreedyPreconditioner* c);
   /// @}
 
   virtual ~GreedySolver();
@@ -153,7 +150,7 @@ class GreedySolver : public ExchangeSolver {
   void GetCaps(ExchangeNodeGroup::Ptr prs);
   void GreedilySatisfySet(RequestGroup::Ptr prs);
   void UpdateCapacity(ExchangeNode::Ptr n, const Arc& a, double qty);
-  void UpdateObj(double qty, const Arc& a);
+  void UpdateObj(double qty, double pref);
 
   GreedyPreconditioner* conditioner_;
   std::map<ExchangeNode::Ptr, double> n_qty_;

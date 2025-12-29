@@ -1,7 +1,5 @@
 #include "sim_init.h"
 
-#include <algorithm>
-
 #include "greedy_preconditioner.h"
 #include "greedy_solver.h"
 #include "platform.h"
@@ -267,9 +265,8 @@ void* SimInit::LoadPreconditioner(std::string name) {
   return precon;
 }
 
-ExchangeSolver* SimInit::LoadGreedySolver(
-    bool exclusive, ExchangeSolver::ExchangeMode exchange_mode,
-    std::set<std::string> tables) {
+ExchangeSolver* SimInit::LoadGreedySolver(bool exclusive,
+                                          std::set<std::string> tables) {
   using std::set;
   using std::string;
   ExchangeSolver* solver;
@@ -286,17 +283,16 @@ ExchangeSolver* SimInit::LoadGreedySolver(
 
   precon = LoadPreconditioner(precon_name);
   if (precon == NULL) {
-    solver = new GreedySolver(exclusive, exchange_mode);
+    solver = new GreedySolver(exclusive);
   } else {
-    solver = new GreedySolver(exclusive, exchange_mode,
+    solver = new GreedySolver(exclusive,
                               reinterpret_cast<GreedyPreconditioner*>(precon));
   }
   return solver;
 }
 
-ExchangeSolver* SimInit::LoadCoinSolver(
-    bool exclusive, ExchangeSolver::ExchangeMode exchange_mode,
-    std::set<std::string> tables) {
+ExchangeSolver* SimInit::LoadCoinSolver(bool exclusive,
+                                        std::set<std::string> tables) {
 #if CYCLUS_HAS_COIN
   ExchangeSolver* solver;
   double timeout;
@@ -312,7 +308,7 @@ ExchangeSolver* SimInit::LoadCoinSolver(
 
   // set timeout to default if input value is non-positive
   timeout = timeout <= 0 ? ProgSolver::kDefaultTimeout : timeout;
-  solver = new ProgSolver("cbc", timeout, exclusive, exchange_mode, verbose, mps);
+  solver = new ProgSolver("cbc", timeout, exclusive, verbose, mps);
   return solver;
 #else
   throw cyclus::Error(
@@ -323,12 +319,10 @@ ExchangeSolver* SimInit::LoadCoinSolver(
 void SimInit::LoadSolverInfo() {
   using std::set;
   using std::string;
-  using ExchangeMode = ExchangeSolver::ExchangeMode;
   // context will delete solver
   ExchangeSolver* solver;
   string solver_name;
   bool exclusive_orders;
-  ExchangeMode exchange_mode = ExchangeSolver::LEGACY;
 
   // load in possible Solver info, needs to be optional to
   // maintain backwards compatibility, defaults above.
@@ -339,30 +333,13 @@ void SimInit::LoadSolverInfo() {
     if (qr.rows.size() > 0) {
       solver_name = qr.GetVal<string>("Solver");
       exclusive_orders = qr.GetVal<bool>("ExclusiveOrders");
-      // get exchange mode (defaults to legacy if not present or invalid)
-      // Check if ExchangeMode column exists by checking fields vector
-      string exchange_mode_str = "legacy";
-      bool has_exchange_mode = std::find(qr.fields.begin(), qr.fields.end(),
-                                         "ExchangeMode") != qr.fields.end();
-      if (has_exchange_mode) {
-        exchange_mode_str = qr.GetVal<string>("ExchangeMode");
-        // normalize to lowercase
-        std::transform(exchange_mode_str.begin(), exchange_mode_str.end(),
-                       exchange_mode_str.begin(), ::tolower);
-        if (exchange_mode_str == "welfare") {
-          exchange_mode = ExchangeSolver::WELFARE;
-        } else {
-          exchange_mode = ExchangeSolver::LEGACY;
-        }
-      }
-      // else: defaults to LEGACY (already set above)
     }
   }
 
   if (solver_name == "greedy") {
-    solver = LoadGreedySolver(exclusive_orders, exchange_mode, tables);
+    solver = LoadGreedySolver(exclusive_orders, tables);
   } else if (solver_name == "coin-or") {
-    solver = LoadCoinSolver(exclusive_orders, exchange_mode, tables);
+    solver = LoadCoinSolver(exclusive_orders, tables);
   } else {
     throw ValueError(
         "The name of the solver was not recognized, "

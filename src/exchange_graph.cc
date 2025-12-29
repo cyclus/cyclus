@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <boost/math/special_functions/next.hpp>
-#include <limits>
 
 #include "cyc_limits.h"
 #include "error.h"
@@ -49,9 +48,7 @@ bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs) {
 Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
          boost::shared_ptr<ExchangeNode>
              vnode)
-    : unode_(unode), vnode_(vnode),
-      mc_(std::numeric_limits<double>::quiet_NaN()),
-      mu_(std::numeric_limits<double>::quiet_NaN()) {
+    : unode_(unode), vnode_(vnode) {
   exclusive_ = unode->exclusive || vnode->exclusive;
   if (exclusive_) {
     double fqty = unode->qty;
@@ -77,9 +74,7 @@ Arc::Arc(const Arc& other)
       vnode_(other.vnode()),
       pref_(other.pref()),
       exclusive_(other.exclusive()),
-      excl_val_(other.excl_val()),
-      mc_(other.mc()),
-      mu_(other.mu()) {}
+      excl_val_(other.excl_val()) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeNodeGroup::AddExchangeNode(ExchangeNode::Ptr node) {
