@@ -153,7 +153,9 @@ void SimInit::LoadInfo() {
   std::string h = qr.GetVal<std::string>("Handle");
   QueryResult dq = b_->Query("DecayMode", NULL);
   std::string d = dq.GetVal<std::string>("Decay");
-  si_ = SimInfo(dur, y0, m0, h, d);
+  QueryResult eq = b_->Query("ExchangeMode", NULL);
+  std::string e = eq.GetVal<std::string>("Exchange");
+  si_ = SimInfo(dur, y0, m0, h, d, e);
 
   si_.seed = qr.GetVal<int>("Seed");
   si_.stride = qr.GetVal<int>("Stride");

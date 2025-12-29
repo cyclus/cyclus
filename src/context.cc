@@ -54,7 +54,8 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
       seed(kDefaultSeed),
       stride(kDefaultStride) {}
 
-SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d)
+SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d,
+                 std::string e)
     : duration(dur),
       y0(y0),
       m0(m0),
@@ -296,7 +297,11 @@ void Context::InitSim(SimInfo si) {
 
   NewDatum("DecayMode")->AddVal("Decay", si.decay)->Record();
 
+<<<<<<< HEAD
   NewDatum("DecayThreshold")->AddVal("Epsilon", si.decay_eps)->Record();
+=======
+  NewDatum("ExchangeMode")->AddVal("Exchange", si.exchange)->Record();
+>>>>>>> ca16ecaa7 (added control block option for exchange mode, updated necessary constructors in tests, etc)
 
   NewDatum("InfoExplicitInv")
       ->AddVal("RecordInventory", si.explicit_inventory)
