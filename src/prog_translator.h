@@ -13,7 +13,6 @@ namespace cyclus {
 
 class ExchangeGraph;
 class ExchangeNodeGroup;
-class ExchangeSolver;
 
 /// @brief struct to hold all problem instance state
 struct ProgTranslatorContext {
@@ -49,14 +48,13 @@ class ProgTranslator {
   /// @param g the exchange graph
   /// @param iface the solver interface
   /// @param exclusive whether or not to include binary-valued arcs
-  /// @param exchange_mode the exchange objective function mode (legacy or welfare)
   /// @param pseudo_cost the cost to use for faux arcs
   ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface);
   ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface, bool exclusive);
   ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
                  double pseudo_cost);
   ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface, bool exclusive,
-                 ExchangeSolver::ExchangeMode exchange_mode, double pseudo_cost);
+                 double pseudo_cost);
 
   /// @brief translates the graph, filling the translators Context
   void Translate();
@@ -88,7 +86,6 @@ class ProgTranslator {
   ExchangeGraph* g_;
   OsiSolverInterface* iface_;
   bool excl_;
-  ExchangeSolver::ExchangeMode exchange_mode_;
   int arc_offset_;
   ProgTranslatorContext ctx_;
   double pseudo_cost_;

@@ -16,29 +16,12 @@ class ExchangeSolver {
  public:
   /// default value to allow exclusive orders or not
   static const bool kDefaultExclusive = true;
-  
-  /// exchange objective function modes
-  enum ExchangeMode {
-    LEGACY,   /// use legacy objective: arc_weight = 1/pref
-    WELFARE   /// use welfare objective: arc_weight = MC - MU
-  };
 
   /// return the cost of an arc
-  static double Cost(const Arc& a, bool exclusive_orders = kDefaultExclusive,
-                     ExchangeMode mode = LEGACY);
+  static double Cost(const Arc& a, bool exclusive_orders = kDefaultExclusive);
 
-  explicit ExchangeSolver(bool exclusive_orders = kDefaultExclusive,
-                          ExchangeMode exchange_mode = LEGACY)
-      : exclusive_orders_(exclusive_orders),
-        exchange_mode_(exchange_mode),
-        sim_ctx_(NULL),
-        verbose_(false) {}
-  
-  /// exchange mode get/set
-  /// @{
-  inline void exchange_mode(ExchangeMode mode) { exchange_mode_ = mode; }
-  inline ExchangeMode exchange_mode() const { return exchange_mode_; }
-  /// @}
+  explicit ExchangeSolver(bool exclusive_orders = kDefaultExclusive)
+      : exclusive_orders_(exclusive_orders), sim_ctx_(NULL), verbose_(false) {}
   virtual ~ExchangeSolver() {}
 
   /// simulation context get/set
@@ -73,9 +56,7 @@ class ExchangeSolver {
   /// @}
 
   /// return the cost of an arc
-  inline double ArcCost(const Arc& a) {
-    return Cost(a, exclusive_orders_, exchange_mode_);
-  }
+  inline double ArcCost(const Arc& a) { return Cost(a, exclusive_orders_); }
 
  protected:
   /// @brief Worker function for solving a graph. This must be implemented by
@@ -83,7 +64,6 @@ class ExchangeSolver {
   virtual double SolveGraph() = 0;
   ExchangeGraph* graph_;
   bool exclusive_orders_;
-  ExchangeMode exchange_mode_;
   bool verbose_;
   Context* sim_ctx_;
 };

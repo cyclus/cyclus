@@ -20,29 +20,29 @@ ProgSolver::ProgSolver(std::string solver_t)
       tmax_(ProgSolver::kDefaultTimeout),
       verbose_(false),
       mps_(false),
-      ExchangeSolver(false, LEGACY) {}
+      ExchangeSolver(false) {}
 
 ProgSolver::ProgSolver(std::string solver_t, bool exclusive_orders)
     : solver_t_(solver_t),
       tmax_(ProgSolver::kDefaultTimeout),
       verbose_(false),
       mps_(false),
-      ExchangeSolver(exclusive_orders, LEGACY) {}
+      ExchangeSolver(exclusive_orders) {}
 
 ProgSolver::ProgSolver(std::string solver_t, double tmax)
     : solver_t_(solver_t),
       tmax_(tmax),
       verbose_(false),
       mps_(false),
-      ExchangeSolver(false, LEGACY) {}
+      ExchangeSolver(false) {}
 
 ProgSolver::ProgSolver(std::string solver_t, double tmax, bool exclusive_orders,
-                       ExchangeMode exchange_mode, bool verbose, bool mps)
+                       bool verbose, bool mps)
     : solver_t_(solver_t),
       tmax_(tmax),
       verbose_(verbose),
       mps_(mps),
-      ExchangeSolver(exclusive_orders, exchange_mode) {}
+      ExchangeSolver(exclusive_orders) {}
 
 ProgSolver::~ProgSolver() {}
 
@@ -57,14 +57,13 @@ double ProgSolver::SolveGraph() {
   iface_ = sf.get();
   try {
     // get greedy solution
-    GreedySolver greedy(exclusive_orders_, exchange_mode_);
+    GreedySolver greedy(exclusive_orders_);
     double greedy_obj = greedy.Solve(graph_);
     graph_->ClearMatches();
 
     // translate graph to iface_ instance
     double pseudo_cost = PseudoCost();  // from ExchangeSolver API
-    ProgTranslator xlator(graph_, iface_, exclusive_orders_, exchange_mode_,
-                          pseudo_cost);
+    ProgTranslator xlator(graph_, iface_, exclusive_orders_, pseudo_cost);
     xlator.ToProg();
     if (mps_) WriteMPS();
 
