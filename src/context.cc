@@ -27,6 +27,7 @@ SimInfo::SimInfo()
       m0(0),
       dt(kDefaultTimeStepDur),
       decay("manual"),
+      exchange("legacy"),
       branch_time(-1),
       explicit_inventory(false),
       explicit_inventory_compact(false),
@@ -41,6 +42,7 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
       m0(m0),
       dt(kDefaultTimeStepDur),
       decay("manual"),
+      exchange("legacy"),
       branch_time(-1),
       handle(handle),
       explicit_inventory(false),
@@ -50,12 +52,14 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
       seed(kDefaultSeed),
       stride(kDefaultStride) {}
 
-SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d)
+SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d,
+                 std::string e)
     : duration(dur),
       y0(y0),
       m0(m0),
       dt(kDefaultTimeStepDur),
       decay(d),
+      exchange(e),
       branch_time(-1),
       handle(handle),
       explicit_inventory(false),
@@ -72,6 +76,7 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim, int branch_time,
       m0(-1),
       dt(kDefaultTimeStepDur),
       decay("manual"),
+      exchange("legacy"),
       parent_sim(parent_sim),
       parent_type(parent_type),
       branch_time(branch_time),
@@ -285,6 +290,8 @@ void Context::InitSim(SimInfo si) {
       ->Record();
 
   NewDatum("DecayMode")->AddVal("Decay", si.decay)->Record();
+
+  NewDatum("ExchangeMode")->AddVal("Exchange", si.exchange)->Record();
 
   NewDatum("InfoExplicitInv")
       ->AddVal("RecordInventory", si.explicit_inventory)

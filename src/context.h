@@ -66,8 +66,10 @@ class SimInfo {
   /// @param m0 start month for the simulation
   /// @param handle is this simulation's unique simulation handle
   /// @param d the decay data member, "never" for no decay. "manual" otherwise
+  /// @param e the exchange mode, "legacy" or "welfare"
   /// @return a SimInfo instance
-  SimInfo(int dur, int y0, int m0, std::string handle, std::string d);
+  SimInfo(int dur, int y0, int m0, std::string handle, std::string d,
+          std::string e);
 
   /// @brief constructs a SimInfo instance
   /// @param dur simulation duration in number of timesteps
@@ -84,6 +86,9 @@ class SimInfo {
 
   /// "manual" if use of the decay function is allowed, "never" otherwise
   std::string decay;
+
+  /// "legacy" for legacy DRE objective function, "welfare" for welfare objective
+  std::string exchange;
 
   /// length of the simulation in timesteps (months)
   int duration;

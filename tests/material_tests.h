@@ -45,7 +45,7 @@ class MaterialTest : public ::testing::Test {
     ctx = new cyclus::Context(&ti, &rec);
     fac = new TestFacility(ctx);
 
-    si = SimInfo(100, 2015, 1, "", "never");
+    si = SimInfo(100, 2015, 1, "", "never", "legacy");
     ctx_no_decay = new cyclus::Context(&ti, &rec);
     ctx_no_decay->InitSim(si);
     fac_no_decay = new TestFacility(ctx_no_decay);
