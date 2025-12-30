@@ -55,7 +55,7 @@ class ExchangeSolver {
   double PseudoCostByPref(double cost_factor);
   /// @}
 
-  /// return the cost of an arc (checks exchange mode)
+  /// return the cost of an arc
   double ArcCost(const Arc& a);
 
  protected:
