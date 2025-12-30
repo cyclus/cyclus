@@ -260,6 +260,10 @@ class ExchangeGraph {
   inline const std::map<int, Arc>& arc_by_id() const { return arc_by_id_; }
   inline std::map<int, Arc>& arc_by_id() { return arc_by_id_; }
 
+  /// @brief get/set max MU value (for welfare mode)
+  inline double max_mu() const { return max_mu_; }
+  inline void max_mu(double val) { max_mu_ = val; }
+
  private:
   std::vector<RequestGroup::Ptr> request_groups_;
   std::vector<ExchangeNodeGroup::Ptr> supply_groups_;
@@ -269,6 +273,7 @@ class ExchangeGraph {
   std::map<Arc, int> arc_ids_;
   std::map<int, Arc> arc_by_id_;
   int next_arc_id_;
+  double max_mu_;  // maximum MU across all requests (for welfare mode)
 };
 
 }  // namespace cyclus
