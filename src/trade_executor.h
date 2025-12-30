@@ -142,6 +142,7 @@ template <class T> class TradeExecutor {
               ->AddVal("Time", ctx->time())
               ->AddVal("BidCost", 1 / original_preference)
               ->AddVal("AdjustedCost", 1 / adjusted_preference)
+              ->AddVal("MarginalCost", trade.bid->preference())
               ->Record();
         }
       }
