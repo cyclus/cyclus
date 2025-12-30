@@ -1,6 +1,7 @@
 #include "prog_translator.h"
 
 #include <algorithm>
+#include <cmath>
 
 #include "CoinPackedVector.hpp"
 #include "OsiSolverInterface.hpp"
@@ -38,7 +39,16 @@ ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
 
 ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
                                bool exclusive, double pseudo_cost)
-    : g_(g), iface_(iface), excl_(exclusive), pseudo_cost_(pseudo_cost) {
+    : g_(g), iface_(iface), excl_(exclusive), pseudo_cost_(pseudo_cost),
+      exchange_mode_("legacy") {
+  Init();
+}
+
+ProgTranslator::ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface,
+                               bool exclusive, double pseudo_cost,
+                               const std::string& exchange_mode)
+    : g_(g), iface_(iface), excl_(exclusive), pseudo_cost_(pseudo_cost),
+      exchange_mode_(exchange_mode) {
   Init();
 }
 
@@ -156,7 +166,14 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
 
       if (request) {
         CheckPref(a.pref());
-        ctx_.obj_coeffs[arc_id] = ExchangeSolver::Cost(a, excl_);
+        // Calculate objective coefficient based on exchange mode
+        if (exchange_mode_ == "welfare") {
+          // Welfare mode: arc.pref() already contains (MC - MU) + max_MU
+          ctx_.obj_coeffs[arc_id] = a.pref();
+        } else {
+          // Legacy mode: 1/pref
+          ctx_.obj_coeffs[arc_id] = ExchangeSolver::Cost(a, excl_);
+        }
         ctx_.col_lbs[arc_id] = 0;
         ctx_.col_ubs[arc_id] =
             (excl_ && a.exclusive()) ? 1 : std::min(nodes[i]->qty, inf);

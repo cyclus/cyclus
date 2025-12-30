@@ -13,6 +13,17 @@ double ExchangeSolver::Cost(const Arc& a, bool exclusive_orders) {
                                              : 1.0 / a.pref();
 }
 
+double ExchangeSolver::ArcCost(const Arc& a) {
+  if (sim_ctx_ != NULL && sim_ctx_->sim_info().exchange == "welfare" && graph_ != NULL) {
+    // Welfare mode: arc.pref() already contains (MC - MU) + max_MU
+    // Cost is just the pref value (already calculated during translation)
+    return a.pref();
+  } else {
+    // Legacy mode: 1/pref
+    return Cost(a, exclusive_orders_);
+  }
+}
+
 double ExchangeSolver::PseudoCost() {
   return PseudoCost(1e-1);
 }
