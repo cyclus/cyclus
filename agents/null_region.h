@@ -22,9 +22,6 @@ class NullRegion : public cyclus::Region {
                               "institutions but exhibits null behavior. " \
                               "No parameters are given when using the " \
                               "null region."}
-
-  private:
-  #include "toolkit/region_cost.cycpp.h"
 };
 
 }  // namespace cyclus
