@@ -1,6 +1,6 @@
 /// This includes the required header to add facility costs to archetypes.
 /// One should only need to:
-/// - '#include "toolkit/facility_cost.cycpp.h"' in the header of the
+/// - '#include "toolkit/marginal_cost.cycpp.h"' in the header of the
 ///    archetype class (as private)
 /// - Add `InitEconParameters()` to `EnterNotify()` in the cc file of the
 ///   archetype class.
