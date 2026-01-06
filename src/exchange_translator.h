@@ -34,13 +34,11 @@ template <class T> class ExchangeTranslator {
   /// @brief default constructor
   ///
   /// @param ex_ctx the exchance context
-  ExchangeTranslator(ExchangeContext<T>* ex_ctx) : ex_ctx_(ex_ctx) {}
+  ExchangeTranslator(ExchangeContext<T>* ex_ctx) { ex_ctx_ = ex_ctx; }
 
   /// @brief translate the ExchangeContext into an ExchangeGraph
-  /// @param max_mu maximum MU value (for welfare mode, 0.0 otherwise)
-  ExchangeGraph::Ptr Translate(double max_mu = 0.0) {
+  ExchangeGraph::Ptr Translate() {
     ExchangeGraph::Ptr graph(new ExchangeGraph());
-    graph->max_mu(max_mu);  // Set max_mu before creating arcs
 
     // add each request group
     const std::vector<typename RequestPortfolio<T>::Ptr>& requests =
@@ -93,23 +91,7 @@ template <class T> class ExchangeTranslator {
     }
     // get translated arc
     Arc a = TranslateArc(xlation_ctx_, bid, pref);
-    
-    // In welfare mode, calculate arc weight as (MC - MU) + max_MU
-    // Otherwise use the preference as-is
-    double arc_weight = pref;
-    if (graph->max_mu() > 0.0) {  // max_mu > 0 indicates welfare mode
-      double mc = bid->preference();
-      double mu = req->preference();
-      if (!std::isnan(mc) && !std::isnan(mu)) {
-        double net_cost = mc - mu;
-        // Shift by max_MU, then clamp to ensure non-negative
-        arc_weight = net_cost + graph->max_mu();
-        if (arc_weight < 0) arc_weight = 0;
-      }
-    }
-    
-    a.pref(arc_weight);
-    a.unode()->prefs[a] = arc_weight;  // request node is a.unode()
+    a.unode()->prefs[a] = pref;  // request node is a.unode()
     int n_prefs = a.unode()->prefs.size();
 
     CLOG(LEV_DEBUG5) << "Updating preference for one of "

@@ -101,7 +101,7 @@ void RequestGroup::AddExchangeNode(ExchangeNode::Ptr node) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-ExchangeGraph::ExchangeGraph() : next_arc_id_(0), max_mu_(0.0) {}
+ExchangeGraph::ExchangeGraph() : next_arc_id_(0) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddRequestGroup(RequestGroup::Ptr prs) {

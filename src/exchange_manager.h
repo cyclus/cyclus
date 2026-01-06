@@ -2,7 +2,6 @@
 #define CYCLUS_SRC_EXCHANGE_MANAGER_H_
 
 #include <algorithm>
-#include <cmath>
 
 #include "exchange_graph.h"
 #include "exchange_solver.h"
@@ -44,26 +43,10 @@ template <class T> class ExchangeManager {
 
     if (exchng.Empty()) return;  // empty exchange, move on
 
-    // Calculate max_MU for welfare mode (if needed) - must be done before translation
-    double max_mu = 0.0;
-    if (ctx_->sim_info().exchange == "welfare") {
-      typename std::vector<typename RequestPortfolio<T>::Ptr>::iterator it;
-      for (it = exchng.ex_ctx().requests.begin(); it != exchng.ex_ctx().requests.end(); ++it) {
-        std::vector<Request<T>*> reqs = (*it)->requests();
-        typename std::vector<Request<T>*>::iterator it2;
-        for (it2 = reqs.begin(); it2 != reqs.end(); ++it2) {
-          double mu = (*it2)->preference();
-          if (!std::isnan(mu) && mu > max_mu) {
-            max_mu = mu;
-          }
-        }
-      }
-    }
-
     // translate graph
     ExchangeTranslator<T> xlator(&exchng.ex_ctx());
     CLOG(LEV_DEBUG1) << "translating graph...";
-    ExchangeGraph::Ptr graph = xlator.Translate(max_mu);
+    ExchangeGraph::Ptr graph = xlator.Translate();
     CLOG(LEV_DEBUG1) << "graph translated!";
 
     // solve graph

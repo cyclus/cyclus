@@ -2,12 +2,10 @@
 
 #include <algorithm>
 #include <cassert>
-#include <cmath>
 #include <functional>
 #include <vector>
 #include <boost/math/special_functions/next.hpp>
 
-#include "context.h"
 #include "cyc_limits.h"
 #include "error.h"
 #include "logger.h"
@@ -189,7 +187,7 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
           graph_->AddMatch(a, tomatch);
 
           match += tomatch;
-          UpdateObj(tomatch, a);
+          UpdateObj(tomatch, u->prefs[a]);
         }
         ++arc_it;
       }  // while( (match =< target) && (arc_it != arcs.end()) )
@@ -200,16 +198,10 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
   unmatched_ += target - match;
 }
 
-void GreedySolver::UpdateObj(double qty, const Arc& a) {
-  // updates minimizing object
-  if (sim_ctx_ != NULL && sim_ctx_->sim_info().exchange == "welfare" && graph_ != NULL) {
-    // Welfare mode: arc.pref() already contains (MC - MU) + max_MU
-    // Objective is pref * qty
-    obj_ += a.pref() * qty;
-  } else {
-    // Legacy mode: (1/pref) * qty
-    obj_ += qty / a.pref();
-  }
+void GreedySolver::UpdateObj(double qty, double pref) {
+  // updates minimizing object (i.e., 1/pref is a cost and the objective is cost
+  // * flow)
+  obj_ += qty / pref;
 }
 
 void GreedySolver::UpdateCapacity(ExchangeNode::Ptr n, const Arc& a,
