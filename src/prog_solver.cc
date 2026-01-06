@@ -63,8 +63,7 @@ double ProgSolver::SolveGraph() {
 
     // translate graph to iface_ instance
     double pseudo_cost = PseudoCost();  // from ExchangeSolver API
-    std::string exchange_mode = (sim_ctx_ != NULL) ? sim_ctx_->sim_info().exchange : "legacy";
-    ProgTranslator xlator(graph_, iface_, exclusive_orders_, pseudo_cost, exchange_mode);
+    ProgTranslator xlator(graph_, iface_, exclusive_orders_, pseudo_cost);
     xlator.ToProg();
     if (mps_) WriteMPS();
 

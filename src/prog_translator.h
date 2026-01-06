@@ -55,8 +55,6 @@ class ProgTranslator {
                  double pseudo_cost);
   ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface, bool exclusive,
                  double pseudo_cost);
-  ProgTranslator(ExchangeGraph* g, OsiSolverInterface* iface, bool exclusive,
-                 double pseudo_cost, const std::string& exchange_mode);
 
   /// @brief translates the graph, filling the translators Context
   void Translate();
@@ -91,7 +89,6 @@ class ProgTranslator {
   int arc_offset_;
   ProgTranslatorContext ctx_;
   double pseudo_cost_;
-  std::string exchange_mode_;  // exchange mode: "legacy" or "welfare"
 };
 
 }  // namespace cyclus

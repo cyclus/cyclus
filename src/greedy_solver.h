@@ -150,7 +150,7 @@ class GreedySolver : public ExchangeSolver {
   void GetCaps(ExchangeNodeGroup::Ptr prs);
   void GreedilySatisfySet(RequestGroup::Ptr prs);
   void UpdateCapacity(ExchangeNode::Ptr n, const Arc& a, double qty);
-  void UpdateObj(double qty, const Arc& a);
+  void UpdateObj(double qty, double pref);
 
   GreedyPreconditioner* conditioner_;
   std::map<ExchangeNode::Ptr, double> n_qty_;

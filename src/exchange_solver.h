@@ -55,8 +55,8 @@ class ExchangeSolver {
   double PseudoCostByPref(double cost_factor);
   /// @}
 
-  /// return the cost of an arc (checks exchange mode)
-  double ArcCost(const Arc& a);
+  /// return the cost of an arc
+  inline double ArcCost(const Arc& a) { return Cost(a, exclusive_orders_); }
 
  protected:
   /// @brief Worker function for solving a graph. This must be implemented by
