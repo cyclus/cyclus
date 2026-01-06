@@ -292,7 +292,7 @@ TEST_F(MaterialTest, DecayManual) {
 }
 
 TEST_F(MaterialTest, DecayLazy) {
-  SimInfo si(100, 2015, 1, "", "lazy", "legacy");
+  SimInfo si(100, 2015, 1, "", "lazy");
   cyclus::Context ctx(&ti, &rec);
   ctx.InitSim(si);
   Agent* a = new TestFacility(&ctx);
@@ -452,7 +452,7 @@ TEST_F(MaterialTest, DecayCustomTimeStep) {
   uint64_t custom_timestep = pyne::half_life(cs137);
   double qty = 1.0;
 
-  SimInfo si(10, 2015, 1, "", "manual", "legacy");
+  SimInfo si(10, 2015, 1, "", "manual");
   si.dt = custom_timestep;
   FakeContext* fake_ctx = new FakeContext(&ti, &rec);
   fake_ctx->InitSim(si);
@@ -490,7 +490,7 @@ TEST_F(MaterialTest, ExtractPrevDecay) {
 // Transmute should reset a material's prev_decay_time to the current
 // simulation time.
 TEST_F(MaterialTest, TransmutePrevDecay) {
-  SimInfo si(10, 2015, 1, "", "manual", "legacy");
+  SimInfo si(10, 2015, 1, "", "manual");
   cyclus::Context ctx(&ti, &rec);
   ctx.InitSim(si);
   Agent* a = new TestFacility(&ctx);

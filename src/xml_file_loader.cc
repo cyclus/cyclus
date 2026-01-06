@@ -493,16 +493,8 @@ void XMLFileLoader::LoadControlParams() {
   int y0 = strtol(y0_str.c_str(), NULL, 10);
   // get decay mode
   std::string d = OptionalQuery<std::string>(qe, "decay", "manual");
-<<<<<<< HEAD
   SimInfo si(dur, y0, m0, handle, d);
   si.decay_eps = OptionalQuery<double>(qe, "decay_eps", kDefaultDecayEps);
-=======
-
-  // get exchange mode
-  std::string e = OptionalQuery<std::string>(qe, "exchange", "legacy");
-
-  SimInfo si(dur, y0, m0, handle, d, e);
->>>>>>> ca16ecaa7 (added control block option for exchange mode, updated necessary constructors in tests, etc)
 
   si.explicit_inventory = OptionalQuery<bool>(qe, "explicit_inventory", false);
   si.explicit_inventory_compact =
