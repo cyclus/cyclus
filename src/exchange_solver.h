@@ -3,6 +3,8 @@
 
 #include <cstddef>
 
+#include "error.h"
+
 namespace cyclus {
 
 class Context;
@@ -17,8 +19,20 @@ class ExchangeSolver {
   /// default value to allow exclusive orders or not
   static const bool kDefaultExclusive = true;
 
-  /// return the cost of an arc
-  static double Cost(const Arc& a, bool exclusive_orders = kDefaultExclusive);
+  /// return the arc weight (cost) of an arc, using the provided graph to compute shift
+  /// The objective function is: arc_weight = MC - MU + shift
+  /// where MC is marginal cost, MU is marginal utility, and shift = max(MU)
+  /// @param a the arc
+  /// @param graph the exchange graph (used to compute shift = max(MU))
+  /// @param exclusive_orders whether to apply exclusive order scaling
+  static double Cost(const Arc& a, ExchangeGraph* graph, bool exclusive_orders = kDefaultExclusive);
+  
+  /// return the arc weight (cost) of an arc, using the provided shift value
+  /// This is useful when the shift needs to be computed once and reused
+  /// @param a the arc
+  /// @param shift the shift value (max MU across all arcs)
+  /// @param exclusive_orders whether to apply exclusive order scaling
+  static double ArcWeight(const Arc& a, double shift, bool exclusive_orders = kDefaultExclusive);
 
   explicit ExchangeSolver(bool exclusive_orders = kDefaultExclusive)
       : exclusive_orders_(exclusive_orders), sim_ctx_(NULL), verbose_(false) {}
@@ -55,8 +69,13 @@ class ExchangeSolver {
   double PseudoCostByPref(double cost_factor);
   /// @}
 
-  /// return the cost of an arc
-  inline double ArcCost(const Arc& a) { return Cost(a, exclusive_orders_); }
+  /// return the cost of an arc (instance method that uses the solver's graph)
+  inline double ArcCost(const Arc& a) {
+    if (graph_ == NULL) {
+      throw ValueError("ExchangeSolver::ArcCost requires graph to be set");
+    }
+    return Cost(a, graph_, exclusive_orders_);
+  }
 
  protected:
   /// @brief Worker function for solving a graph. This must be implemented by

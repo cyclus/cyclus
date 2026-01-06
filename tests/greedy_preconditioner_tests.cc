@@ -18,10 +18,21 @@ TEST(ConditionerTests, AvgPref) {
   ExchangeNode::Ptr v(new ExchangeNode());
 
   Arc a(u1, v);
+  
+  // Set MC and MU on arc for testing
+  a.mc(1.0);
+  a.mu(0.0);
 
-  u1->prefs[a] = 1;
-
-  EXPECT_TRUE(AvgPref(u1) > AvgPref(u2));
+  ExchangeGraph g;
+  RequestGroup::Ptr rg(new RequestGroup());
+  rg->AddExchangeNode(u1);
+  rg->AddExchangeNode(u2);
+  g.AddRequestGroup(rg);
+  ExchangeNodeGroup::Ptr sg(new ExchangeNodeGroup());
+  sg->AddExchangeNode(v);
+  g.AddSupplyGroup(sg);
+  g.AddArc(a);
+  EXPECT_TRUE(AvgPref(u1, &g) > AvgPref(u2, &g));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -102,11 +113,11 @@ TEST(ConditionerTests, Conditioning) {
   double c1s = (1. + n1spref / (1 + n1spref));
   double c2e = (1. + n2epref / (1 + n2epref));
   double c2s = (1. + n2spref / (1 + n2spref));
-  avg_prefs[n11] = AvgPref(n11);
-  avg_prefs[n12] = AvgPref(n12);
-  avg_prefs[n13] = AvgPref(n13);
-  avg_prefs[n21] = AvgPref(n21);
-  avg_prefs[n22] = AvgPref(n22);
+  avg_prefs[n11] = AvgPref(n11, &g);
+  avg_prefs[n12] = AvgPref(n12, &g);
+  avg_prefs[n13] = AvgPref(n13, &g);
+  avg_prefs[n21] = AvgPref(n21, &g);
+  avg_prefs[n22] = AvgPref(n22, &g);
 
   double exp11 = c1e * weights[n11->commod];
   double exp12 = c1s * weights[n12->commod];

@@ -2,15 +2,32 @@
 
 #include <vector>
 #include <map>
+#include <limits>
 
 #include "context.h"
 #include "exchange_graph.h"
+#include "error.h"
 
 namespace cyclus {
 
-double ExchangeSolver::Cost(const Arc& a, bool exclusive_orders) {
-  return (exclusive_orders && a.exclusive()) ? a.excl_val() / a.pref()
-                                             : 1.0 / a.pref();
+double ExchangeSolver::Cost(const Arc& a, ExchangeGraph* graph, bool exclusive_orders) {
+  if (graph == NULL) {
+    throw ValueError("ExchangeSolver::Cost requires graph to be provided for shift calculation");
+  }
+  double shift = graph->max_marginal_utility();
+  return ArcWeight(a, shift, exclusive_orders);
+}
+
+double ExchangeSolver::ArcWeight(const Arc& a, double shift, bool exclusive_orders) {
+  // New objective: arc_weight = MC - MU + shift
+  // where MC is marginal cost, MU is marginal utility, and shift = max(MU)
+  double arc_weight = a.mc() - a.mu() + shift;
+  
+  if (exclusive_orders && a.exclusive()) {
+    // For exclusive arcs, scale by excl_val if needed
+    return arc_weight * (a.excl_val() > 0 ? 1.0 / a.excl_val() : 1.0);
+  }
+  return arc_weight;
 }
 
 double ExchangeSolver::PseudoCost() {
@@ -66,12 +83,11 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
         }
       }
 
-      // update max_pref_
-      std::map<Arc, double>& prefs = (*n_it)->prefs;
-      for (p_it = prefs.begin(); p_it != prefs.end(); ++p_it) {
-        pref = p_it->second;
-        const Arc& a = p_it->first;
-        coeff = ArcCost(a);
+      // update max_coeff by checking all arcs connected to this node
+      std::vector<Arc>& node_arcs = graph_->node_arc_map()[*n_it];
+      for (std::vector<Arc>::iterator arc_it = node_arcs.begin(); 
+           arc_it != node_arcs.end(); ++arc_it) {
+        coeff = ArcCost(*arc_it);
         if (coeff > max_coeff) max_coeff = coeff;
       }
     }

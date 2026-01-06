@@ -73,31 +73,24 @@ template <class T> class ExchangeTranslator {
     return graph;
   }
 
-  /// @brief adds a bid-request arc to a graph, if the preference for the arc is
-  /// non-negative
+  /// @brief adds a bid-request arc to a graph, using MC and MU values
   void AddArc(Request<T>* req, Bid<T>* bid, ExchangeGraph::Ptr graph) {
-    double pref = ex_ctx_->trader_prefs.at(req->requester())[req][bid];
-    // TODO: make the following check `pref <=0` and remove the `else if` block
-    // before release 1.5
-    if (pref < 0) {
-      CLOG(LEV_DEBUG1) << "Removing arc because of negative preference.";
+    // Get MC and MU from the exchange context
+    double mc = ex_ctx_->trader_mc.at(req->requester())[req].at(bid);
+    double mu = ex_ctx_->trader_mu.at(req->requester())[req].at(bid);
+    
+    // MC must be positive (or zero)
+    if (mc < 0) {
+      CLOG(LEV_DEBUG1) << "Removing arc because of negative marginal cost.";
       return;
-    } else if (pref == 0) {
-      std::stringstream ss;
-      ss << "0-valued preferences have been deprecated. "
-         << "Please make preference value positive."
-         << "This message will go away in before the next release (1.5).";
-      throw ValueError(ss.str());
     }
-    // get translated arc
-    Arc a = TranslateArc(xlation_ctx_, bid, pref);
-    a.unode()->prefs[a] = pref;  // request node is a.unode()
-    int n_prefs = a.unode()->prefs.size();
-
-    CLOG(LEV_DEBUG5) << "Updating preference for one of "
+    
+    // get translated arc with MC and MU
+    Arc a = TranslateArc(xlation_ctx_, bid, mc, mu);
+    
+    CLOG(LEV_DEBUG5) << "Adding arc for "
                      << req->requester()->manager()->prototype()
-                     << "'s trade nodes:";
-    CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
+                     << " with MC=" << mc << ", MU=" << mu;
 
     graph->AddArc(a);
   }
@@ -219,18 +212,15 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
 /// updates the unit capacities for the associated nodes on the arc
 template <class T>
 Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
-                 Bid<T>* bid) {
-  return TranslateArc<T>(translation_ctx, bid, 1);
-}
-
-template <class T>
-Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
-                 Bid<T>* bid, double pref) {
+                 Bid<T>* bid, double mc, double mu) {
   Request<T>* req = bid->request();
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
   Arc arc(unode, vnode);
-  arc.pref(pref);
+  arc.mc(mc);
+  arc.mu(mu);
+  // Keep pref for backward compatibility (set to old value for now)
+  arc.pref(mc);
 
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();

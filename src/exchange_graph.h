@@ -81,6 +81,9 @@ class Arc {
     vnode_ = other.vnode();
     exclusive_ = other.exclusive();
     excl_val_ = other.excl_val();
+    mc_ = other.mc();
+    mu_ = other.mu();
+    pref_ = other.pref();
     return *this;
   }
 
@@ -97,14 +100,28 @@ class Arc {
   inline boost::shared_ptr<ExchangeNode> vnode() const { return vnode_.lock(); }
   inline bool exclusive() const { return exclusive_; }
   inline double excl_val() const { return excl_val_; }
+  
+  /// @brief marginal cost (from bid node)
+  inline double mc() const { return mc_; }
+  inline void mc(double mc) { mc_ = mc; }
+  
+  /// @brief marginal utility (from request node)
+  inline double mu() const { return mu_; }
+  inline void mu(double mu) { mu_ = mu; }
+  
+  /// @deprecated Use mc() and mu() instead. This method is kept for backward compatibility.
   inline double pref() const { return pref_; }
+  /// @deprecated Use mc() and mu() instead. This method is kept for backward compatibility.
   inline void pref(double pref) { pref_ = pref; }
 
  private:
   boost::weak_ptr<ExchangeNode> unode_;
   boost::weak_ptr<ExchangeNode> vnode_;
   bool exclusive_;
-  double excl_val_, pref_;
+  double excl_val_;
+  double mc_;  ///< marginal cost from bid
+  double mu_;  ///< marginal utility from request
+  double pref_;  ///< deprecated, kept for backward compatibility
 };
 
 /// @brief ExchangeNode-ExchangeNode equality operator
@@ -151,10 +168,13 @@ class ExchangeNodeGroup {
 
   /// @return true of any nodes have arcs associated with them
   bool HasArcs() {
+    // Check if any nodes have arcs by looking at the graph's node_arc_map
+    // This is a bit of a hack, but we need the graph to check this properly
+    // For now, we'll check if nodes have unit_capacities which indicates arcs
     for (std::vector<ExchangeNode::Ptr>::iterator it = nodes_.begin();
          it != nodes_.end();
          ++it) {
-      if (it->get()->prefs.size() > 0) return true;
+      if (it->get()->unit_capacities.size() > 0) return true;
     }
     return false;
   }
@@ -259,6 +279,10 @@ class ExchangeGraph {
 
   inline const std::map<int, Arc>& arc_by_id() const { return arc_by_id_; }
   inline std::map<int, Arc>& arc_by_id() { return arc_by_id_; }
+
+  /// @brief computes the maximum marginal utility across all arcs in the graph
+  /// This is used to compute the shift value for the objective function
+  double max_marginal_utility() const;
 
  private:
   std::vector<RequestGroup::Ptr> request_groups_;
