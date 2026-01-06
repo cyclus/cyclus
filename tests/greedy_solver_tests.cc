@@ -22,9 +22,20 @@ TEST(GreedySolverTests, AvgPref) {
 
   Arc a1(u1, v);
   Arc a2(u2, v);
+  
+  // Set MC and MU on arcs (for testing, we'll use simple values)
+  a1.mc(1.0);
+  a1.mu(0.0);
+  a2.mc(2.0);
+  a2.mu(0.0);
 
-  u1->prefs[a1] = 1;
-  u2->prefs[a2] = 2;
+  ExchangeGraph g;
+  RequestGroup::Ptr rg(new RequestGroup());
+  rg->AddExchangeNode(u1);
+  rg->AddExchangeNode(u2);
+  g.AddRequestGroup(rg);
+  g.AddArc(a1);
+  g.AddArc(a2);
 
   std::vector<ExchangeNode::Ptr> nodes;
   nodes.push_back(u1);
@@ -32,7 +43,7 @@ TEST(GreedySolverTests, AvgPref) {
 
   EXPECT_EQ(nodes[0], u1);
   EXPECT_EQ(nodes[1], u2);
-  std::sort(nodes.begin(), nodes.end(), AvgPrefComp);
+  std::sort(nodes.begin(), nodes.end(), AvgPrefComp(&g));
   EXPECT_EQ(nodes[0], u2);
   EXPECT_EQ(nodes[1], u1);
 }

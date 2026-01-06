@@ -128,10 +128,12 @@ class Facility : public TimeListener, public Agent, public Trader {
   }
 
   /// default implementation for material preferences.
-  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
+  virtual void AdjustMatlPrefs(MCMap<Material>::type& mc_prefs,
+                               MUMap<Material>::type& mu_prefs) {}
 
-  /// default implementation for material preferences.
-  virtual void AdjustProductPrefs(PrefMap<Product>::type& prefs) {}
+  /// default implementation for product preferences.
+  virtual void AdjustProductPrefs(MCMap<Product>::type& mc_prefs,
+                                   MUMap<Product>::type& mu_prefs) {}
 
   /// @brief default implementation for responding to material trades
   /// @param trades all trades in which this trader is the supplier

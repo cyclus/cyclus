@@ -155,8 +155,14 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       }
 
       if (request) {
-        CheckPref(a.pref());
-        ctx_.obj_coeffs[arc_id] = ExchangeSolver::Cost(a, excl_);
+        // MC must be >= 0 (can be 0 for free resources)
+        if (a.mc() < 0) {
+          std::stringstream ss;
+          ss << "Marginal cost found to be negative (" << a.mc()
+             << "). Marginal costs must be non-negative when using an optimization solver.";
+          throw ValueError(ss.str());
+        }
+        ctx_.obj_coeffs[arc_id] = ExchangeSolver::Cost(a, g_, excl_);
         ctx_.col_lbs[arc_id] = 0;
         ctx_.col_ubs[arc_id] =
             (excl_ && a.exclusive()) ? 1 : std::min(nodes[i]->qty, inf);

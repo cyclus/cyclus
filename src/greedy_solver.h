@@ -20,31 +20,41 @@ void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
 ///     return 0;
 /// }
 
-/// @brief A comparison function for sorting a container of Arcs by the
-/// requester's (unode's) preference, in decensing order (i.e., most preferred
-/// Arc first). In the case of a tie, a lexicalgraphic ordering of node ids is
-/// used.
-inline bool ReqPrefComp(const Arc& l, const Arc& r) {
-  int lu = l.unode()->agent_id;
-  int lv = l.vnode()->agent_id;
-  int ru = r.unode()->agent_id;
-  int rv = r.vnode()->agent_id;
-  double lpref = l.unode()->prefs[l];
-  double rpref = r.unode()->prefs[r];
-  return (lpref != rpref) ? (lpref > rpref)
-                          : (lu > ru || (lu == ru && lv > rv));
-}
+/// @brief A comparison functor for sorting a container of Arcs by arc weight,
+/// in ascending order (i.e., lowest cost Arc first). In the case of a tie, a
+/// lexicalgraphic ordering of node ids is used.
+/// Note: Lower arc weight (MC - MU + shift) is better, so we sort ascending.
+struct ReqPrefComp {
+  double shift_;
+  ReqPrefComp(double shift) : shift_(shift) {}
+  bool operator()(const Arc& l, const Arc& r) const {
+    int lu = l.unode()->agent_id;
+    int lv = l.vnode()->agent_id;
+    int ru = r.unode()->agent_id;
+    int rv = r.vnode()->agent_id;
+    double lweight = l.mc() - l.mu() + shift_;
+    double rweight = r.mc() - r.mu() + shift_;
+    return (lweight != rweight) ? (lweight < rweight)
+                                : (lu > ru || (lu == ru && lv > rv));
+  }
+};
 
-/// @brief A comparison function for sorting a container of Nodes by the nodes
-/// preference in decensing order (i.e., most preferred Node first). In the case
-/// of a tie, a lexicalgraphic ordering of node ids is used.
-inline bool AvgPrefComp(ExchangeNode::Ptr l, ExchangeNode::Ptr r) {
-  int lid = l->agent_id;
-  int rid = r->agent_id;
-  double lpref = AvgPref(l);
-  double rpref = AvgPref(r);
-  return (lpref != rpref) ? (lpref > rpref) : (lid > rid);
-}
+/// @brief A comparison function for sorting a container of Nodes by average arc weight
+/// in ascending order (i.e., lowest cost Node first). In the case of a tie, a
+/// lexicalgraphic ordering of node ids is used.
+/// Note: This requires the graph to be available, so it's not a simple inline function
+struct AvgPrefComp {
+  ExchangeGraph* graph_;
+  AvgPrefComp(ExchangeGraph* graph) : graph_(graph) {}
+  bool operator()(ExchangeNode::Ptr l, ExchangeNode::Ptr r) const {
+    int lid = l->agent_id;
+    int rid = r->agent_id;
+    double lpref = AvgPref(l, graph_);
+    double rpref = AvgPref(r, graph_);
+    // Lower arc weight is better, so we sort ascending
+    return (lpref != rpref) ? (lpref < rpref) : (lid > rid);
+  }
+};
 
 class ExchangeGraph;
 class GreedyPreconditioner;
@@ -150,13 +160,14 @@ class GreedySolver : public ExchangeSolver {
   void GetCaps(ExchangeNodeGroup::Ptr prs);
   void GreedilySatisfySet(RequestGroup::Ptr prs);
   void UpdateCapacity(ExchangeNode::Ptr n, const Arc& a, double qty);
-  void UpdateObj(double qty, double pref);
+  void UpdateObj(double qty, double arc_weight);
 
   GreedyPreconditioner* conditioner_;
   std::map<ExchangeNode::Ptr, double> n_qty_;
   std::map<ExchangeNodeGroup*, std::vector<double>> grp_caps_;
   double obj_;
   double unmatched_;
+  double shift_;  ///< shift value (max MU) for computing arc weights
 };
 
 }  // namespace cyclus

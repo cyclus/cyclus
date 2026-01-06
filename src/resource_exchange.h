@@ -19,18 +19,23 @@ namespace cyclus {
 /// @brief Preference adjustment method helpers to convert from templates to the
 /// Agent inheritance hierarchy
 template <class T>
-inline static void AdjustPrefs(Agent* m, typename PrefMap<T>::type& prefs) {}
-inline static void AdjustPrefs(Agent* m, PrefMap<Material>::type& prefs) {
-  m->AdjustMatlPrefs(prefs);
+inline static void AdjustPrefs(Agent* m, typename MCMap<T>::type& mc_prefs,
+                                typename MUMap<T>::type& mu_prefs) {}
+inline static void AdjustPrefs(Agent* m, MCMap<Material>::type& mc_prefs,
+                                MUMap<Material>::type& mu_prefs) {
+  m->AdjustMatlPrefs(mc_prefs, mu_prefs);
 }
-inline static void AdjustPrefs(Agent* m, PrefMap<Product>::type& prefs) {
-  m->AdjustProductPrefs(prefs);
+inline static void AdjustPrefs(Agent* m, MCMap<Product>::type& mc_prefs,
+                                MUMap<Product>::type& mu_prefs) {
+  m->AdjustProductPrefs(mc_prefs, mu_prefs);
 }
-inline static void AdjustPrefs(Trader* t, PrefMap<Material>::type& prefs) {
-  t->AdjustMatlPrefs(prefs);
+inline static void AdjustPrefs(Trader* t, MCMap<Material>::type& mc_prefs,
+                                MUMap<Material>::type& mu_prefs) {
+  t->AdjustMatlPrefs(mc_prefs, mu_prefs);
 }
-inline static void AdjustPrefs(Trader* t, PrefMap<Product>::type& prefs) {
-  t->AdjustProductPrefs(prefs);
+inline static void AdjustPrefs(Trader* t, MCMap<Product>::type& mc_prefs,
+                                MUMap<Product>::type& mu_prefs) {
+  t->AdjustProductPrefs(mc_prefs, mu_prefs);
 }
 
 /// @class ResourceExchange
@@ -134,11 +139,12 @@ template <class T> class ResourceExchange {
   /// @brief allows a trader and its parents to adjust any preferences in the
   /// system
   void AdjustPrefs_(Trader* t) {
-    typename PrefMap<T>::type& prefs = ex_ctx_.trader_prefs[t];
-    AdjustPrefs(t, prefs);
+    typename MCMap<T>::type& mc_prefs = ex_ctx_.trader_mc[t];
+    typename MUMap<T>::type& mu_prefs = ex_ctx_.trader_mu[t];
+    AdjustPrefs(t, mc_prefs, mu_prefs);
     Agent* m = t->manager()->parent();
     while (m != NULL) {
-      AdjustPrefs(m, prefs);
+      AdjustPrefs(m, mc_prefs, mu_prefs);
       m = m->parent();
     }
   }
