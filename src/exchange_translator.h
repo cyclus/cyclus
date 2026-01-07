@@ -93,9 +93,41 @@ template <class T> class ExchangeTranslator {
 
   /// @brief adds a bid-request arc to a graph, using MC and MU values
   void AddArc(Request<T>* req, Bid<T>* bid, ExchangeGraph::Ptr graph) {
-    // Get MC and MU from the exchange context
-    double mc = ex_ctx_->trader_mc.at(req->requester())[req].at(bid);
-    double mu = ex_ctx_->trader_mu.at(req->requester())[req].at(bid);
+    // Validate request preference (MU) first - before accessing maps
+    // This matches the validation in ProgTranslator::CheckPref
+    double mu = req->preference();
+    if (mu <= 0) {
+      std::stringstream ss;
+      ss << "Request preference value is nonpositive (" << mu
+         << "). Preferences must be positive when using an optimization solver.";
+      throw ValueError(ss.str());
+    }
+    
+    // Get MC from the exchange context using safe map access
+    auto req_it = ex_ctx_->trader_mc.find(req->requester());
+    if (req_it == ex_ctx_->trader_mc.end()) {
+      std::stringstream ss;
+      ss << "Requester not found in exchange context for arc addition.";
+      throw ValueError(ss.str());
+    }
+    
+    auto req_map_it = req_it->second.find(req);
+    if (req_map_it == req_it->second.end()) {
+      std::stringstream ss;
+      ss << "Request not found in exchange context for arc addition.";
+      throw ValueError(ss.str());
+    }
+    
+    auto bid_it = req_map_it->second.find(bid);
+    if (bid_it == req_map_it->second.end()) {
+      std::stringstream ss;
+      ss << "Bid not found in exchange context for arc addition.";
+      throw ValueError(ss.str());
+    }
+    double mc = bid_it->second;
+    
+    // Note: MU is already validated above from req->preference()
+    // and matches what's stored in trader_mu (set in ExchangeContext::AddBid)
     
     // Clamp MC to be non-negative (MC < 0 is invalid, clamp to 0)
     if (mc < 0) {

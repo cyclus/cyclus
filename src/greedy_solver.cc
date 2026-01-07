@@ -58,10 +58,6 @@ double GreedySolver::SolveGraph() {
 
   Init();
   
-  // Note: shift is no longer needed here since arc weights are pre-computed
-  // and stored in arc.pref() during translation. We keep shift_ for potential
-  // future use but don't need to compute it.
-
   std::for_each(graph_->request_groups().begin(),
                 graph_->request_groups().end(),
                 std::bind(&GreedySolver::GreedilySatisfySet, this,
