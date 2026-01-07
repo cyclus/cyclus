@@ -23,6 +23,8 @@
     "uilabel": "Marginal Utility Functional Form. Must be one of: Linear, Affine, Exponential, Logarithmic", \
     "uitype": "combobox", \
     "categorical": ["Linear", "Affine", "Exponential", "Logarithmic"], \
+    "uitype": "range", \
+    "range": [0.0, CY_LARGE_DOUBLE], \
     "doc": "The functional form to use for calculating marginal utility. Must be one of: Linear, Affine, Exponential, Logarithmic" \
     }
 std::string mu_functional_form;

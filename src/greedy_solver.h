@@ -25,15 +25,17 @@ void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
 /// lexicalgraphic ordering of node ids is used.
 /// Note: Lower arc weight (MC - MU + shift) is better, so we sort ascending.
 struct ReqPrefComp {
-  double shift_;
-  ReqPrefComp(double shift) : shift_(shift) {}
+  // Note: shift_ is no longer needed since arc weight is stored in pref()
+  // Keeping for potential future use, but not using it
+  ReqPrefComp(double shift) {}
   bool operator()(const Arc& l, const Arc& r) const {
     int lu = l.unode()->agent_id;
     int lv = l.vnode()->agent_id;
     int ru = r.unode()->agent_id;
     int rv = r.vnode()->agent_id;
-    double lweight = l.mc() - l.mu() + shift_;
-    double rweight = r.mc() - r.mu() + shift_;
+    // Use stored arc weight from pref() to avoid recalculation
+    double lweight = l.pref();
+    double rweight = r.pref();
     return (lweight != rweight) ? (lweight < rweight)
                                 : (lu > ru || (lu == ru && lv > rv));
   }

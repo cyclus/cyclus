@@ -138,8 +138,15 @@ template <class T> struct ExchangeContext {
   /// @brief maps trader to request to bid to marginal utility (MU) adjustments
   std::map<Trader*, typename MUMap<T>::type> trader_mu;
   
+  /// @brief the shift value (max MU) used in arc weight calculation
+  /// This is computed after all arcs are created during translation
+  double shift_;
+  
   /// @deprecated Use trader_mc and trader_mu instead. Kept for backward compatibility.
   std::map<Trader*, typename PrefMap<T>::type> trader_prefs;
+  
+  /// @brief default constructor initializes shift to 0
+  ExchangeContext() : shift_(0.0) {}
 };
 
 }  // namespace cyclus

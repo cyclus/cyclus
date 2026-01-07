@@ -69,6 +69,24 @@ template <class T> class ExchangeTranslator {
         AddArc(req, bid, graph);
       }
     }
+    
+    // Compute shift (max MU) after all arcs are created and store in context
+    ex_ctx_->shift_ = graph->max_marginal_utility();
+    
+    // Now update all arcs with the computed arc weight (MC - MU + shift)
+    // and store it in pref for backward compatibility
+    std::vector<Arc>& arcs = graph->arcs();
+    for (std::vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
+      double arc_weight = it->mc() - it->mu() + ex_ctx_->shift_;
+      it->pref(arc_weight);  // Store arc weight in pref for backward compatibility
+      
+      // Warn if arc weight is zero or negative
+      if (arc_weight <= 0.0) {
+        CLOG(LEV_WARN) << "Arc weight is non-positive (" << arc_weight 
+                       << "). MC=" << it->mc() << ", MU=" << it->mu() 
+                       << ", shift=" << ex_ctx_->shift_;
+      }
+    }
 
     return graph;
   }
@@ -79,10 +97,11 @@ template <class T> class ExchangeTranslator {
     double mc = ex_ctx_->trader_mc.at(req->requester())[req].at(bid);
     double mu = ex_ctx_->trader_mu.at(req->requester())[req].at(bid);
     
-    // MC must be positive (or zero)
+    // Clamp MC to be non-negative (MC < 0 is invalid, clamp to 0)
     if (mc < 0) {
-      CLOG(LEV_DEBUG1) << "Removing arc because of negative marginal cost.";
-      return;
+      CLOG(LEV_WARN) << "Marginal cost is negative (" << mc 
+                     << "), clamping to 0.0";
+      mc = 0.0;
     }
     
     // get translated arc with MC and MU
@@ -219,8 +238,10 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
   Arc arc(unode, vnode);
   arc.mc(mc);
   arc.mu(mu);
-  // Keep pref for backward compatibility (set to old value for now)
-  arc.pref(mc);
+  // Note: pref will be set to arc_weight (MC - MU + shift) after all arcs
+  // are created and shift is computed. For now, set to a placeholder.
+  // This will be updated in Translate() after shift is computed.
+  arc.pref(0.0);
 
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();

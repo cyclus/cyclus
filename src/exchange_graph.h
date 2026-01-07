@@ -109,9 +109,12 @@ class Arc {
   inline double mu() const { return mu_; }
   inline void mu(double mu) { mu_ = mu; }
   
-  /// @deprecated Use mc() and mu() instead. This method is kept for backward compatibility.
+  /// @brief returns the arc weight (MC - MU + shift) used in the objective function
+  /// This is computed and stored after all arcs are created and shift is known.
+  /// For the individual components, use mc() and mu() instead.
   inline double pref() const { return pref_; }
-  /// @deprecated Use mc() and mu() instead. This method is kept for backward compatibility.
+  /// @brief sets the arc weight (MC - MU + shift)
+  /// This is typically called during graph translation after shift is computed.
   inline void pref(double pref) { pref_ = pref; }
 
  private:
@@ -121,7 +124,7 @@ class Arc {
   double excl_val_;
   double mc_;  ///< marginal cost from bid
   double mu_;  ///< marginal utility from request
-  double pref_;  ///< deprecated, kept for backward compatibility
+  double pref_;  ///< arc weight (MC - MU + shift) used in objective function
 };
 
 /// @brief ExchangeNode-ExchangeNode equality operator
@@ -166,11 +169,12 @@ class ExchangeNodeGroup {
     excl_node_groups_.push_back(nodes);
   }
 
-  /// @return true of any nodes have arcs associated with them
+  /// @return true if any nodes in this group have arcs associated with them
+  /// This is used by ProgTranslator to determine if a request group needs
+  /// variables/constraints in the LP formulation. We check unit_capacities
+  /// because they are only populated when arcs are created, making this a
+  /// reliable indicator of arc presence.
   bool HasArcs() {
-    // Check if any nodes have arcs by looking at the graph's node_arc_map
-    // This is a bit of a hack, but we need the graph to check this properly
-    // For now, we'll check if nodes have unit_capacities which indicates arcs
     for (std::vector<ExchangeNode::Ptr>::iterator it = nodes_.begin();
          it != nodes_.end();
          ++it) {

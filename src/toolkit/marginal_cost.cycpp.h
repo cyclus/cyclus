@@ -22,7 +22,9 @@
   "doc": "Variable cost per unit of production (labor, materials, etc.). " \
          "The data from the Cost Basis Report represents a variable cost per " \
          "unit and can be used here.", \
-  "units": "Unit of Currency/Unit of Production" \
+  "units": "Unit of Currency/Unit of Production", \
+  "uitype": "range", \
+  "range": [0.0, CY_LARGE_DOUBLE], \
   }
 double variable_cost_per_unit;
 // clang-format on

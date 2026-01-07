@@ -58,9 +58,9 @@ double GreedySolver::SolveGraph() {
 
   Init();
   
-  // Compute shift once for the entire graph
-  double shift = graph_->max_marginal_utility();
-  shift_ = shift;  // Store for use in GreedilySatisfySet
+  // Note: shift is no longer needed here since arc weights are pre-computed
+  // and stored in arc.pref() during translation. We keep shift_ for potential
+  // future use but don't need to compute it.
 
   std::for_each(graph_->request_groups().begin(),
                 graph_->request_groups().end(),
@@ -156,7 +156,8 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
     if (graph_->node_arc_map().count(*req_it) > 0) {
       const std::vector<Arc>& arcs = graph_->node_arc_map().at(*req_it);
       sorted = std::vector<Arc>(arcs);  // make a copy for now
-      std::stable_sort(sorted.begin(), sorted.end(), ReqPrefComp(shift_));
+      // ReqPrefComp no longer needs shift since it uses arc.pref() directly
+      std::stable_sort(sorted.begin(), sorted.end(), ReqPrefComp(0.0));
       arc_it = sorted.begin();
 
       while ((match <= target) && (arc_it != sorted.end())) {
@@ -191,8 +192,8 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
           graph_->AddMatch(a, tomatch);
 
           match += tomatch;
-          double arc_weight = a.mc() - a.mu() + shift_;
-          UpdateObj(tomatch, arc_weight);
+          // Use stored arc weight from pref() to avoid recalculation and ensure consistency
+          UpdateObj(tomatch, a.pref());
         }
         ++arc_it;
       }  // while( (match =< target) && (arc_it != arcs.end()) )
