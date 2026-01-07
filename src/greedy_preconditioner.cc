@@ -19,12 +19,12 @@ inline double SumPref(double total, std::pair<Arc, double> pref) {
 }
 
 double AvgPref(ExchangeNode::Ptr n, ExchangeGraph* graph) {
-  // Compute average arc weight (MC - MU + shift) across all arcs connected to this node
+  // Compute average arc weight across all arcs connected to this node
+  // Use stored arc weight from pref() to avoid recalculation
   if (graph == NULL) {
     return 0.0;
   }
   
-  double shift = graph->max_marginal_utility();
   const std::map<ExchangeNode::Ptr, std::vector<Arc>>& node_arc_map = graph->node_arc_map();
   
   auto it = node_arc_map.find(n);
@@ -35,8 +35,8 @@ double AvgPref(ExchangeNode::Ptr n, ExchangeGraph* graph) {
   const std::vector<Arc>& arcs = it->second;
   double sum = 0.0;
   for (std::vector<Arc>::const_iterator arc_it = arcs.begin(); arc_it != arcs.end(); ++arc_it) {
-    double arc_weight = arc_it->mc() - arc_it->mu() + shift;
-    sum += arc_weight;
+    // Use stored arc weight from pref() instead of recalculating
+    sum += arc_it->pref();
   }
   
   return sum / arcs.size();

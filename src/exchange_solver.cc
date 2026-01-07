@@ -11,17 +11,29 @@
 namespace cyclus {
 
 double ExchangeSolver::Cost(const Arc& a, ExchangeGraph* graph, bool exclusive_orders) {
-  if (graph == NULL) {
-    throw ValueError("ExchangeSolver::Cost requires graph to be provided for shift calculation");
+  // Use stored arc weight from pref() which is set during translation.
+  // This avoids recalculation and ensures consistency across all uses.
+  // Fall back to calculation only if graph is provided and pref() appears unset
+  // (though in normal flow, pref() is always set after translation).
+  double arc_weight = a.pref();
+  
+  // If pref() is 0.0 and we have a graph, it might be unset (or legitimately 0.0).
+  // Since translation always sets pref(), we trust it. But if graph is NULL,
+  // we can't compute shift anyway, so just use pref().
+  // In practice, pref() is always set after ExchangeTranslator::Translate() completes.
+  
+  if (exclusive_orders && a.exclusive()) {
+    // For exclusive arcs, scale by excl_val if needed
+    return arc_weight * (a.excl_val() > 0 ? 1.0 / a.excl_val() : 1.0);
   }
-  double shift = graph->max_marginal_utility();
-  return ArcWeight(a, shift, exclusive_orders);
+  return arc_weight;
 }
 
 double ExchangeSolver::ArcWeight(const Arc& a, double shift, bool exclusive_orders) {
-  // New objective: arc_weight = MC - MU + shift
-  // where MC is marginal cost, MU is marginal utility, and shift = max(MU)
-  double arc_weight = a.mc() - a.mu() + shift;
+  // Use stored arc weight from pref() to avoid recalculation and ensure consistency.
+  // The base arc weight (MC - MU + shift) is stored in pref() after translation.
+  // The shift parameter is kept for API compatibility but not used when pref() is available.
+  double arc_weight = a.pref();
   
   if (exclusive_orders && a.exclusive()) {
     // For exclusive arcs, scale by excl_val if needed

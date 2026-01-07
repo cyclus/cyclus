@@ -140,13 +140,7 @@ template <class T> class TradeExecutor {
             }
           }
           
-          // Compute arc weight: MC - MU + shift
-          // We need to compute shift = max(MU) across all arcs
-          // For now, we'll compute it from the graph if available
-          // Otherwise, we'll use a reasonable default
-          double shift = 0.0;  // Will be computed from graph if available
-          double arc_weight = adjusted_mc - adjusted_mu + shift;
-
+          // Record MC and MU. ArcWeight can be computed from these if needed.
           ctx->NewDatum("Transactions")
               ->AddVal("TransactionId", ctx->NextTransactionID())
               ->AddVal("SenderId", supplier->id())
@@ -156,7 +150,6 @@ template <class T> class TradeExecutor {
               ->AddVal("Time", ctx->time())
               ->AddVal("MC", adjusted_mc)
               ->AddVal("MU", adjusted_mu)
-              ->AddVal("ArcWeight", arc_weight)
               ->Record();
         }
       }
