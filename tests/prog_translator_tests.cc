@@ -34,7 +34,23 @@ TEST(ProgTranslatorTests, translation) {
   int nrows = 8;
   int nexcl = 3;
 
-  double prefs[] = {0.2, 1.2, 4, 5, 1.3};
+  // Marginal cost (MC) and marginal utility (MU) values for each arc
+  // MC comes from bid, MU comes from request
+  double mc_vals[] = {5.0, 2.0, 1.0, 0.5, 1.5};  // MC values (non-negative)
+  double mu_vals[] = {0.0, 0.5, 0.0, 0.0, 0.2};  // MU values
+  
+  // Calculate shift = max(MU) across all arcs
+  double shift = 0.0;
+  for (int i = 0; i != narcs; i++) {
+    shift = std::max(shift, mu_vals[i]);
+  }
+  
+  // Calculate arc_weight = MC - MU + shift for each arc
+  double arc_weights[narcs];
+  for (int i = 0; i != narcs; i++) {
+    arc_weights[i] = mc_vals[i] - mu_vals[i] + shift;
+  }
+
   double ucaps_a_0[] = {0.5, 0.4};
   double ucaps_a_3[] = {0.3, 0.6};
   double ucaps_b_1[] = {0.9};
@@ -56,15 +72,23 @@ TEST(ProgTranslatorTests, translation) {
   int excl_arcs[] = {1, 2, 4};
   double excl_flow[] = {0, 2, 2, 0, 2, 0, 0};
 
+  // Calculate expected objective coefficients using ExchangeSolver::Cost logic
+  // For non-exclusive arcs: obj_coeff = arc_weight
+  // For exclusive arcs with excl_val > 0: obj_coeff = arc_weight * (1.0 / excl_val)
   std::vector<double> obj_coeffs;
+  double excl_val = 2.0;  // excl_val for exclusive arcs (set by excl_flow[1])
   for (int i = 0; i != narcs; i++) {
-    obj_coeffs.push_back((excl_flow[i] != 0) ?
-                         excl_flow[i] / prefs[i] : 1 / prefs[i]);
+    double coeff = arc_weights[i];
+    if (excl_flow[i] != 0) {
+      // Exclusive arcs: ExchangeSolver::Cost returns arc_weight * (1.0 / excl_val)
+      coeff = arc_weights[i] * (1.0 / excl_val);
+    }
+    obj_coeffs.push_back(coeff);
   }
 
-
+  // Calculate max_cost for faux arcs
   double cost_add = 1;
-  double max_obj_coeff = 1 / 0.2;  // 1 / prefs[0]
+  double max_obj_coeff = arc_weights[0];  // Use arc_weight directly
   double min_row_coeff = 0.3;  // ucaps_a_3
   double max_cost = max_obj_coeff / min_row_coeff + cost_add;
   for (int i = 0; i != nfaux; i++) {
@@ -82,15 +106,25 @@ TEST(ProgTranslatorTests, translation) {
   ExchangeNode::Ptr d1(new ExchangeNode());
 
   Arc x0(a0, c0);
-  x0.pref(prefs[0]);
+  x0.mc(mc_vals[0]);
+  x0.mu(mu_vals[0]);
+  x0.pref(arc_weights[0]);  // arc_weight = MC - MU + shift
   Arc x1(b0, c1);
-  x1.pref(prefs[1]);
+  x1.mc(mc_vals[1]);
+  x1.mu(mu_vals[1]);
+  x1.pref(arc_weights[1]);
   Arc x2(b1, c2);
-  x2.pref(prefs[2]);
+  x2.mc(mc_vals[2]);
+  x2.mu(mu_vals[2]);
+  x2.pref(arc_weights[2]);
   Arc x3(a1, d0);
-  x3.pref(prefs[3]);
+  x3.mc(mc_vals[3]);
+  x3.mu(mu_vals[3]);
+  x3.pref(arc_weights[3]);
   Arc x4(b1, d1);
-  x4.pref(prefs[4]);
+  x4.mc(mc_vals[4]);
+  x4.mu(mu_vals[4]);
+  x4.pref(arc_weights[4]);
 
   a0->unit_capacities[x0] = std::vector<double>(
       ucaps_a_0, ucaps_a_0 + sizeof(ucaps_a_0) / sizeof(ucaps_a_0[0]) );
@@ -113,11 +147,13 @@ TEST(ProgTranslatorTests, translation) {
   d1->unit_capacities[x4] = std::vector<double>(
       ucaps_d_4, ucaps_d_4 + sizeof(ucaps_d_4) / sizeof(ucaps_d_4[0]) );
 
-  a0->prefs[x0] = prefs[0];
-  b0->prefs[x1] = prefs[1];
-  b1->prefs[x2] = prefs[2];
-  a1->prefs[x3] = prefs[3];
-  b1->prefs[x4] = prefs[4];
+  // Note: node->prefs map is kept for backward compatibility but
+  // arc_weight is now stored in arc.pref() after MC/MU calculation
+  a0->prefs[x0] = arc_weights[0];
+  b0->prefs[x1] = arc_weights[1];
+  b1->prefs[x2] = arc_weights[2];
+  a1->prefs[x3] = arc_weights[3];
+  b1->prefs[x4] = arc_weights[4];
 
   RequestGroup::Ptr a(new RequestGroup());  // new RequestGroup(dem_a[0])?
   a->AddExchangeNode(a0);
