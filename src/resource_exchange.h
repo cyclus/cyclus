@@ -147,6 +147,8 @@ template <class T> class ResourceExchange {
       AdjustPrefs(m, mc_prefs, mu_prefs);
       m = m->parent();
     }
+    // Update trader_prefs to mirror trader_mc for backward compatibility
+    ex_ctx_.trader_prefs[t] = mc_prefs;
   }
 
   struct trader_compare {
