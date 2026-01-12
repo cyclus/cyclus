@@ -15,24 +15,46 @@ using cyclus::RequestGroup;
 TEST(ConditionerTests, AvgPref) {
   ExchangeNode::Ptr u1(new ExchangeNode());
   ExchangeNode::Ptr u2(new ExchangeNode());
-  ExchangeNode::Ptr v(new ExchangeNode());
+  ExchangeNode::Ptr u3(new ExchangeNode());
+  ExchangeNode::Ptr v1(new ExchangeNode());
+  ExchangeNode::Ptr v2(new ExchangeNode());
 
-  Arc a(u1, v);
+  // u1 has two arcs with average pref of (1.0 + 3.0) / 2 = 2.0
+  Arc a1(u1, v1);
+  a1.pref(1.0);
+  Arc a2(u1, v2);
+  a2.pref(3.0);
   
-  // Set MC and MU on arc for testing
-  a.mc(1.0);
-  a.mu(0.0);
+  // u2 has one arc with pref 1.5
+  Arc a3(u2, v1);
+  a3.pref(1.5);
 
   ExchangeGraph g;
   RequestGroup::Ptr rg(new RequestGroup());
   rg->AddExchangeNode(u1);
   rg->AddExchangeNode(u2);
+  rg->AddExchangeNode(u3);
   g.AddRequestGroup(rg);
   ExchangeNodeGroup::Ptr sg(new ExchangeNodeGroup());
-  sg->AddExchangeNode(v);
+  sg->AddExchangeNode(v1);
+  sg->AddExchangeNode(v2);
   g.AddSupplyGroup(sg);
-  g.AddArc(a);
+  g.AddArc(a1);
+  g.AddArc(a2);
+  g.AddArc(a3);
+  
+  // Test average calculation: u1 should have average of (1.0 + 3.0) / 2 = 2.0
+  EXPECT_DOUBLE_EQ(AvgPref(u1, &g), 2.0);
+  
+  // Test single arc: u2 should have average of 1.5
+  EXPECT_DOUBLE_EQ(AvgPref(u2, &g), 1.5);
+  
+  // Test node with no arcs returns 0.0
+  EXPECT_DOUBLE_EQ(AvgPref(u3, &g), 0.0);
+  
+  // Test ordering: u1 (2.0) > u2 (1.5) > u3 (0.0)
   EXPECT_TRUE(AvgPref(u1, &g) > AvgPref(u2, &g));
+  EXPECT_TRUE(AvgPref(u2, &g) > AvgPref(u3, &g));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -45,8 +67,8 @@ TEST(ConditionerTests, Conditioning) {
   n12->commod = "spam";
   ExchangeNode::Ptr n13(new ExchangeNode());
   n13->commod = "eggs";
-  double n1epref = 1/4;
-  double n1spref = 3/4;
+  double n1epref = 1.0/4.0;
+  double n1spref = 3.0/4.0;
 
   RequestGroup::Ptr g1(new RequestGroup());
   g1->AddExchangeNode(n11);
@@ -79,17 +101,18 @@ TEST(ConditionerTests, Conditioning) {
   Arc n21e(n21, eggs);
   Arc n22s(n22, spam);
 
+  // Set arc preferences (arc weight) - this is what AvgPref reads
+  n11e.pref(n1epref);
+  n12s.pref(n1spref);
+  n13s.pref(n1spref);
+  n21e.pref(n2epref);
+  n22s.pref(n2spref);
+
   g.AddArc(n11e);
   g.AddArc(n12s);
   g.AddArc(n13s);
   g.AddArc(n21e);
   g.AddArc(n22s);
-
-  n11->prefs[n11e] = n1epref;
-  n12->prefs[n12s] = n1spref;
-  n13->prefs[n13s] = n1spref;
-  n21->prefs[n21e] = n2epref;
-  n22->prefs[n22s] = n2epref;
 
   // initial state
   EXPECT_EQ(g.request_groups().at(0), g1);
@@ -143,6 +166,6 @@ TEST(ConditionerTests, Conditioning) {
   EXPECT_EQ(g.request_groups().at(0)->nodes().at(1), n21);
   EXPECT_EQ(g.request_groups().at(1), g1);
   EXPECT_EQ(g.request_groups().at(1)->nodes().at(0), n12);
-  EXPECT_EQ(g.request_groups().at(1)->nodes().at(1), n11);
-  EXPECT_EQ(g.request_groups().at(1)->nodes().at(2), n13);
+  EXPECT_EQ(g.request_groups().at(1)->nodes().at(1), n13);
+  EXPECT_EQ(g.request_groups().at(1)->nodes().at(2), n11);
 }
