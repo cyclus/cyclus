@@ -93,8 +93,7 @@ template <class T> class ExchangeTranslator {
 
   /// @brief adds a bid-request arc to a graph, using MC and MU values
   void AddArc(Request<T>* req, Bid<T>* bid, ExchangeGraph::Ptr graph) {
-    // Validate request preference (MU) first - before accessing maps
-    // This matches the validation in ProgTranslator::CheckPref
+    // Validate request preference (MU) first
     double mu = req->preference();
     if (mu <= 0) {
       std::stringstream ss;
@@ -125,9 +124,6 @@ template <class T> class ExchangeTranslator {
       throw ValueError(ss.str());
     }
     double mc = bid_it->second;
-    
-    // Note: MU is already validated above from req->preference()
-    // and matches what's stored in trader_mu (set in ExchangeContext::AddBid)
     
     // Clamp MC to be non-negative (MC < 0 is invalid, clamp to 0)
     if (mc < 0) {
