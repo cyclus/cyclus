@@ -147,13 +147,8 @@ TEST(ProgTranslatorTests, translation) {
   d1->unit_capacities[x4] = std::vector<double>(
       ucaps_d_4, ucaps_d_4 + sizeof(ucaps_d_4) / sizeof(ucaps_d_4[0]) );
 
-  // Note: node->prefs map is kept for backward compatibility but
-  // arc_weight is now stored in arc.pref() after MC/MU calculation
-  a0->prefs[x0] = arc_weights[0];
-  b0->prefs[x1] = arc_weights[1];
-  b1->prefs[x2] = arc_weights[2];
-  a1->prefs[x3] = arc_weights[3];
-  b1->prefs[x4] = arc_weights[4];
+  // Note: arc preferences are set via arc.pref() above (lines 111, 115, 119, 123, 127)
+  // The old node->prefs map is deprecated and no longer used
 
   RequestGroup::Ptr a(new RequestGroup());  // new RequestGroup(dem_a[0])?
   a->AddExchangeNode(a0);

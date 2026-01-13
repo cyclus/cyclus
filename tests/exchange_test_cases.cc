@@ -188,8 +188,8 @@ void Case3::Construct(ExchangeGraph* g, bool exclusive_orders) {
   v->unit_capacities[a1].push_back(1);
   u->unit_capacities[a2].push_back(1);
   w->unit_capacities[a2].push_back(1);
-  u->prefs[a1] = p1;
-  u->prefs[a2] = p2;
+  a1.pref(p1);
+  a2.pref(p2);
 
   RequestGroup::Ptr request(new RequestGroup(q));
   request->AddCapacity(q);
@@ -242,8 +242,8 @@ void Case3a::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 5;
   c1 = 5;
   c2 = 10;
-  p1 = 1;
-  p2 = 0;
+  p1 = 0;
+  p2 = 1;
   f1 = c1;
   f2 = 0;
 
@@ -255,8 +255,8 @@ void Case3b::Construct(ExchangeGraph* g, bool exclusive_orders) {
   q = 5;
   c1 = 3;
   c2 = q - c1 + 0.1;
-  p1 = 1;
-  p2 = 0;
+  p1 = 0;
+  p2 = 1;
   f1 = c1;
   f2 = q - c1;
 
@@ -270,8 +270,8 @@ void Case3c::Construct(ExchangeGraph* g, bool exclusive_orders) {
   c2 = q - c1;
   f1 = c1;
   f2 = c2;
-  p1 = 1;
-  p2 = 0;
+  p1 = 0;
+  p2 = 1;
 
   Case3::Construct(g, exclusive_orders);
 }
@@ -283,8 +283,8 @@ void Case3d::Construct(ExchangeGraph* g, bool exclusive_orders) {
   c2 = q - c1 - 0.1;
   f1 = c1;
   f2 = c2;
-  p1 = 1;
-  p2 = 0;
+  p1 = 0;
+  p2 = 1;
 
   Case3::Construct(g, exclusive_orders);
 }
@@ -296,8 +296,8 @@ void Case3e::Construct(ExchangeGraph* g, bool exclusive_orders) {
   c2 = q;
   f1 = 0;
   f2 = c2;
-  p2 = 5;
-  p1 = 2;
+  p1 = 5;
+  p2 = 2;
 
   Case3::Construct(g, exclusive_orders);
 }
@@ -318,8 +318,8 @@ void Case3f::Construct(ExchangeGraph* g, bool exclusive_orders) {
   c2 = 4;
   f1 = q - c2;
   f2 = c2;
-  p2 = 5;
-  p1 = 2;
+  p1 = 5;
+  p2 = 2;
 
   Case3::Construct(g, exclusive_orders);
 }
