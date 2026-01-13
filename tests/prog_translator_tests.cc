@@ -147,8 +147,6 @@ TEST(ProgTranslatorTests, translation) {
   d1->unit_capacities[x4] = std::vector<double>(
       ucaps_d_4, ucaps_d_4 + sizeof(ucaps_d_4) / sizeof(ucaps_d_4[0]) );
 
-  // Note: arc preferences are set via arc.pref() above (lines 111, 115, 119, 123, 127)
-  // The old node->prefs map is deprecated and no longer used
 
   RequestGroup::Ptr a(new RequestGroup());  // new RequestGroup(dem_a[0])?
   a->AddExchangeNode(a0);
