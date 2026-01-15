@@ -88,6 +88,23 @@ template <class T> class ExchangeTranslator {
       }
     }
 
+    // Also update arc weights in node_arc_map_ to keep it in sync
+    std::map<ExchangeNode::Ptr, std::vector<Arc>>& node_arc_map = graph->node_arc_map();
+    for (std::map<ExchangeNode::Ptr, std::vector<Arc>>::iterator map_it = node_arc_map.begin();
+         map_it != node_arc_map.end(); ++map_it) {
+      for (std::vector<Arc>::iterator arc_it = map_it->second.begin();
+           arc_it != map_it->second.end(); ++arc_it) {
+        // Find matching arc in arcs_ vector and copy its pref value
+        for (std::vector<Arc>::iterator arcs_it = arcs.begin();
+             arcs_it != arcs.end(); ++arcs_it) {
+          if (*arc_it == *arcs_it) {
+            arc_it->pref(arcs_it->pref());
+            break;
+          }
+        }
+      }
+    }
+
     return graph;
   }
 
