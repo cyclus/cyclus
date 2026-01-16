@@ -94,8 +94,8 @@ TEST(ExXlateTests, NegPref) {
   ctx.AddBidPortfolio(bp);
   ExchangeTranslator<Material> xlator(&ctx);
 
-  // Negative preferences should throw ValueError
-  EXPECT_THROW(xlator.AddArc(req, bid, graph), cyclus::ValueError);
+  // Negative preferences should be silently rejected (no arc added)
+  xlator.AddArc(req, bid, graph);
   EXPECT_EQ(graph->arcs().size(), 0);
 }
 

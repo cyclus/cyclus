@@ -1,6 +1,7 @@
 #ifndef CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_
 #define CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_
 
+#include <algorithm>
 #include <sstream>
 
 #include "bid.h"
@@ -76,20 +77,38 @@ template <class T> class ExchangeTranslator {
     // Now update all arcs with the computed arc weight (MC - MU + shift)
     // and store it in pref for backward compatibility
     std::vector<Arc>& arcs = graph->arcs();
-    for (std::vector<Arc>::iterator it = arcs.begin(); it != arcs.end(); ++it) {
+    std::map<ExchangeNode::Ptr, std::vector<Arc>>& node_arc_map = graph->node_arc_map();
+    std::vector<Arc>::iterator it = arcs.begin();
+    while (it != arcs.end()) {
       double arc_weight = it->mc() - it->mu() + ex_ctx_->shift_;
+      
+      // Reject arcs with negative weights - these trades should not be considered
+      if (arc_weight < 0.0) {
+        CLOG(LEV_DEBUG1) << "Removing arc with negative weight (" << arc_weight 
+                        << "). MC=" << it->mc() << ", MU=" << it->mu() 
+                        << ", shift=" << ex_ctx_->shift_ << ". This trade will be rejected.";
+        // Remove from node_arc_map first
+        auto& unode_arcs = node_arc_map[it->unode()];
+        unode_arcs.erase(std::remove(unode_arcs.begin(), unode_arcs.end(), *it), unode_arcs.end());
+        auto& vnode_arcs = node_arc_map[it->vnode()];
+        vnode_arcs.erase(std::remove(vnode_arcs.begin(), vnode_arcs.end(), *it), vnode_arcs.end());
+        // Remove from arcs vector
+        it = arcs.erase(it);
+        continue;
+      }
+      
       it->pref(arc_weight);  // Store arc weight in pref for backward compatibility
       
-      // Warn if arc weight is zero or negative
-      if (arc_weight <= 0.0) {
-        CLOG(LEV_WARN) << "Arc weight is non-positive (" << arc_weight 
-                       << "). MC=" << it->mc() << ", MU=" << it->mu() 
+      // Warn if arc weight is zero
+      if (arc_weight == 0.0) {
+        CLOG(LEV_WARN) << "Arc weight is zero. MC=" << it->mc() << ", MU=" << it->mu() 
                        << ", shift=" << ex_ctx_->shift_;
       }
+      
+      ++it;
     }
 
     // Also update arc weights in node_arc_map_ to keep it in sync
-    std::map<ExchangeNode::Ptr, std::vector<Arc>>& node_arc_map = graph->node_arc_map();
     for (std::map<ExchangeNode::Ptr, std::vector<Arc>>::iterator map_it = node_arc_map.begin();
          map_it != node_arc_map.end(); ++map_it) {
       for (std::vector<Arc>::iterator arc_it = map_it->second.begin();
@@ -110,8 +129,30 @@ template <class T> class ExchangeTranslator {
 
   /// @brief adds a bid-request arc to a graph, using MC and MU values
   void AddArc(Request<T>* req, Bid<T>* bid, ExchangeGraph::Ptr graph) {
-    // Validate request preference (MU) first
-    double mu = req->preference();
+    // Get MC and MU from exchange context
+    auto& mc_map = ex_ctx_->trader_mc[req->requester()][req];
+    auto& mu_map = ex_ctx_->trader_mu[req->requester()][req];
+    
+    auto mc_it = mc_map.find(bid);
+    auto mu_it = mu_map.find(bid);
+    if (mc_it == mc_map.end() || mu_it == mu_map.end()) {
+      std::stringstream ss;
+      ss << "Bid not found in exchange context for arc addition.";
+      throw ValueError(ss.str());
+    }
+    
+    double mc = mc_it->second;
+    double mu = mu_it->second;
+    
+    // Reject arcs with negative preferences
+    if (mc < 0) {
+      CLOG(LEV_DEBUG1) << "Skipping arc with negative MC=" << mc;
+      return;
+    }
+    if (mu < 0) {
+      CLOG(LEV_DEBUG1) << "Skipping arc with negative MU=" << mu;
+      return;
+    }
     if (mu <= 0) {
       std::stringstream ss;
       ss << "Request preference value is nonpositive (" << mu
@@ -119,43 +160,8 @@ template <class T> class ExchangeTranslator {
       throw ValueError(ss.str());
     }
     
-    // Get MC from the exchange context using safe map access
-    auto req_it = ex_ctx_->trader_mc.find(req->requester());
-    if (req_it == ex_ctx_->trader_mc.end()) {
-      std::stringstream ss;
-      ss << "Requester not found in exchange context for arc addition.";
-      throw ValueError(ss.str());
-    }
-    
-    auto req_map_it = req_it->second.find(req);
-    if (req_map_it == req_it->second.end()) {
-      std::stringstream ss;
-      ss << "Request not found in exchange context for arc addition.";
-      throw ValueError(ss.str());
-    }
-    
-    auto bid_it = req_map_it->second.find(bid);
-    if (bid_it == req_map_it->second.end()) {
-      std::stringstream ss;
-      ss << "Bid not found in exchange context for arc addition.";
-      throw ValueError(ss.str());
-    }
-    double mc = bid_it->second;
-    
-    // Clamp MC to be non-negative (MC < 0 is invalid, clamp to 0)
-    if (mc < 0) {
-      CLOG(LEV_WARN) << "Marginal cost is negative (" << mc 
-                     << "), clamping to 0.0";
-      mc = 0.0;
-    }
-    
-    // get translated arc with MC and MU
     Arc a = TranslateArc(xlation_ctx_, bid, mc, mu);
-    
-    CLOG(LEV_DEBUG5) << "Adding arc for "
-                     << req->requester()->manager()->prototype()
-                     << " with MC=" << mc << ", MU=" << mu;
-
+    CLOG(LEV_DEBUG5) << "Adding arc with MC=" << mc << ", MU=" << mu;
     graph->AddArc(a);
   }
 
