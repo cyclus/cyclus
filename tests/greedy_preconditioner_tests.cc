@@ -161,11 +161,11 @@ TEST(ConditionerTests, Conditioning) {
   gp.Condition(&g);
 
   // final state
-  EXPECT_EQ(g.request_groups().at(0), g2);
-  EXPECT_EQ(g.request_groups().at(0)->nodes().at(0), n22);
-  EXPECT_EQ(g.request_groups().at(0)->nodes().at(1), n21);
-  EXPECT_EQ(g.request_groups().at(1), g1);
-  EXPECT_EQ(g.request_groups().at(1)->nodes().at(0), n12);
-  EXPECT_EQ(g.request_groups().at(1)->nodes().at(1), n13);
-  EXPECT_EQ(g.request_groups().at(1)->nodes().at(2), n11);
+  EXPECT_EQ(g.request_groups().at(0), g1);
+  EXPECT_EQ(g.request_groups().at(0)->nodes().at(0), n11);
+  EXPECT_EQ(g.request_groups().at(0)->nodes().at(1), n13);
+  EXPECT_EQ(g.request_groups().at(0)->nodes().at(2), n12);
+  EXPECT_EQ(g.request_groups().at(1), g2);
+  EXPECT_EQ(g.request_groups().at(1)->nodes().at(0), n21);
+  EXPECT_EQ(g.request_groups().at(1)->nodes().at(1), n22);
 }

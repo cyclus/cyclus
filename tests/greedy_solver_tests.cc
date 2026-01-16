@@ -91,6 +91,8 @@ TEST(GreedySolverTests, General) {
   EXPECT_EQ(s.Capacity(a2), 1.5);
   
   s.Condition();  
-  EXPECT_EQ(g.request_groups()[1], gu1);
-  EXPECT_EQ(g.request_groups()[0], gu2);
+  // With ascending sort (lower weights first):
+  // gu1 has lower weight (pref 1.0 -> weight ~1.5) than gu2 (pref 2.0 -> weight ~1.667)
+  EXPECT_EQ(g.request_groups()[0], gu1);
+  EXPECT_EQ(g.request_groups()[1], gu2);
 }
