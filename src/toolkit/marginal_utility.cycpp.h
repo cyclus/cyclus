@@ -51,14 +51,15 @@ std::map<std::string, double> mu_cache_;
 ///
 /// @param commods Vector of commodity names
 /// @param prefs Vector of preference values (must be same length as commods)
-/// @return Vector of pairs (commodity name, marginal utility value) for each commodity
-std::vector<std::pair<std::string, double>> CalcMarginalUtility(
+/// @return Pair of vectors: first vector contains commodity names, second vector contains marginal utility values (in matching order)
+std::pair<std::vector<std::string>, std::vector<double>> CalcMarginalUtility(
     std::vector<std::string> commods, std::vector<double> prefs) const {
-  std::vector<std::pair<std::string, double>> results;
+  std::vector<std::string> result_commods;
+  std::vector<double> result_values;
 
   // Ensure inputs are the same length
   if (commods.size() != prefs.size()) {
-    return results;  // Return empty vector if sizes don't match
+    return std::make_pair(result_commods, result_values);  // Return empty vectors if sizes don't match
   }
 
   // Extract parameters based on functional form
@@ -67,7 +68,8 @@ std::vector<std::pair<std::string, double>> CalcMarginalUtility(
     double k = mu_parameters.size() > 0 ? mu_parameters[0] : 1.0;
     for (size_t i = 0; i < commods.size(); ++i) {
       double mu = k * prefs[i];
-      results.push_back(std::make_pair(commods[i], mu));
+      result_commods.push_back(commods[i]);
+      result_values.push_back(mu);
     }
   } else if (mu_functional_form == "Affine") {
     // Affine: MU = b + k * P
@@ -75,7 +77,8 @@ std::vector<std::pair<std::string, double>> CalcMarginalUtility(
     double k = mu_parameters.size() > 1 ? mu_parameters[1] : 1.0;
     for (size_t i = 0; i < commods.size(); ++i) {
       double mu = b + k * prefs[i];
-      results.push_back(std::make_pair(commods[i], mu));
+      result_commods.push_back(commods[i]);
+      result_values.push_back(mu);
     }
   } else if (mu_functional_form == "Exponential") {
     // Exponential: MU = B * exp(k * P)
@@ -83,7 +86,8 @@ std::vector<std::pair<std::string, double>> CalcMarginalUtility(
     double k = mu_parameters.size() > 1 ? mu_parameters[1] : 1.0;
     for (size_t i = 0; i < commods.size(); ++i) {
       double mu = B * std::exp(k * prefs[i]);
-      results.push_back(std::make_pair(commods[i], mu));
+      result_commods.push_back(commods[i]);
+      result_values.push_back(mu);
     }
   } else if (mu_functional_form == "Logarithmic") {
     // Logarithmic: MU = B * ln(1 + k * P)
@@ -91,11 +95,12 @@ std::vector<std::pair<std::string, double>> CalcMarginalUtility(
     double k = mu_parameters.size() > 1 ? mu_parameters[1] : 1.0;
     for (size_t i = 0; i < commods.size(); ++i) {
       double mu = B * std::log(1.0 + k * prefs[i]);
-      results.push_back(std::make_pair(commods[i], mu));
+      result_commods.push_back(commods[i]);
+      result_values.push_back(mu);
     }
   }
 
-  return results;
+  return std::make_pair(result_commods, result_values);
 }
 
 /// @brief Initializes and caches marginal utility values for all commodities.
@@ -110,10 +115,11 @@ std::vector<std::pair<std::string, double>> CalcMarginalUtility(
 void InitializeMarginalUtility(std::vector<std::string> commods,
                                std::vector<double> prefs) {
   mu_cache_.clear();
-  std::vector<std::pair<std::string, double>> mu_results =
-      CalcMarginalUtility(commods, prefs);
-  for (const auto& pair : mu_results) {
-    mu_cache_[pair.first] = pair.second;
+  auto mu_results = CalcMarginalUtility(commods, prefs);
+  const auto& mu_commods = mu_results.first;
+  const auto& mu_values = mu_results.second;
+  for (size_t i = 0; i < mu_commods.size(); ++i) {
+    mu_cache_[mu_commods[i]] = mu_values[i];
   }
 }
 
