@@ -140,6 +140,9 @@ template <class T> class TradeExecutor {
             }
           }
           
+          // Set the resource's unit value to the trade's marginal cost
+          rsrc->SetUnitValue(adjusted_mc);
+          
           // Record MC and MU. ArcWeight can be computed from these if needed.
           ctx->NewDatum("Transactions")
               ->AddVal("TransactionId", ctx->NextTransactionID())
