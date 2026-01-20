@@ -57,21 +57,14 @@ std::pair<std::vector<std::string>, std::vector<double>> CalcMarginalUtility(
   std::vector<std::string> result_commods;
   std::vector<double> result_values;
 
+  
   // Ensure inputs are the same length
   if (commods.size() != prefs.size()) {
     return std::make_pair(result_commods, result_values);  // Return empty vectors if sizes don't match
   }
 
   // Extract parameters based on functional form
-  if (mu_functional_form == "Linear") {
-    // Linear: MU = k * P
-    double k = mu_parameters.size() > 0 ? mu_parameters[0] : 1.0;
-    for (size_t i = 0; i < commods.size(); ++i) {
-      double mu = k * prefs[i];
-      result_commods.push_back(commods[i]);
-      result_values.push_back(mu);
-    }
-  } else if (mu_functional_form == "Affine") {
+  if (mu_functional_form == "Affine") {
     // Affine: MU = b + k * P
     double b = mu_parameters.size() > 0 ? mu_parameters[0] : 0.0;
     double k = mu_parameters.size() > 1 ? mu_parameters[1] : 1.0;
@@ -95,6 +88,14 @@ std::pair<std::vector<std::string>, std::vector<double>> CalcMarginalUtility(
     double k = mu_parameters.size() > 1 ? mu_parameters[1] : 1.0;
     for (size_t i = 0; i < commods.size(); ++i) {
       double mu = B * std::log(1.0 + k * prefs[i]);
+      result_commods.push_back(commods[i]);
+      result_values.push_back(mu);
+    }
+  } else { // mu_functional_form is either Linear or unset. Default to Linear.
+    // Linear: MU = k * P
+    double k = mu_parameters.size() > 0 ? mu_parameters[0] : 1.0;
+    for (size_t i = 0; i < commods.size(); ++i) {
+      double mu = k * prefs[i];
       result_commods.push_back(commods[i]);
       result_values.push_back(mu);
     }
