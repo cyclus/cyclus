@@ -105,8 +105,10 @@ double ExchangeSolver::PseudoCostByPref(double cost_factor) {
     const Arc& a = arcs[i];
     // remove exclusive value factor from costs for preferences that are less
     // than unity. otherwise they can artificially raise the maximum cost.
+    // Guard excl_val > 0 to avoid division by zero (excl_val can be 0 when
+    // request/bid quantities don't match).
     double factor =
-        (a.exclusive() && a.excl_val() < 1) ? 1 / a.excl_val() : 1.0;
+        (a.exclusive() && a.excl_val() > 0 && a.excl_val() < 1) ? 1 / a.excl_val() : 1.0;
     max_cost = std::max(max_cost, ArcCost(a) * factor);
   }
   return max_cost * (1 + cost_factor);
