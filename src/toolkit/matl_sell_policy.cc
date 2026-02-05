@@ -90,28 +90,31 @@ void MatlSellPolicy::set_transport_unit(std::string x) {
 }
 
 MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                     std::string name) {
+                                     std::string name, double cost_per_unit) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
+  cost_per_unit_ = cost_per_unit;
   return *this;
 }
 
 MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                     std::string name, double throughput) {
+                                     std::string name, double throughput, double cost_per_unit) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
   set_throughput(throughput);
+  cost_per_unit_ = cost_per_unit;
   return *this;
 }
 
 MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                     std::string name, bool ignore_comp) {
+                                     std::string name, bool ignore_comp, double cost_per_unit) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
   set_ignore_comp(ignore_comp);
+  cost_per_unit_ = cost_per_unit;
   return *this;
 }
 
@@ -130,7 +133,7 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                      std::string name, double throughput,
                                      bool ignore_comp, double quantize,
                                      std::string package_name,
-                                     std::string transport_unit_name) {
+                                     std::string transport_unit_name, double cost_per_unit) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
@@ -139,6 +142,7 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   set_ignore_comp(ignore_comp);
   set_package(package_name);
   set_transport_unit(transport_unit_name);
+  cost_per_unit_ = cost_per_unit;
   return *this;
 }
 
@@ -225,12 +229,16 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       // Peek at resbuf to get current composition
       m = buf_->Peek();
 
+      // This is done outside of ClacUnitCost() because matl_sell_policy
+      // isn't a facility so it makes less sense to inherit that.
+      double bid_cost = cost_per_unit_ + m->UnitValue();
+
       std::vector<double>::iterator bit;
       for (bit = bids.begin(); bit != bids.end(); ++bit) {
         offer = ignore_comp_
                     ? Material::CreateUntracked(*bit, req->target()->comp())
                     : Material::CreateUntracked(*bit, m->comp());
-        port->AddBid(req, offer, this, excl);
+        port->AddBid(req, offer, this, excl, bid_cost);
         LG(INFO3) << "  - bid " << *bit << " kg on a request for " << commod;
       }
     }

@@ -75,18 +75,21 @@ class MatlSellPolicy : public Trader {
   /// exclusive, integral quantize kg bids. Otherwise, single bids will
   /// be sent matching the requested quantity.
   /// @{
-  MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name);
+  MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name, double cost_per_unit = 0.0);
   MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                       double throughput);
+                       double throughput, double cost_per_unit = 0.0);
   MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
-                       bool ignore_comp);
+                       bool ignore_comp, double cost_per_unit = 0.0);
+  // This needs to have cost_per_unit added, but I couldn't figure out a good
+  // way to do it without adding an Init conflict.
   MatlSellPolicy& Init(Agent* manager, ResBuf<Material>* buf, std::string name,
                        double throughput, bool ignore_comp);
   MatlSellPolicy& Init(
       Agent* manager, ResBuf<Material>* buf, std::string name,
       double throughput, bool ignore_comp, double quantize,
       std::string package_name = Package::unpackaged_name(),
-      std::string transport_unit_name = TransportUnit::unrestricted_name());
+      std::string transport_unit_name = TransportUnit::unrestricted_name(), 
+      double cost_per_unit = 0.0);
   /// @}
 
   /// Instructs the policy to empty its buffer with offers on the given
@@ -138,6 +141,7 @@ class MatlSellPolicy : public Trader {
   bool ignore_comp_;
   Package::Ptr package_;
   TransportUnit::Ptr transport_unit_;
+  double cost_per_unit_;
 };
 
 }  // namespace toolkit
