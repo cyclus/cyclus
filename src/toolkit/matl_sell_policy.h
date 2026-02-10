@@ -126,6 +126,8 @@ class MatlSellPolicy : public Trader {
       std::vector<std::pair<Trade<Material>, Material::Ptr>>& responses);
   /// }@
 
+  void set_cost_per_unit(double x);
+
  private:
   void set_quantize(double x);
   void set_throughput(double x);
