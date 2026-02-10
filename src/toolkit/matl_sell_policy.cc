@@ -42,6 +42,11 @@ void MatlSellPolicy::set_ignore_comp(bool x) {
   ignore_comp_ = x;
 }
 
+void MatlSellPolicy::set_cost_per_unit(double x) {
+  assert(x >= 0);
+  cost_per_unit_ = x;
+}
+
 void MatlSellPolicy::set_package(std::string x) {
   // if no real context, only unpackaged can be used (keep default)
   if (manager() != NULL) {
