@@ -68,9 +68,11 @@ template <class T> class ResourceExchange {
 
   /// @brief queries traders and collects all requests for bids
   void AddAllRequests() {
-    InitTraders();
-    std::for_each(traders_.begin(),
-                  traders_.end(),
+    std::cout << sim_ctx_ ->time_ << "\n";
+
+    InitRequesters();
+    std::for_each(requesters_.begin(),
+                  requesters_.end(),
                   std::bind(&cyclus::ResourceExchange<T>::AddRequests_,
                             this,
                             std::placeholders::_1));
@@ -110,6 +112,19 @@ template <class T> class ResourceExchange {
         traders_.insert(*it);
       }
     }
+  }
+// MEG HAVE TO FIX THIS LINe SO THAT WE GET THE CORRECT ELEMMENT IN The MAP
+  void InitRequesters() {
+    //std::set<Trader*> orig = sim_ctx_->EventRequesters()[sim_ctx_->time_];
+    if (requesters_.size() == 0) {
+      auto map = sim_ctx_->EventRequesters();
+      std::set<Trader*> orig = map[sim_ctx_->time_];
+      std::set<Trader*>::iterator it;
+      for (it = orig.begin(); it != orig.end(); ++it) {
+        requesters_.insert(*it);
+      }
+    }
+    //requesters_.insert(req_vec.begin(),req_vec.end());
   }
 
   /// @brief queries a given facility agent for
@@ -160,7 +175,7 @@ template <class T> class ResourceExchange {
   // determinism of Cyclus overall.  This allows all traders' resource
   // exchange functions are called in a much closer to deterministic order.
   std::set<Trader*, trader_compare> traders_;
-
+  std::set<Trader*,trader_compare> requesters_; 
   Context* sim_ctx_;
   ExchangeContext<T> ex_ctx_;
 };

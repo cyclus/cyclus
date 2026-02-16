@@ -50,6 +50,10 @@ class Timer {
   /// Agents should unregister from their Decommission method.
   void UnregisterTimeListener(TimeListener* tl);
 
+  void DoLookAhead();
+
+  int NextEvent();
+
   /// Schedules the named prototype to be built for the specified parent at
   /// timestep t.
   void SchedBuild(Agent* parent, std::string proto_name, int t);
@@ -106,7 +110,7 @@ class Timer {
   /// The current time, measured in months from when the simulation
   /// started.
   int time_;
-
+  int prev_time_;
   SimInfo si_;
 
   bool want_snapshot_;
@@ -121,6 +125,8 @@ class Timer {
 
   // std::map<time,std::vector<std::pair<prototype, parent> > >
   std::map<int, std::vector<std::pair<std::string, Agent*>>> build_queue_;
+
+  std::map<int, std::vector<Agent*>> request_queue_;
 
   // std::map<time,std::vector<config> >
   std::map<int, std::vector<Agent*>> decom_queue_;

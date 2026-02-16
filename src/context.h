@@ -19,6 +19,7 @@
 #include "pyhooks.h"
 #include "recorder.h"
 #include "package.h"
+//#include "timer.h" MEG
 
 // Defined as 4 seconds longer than a Gaussian year (to make division by 12
 // a round number)
@@ -183,6 +184,16 @@ class Context {
   /// @return the current set of traders registered for resource exchange.
   inline const std::set<Trader*>& traders() const { return traders_; }
 
+  inline void RegisterRequesters(std::pair<int, Trader*> e) {request_queue_[e.first].insert(e.second); }
+
+  inline const std::map<int, std::set<Trader*>>& EventRequesters() const { return request_queue_; }
+
+  inline void Populate(int next_event) {request_queue_[next_event] = traders(); }
+
+  int time_; 
+  inline void GetTime(int t) {time_ = t;}
+
+  //inline const std::set<Trader*>& GetRequesterEvent() {return request_queue_[ti_->time()]; } 
   /// Create a new agent by cloning the named prototype. The returned agent is
   /// not initialized as a simulation participant.
   ///
@@ -364,13 +375,13 @@ class Context {
   /// contains archetype specs of all agents for which version have already
   /// been recorded in the db
   std::set<std::string> rec_ver_;
-
   std::map<std::string, Agent*> protos_;
   std::map<std::string, Composition::Ptr> recipes_;
   std::map<std::string, Package::Ptr> packages_;
   std::map<std::string, TransportUnit::Ptr> transport_units_;
   std::set<Agent*> agent_list_;
   std::set<Trader*> traders_;
+  std::map<int, std::set<Trader*>> request_queue_;
   std::map<std::string, int> n_prototypes_;
   std::map<std::string, int> n_specs_;
 

@@ -29,9 +29,8 @@ void Timer::RunSim() {
 
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
-  while (time_ < si_.duration) {
+  while ( (time_ < si_.duration) && (prev_time_ != time_)) {
     CLOG(LEV_INFO1) << "Current time: " << time_;
-
     if (want_snapshot_) {
       want_snapshot_ = false;
       SimInit::Snapshot(ctx_);
@@ -48,13 +47,15 @@ void Timer::RunSim() {
     CLOG(LEV_INFO2) << "Beginning Decision for time: " << time_;
     DoDecision();
     DoDecom();
+    DoLookAhead();
 
 #ifdef CYCLUS_WITH_PYTHON
     EventLoop();
 #endif
-
-    time_++;
-
+    prev_time_ = time_;
+    time_ = NextEvent();
+    ctx_->GetTime(time_);
+    
     if (want_kill_) {
       break;
     }
@@ -113,6 +114,7 @@ void Timer::DoTock() {
   }
 
 #pragma omp parallel for
+// change this so that it is just 
   for (size_t i = 0; i < cpp_tickers_.size(); ++i) {
     cpp_tickers_[i]->Tock();
   }
@@ -198,7 +200,7 @@ void Timer::DoDecom() {
     m->Decommission();
   }
 }
-
+// I want this to go every time event 
 void Timer::RegisterTimeListener(TimeListener* agent) {
   tickers_[agent->id()] = agent;
   if (agent->IsShim()) {
@@ -218,6 +220,26 @@ void Timer::UnregisterTimeListener(TimeListener* tl) {
         std::remove(cpp_tickers_.begin(), cpp_tickers_.end(), tl),
         cpp_tickers_.end());
   }
+}
+
+void Timer::DoLookAhead() {
+  std::set<Trader*> all_traders = ctx_->traders();
+  for(Trader* m : all_traders){
+    m->EventRequest();
+  };
+  auto reg_traders = ctx_->EventRequesters();
+  if(reg_traders.count(time_+1) == 0){
+    ctx_->Populate(NextEvent()); 
+  };
+}
+
+int Timer::NextEvent(){
+  auto reg_traders = ctx_->EventRequesters();
+  int t_p = time_ + 1; // time plus +1 
+  std::vector<int> event_lists = {build_queue_.upper_bound(t_p)->first,
+                                  decom_queue_.upper_bound(t_p)->first,
+                                  reg_traders.upper_bound(t_p)->first};
+  return *std::min_element(event_lists.begin(), event_lists.end());
 }
 
 void Timer::SchedBuild(Agent* parent, std::string proto_name, int t) {
@@ -276,12 +298,15 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   if (si.m0 < 1 || si.m0 > 12) {
     throw ValueError("Invalid month0; must be between 1 and 12 (inclusive).");
   }
-
+  prev_time_ = -1;
   want_kill_ = false;
   ctx_ = ctx;
   time_ = 0;
   si_ = si;
 
+
+  //ctx_->Populate(0);
+  //std::cout << (ctx_->EventRequesters())[0].size();
   if (si.branch_time > -1) {
     time_ = si.branch_time;
   }

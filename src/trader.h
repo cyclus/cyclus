@@ -78,6 +78,8 @@ class Trader {
   virtual void AcceptProductTrades(
       const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {}
 
+  virtual void EventRequest() {}
+
  protected:
   Agent* manager_;
 
