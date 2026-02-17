@@ -77,6 +77,7 @@ void Timer::RunSim() {
 void Timer::DoBuild() {
   // build queued agents
   std::vector<std::pair<std::string, Agent*>> build_list = build_queue_[time_];
+  std::cout<<time_;
   for (int i = 0; i < build_list.size(); ++i) {
     Agent* m = ctx_->CreateAgent<Agent>(build_list[i].first);
     Agent* parent = build_list[i].second;
@@ -88,6 +89,8 @@ void Timer::DoBuild() {
     } else {
       CLOG(LEV_DEBUG1) << "Hey! Listen! Built an Agent without a Parent.";
     }
+  std::cout<<"HERE";
+  std::cout<<build_list.size();
   }
 }
 
@@ -305,8 +308,7 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   si_ = si;
 
 
-  //ctx_->Populate(0);
-  //std::cout << (ctx_->EventRequesters())[0].size();
+  ctx_->Populate(0);
   if (si.branch_time > -1) {
     time_ = si.branch_time;
   }
