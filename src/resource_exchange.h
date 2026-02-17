@@ -68,8 +68,6 @@ template <class T> class ResourceExchange {
 
   /// @brief queries traders and collects all requests for bids
   void AddAllRequests() {
-    std::cout << sim_ctx_ ->time_ << "\n";
-
     InitRequesters();
     std::for_each(requesters_.begin(),
                   requesters_.end(),
