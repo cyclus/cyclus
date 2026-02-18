@@ -29,13 +29,18 @@ void Timer::RunSim() {
 
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
+
+  ctx_->Populate(0); //find better home for this line
+  ctx_->GetTime(0);
+
   while ( (time_ < si_.duration) && (prev_time_ != time_)) {
+
+    //std::cout<<(ctx_->EventRequesters()).at(time_).size();
     CLOG(LEV_INFO1) << "Current time: " << time_;
     if (want_snapshot_) {
       want_snapshot_ = false;
       SimInit::Snapshot(ctx_);
     }
-
     // run through phases
     DoBuild();
     CLOG(LEV_INFO2) << "Beginning Tick for time: " << time_;
@@ -53,6 +58,7 @@ void Timer::RunSim() {
     EventLoop();
 #endif
     prev_time_ = time_;
+    ctx_->EventComplete(time_);
     time_ = NextEvent();
     ctx_->GetTime(time_);
     
@@ -77,7 +83,6 @@ void Timer::RunSim() {
 void Timer::DoBuild() {
   // build queued agents
   std::vector<std::pair<std::string, Agent*>> build_list = build_queue_[time_];
-  std::cout<<time_;
   for (int i = 0; i < build_list.size(); ++i) {
     Agent* m = ctx_->CreateAgent<Agent>(build_list[i].first);
     Agent* parent = build_list[i].second;
@@ -89,8 +94,6 @@ void Timer::DoBuild() {
     } else {
       CLOG(LEV_DEBUG1) << "Hey! Listen! Built an Agent without a Parent.";
     }
-  std::cout<<"HERE";
-  std::cout<<build_list.size();
   }
 }
 
@@ -307,8 +310,6 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   time_ = 0;
   si_ = si;
 
-
-  ctx_->Populate(0);
   if (si.branch_time > -1) {
     time_ = si.branch_time;
   }

@@ -113,7 +113,6 @@ template <class T> class ResourceExchange {
   }
 // MEG HAVE TO FIX THIS LINe SO THAT WE GET THE CORRECT ELEMMENT IN The MAP
   void InitRequesters() {
-    //std::set<Trader*> orig = sim_ctx_->EventRequesters()[sim_ctx_->time_];
     if (requesters_.size() == 0) {
       auto map = sim_ctx_->EventRequesters();
       std::set<Trader*> orig = map[sim_ctx_->time_];
@@ -122,7 +121,6 @@ template <class T> class ResourceExchange {
         requesters_.insert(*it);
       }
     }
-    //requesters_.insert(req_vec.begin(),req_vec.end());
   }
 
   /// @brief queries a given facility agent for
