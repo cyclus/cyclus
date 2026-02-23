@@ -30,9 +30,11 @@ void Timer::RunSim() {
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
 
+  //ctx_->GetTime(0);
   ctx_->Populate(0); //find better home for this line
-  ctx_->GetTime(0);
 
+  build_queue_[dur()]; // find a better home 
+  decom_queue_[dur()]; // find a better home 
   while ( (time_ < si_.duration) && (prev_time_ != time_)) {
 
     //std::cout<<(ctx_->EventRequesters()).at(time_).size();
@@ -52,15 +54,15 @@ void Timer::RunSim() {
     CLOG(LEV_INFO2) << "Beginning Decision for time: " << time_;
     DoDecision();
     DoDecom();
-    DoLookAhead();
+    //DoLookAhead();
 
 #ifdef CYCLUS_WITH_PYTHON
     EventLoop();
 #endif
     prev_time_ = time_;
-    ctx_->EventComplete(time_);
+    //ctx_->EventComplete(time_);
     time_ = NextEvent();
-    ctx_->GetTime(time_);
+    //ctx_->GetTime(time_);
     
     if (want_kill_) {
       break;
@@ -110,8 +112,13 @@ void Timer::DoTick() {
 
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
+  // auto reg_traders = ctx_->EventRequesters(); // MEG 
+  // if(reg_traders.count(time_)==0){
+  //   return;
+  // } else { 
   matmgr->Execute();
   genmgr->Execute();
+  //}
 }
 
 void Timer::DoTock() {
@@ -198,7 +205,9 @@ void Timer::RecordInventory(Agent* a, std::string name, Material::Ptr m) {
 void Timer::DoDecom() {
   // decommission queued agents
   std::vector<Agent*> decom_list = decom_queue_[time_];
+  std::cout <<"DECOM KEY check 2 "<< decom_queue_.count(time_)<< "\n";
   for (int i = 0; i < decom_list.size(); ++i) {
+    std::cout<<"we are decomissioning at" << time_;
     Agent* m = decom_list[i];
     if (m->parent() != NULL) {
       m->parent()->DecomNotify(m);
@@ -241,10 +250,11 @@ void Timer::DoLookAhead() {
 
 int Timer::NextEvent(){
   auto reg_traders = ctx_->EventRequesters();
-  int t_p = time_ + 1; // time plus +1 
-  std::vector<int> event_lists = {build_queue_.upper_bound(t_p)->first,
-                                  decom_queue_.upper_bound(t_p)->first,
-                                  reg_traders.upper_bound(t_p)->first};
+  int t_p = time_; // time plus +1 
+  std::vector<int> event_lists = {decom_queue_.upper_bound(t_p)->first,build_queue_.upper_bound(t_p)->first};
+                                  //reg_traders.upper_bound(t_p)->first};
+  std::cout<< "NExt Decom EVENT" << decom_queue_.upper_bound(t_p)->first << "\n";
+  std::cout << "NEXT EVENT"<< *std::min_element(event_lists.begin(), event_lists.end()) << "\n";
   return *std::min_element(event_lists.begin(), event_lists.end());
 }
 

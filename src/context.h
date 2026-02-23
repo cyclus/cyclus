@@ -184,7 +184,7 @@ class Context {
   /// @return the current set of traders registered for resource exchange.
   inline const std::set<Trader*>& traders() const { return traders_; }
 
-  inline void RegisterRequesters(std::pair<int, Trader*> e) {request_queue_[e.first].insert(e.second); }
+  inline void RegisterRequesters(int time, Trader* e) {request_queue_[time].insert(e); }
 
   inline void EventComplete(int t) {request_queue_.erase(t);}
 
@@ -192,8 +192,9 @@ class Context {
 
   inline void Populate(int next_event) {request_queue_[next_event] = traders(); }
 
-  int time_; 
-  inline void GetTime(int t) {time_ = t;}
+  // int time_; 
+  // inline void GetTime(int t) {time_ = t;}
+  //inline int GetTime(){return ti_->time();}
 
   /// Create a new agent by cloning the named prototype. The returned agent is
   /// not initialized as a simulation participant.

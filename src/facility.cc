@@ -46,6 +46,7 @@ void Facility::Decommission() {
   }
 
   context()->UnregisterTrader(dynamic_cast<Trader*>(this));
+  //unregister requester 
   context()->UnregisterTimeListener(this);
   Agent::Decommission();
 }
