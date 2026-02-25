@@ -153,7 +153,16 @@ void Agent::Build(Agent* parent) {
   enter_time_ = ctx_->time();
   EnterNotify();
   this->AddToTable();
+  // this is redacted from Institution::Tock() and merely checks if DecomStatus variable exists (if it does) it will not schedule a decom event during the build event 
+  if (lifetime() >= 0 || !CheckDecommissionCondition()) { 
+      context()->SchedDecom(this, exit_time());
+  }
 }
+
+//MEG
+// bool Agent::CheckDecommissionCondition() {
+//   return true;
+// }
 
 void Agent::EnterNotify() {
   ctx_->RegisterAgent(this);

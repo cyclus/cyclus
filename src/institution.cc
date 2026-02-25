@@ -45,18 +45,18 @@ void Institution::Decommission() {
 }
 
 void Institution::Tock() {
-  std::set<Agent*>::iterator it;
-  for (it = children().begin(); it != children().end(); ++it) {
-    Agent* a = *it;
-    if (a->lifetime() != -1 && context()->time() >= a->exit_time()) {
-      Facility* fac = dynamic_cast<Facility*>(a);
-      if (fac == NULL || fac->CheckDecommissionCondition()) {
-        CLOG(LEV_INFO3) << a->prototype()
-                        << " has reached the end of its lifetime";
-        context()->SchedDecom(a);
-      }
-    }
-  }
+  // std::set<Agent*>::iterator it; MEG COMMENTED 
+  // for (it = children().begin(); it != children().end(); ++it) {
+  //   Agent* a = *it;
+  //   if (a->lifetime() != -1 && context()->time() >= a->exit_time()) {
+  //     Facility* fac = dynamic_cast<Facility*>(a);
+  //     if (fac == NULL || fac->CheckDecommissionCondition()) {
+  //       CLOG(LEV_INFO3) << a->prototype()
+  //                       << " has reached the end of its lifetime";
+  //       context()->SchedDecom(a);
+  //     }
+  //   }
+  // }
 }
 
 Region* Institution::GetParentRegion(int layer) {

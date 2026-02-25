@@ -390,6 +390,7 @@ class Agent : public StateWrangler, virtual public Ider, public EconomicEntity {
   /// Returns the number of time steps this agent operates between building and
   /// decommissioning (-1 if the agent has an infinite lifetime).
   inline const int lifetime() const { return lifetime_; }
+  inline bool CheckDecommissionCondition() const {return true;}; // MEG
 
   /// Returns the default time step at which this agent will exit the
   /// simulation (-1 if the agent has an infinite lifetime).
