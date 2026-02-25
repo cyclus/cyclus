@@ -68,9 +68,9 @@ template <class T> class ResourceExchange {
 
   /// @brief queries traders and collects all requests for bids
   void AddAllRequests() {
-    InitTraders(); //InitRequesters //
-    std::for_each(traders_.begin(), //requesters_
-                  traders_.end(), //requesters _
+    InitRequesters();
+    std::for_each(requesters_.begin(), //requesters_
+                  requesters_.end(), //requesters _
                   std::bind(&cyclus::ResourceExchange<T>::AddRequests_,
                             this,
                             std::placeholders::_1));

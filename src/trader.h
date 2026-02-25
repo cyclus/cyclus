@@ -78,7 +78,7 @@ class Trader {
   virtual void AcceptProductTrades(
       const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {}
 
-  virtual void EventRequest() {manager()->context()->RegisterRequesters(manager()->context()->time(),this);} // MEG 
+  virtual void EventRequest() {manager()->context()->RegisterRequesters(manager()->context()->time(),this);} // MEG can be overridden 
 
  protected:
   Agent* manager_;

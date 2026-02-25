@@ -41,7 +41,7 @@ std::string Facility::str() {
 }
 
 void Facility::Decommission() {
-  if (!CheckDecommissionCondition()) {
+  if (!CheckDecommissionCondition()) { //MEG should be able to keep this 
     throw Error("Cannot decommission " + prototype());
   }
 
@@ -51,9 +51,10 @@ void Facility::Decommission() {
   Agent::Decommission();
 }
 
-bool Facility::CheckDecommissionCondition() {
-  return true;
-}
+//MEG
+// bool Facility::CheckDecommissionCondition() {
+//   return true;
+// }
 
 Region* Facility::GetParentRegion(int layer) {
   return dynamic_cast<Region*>(GetAncestorOfKind("Region", layer));
