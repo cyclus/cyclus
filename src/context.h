@@ -192,10 +192,6 @@ class Context {
 
   inline void Populate(int next_event) {request_queue_[next_event] = traders(); }
 
-  // int time_; 
-  // inline void GetTime(int t) {time_ = t;}
-  //inline int GetTime(){return ti_->time();}
-
   /// Create a new agent by cloning the named prototype. The returned agent is
   /// not initialized as a simulation participant.
   ///

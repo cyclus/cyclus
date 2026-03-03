@@ -17,6 +17,7 @@
 namespace cyclus {
 
 void Timer::RunSim() {
+  auto start = std::chrono::high_resolution_clock::now();
   LogLevel saved_level = Logger::ReportLevel();
   if (quiet_) {
     // Set log level below LEV_ERROR (lowest level) to suppress all CLOG output
@@ -32,11 +33,11 @@ void Timer::RunSim() {
 
   //ctx_->GetTime(0);
   ctx_->Populate(0); //find better home for this line
-  ctx_->Populate(dur()); 
-  build_queue_[dur()]; // find a better home 
-  decom_queue_[dur()]; // find a better home 
-  while ( (time_ < si_.duration)) {
-
+  ctx_->Populate(dur()+1); 
+  build_queue_[dur()+1]; // find a better home 
+  decom_queue_[dur()+1]; // find a better home 
+  while (time_ < si_.duration) {
+    std::cout<<time_ <<"\n";
     CLOG(LEV_INFO1) << "Current time: " << time_;
     if (want_snapshot_) {
       want_snapshot_ = false;
@@ -61,8 +62,6 @@ void Timer::RunSim() {
     prev_time_ = time_;
     ctx_->EventComplete(time_);
     time_ = NextEvent();
-    std::cout<<time_ <<"\n";
-    //ctx_->GetTime(time_);
     
     if (want_kill_) {
       break;
@@ -80,6 +79,11 @@ void Timer::RunSim() {
   if (quiet_) {
     Logger::SetReportLevel(saved_level);
   }
+  auto stop = std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+
+  std::cout << "Time taken by function: "
+         << duration.count() << " microseconds" << std::endl;
 }
 
 void Timer::DoBuild() {
@@ -242,17 +246,17 @@ void Timer::DoLookAhead() {
   for(Trader* m : all_traders){
     m->EventRequest();
   };
-  auto reg_traders = ctx_->EventRequesters();
-  if(reg_traders.count(time_+1) == 0){
-    ctx_->Populate(NextEvent()); 
-  };
+  // auto reg_traders = ctx_->EventRequesters();
+  // if(reg_traders.count(time_+1) == 0){
+  //   ctx_->Populate(NextEvent()); 
+  // };
 }
 
 int Timer::NextEvent(){
   auto reg_traders = ctx_->EventRequesters();
-  int t_p = time_; // time plus +1 
-  std::vector<int> event_lists = {decom_queue_.upper_bound(t_p)->first,build_queue_.upper_bound(t_p)->first,
-                                  reg_traders.upper_bound(t_p)->first};
+  int t_p = time_ +1; // time plus +1 
+  std::vector<int> event_lists = {decom_queue_.lower_bound(t_p)->first,build_queue_.lower_bound(t_p)->first,
+                                  reg_traders.lower_bound(t_p)->first};
   return *std::min_element(event_lists.begin(), event_lists.end());
 }
 
