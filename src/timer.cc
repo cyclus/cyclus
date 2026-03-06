@@ -246,10 +246,10 @@ void Timer::DoLookAhead() {
   for(Trader* m : all_traders){
     m->EventRequest();
   };
-  // auto reg_traders = ctx_->EventRequesters();
-  // if(reg_traders.count(time_+1) == 0){
-  //   ctx_->Populate(NextEvent()); 
-  // };
+  auto reg_traders = ctx_->EventRequesters();
+  if(reg_traders.count(time_+1) == 0){
+    ctx_->Populate(NextEvent()); 
+  };
 }
 
 int Timer::NextEvent(){
