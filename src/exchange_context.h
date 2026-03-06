@@ -101,7 +101,8 @@ template <class T> struct ExchangeContext {
     double mc = std::isnan(bid_pref) ? 0.0 : bid_pref;
     
     // MU comes from request preference
-    double mu = pb->request()->preference();
+    double req_pref = pb->request()->preference();
+    double mu = std::isnan(req_pref) ? 0.0 : req_pref;
     
     // Store MC and MU separately
     trader_mc[pb->request()->requester()][pb->request()].insert(
