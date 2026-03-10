@@ -109,12 +109,9 @@ class Arc {
   inline double mu() const { return mu_; }
   inline void mu(double mu) { mu_ = mu; }
   
-  /// @brief returns the arc weight (MC - MU + shift) used in the objective function
-  /// This is computed and stored after all arcs are created and shift is known.
-  /// For the individual components, use mc() and mu() instead.
+  /// @brief returns the arc weight
   inline double pref() const { return pref_; }
   /// @brief sets the arc weight arbitrarily
-  /// This is typically called during graph translation after shift is computed.
   inline void pref(double pref) { pref_ = pref; }
 
  private:
