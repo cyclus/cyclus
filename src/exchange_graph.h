@@ -113,7 +113,7 @@ class Arc {
   /// This is computed and stored after all arcs are created and shift is known.
   /// For the individual components, use mc() and mu() instead.
   inline double pref() const { return pref_; }
-  /// @brief sets the arc weight (MC - MU + shift)
+  /// @brief sets the arc weight arbitrarily
   /// This is typically called during graph translation after shift is computed.
   inline void pref(double pref) { pref_ = pref; }
 
