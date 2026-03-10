@@ -92,7 +92,7 @@ template <class T> class ExchangeTranslator {
         unode_arcs.erase(std::remove(unode_arcs.begin(), unode_arcs.end(), *it), unode_arcs.end());
         auto& vnode_arcs = node_arc_map[it->vnode()];
         vnode_arcs.erase(std::remove(vnode_arcs.begin(), vnode_arcs.end(), *it), vnode_arcs.end());
-        // Remove from arcs vector
+        // Remove from arcs vector and advance iterator
         it = arcs.erase(it);
         continue;
       }
