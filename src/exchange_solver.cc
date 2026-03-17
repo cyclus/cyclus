@@ -10,7 +10,7 @@
 
 namespace cyclus {
 
-double ExchangeSolver::Cost(const Arc& a, ExchangeGraph* graph, bool exclusive_orders) {
+double ExchangeSolver::Cost(const Arc& a, bool exclusive_orders) {
   // Use stored arc weight from pref() which is set during translation.
   double arc_weight = a.pref();
   
