@@ -27,7 +27,7 @@ void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
 struct ReqPrefComp {
   // Note: shift_ is no longer needed since arc weight is stored in pref()
   // Keeping for potential future use, but not using it
-  ReqPrefComp(double shift) {}
+  ReqPrefComp() {}
   bool operator()(const Arc& l, const Arc& r) const {
     int lu = l.unode()->agent_id;
     int lv = l.vnode()->agent_id;

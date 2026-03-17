@@ -153,7 +153,7 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
       const std::vector<Arc>& arcs = graph_->node_arc_map().at(*req_it);
       sorted = std::vector<Arc>(arcs);  // make a copy for now
       // ReqPrefComp no longer needs shift since it uses arc.pref() directly
-      std::stable_sort(sorted.begin(), sorted.end(), ReqPrefComp(0.0));
+      std::stable_sort(sorted.begin(), sorted.end(), ReqPrefComp());
       arc_it = sorted.begin();
 
       while ((match <= target) && (arc_it != sorted.end())) {
