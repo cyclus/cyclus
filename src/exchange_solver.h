@@ -25,7 +25,7 @@ class ExchangeSolver {
   /// @param a the arc
   /// @param graph the exchange graph (used to compute shift = max(MU))
   /// @param exclusive_orders whether to apply exclusive order scaling
-  static double Cost(const Arc& a, ExchangeGraph* graph, bool exclusive_orders = kDefaultExclusive);
+  static double Cost(const Arc& a, bool exclusive_orders = kDefaultExclusive);
 
   explicit ExchangeSolver(bool exclusive_orders = kDefaultExclusive)
       : exclusive_orders_(exclusive_orders), sim_ctx_(NULL), verbose_(false) {}
@@ -64,10 +64,7 @@ class ExchangeSolver {
 
   /// return the cost of an arc (instance method that uses the solver's graph)
   inline double ArcCost(const Arc& a) {
-    if (graph_ == NULL) {
-      throw ValueError("ExchangeSolver::ArcCost requires graph to be set");
-    }
-    return Cost(a, graph_, exclusive_orders_);
+    return Cost(a, exclusive_orders_);
   }
 
  protected:
