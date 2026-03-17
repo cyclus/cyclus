@@ -31,9 +31,9 @@ void Timer::RunSim() {
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
 
-  //ctx_->GetTime(0);
+  ctx_->SchedPopulate(0);
   ctx_->Populate(0); //find better home for this line
-  ctx_->Populate(dur()+1); 
+  ctx_->SchedPopulate(dur()+1); 
   build_queue_[dur()+1]; // find a better home 
   decom_queue_[dur()+1]; // find a better home 
   while (time_ < si_.duration) {
@@ -60,7 +60,6 @@ void Timer::RunSim() {
     EventLoop();
 #endif
     prev_time_ = time_;
-    ctx_->EventComplete(time_);
     time_ = NextEvent();
     
     if (want_kill_) {
@@ -117,14 +116,12 @@ void Timer::DoTick() {
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
   auto reg_traders = ctx_->EventRequesters(); // MEG 
-  if(reg_traders.count(time_)==0){
-    return;
-  } else { 
-  std::cout<<"evenrequster "<<(ctx_->EventRequesters()).at(time_).size()<<"\n";
-  std::cout<<"trading "<<(ctx_->traders()).size()<<"\n";
-  matmgr->Execute();
-  genmgr->Execute();
-  }
+  ctx_->Populate(time_);
+  if(reg_traders.at(time_).size()>0){
+      std::cout<<"registered to trade " << reg_traders.at(time_).size() << "\n";
+      matmgr->Execute();
+      genmgr->Execute();
+    }
 }
 
 void Timer::DoTock() {
@@ -242,13 +239,14 @@ void Timer::UnregisterTimeListener(TimeListener* tl) {
 }
 
 void Timer::DoLookAhead() {
+  ctx_->EventComplete(time_);
   std::set<Trader*> all_traders = ctx_->traders();
   for(Trader* m : all_traders){
     m->EventRequest();
   };
   auto reg_traders = ctx_->EventRequesters();
   if(reg_traders.count(time_+1) == 0){
-    ctx_->Populate(NextEvent()); 
+    ctx_->SchedPopulate(NextEvent()); 
   };
 }
 

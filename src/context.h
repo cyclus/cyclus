@@ -190,7 +190,9 @@ class Context {
 
   inline const std::map<int, std::set<Trader*>>& EventRequesters() const { return request_queue_; }
 
-  inline void Populate(int next_event) {request_queue_[next_event] = traders(); }
+  inline void Populate(int t) {if (pop_sched_.count(t)>0){request_queue_.at(t) = traders();};} // if there is someone already there then i wouldve unionized the sets any way, is ithe same thing as just resetting the vals
+
+  inline void SchedPopulate(int next_event) {pop_sched_.insert(next_event); request_queue_[next_event];}
 
   /// Create a new agent by cloning the named prototype. The returned agent is
   /// not initialized as a simulation participant.
@@ -382,7 +384,7 @@ class Context {
   std::map<int, std::set<Trader*>> request_queue_;
   std::map<std::string, int> n_prototypes_;
   std::map<std::string, int> n_specs_;
-
+  std::set<int> pop_sched_;
   SimInfo si_;
   Timer* ti_;
   ExchangeSolver* solver_;
