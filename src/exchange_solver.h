@@ -26,13 +26,6 @@ class ExchangeSolver {
   /// @param graph the exchange graph (used to compute shift = max(MU))
   /// @param exclusive_orders whether to apply exclusive order scaling
   static double Cost(const Arc& a, ExchangeGraph* graph, bool exclusive_orders = kDefaultExclusive);
-  
-  /// return the arc weight (cost) of an arc, using the provided shift value
-  /// This is useful when the shift needs to be computed once and reused
-  /// @param a the arc
-  /// @param shift the shift value (max MU across all arcs)
-  /// @param exclusive_orders whether to apply exclusive order scaling
-  static double ArcWeight(const Arc& a, double shift, bool exclusive_orders = kDefaultExclusive);
 
   explicit ExchangeSolver(bool exclusive_orders = kDefaultExclusive)
       : exclusive_orders_(exclusive_orders), sim_ctx_(NULL), verbose_(false) {}

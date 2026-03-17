@@ -21,17 +21,6 @@ double ExchangeSolver::Cost(const Arc& a, ExchangeGraph* graph, bool exclusive_o
   return arc_weight;
 }
 
-double ExchangeSolver::ArcWeight(const Arc& a, double shift, bool exclusive_orders) {
-  // The base arc weight (MC - MU + shift) is stored in pref() after translation.
-  double arc_weight = a.pref();
-  
-  if (exclusive_orders && a.exclusive()) {
-    // For exclusive arcs, scale by excl_val if needed
-    return arc_weight * (a.excl_val() > 0 ? 1.0 / a.excl_val() : 1.0);
-  }
-  return arc_weight;
-}
-
 double ExchangeSolver::PseudoCost() {
   return PseudoCost(1e-1);
 }
