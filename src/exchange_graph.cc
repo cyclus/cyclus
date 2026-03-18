@@ -131,6 +131,18 @@ void ExchangeGraph::AddMatch(const Arc& a, double qty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::vector<Arc>& ExchangeGraph::GetArcsFromNode(ExchangeNode::Ptr node){
+  std::map<ExchangeNode::Ptr, std::vector<Arc>>& node_arc_map = this->node_arc_map();
+
+  auto it = node_arc_map.find(node);
+  
+  static std::vector<Arc> empty;
+  if (it == node_arc_map.end() || it->second.size() == 0){
+    return empty;
+  }
+  return it->second;
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double ExchangeGraph::max_marginal_utility() const {
   double max_mu = std::numeric_limits<double>::lowest();
   for (std::vector<Arc>::const_iterator it = arcs_.begin(); it != arcs_.end(); ++it) {

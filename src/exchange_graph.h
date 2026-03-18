@@ -121,7 +121,7 @@ class Arc {
   double excl_val_;
   double mc_;  ///< marginal cost from bid
   double mu_;  ///< marginal utility from request
-  double pref_;  ///< arc weight (MC - MU + shift) used in objective function
+  double pref_;  ///< arc weight used in objective function
 };
 
 /// @brief ExchangeNode-ExchangeNode equality operator
@@ -284,6 +284,9 @@ class ExchangeGraph {
   /// @brief computes the maximum marginal utility across all arcs in the graph
   /// This is used to compute the shift value for the objective function
   double max_marginal_utility() const;
+
+  /// @brief returns all arcs on the graph connected to a specified node
+  std::vector<Arc>& GetArcsFromNode(ExchangeNode::Ptr node);
 
  private:
   std::vector<RequestGroup::Ptr> request_groups_;
