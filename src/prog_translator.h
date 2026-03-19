@@ -13,6 +13,7 @@ namespace cyclus {
 
 class ExchangeGraph;
 class ExchangeNodeGroup;
+class Arc;
 
 /// @brief struct to hold all problem instance state
 struct ProgTranslatorContext {
@@ -76,7 +77,7 @@ class ProgTranslator {
   void Init();
 
   /// @throws if preference is unsatisfactory (i.e., not greater than 0)
-  void CheckPref(double pref);
+  void CheckMC(double mc);
 
   /// perform all translation for a node group
   /// @param grp a pointer to the node group

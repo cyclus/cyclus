@@ -14,10 +14,6 @@ namespace l = boost::lambda;
 
 namespace cyclus {
 
-inline double SumPref(double total, std::pair<Arc, double> pref) {
-  return total += pref.second;
-}
-
 double AvgPref(ExchangeNode::Ptr n, ExchangeGraph* graph) {
   // Compute average arc weight across all arcs connected to this node
   if (graph == NULL) {
