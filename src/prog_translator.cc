@@ -51,17 +51,14 @@ void ProgTranslator::Init() {
   ctx_.m = CoinPackedMatrix(false, 0, 0);
 }
 
-void ProgTranslator::CheckPref(const Arc& arc) {
+void ProgTranslator::CheckMC(double mc) {
   std::stringstream ss;
-  if (arc.mc() < 0) {
-      ss << "Marginal cost found to be negative (" << a.mc()
+  if (mc < 0) {
+      ss << "Marginal cost found to be negative (" << mc
          << "). Marginal costs must be non-negative.";
-      
-  } else if (arc.mu() <= 0) {
-    ss << "Marginal utility found to be non-positive (" << arc.mu()
-       << "). Marginal utility must be positive.";
+         throw ValueError(ss.str());
   }
-  throw ValueError(ss.str());
+  
 }
 
 void ProgTranslator::Translate() {
@@ -155,7 +152,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       }
 
       if (request) {
-        CheckPref(a);
+        CheckMC(a.mc());
         ctx_.obj_coeffs[arc_id] = ExchangeSolver::Cost(a, excl_);
         ctx_.col_lbs[arc_id] = 0;
         ctx_.col_ubs[arc_id] =
