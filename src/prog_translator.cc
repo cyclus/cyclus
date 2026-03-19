@@ -51,17 +51,17 @@ void ProgTranslator::Init() {
   ctx_.m = CoinPackedMatrix(false, 0, 0);
 }
 
-void ProgTranslator::CheckPref(double pref) {
-  if (pref <= 0) {
-    std::stringstream ss;
-    ss << "Preference value found to be nonpositive (" << pref
-       << "). Preferences must be positive when using an optimization solver."
-       << " If using Cyclus in simulation mode (e.g., from the command line),"
-       << " this error is likely a bug in Cyclus. Please report it to the "
-          "developer's "
-       << "list (https://groups.google.com/forum/#!forum/cyclus-dev).";
-    throw ValueError(ss.str());
+void ProgTranslator::CheckPref(const Arc& arc) {
+  std::stringstream ss;
+  if (arc.mc() < 0) {
+      ss << "Marginal cost found to be negative (" << a.mc()
+         << "). Marginal costs must be non-negative.";
+      
+  } else if (arc.mu() <= 0) {
+    ss << "Marginal utility found to be non-positive (" << arc.mu()
+       << "). Marginal utility must be positive.";
   }
+  throw ValueError(ss.str());
 }
 
 void ProgTranslator::Translate() {
@@ -155,13 +155,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       }
 
       if (request) {
-        // MC must be >= 0 (can be 0 for free resources)
-        if (a.mc() < 0) {
-          std::stringstream ss;
-          ss << "Marginal cost found to be negative (" << a.mc()
-             << "). Marginal costs must be non-negative when using an optimization solver.";
-          throw ValueError(ss.str());
-        }
+        CheckPref(a);
         ctx_.obj_coeffs[arc_id] = ExchangeSolver::Cost(a, excl_);
         ctx_.col_lbs[arc_id] = 0;
         ctx_.col_ubs[arc_id] =
