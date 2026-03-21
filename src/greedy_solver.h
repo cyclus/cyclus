@@ -23,10 +23,8 @@ void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
 /// @brief A comparison functor for sorting a container of Arcs by arc weight,
 /// in ascending order (i.e., lowest cost Arc first). In the case of a tie, a
 /// lexicalgraphic ordering of node ids is used.
-/// Note: Lower arc weight (MC - MU + shift) is better, so we sort ascending.
+/// Note: Lower arc weight (MC - MU) is better, so we sort ascending.
 struct ReqPrefComp {
-  // Note: shift_ is no longer needed since arc weight is stored in pref()
-  // Keeping for potential future use, but not using it
   ReqPrefComp() {}
   bool operator()(const Arc& l, const Arc& r) const {
     int lu = l.unode()->agent_id;
@@ -169,7 +167,6 @@ class GreedySolver : public ExchangeSolver {
   std::map<ExchangeNodeGroup*, std::vector<double>> grp_caps_;
   double obj_;
   double unmatched_;
-  double shift_;  ///< shift value (max MU) for computing arc weights
 };
 
 }  // namespace cyclus
