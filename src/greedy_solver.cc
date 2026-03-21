@@ -17,17 +17,17 @@ void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
               double) {};
 
 GreedySolver::GreedySolver(bool exclusive_orders, GreedyPreconditioner* c)
-    : conditioner_(c), ExchangeSolver(exclusive_orders), shift_(0.0) {}
+    : conditioner_(c), ExchangeSolver(exclusive_orders) {}
 
 GreedySolver::GreedySolver(bool exclusive_orders)
-    : ExchangeSolver(exclusive_orders), shift_(0.0) {
+    : ExchangeSolver(exclusive_orders) {
   conditioner_ = new cyclus::GreedyPreconditioner();
 }
 
 GreedySolver::GreedySolver(GreedyPreconditioner* c)
-    : conditioner_(c), ExchangeSolver(true), shift_(0.0) {}
+    : conditioner_(c), ExchangeSolver(true) {}
 
-GreedySolver::GreedySolver() : ExchangeSolver(true), shift_(0.0) {
+GreedySolver::GreedySolver() : ExchangeSolver(true) {
   conditioner_ = new cyclus::GreedyPreconditioner();
 }
 
@@ -152,7 +152,6 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
     if (graph_->node_arc_map().count(*req_it) > 0) {
       const std::vector<Arc>& arcs = graph_->node_arc_map().at(*req_it);
       sorted = std::vector<Arc>(arcs);  // make a copy for now
-      // ReqPrefComp no longer needs shift since it uses arc.pref() directly
       std::stable_sort(sorted.begin(), sorted.end(), ReqPrefComp());
       arc_it = sorted.begin();
 

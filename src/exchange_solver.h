@@ -19,11 +19,10 @@ class ExchangeSolver {
   /// default value to allow exclusive orders or not
   static const bool kDefaultExclusive = true;
 
-  /// return the arc weight (cost) of an arc, using the provided graph to compute shift
-  /// The objective function is: arc_weight = MC - MU + shift
-  /// where MC is marginal cost, MU is marginal utility, and shift = max(MU)
+  /// return the arc weight (cost) of an arc. 
+  /// The objective function is: arc_weight = MC - MU
+  /// where MC is marginal cost, and MU is marginal utility.
   /// @param a the arc
-  /// @param graph the exchange graph (used to compute shift = max(MU))
   /// @param exclusive_orders whether to apply exclusive order scaling
   static double Cost(const Arc& a, bool exclusive_orders = kDefaultExclusive);
 

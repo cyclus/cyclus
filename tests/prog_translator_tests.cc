@@ -39,16 +39,10 @@ TEST(ProgTranslatorTests, translation) {
   double mc_vals[] = {5.0, 2.0, 1.0, 0.5, 1.5};  // MC values (non-negative)
   double mu_vals[] = {0.0, 0.5, 0.0, 0.0, 0.2};  // MU values
   
-  // Calculate shift = max(MU) across all arcs
-  double shift = 0.0;
-  for (int i = 0; i != narcs; i++) {
-    shift = std::max(shift, mu_vals[i]);
-  }
-  
-  // Calculate arc_weight = MC - MU + shift for each arc
+  // Calculate arc_weight = MC - MU for each arc
   double arc_weights[narcs];
   for (int i = 0; i != narcs; i++) {
-    arc_weights[i] = mc_vals[i] - mu_vals[i] + shift;
+    arc_weights[i] = mc_vals[i] - mu_vals[i];
   }
 
   double ucaps_a_0[] = {0.5, 0.4};
@@ -108,7 +102,7 @@ TEST(ProgTranslatorTests, translation) {
   Arc x0(a0, c0);
   x0.mc(mc_vals[0]);
   x0.mu(mu_vals[0]);
-  x0.pref(arc_weights[0]);  // arc_weight = MC - MU + shift
+  x0.pref(arc_weights[0]);  // arc_weight = MC - MU
   Arc x1(b0, c1);
   x1.mc(mc_vals[1]);
   x1.mu(mu_vals[1]);

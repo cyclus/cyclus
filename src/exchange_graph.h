@@ -281,10 +281,6 @@ class ExchangeGraph {
   inline const std::map<int, Arc>& arc_by_id() const { return arc_by_id_; }
   inline std::map<int, Arc>& arc_by_id() { return arc_by_id_; }
 
-  /// @brief computes the maximum marginal utility across all arcs in the graph
-  /// This is used to compute the shift value for the objective function
-  double max_marginal_utility() const;
-
   /// @brief returns all arcs on the graph connected to a specified node
   std::vector<Arc>& GetArcsFromNode(ExchangeNode::Ptr node);
 

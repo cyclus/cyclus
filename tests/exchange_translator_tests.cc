@@ -87,16 +87,16 @@ TEST(ExXlateTests, NegPref) {
       rp->AddRequest(get_mat(u235, qty), trader, "", pref);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
-  ExchangeGraph::Ptr graph = ExchangeGraph::Ptr(new ExchangeGraph());
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rp);
   ctx.AddBidPortfolio(bp);
   ExchangeTranslator<Material> xlator(&ctx);
 
-  // Negative preferences should be silently rejected (no arc added)
-  xlator.AddArc(req, bid, graph);
-  EXPECT_EQ(graph->arcs().size(), 0);
+  ExchangeGraph::Ptr graph = xlator.Translate();
+
+  // We no longer reject negative pref arcs, so the one we added should be there
+  EXPECT_EQ(graph->arcs().size(), 1);
 }
 
 /// this test checks the condition of an arc with a zero-valued preference value
@@ -115,14 +115,14 @@ TEST(ExXlateTests, ZeroPref) {
       rp->AddRequest(get_mat(u235, qty), trader, "", pref);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
-  ExchangeGraph::Ptr graph = ExchangeGraph::Ptr(new ExchangeGraph());
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rp);
   ctx.AddBidPortfolio(bp);
   ExchangeTranslator<Material> xlator(&ctx);
 
-  EXPECT_THROW(xlator.AddArc(req, bid, graph), cyclus::ValueError);
+  
+  EXPECT_NO_THROW(ExchangeGraph::Ptr graph = xlator.Translate());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -448,15 +448,15 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(1, graph->arcs().size());
   EXPECT_EQ(0, graph->matches().size());
   const Arc& a = *graph->arcs().begin();
-  // After Translate(), arc.pref() contains arc_weight = MC - MU + shift
-  // In this test: MC = 0 (bid has no explicit preference), MU = pref = 4.5, shift = max(MU) = 4.5
-  // So arc_weight = 0 - 4.5 + 4.5 = 0.0 (which is valid - free resource with utility = max utility)
+  // After Translate(), arc.pref() contains arc_weight = MC - MU
+  // In this test: MC = 0 (bid has no explicit preference), MU = pref = 4.5
+  // So arc_weight = 0 - 4.5 = -4.5
   // Verify that MU matches the request preference
   EXPECT_EQ(pref, a.mu());
   // Verify that MC is 0 (bid has no explicit preference, defaults to 0)
   EXPECT_EQ(0.0, a.mc());
-  // Verify that arc_weight is calculated correctly: MC - MU + shift
-  double expected_arc_weight = a.mc() - a.mu() + graph->max_marginal_utility();
+  // Verify that arc_weight is calculated correctly: MC - MU
+  double expected_arc_weight = a.mc() - a.mu();
   EXPECT_DOUBLE_EQ(expected_arc_weight, a.pref());
 }
 
