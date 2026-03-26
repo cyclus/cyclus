@@ -142,13 +142,5 @@ std::vector<Arc>& ExchangeGraph::GetArcsFromNode(ExchangeNode::Ptr node){
   }
   return it->second;
 }
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double ExchangeGraph::max_marginal_utility() const {
-  double max_mu = std::numeric_limits<double>::lowest();
-  for (std::vector<Arc>::const_iterator it = arcs_.begin(); it != arcs_.end(); ++it) {
-    max_mu = std::max(max_mu, it->mu());
-  }
-  return max_mu;
-}
 
 }  // namespace cyclus

@@ -71,40 +71,14 @@ template <class T> class ExchangeTranslator {
       }
     }
     
-    // Compute shift (max MU) after all arcs are created and store in context
-    ex_ctx_->shift_ = graph->max_marginal_utility();
-    
-    // Now update all arcs with the computed arc weight (MC - MU + shift)
-    // and store it in pref for backward compatibility
+    // Now update all arcs with the computed arc weight and store it in pref 
+    // for backward compatibility
     std::vector<Arc>& arcs = graph->arcs();
     std::map<ExchangeNode::Ptr, std::vector<Arc>>& node_arc_map = graph->node_arc_map();
     std::vector<Arc>::iterator it = arcs.begin();
     while (it != arcs.end()) {
-      double arc_weight = it->mc() - it->mu() + ex_ctx_->shift_;
-      
-      // Reject arcs with negative weights - these trades should not be considered
-      if (arc_weight < 0.0) {
-        CLOG(LEV_DEBUG1) << "Removing arc with negative weight (" << arc_weight 
-                        << "). MC=" << it->mc() << ", MU=" << it->mu() 
-                        << ", shift=" << ex_ctx_->shift_ << ". This trade will be rejected.";
-        // Remove from node_arc_map first
-        auto& unode_arcs = node_arc_map[it->unode()];
-        unode_arcs.erase(std::remove(unode_arcs.begin(), unode_arcs.end(), *it), unode_arcs.end());
-        auto& vnode_arcs = node_arc_map[it->vnode()];
-        vnode_arcs.erase(std::remove(vnode_arcs.begin(), vnode_arcs.end(), *it), vnode_arcs.end());
-        // Remove from arcs vector and advance iterator
-        it = arcs.erase(it);
-        continue;
-      }
-      
-      it->pref(arc_weight);  // Store arc weight in pref for backward compatibility
-      
-      // Warn if arc weight is zero
-      if (arc_weight == 0.0) {
-        CLOG(LEV_WARN) << "Arc weight is zero. MC=" << it->mc() << ", MU=" << it->mu() 
-                       << ", shift=" << ex_ctx_->shift_;
-      }
-      
+      double arc_weight = it->mc() - it->mu();
+      it->pref(arc_weight);
       ++it;
     }
 
@@ -143,22 +117,6 @@ template <class T> class ExchangeTranslator {
     
     double mc = mc_it->second;
     double mu = mu_it->second;
-    
-    // Reject arcs with negative preferences
-    if (mc < 0) {
-      CLOG(LEV_DEBUG1) << "Skipping arc with negative MC=" << mc;
-      return;
-    }
-    if (mu < 0) {
-      CLOG(LEV_DEBUG1) << "Skipping arc with negative MU=" << mu;
-      return;
-    }
-    if (mu <= 0) {
-      std::stringstream ss;
-      ss << "Request preference value is nonpositive (" << mu
-         << "). Preferences must be positive when using an optimization solver.";
-      throw ValueError(ss.str());
-    }
     
     Arc a = TranslateArc(xlation_ctx_, bid, mc, mu);
     CLOG(LEV_DEBUG5) << "Adding arc with MC=" << mc << ", MU=" << mu;
@@ -289,9 +247,8 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
   Arc arc(unode, vnode);
   arc.mc(mc);
   arc.mu(mu);
-  // Note: pref will be set to arc_weight (MC - MU + shift) after all arcs
-  // are created and shift is computed. For now, set to a placeholder.
-  // This will be updated in Translate() after shift is computed.
+  
+  // This gets overwritten in the translation step so we just set it to 0.0
   arc.pref(0.0);
 
   typename T::Ptr offer = bid->offer();
