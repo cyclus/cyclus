@@ -51,19 +51,6 @@ void ProgTranslator::Init() {
   ctx_.m = CoinPackedMatrix(false, 0, 0);
 }
 
-void ProgTranslator::CheckPref(double pref) {
-  if (pref <= 0) {
-    std::stringstream ss;
-    ss << "Preference value found to be nonpositive (" << pref
-       << "). Preferences must be positive when using an optimization solver."
-       << " If using Cyclus in simulation mode (e.g., from the command line),"
-       << " this error is likely a bug in Cyclus. Please report it to the "
-          "developer's "
-       << "list (https://groups.google.com/forum/#!forum/cyclus-dev).";
-    throw ValueError(ss.str());
-  }
-}
-
 void ProgTranslator::Translate() {
   // number of variables = number of arcs + 1 faux arc per request group with
   // arcs
@@ -155,7 +142,6 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       }
 
       if (request) {
-        CheckPref(a.pref());
         ctx_.obj_coeffs[arc_id] = ExchangeSolver::Cost(a, excl_);
         ctx_.col_lbs[arc_id] = 0;
         ctx_.col_ubs[arc_id] =

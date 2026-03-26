@@ -14,16 +14,23 @@ namespace l = boost::lambda;
 
 namespace cyclus {
 
-inline double SumPref(double total, std::pair<Arc, double> pref) {
-  return total += pref.second;
-}
-
-double AvgPref(ExchangeNode::Ptr n) {
-  std::map<Arc, double>& prefs = n->prefs;
-  return prefs.size() > 0
-             ? std::accumulate(prefs.begin(), prefs.end(), 0.0, SumPref) /
-                   prefs.size()
-             : 0;
+double AvgPref(ExchangeNode::Ptr n, ExchangeGraph* graph) {
+  // Compute average arc weight across all arcs connected to this node
+  if (graph == NULL) {
+    return 0.0;
+  }
+  
+  const std::vector<Arc>& arcs = graph->GetArcsFromNode(n);
+  if (arcs.empty()){
+    return 0.0;
+  }
+  
+  double sum = 0.0;
+  for (std::vector<Arc>::const_iterator arc_it = arcs.begin(); arc_it != arcs.end(); ++arc_it) {
+    sum += arc_it->pref();
+  }
+  
+  return sum / arcs.size();
 }
 
 GreedyPreconditioner::GreedyPreconditioner(){};
@@ -51,9 +58,9 @@ void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
     std::vector<ExchangeNode::Ptr>& nodes =
         const_cast<std::vector<ExchangeNode::Ptr>&>((*it)->nodes());
 
-    // get avg prefs
+    // get avg prefs (now arc weights)
     for (int i = 0; i != nodes.size(); i++) {
-      avg_prefs_[nodes[i]] = AvgPref(nodes[i]);
+      avg_prefs_[nodes[i]] = AvgPref(nodes[i], graph);
     }
 
     // sort nodes by weight

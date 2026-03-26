@@ -2,7 +2,7 @@
 /// One should only need to:
 /// - '#include "toolkit/marginal_cost.cycpp.h"' in the header of the
 ///    archetype class (as private)
-/// - Add `InitEconParameters()` to `EnterNotify()` in the cc file of the
+/// - Add `InitMarginalCost()` to `EnterNotify()` in the cc file of the
 ///   archetype class.
 
 /// How to add parameters to this file:
@@ -22,7 +22,9 @@
   "doc": "Variable cost per unit of production (labor, materials, etc.). " \
          "The data from the Cost Basis Report represents a variable cost per " \
          "unit and can be used here.", \
-  "units": "Unit of Currency/Unit of Production" \
+  "units": "Unit of Currency/Unit of Production", \
+  "uitype": "range", \
+  "range": [0.0, CY_LARGE_DOUBLE], \
   }
 double variable_cost_per_unit;
 // clang-format on
@@ -33,6 +35,14 @@ std::unordered_map<std::string, double> GenerateParamList() const override {
       {"variable_cost_per_unit", variable_cost_per_unit}};
 
   return econ_params;
+}
+
+// When called in EnterNotify(), we can access the user-defined values
+void InitializeMarginalCost() {
+  std::unordered_map<std::string, double> econ_params = GenerateParamList();
+  for (const auto& pair : econ_params) {
+    SetEconParameter(pair.first, pair.second);
+  }
 }
 
 /// @brief Returns the sum of the variable cost per unit and the material cost 

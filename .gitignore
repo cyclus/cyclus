@@ -60,6 +60,7 @@ tests/attr-toaster-comapny.json
 tests/attr-toaster-region.h5
 tests/attr-toaster-region.json
 rs.cred
+*.h5
 
 # Docker stuff
 build-local/

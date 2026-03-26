@@ -48,7 +48,7 @@ bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs) {
 Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
          boost::shared_ptr<ExchangeNode>
              vnode)
-    : unode_(unode), vnode_(vnode) {
+    : unode_(unode), vnode_(vnode), mc_(0.0), mu_(0.0), pref_(0.0) {
   exclusive_ = unode->exclusive || vnode->exclusive;
   if (exclusive_) {
     double fqty = unode->qty;
@@ -72,9 +72,11 @@ Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
 Arc::Arc(const Arc& other)
     : unode_(other.unode()),
       vnode_(other.vnode()),
-      pref_(other.pref()),
       exclusive_(other.exclusive()),
-      excl_val_(other.excl_val()) {}
+      excl_val_(other.excl_val()),
+      mc_(other.mc()),
+      mu_(other.mu()),
+      pref_(other.pref()) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeNodeGroup::AddExchangeNode(ExchangeNode::Ptr node) {
@@ -126,6 +128,19 @@ void ExchangeGraph::AddArc(const Arc& a) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeGraph::AddMatch(const Arc& a, double qty) {
   matches_.push_back(std::make_pair(a, qty));
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::vector<Arc>& ExchangeGraph::GetArcsFromNode(ExchangeNode::Ptr node){
+  std::map<ExchangeNode::Ptr, std::vector<Arc>>& node_arc_map = this->node_arc_map();
+
+  auto it = node_arc_map.find(node);
+  
+  static std::vector<Arc> empty;
+  if (it == node_arc_map.end() || it->second.size() == 0){
+    return empty;
+  }
+  return it->second;
 }
 
 }  // namespace cyclus

@@ -18,8 +18,10 @@ double GroupWeight(RequestGroup::Ptr g,
                    std::map<std::string, double>* weights,
                    std::map<ExchangeNode::Ptr, double>* avg_prefs);
 
-/// @returns the average preference across arcs for a node
-double AvgPref(ExchangeNode::Ptr n);
+/// @returns the average arc weight (MC - MU + shift) across arcs for a node
+/// @param n the node
+/// @param graph the exchange graph (needed to access arcs and compute shift)
+double AvgPref(ExchangeNode::Ptr n, ExchangeGraph* graph);
 
 /// @class GreedyPreconditioner
 ///
@@ -83,16 +85,16 @@ class GreedyPreconditioner {
   void Condition(ExchangeGraph* graph);
 
   /// @brief a comparitor for ordering containers of ExchangeNode::Ptrs in
-  /// descending order based on their commodity's weight
+  /// ascending order based on their commodity's weight (lower arc weight = better)
   inline bool NodeComp(const ExchangeNode::Ptr l, const ExchangeNode::Ptr r) {
-    return NodeWeight(l, &commod_weights_, avg_prefs_[l]) >
+    return NodeWeight(l, &commod_weights_, avg_prefs_[l]) <
            NodeWeight(r, &commod_weights_, avg_prefs_[r]);
   }
 
   /// @brief a comparitor for ordering containers of Request::Ptrs in
-  /// descending order based on their average commodity weight
+  /// ascending order based on their average commodity weight (lower arc weight = better)
   inline bool GroupComp(const RequestGroup::Ptr l, const RequestGroup::Ptr r) {
-    return group_weights_[l] > group_weights_[r];
+    return group_weights_[l] < group_weights_[r];
   }
 
  private:

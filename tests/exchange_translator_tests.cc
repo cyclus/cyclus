@@ -87,15 +87,16 @@ TEST(ExXlateTests, NegPref) {
       rp->AddRequest(get_mat(u235, qty), trader, "", pref);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
-  ExchangeGraph::Ptr graph = ExchangeGraph::Ptr(new ExchangeGraph());
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rp);
   ctx.AddBidPortfolio(bp);
   ExchangeTranslator<Material> xlator(&ctx);
 
-  xlator.AddArc(req, bid, graph);
-  EXPECT_EQ(graph->arcs().size(), 0);
+  ExchangeGraph::Ptr graph = xlator.Translate();
+
+  // We no longer reject negative pref arcs, so the one we added should be there
+  EXPECT_EQ(graph->arcs().size(), 1);
 }
 
 /// this test checks the condition of an arc with a zero-valued preference value
@@ -114,14 +115,14 @@ TEST(ExXlateTests, ZeroPref) {
       rp->AddRequest(get_mat(u235, qty), trader, "", pref);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
-  ExchangeGraph::Ptr graph = ExchangeGraph::Ptr(new ExchangeGraph());
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rp);
   ctx.AddBidPortfolio(bp);
   ExchangeTranslator<Material> xlator(&ctx);
 
-  EXPECT_THROW(xlator.AddArc(req, bid, graph), cyclus::ValueError);
+  
+  EXPECT_NO_THROW(ExchangeGraph::Ptr graph = xlator.Translate());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -307,7 +308,9 @@ TEST(ExXlateTests, XlateArc) {
   ExchangeNodeGroup::Ptr bset =
       TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
-  Arc a = TranslateArc(xlator.translation_ctx(), bid);
+  double mc = std::isnan(bid->preference()) ? 0.0 : bid->preference();
+  double mu = req->preference();
+  Arc a = TranslateArc(xlator.translation_ctx(), bid, mc, mu);
 
   EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.vnode());
   EXPECT_EQ(xlator.translation_ctx().request_to_node[req], a.unode());
@@ -358,46 +361,61 @@ TEST(ExXlateTests, XlateArcExclusive) {
   TranslateRequestPortfolio(xlator.translation_ctx(), rport);
   TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
+  // Helper to get MC and MU for TranslateArc
+  auto get_mc_mu = [](Bid<Material>* b) -> std::pair<double, double> {
+    double mc = std::isnan(b->preference()) ? 0.0 : b->preference();
+    double mu = b->request()->preference();
+    return std::make_pair(mc, mu);
+  };
+  
   // bid > request && req exclusive && bid !exclusive,
   // so excl_val set to request qty
-  Arc a1 = TranslateArc(xlator.translation_ctx(), bid1);
+  auto mc_mu1 = get_mc_mu(bid1);
+  Arc a1 = TranslateArc(xlator.translation_ctx(), bid1, mc_mu1.first, mc_mu1.second);
   EXPECT_TRUE(a1.exclusive());
   EXPECT_DOUBLE_EQ(a1.excl_val(), qty);
   // bid == request && req exclusive && bid !exclusive,
   // so excl_val set to request qty
-  Arc a2 = TranslateArc(xlator.translation_ctx(), bid2);
+  auto mc_mu2 = get_mc_mu(bid2);
+  Arc a2 = TranslateArc(xlator.translation_ctx(), bid2, mc_mu2.first, mc_mu2.second);
   EXPECT_TRUE(a2.exclusive());
   EXPECT_DOUBLE_EQ(a2.excl_val(), qty);
   // request < bid && req exclusive && bid !exclusive,
   // so arc excl_val is set to 0
-  Arc a3 = TranslateArc(xlator.translation_ctx(), bid3);
+  auto mc_mu3 = get_mc_mu(bid3);
+  Arc a3 = TranslateArc(xlator.translation_ctx(), bid3, mc_mu3.first, mc_mu3.second);
   EXPECT_TRUE(a3.exclusive());
   EXPECT_DOUBLE_EQ(a3.excl_val(), 0.0);
 
   // bid != request && req exclusive && bid exclusive,
   // so excl_val set to 0
-  Arc a4 = TranslateArc(xlator.translation_ctx(), bid4);
+  auto mc_mu4 = get_mc_mu(bid4);
+  Arc a4 = TranslateArc(xlator.translation_ctx(), bid4, mc_mu4.first, mc_mu4.second);
   EXPECT_TRUE(a4.exclusive());
   EXPECT_DOUBLE_EQ(a4.excl_val(), 0);
   // bid == request && req exclusive && bid exclusive,
   // so excl_val set to request qty
-  Arc a5 = TranslateArc(xlator.translation_ctx(), bid5);
+  auto mc_mu5 = get_mc_mu(bid5);
+  Arc a5 = TranslateArc(xlator.translation_ctx(), bid5, mc_mu5.first, mc_mu5.second);
   EXPECT_TRUE(a5.exclusive());
   EXPECT_DOUBLE_EQ(a5.excl_val(), qty);
 
   // bid < request && bid exclusive && req !exclusive,
   // so excl_val set to bid qty
-  Arc a6 = TranslateArc(xlator.translation_ctx(), bid6);
+  auto mc_mu6 = get_mc_mu(bid6);
+  Arc a6 = TranslateArc(xlator.translation_ctx(), bid6, mc_mu6.first, mc_mu6.second);
   EXPECT_TRUE(a6.exclusive());
   EXPECT_DOUBLE_EQ(a6.excl_val(), qty - 1);
   // bid == request && bid exclusive && req !exclusive,
   // so excl_val set to bid qty
-  Arc a7 = TranslateArc(xlator.translation_ctx(), bid7);
+  auto mc_mu7 = get_mc_mu(bid7);
+  Arc a7 = TranslateArc(xlator.translation_ctx(), bid7, mc_mu7.first, mc_mu7.second);
   EXPECT_TRUE(a7.exclusive());
   EXPECT_DOUBLE_EQ(a7.excl_val(), qty);
   // bid > request && bid exclusive && req !exclusive,
   // so excl_val set to 0
-  Arc a8 = TranslateArc(xlator.translation_ctx(), bid8);
+  auto mc_mu8 = get_mc_mu(bid8);
+  Arc a8 = TranslateArc(xlator.translation_ctx(), bid8, mc_mu8.first, mc_mu8.second);
   EXPECT_TRUE(a8.exclusive());
   EXPECT_DOUBLE_EQ(a8.excl_val(), 0);
 }
@@ -430,7 +448,16 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(1, graph->arcs().size());
   EXPECT_EQ(0, graph->matches().size());
   const Arc& a = *graph->arcs().begin();
-  EXPECT_EQ(pref, a.unode()->prefs[a]);
+  // After Translate(), arc.pref() contains arc_weight = MC - MU
+  // In this test: MC = 0 (bid has no explicit preference), MU = pref = 4.5
+  // So arc_weight = 0 - 4.5 = -4.5
+  // Verify that MU matches the request preference
+  EXPECT_EQ(pref, a.mu());
+  // Verify that MC is 0 (bid has no explicit preference, defaults to 0)
+  EXPECT_EQ(0.0, a.mc());
+  // Verify that arc_weight is calculated correctly: MC - MU
+  double expected_arc_weight = a.mc() - a.mu();
+  EXPECT_DOUBLE_EQ(expected_arc_weight, a.pref());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

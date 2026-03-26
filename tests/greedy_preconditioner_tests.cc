@@ -15,13 +15,46 @@ using cyclus::RequestGroup;
 TEST(ConditionerTests, AvgPref) {
   ExchangeNode::Ptr u1(new ExchangeNode());
   ExchangeNode::Ptr u2(new ExchangeNode());
-  ExchangeNode::Ptr v(new ExchangeNode());
+  ExchangeNode::Ptr u3(new ExchangeNode());
+  ExchangeNode::Ptr v1(new ExchangeNode());
+  ExchangeNode::Ptr v2(new ExchangeNode());
 
-  Arc a(u1, v);
+  // u1 has two arcs with average pref of (1.0 + 3.0) / 2 = 2.0
+  Arc a1(u1, v1);
+  a1.pref(1.0);
+  Arc a2(u1, v2);
+  a2.pref(3.0);
+  
+  // u2 has one arc with pref 1.5
+  Arc a3(u2, v1);
+  a3.pref(1.5);
 
-  u1->prefs[a] = 1;
-
-  EXPECT_TRUE(AvgPref(u1) > AvgPref(u2));
+  ExchangeGraph g;
+  RequestGroup::Ptr rg(new RequestGroup());
+  rg->AddExchangeNode(u1);
+  rg->AddExchangeNode(u2);
+  rg->AddExchangeNode(u3);
+  g.AddRequestGroup(rg);
+  ExchangeNodeGroup::Ptr sg(new ExchangeNodeGroup());
+  sg->AddExchangeNode(v1);
+  sg->AddExchangeNode(v2);
+  g.AddSupplyGroup(sg);
+  g.AddArc(a1);
+  g.AddArc(a2);
+  g.AddArc(a3);
+  
+  // Test average calculation: u1 should have average of (1.0 + 3.0) / 2 = 2.0
+  EXPECT_DOUBLE_EQ(AvgPref(u1, &g), 2.0);
+  
+  // Test single arc: u2 should have average of 1.5
+  EXPECT_DOUBLE_EQ(AvgPref(u2, &g), 1.5);
+  
+  // Test node with no arcs returns 0.0
+  EXPECT_DOUBLE_EQ(AvgPref(u3, &g), 0.0);
+  
+  // Test ordering: u1 (2.0) > u2 (1.5) > u3 (0.0)
+  EXPECT_TRUE(AvgPref(u1, &g) > AvgPref(u2, &g));
+  EXPECT_TRUE(AvgPref(u2, &g) > AvgPref(u3, &g));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -34,8 +67,8 @@ TEST(ConditionerTests, Conditioning) {
   n12->commod = "spam";
   ExchangeNode::Ptr n13(new ExchangeNode());
   n13->commod = "eggs";
-  double n1epref = 1/4;
-  double n1spref = 3/4;
+  double n1epref = 1.0/4.0;
+  double n1spref = 3.0/4.0;
 
   RequestGroup::Ptr g1(new RequestGroup());
   g1->AddExchangeNode(n11);
@@ -68,17 +101,18 @@ TEST(ConditionerTests, Conditioning) {
   Arc n21e(n21, eggs);
   Arc n22s(n22, spam);
 
+  // Set arc preferences (arc weight) - this is what AvgPref reads
+  n11e.pref(n1epref);
+  n12s.pref(n1spref);
+  n13s.pref(n1spref);
+  n21e.pref(n2epref);
+  n22s.pref(n2spref);
+
   g.AddArc(n11e);
   g.AddArc(n12s);
   g.AddArc(n13s);
   g.AddArc(n21e);
   g.AddArc(n22s);
-
-  n11->prefs[n11e] = n1epref;
-  n12->prefs[n12s] = n1spref;
-  n13->prefs[n13s] = n1spref;
-  n21->prefs[n21e] = n2epref;
-  n22->prefs[n22s] = n2epref;
 
   // initial state
   EXPECT_EQ(g.request_groups().at(0), g1);
@@ -102,11 +136,11 @@ TEST(ConditionerTests, Conditioning) {
   double c1s = (1. + n1spref / (1 + n1spref));
   double c2e = (1. + n2epref / (1 + n2epref));
   double c2s = (1. + n2spref / (1 + n2spref));
-  avg_prefs[n11] = AvgPref(n11);
-  avg_prefs[n12] = AvgPref(n12);
-  avg_prefs[n13] = AvgPref(n13);
-  avg_prefs[n21] = AvgPref(n21);
-  avg_prefs[n22] = AvgPref(n22);
+  avg_prefs[n11] = AvgPref(n11, &g);
+  avg_prefs[n12] = AvgPref(n12, &g);
+  avg_prefs[n13] = AvgPref(n13, &g);
+  avg_prefs[n21] = AvgPref(n21, &g);
+  avg_prefs[n22] = AvgPref(n22, &g);
 
   double exp11 = c1e * weights[n11->commod];
   double exp12 = c1s * weights[n12->commod];
@@ -127,11 +161,11 @@ TEST(ConditionerTests, Conditioning) {
   gp.Condition(&g);
 
   // final state
-  EXPECT_EQ(g.request_groups().at(0), g2);
-  EXPECT_EQ(g.request_groups().at(0)->nodes().at(0), n22);
-  EXPECT_EQ(g.request_groups().at(0)->nodes().at(1), n21);
-  EXPECT_EQ(g.request_groups().at(1), g1);
-  EXPECT_EQ(g.request_groups().at(1)->nodes().at(0), n12);
-  EXPECT_EQ(g.request_groups().at(1)->nodes().at(1), n11);
-  EXPECT_EQ(g.request_groups().at(1)->nodes().at(2), n13);
+  EXPECT_EQ(g.request_groups().at(0), g1);
+  EXPECT_EQ(g.request_groups().at(0)->nodes().at(0), n11);
+  EXPECT_EQ(g.request_groups().at(0)->nodes().at(1), n13);
+  EXPECT_EQ(g.request_groups().at(0)->nodes().at(2), n12);
+  EXPECT_EQ(g.request_groups().at(1), g2);
+  EXPECT_EQ(g.request_groups().at(1)->nodes().at(0), n21);
+  EXPECT_EQ(g.request_groups().at(1)->nodes().at(1), n22);
 }

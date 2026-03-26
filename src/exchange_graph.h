@@ -81,6 +81,9 @@ class Arc {
     vnode_ = other.vnode();
     exclusive_ = other.exclusive();
     excl_val_ = other.excl_val();
+    mc_ = other.mc();
+    mu_ = other.mu();
+    pref_ = other.pref();
     return *this;
   }
 
@@ -97,14 +100,28 @@ class Arc {
   inline boost::shared_ptr<ExchangeNode> vnode() const { return vnode_.lock(); }
   inline bool exclusive() const { return exclusive_; }
   inline double excl_val() const { return excl_val_; }
+  
+  /// @brief marginal cost (from bid node)
+  inline double mc() const { return mc_; }
+  inline void mc(double mc) { mc_ = mc; }
+  
+  /// @brief marginal utility (from request node)
+  inline double mu() const { return mu_; }
+  inline void mu(double mu) { mu_ = mu; }
+  
+  /// @brief returns the arc weight
   inline double pref() const { return pref_; }
+  /// @brief sets the arc weight arbitrarily
   inline void pref(double pref) { pref_ = pref; }
 
  private:
   boost::weak_ptr<ExchangeNode> unode_;
   boost::weak_ptr<ExchangeNode> vnode_;
   bool exclusive_;
-  double excl_val_, pref_;
+  double excl_val_;
+  double mc_;  ///< marginal cost from bid
+  double mu_;  ///< marginal utility from request
+  double pref_;  ///< arc weight used in objective function
 };
 
 /// @brief ExchangeNode-ExchangeNode equality operator
@@ -149,12 +166,16 @@ class ExchangeNodeGroup {
     excl_node_groups_.push_back(nodes);
   }
 
-  /// @return true of any nodes have arcs associated with them
+  /// @return true if any nodes in this group have arcs associated with them
+  /// This is used by ProgTranslator to determine if a request group needs
+  /// variables/constraints in the LP formulation. We check unit_capacities
+  /// because they are only populated when arcs are created, making this a
+  /// reliable indicator of arc presence.
   bool HasArcs() {
     for (std::vector<ExchangeNode::Ptr>::iterator it = nodes_.begin();
          it != nodes_.end();
          ++it) {
-      if (it->get()->prefs.size() > 0) return true;
+      if (it->get()->unit_capacities.size() > 0) return true;
     }
     return false;
   }
@@ -259,6 +280,9 @@ class ExchangeGraph {
 
   inline const std::map<int, Arc>& arc_by_id() const { return arc_by_id_; }
   inline std::map<int, Arc>& arc_by_id() { return arc_by_id_; }
+
+  /// @brief returns all arcs on the graph connected to a specified node
+  std::vector<Arc>& GetArcsFromNode(ExchangeNode::Ptr node);
 
  private:
   std::vector<RequestGroup::Ptr> request_groups_;

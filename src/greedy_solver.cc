@@ -57,7 +57,7 @@ double GreedySolver::SolveGraph() {
   n_qty_.clear();
 
   Init();
-
+  
   std::for_each(graph_->request_groups().begin(),
                 graph_->request_groups().end(),
                 std::bind(&GreedySolver::GreedilySatisfySet, this,
@@ -131,7 +131,7 @@ void GreedySolver::GetCaps(ExchangeNodeGroup::Ptr g) {
 
 void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
   std::vector<ExchangeNode::Ptr>& nodes = prs->nodes();
-  std::stable_sort(nodes.begin(), nodes.end(), AvgPrefComp);
+  std::stable_sort(nodes.begin(), nodes.end(), AvgPrefComp(graph_));
 
   std::vector<ExchangeNode::Ptr>::iterator req_it = nodes.begin();
   double target = prs->qty();
@@ -152,7 +152,7 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
     if (graph_->node_arc_map().count(*req_it) > 0) {
       const std::vector<Arc>& arcs = graph_->node_arc_map().at(*req_it);
       sorted = std::vector<Arc>(arcs);  // make a copy for now
-      std::stable_sort(sorted.begin(), sorted.end(), ReqPrefComp);
+      std::stable_sort(sorted.begin(), sorted.end(), ReqPrefComp());
       arc_it = sorted.begin();
 
       while ((match <= target) && (arc_it != sorted.end())) {
@@ -187,7 +187,8 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
           graph_->AddMatch(a, tomatch);
 
           match += tomatch;
-          UpdateObj(tomatch, u->prefs[a]);
+          // Use stored arc weight from pref() to avoid recalculation and ensure consistency
+          UpdateObj(tomatch, a.pref());
         }
         ++arc_it;
       }  // while( (match =< target) && (arc_it != arcs.end()) )
@@ -198,10 +199,9 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
   unmatched_ += target - match;
 }
 
-void GreedySolver::UpdateObj(double qty, double pref) {
-  // updates minimizing object (i.e., 1/pref is a cost and the objective is cost
-  // * flow)
-  obj_ += qty / pref;
+void GreedySolver::UpdateObj(double qty, double arc_weight) {
+  // updates minimizing objective (arc_weight is the cost and the objective is cost * flow)
+  obj_ += qty * arc_weight;
 }
 
 void GreedySolver::UpdateCapacity(ExchangeNode::Ptr n, const Arc& a,

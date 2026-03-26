@@ -3,6 +3,8 @@
 
 #include <cstddef>
 
+#include "error.h"
+
 namespace cyclus {
 
 class Context;
@@ -17,7 +19,11 @@ class ExchangeSolver {
   /// default value to allow exclusive orders or not
   static const bool kDefaultExclusive = true;
 
-  /// return the cost of an arc
+  /// return the arc weight (cost) of an arc. 
+  /// The objective function is: arc_weight = MC - MU
+  /// where MC is marginal cost, and MU is marginal utility.
+  /// @param a the arc
+  /// @param exclusive_orders whether to apply exclusive order scaling
   static double Cost(const Arc& a, bool exclusive_orders = kDefaultExclusive);
 
   explicit ExchangeSolver(bool exclusive_orders = kDefaultExclusive)
@@ -55,8 +61,10 @@ class ExchangeSolver {
   double PseudoCostByPref(double cost_factor);
   /// @}
 
-  /// return the cost of an arc
-  inline double ArcCost(const Arc& a) { return Cost(a, exclusive_orders_); }
+  /// return the cost of an arc (instance method that uses the solver's graph)
+  inline double ArcCost(const Arc& a) {
+    return Cost(a, exclusive_orders_);
+  }
 
  protected:
   /// @brief Worker function for solving a graph. This must be implemented by

@@ -238,16 +238,17 @@ TEST_F(TradeExecutorDatabaseTests, WrapperFunctionAndBasicRecording) {
   // Verify bid object retains original preference
   EXPECT_DOUBLE_EQ(bid->preference(), orig_pref);
   
-  // Query database and verify both preferences are the same (no ExchangeContext)
+  // Query database and verify MC and MU are recorded (no ExchangeContext means no adjustments)
   cyclus::QueryResult qr = backend_->Query("Transactions", NULL);
   EXPECT_EQ(1, qr.rows.size()) << "Expected 1 transaction, got " << qr.rows.size();
   
   if (qr.rows.size() > 0) {
-    double recorded_orig_cost = qr.GetVal<double>("BidCost", 0);
-    double recorded_adj_cost = qr.GetVal<double>("AdjustedCost", 0);
+    double recorded_mc = qr.GetVal<double>("MC", 0);
+    double recorded_mu = qr.GetVal<double>("MU", 0);
     
-    EXPECT_DOUBLE_EQ(recorded_orig_cost, 1.0 / orig_pref);
-    EXPECT_DOUBLE_EQ(recorded_adj_cost, 1.0 / orig_pref); 
+    // MC should equal bid preference, MU should equal request preference (default = 1.0)
+    EXPECT_DOUBLE_EQ(recorded_mc, orig_pref);
+    EXPECT_DOUBLE_EQ(recorded_mu, 1.0);  // Default request preference
   }
   
   // Cleanup
@@ -267,16 +268,18 @@ TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedPreferences) {
   std::vector<Trade<Material>> trades;
   trades.push_back(Trade<Material>(req, bid, trade_amt));
   
-  // Create ExchangeContext with adjusted preferences
+  // Create ExchangeContext with adjusted MC and MU
   ExchangeContext<Material> ex_ctx;
   ex_ctx.AddRequest(req);
   ex_ctx.AddBid(bid);
   
-  // Set different adjusted preference
-  double adj_pref = 4.2;
+  // Set different adjusted MC and MU values
+  double adj_mc = 4.2;
+  double adj_mu = 1.8;
   
-  // change the preference manually to new value
-  ex_ctx.trader_prefs[r1_][req][bid] = adj_pref;
+  // Set adjusted MC and MU in ExchangeContext
+  ex_ctx.trader_mc[r1_][req][bid] = adj_mc;
+  ex_ctx.trader_mu[r1_][req][bid] = adj_mu;
   
   TradeExecutor<Material> exec(trades);
   
@@ -287,21 +290,18 @@ TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedPreferences) {
   // Verify original bid preference is preserved
   EXPECT_DOUBLE_EQ(bid->preference(), orig_pref);
   
-  // Verify adjusted preference in ExchangeContext
-  EXPECT_DOUBLE_EQ(ex_ctx.trader_prefs[r1_][req][bid], adj_pref);
-  
-  // Query database and verify different original vs adjusted preferences
+  // Query database and verify adjusted MC and MU are recorded
   cyclus::QueryResult qr = backend_->Query("Transactions", NULL);
   EXPECT_EQ(1, qr.rows.size()) << "Expected 1 transaction, got " << qr.rows.size();
   
   if (qr.rows.size() > 0) {
-    double recorded_orig_cost = qr.GetVal<double>("BidCost", 0);
-    double recorded_adj_cost = qr.GetVal<double>("AdjustedCost", 0);
+    double recorded_mc = qr.GetVal<double>("MC", 0);
+    double recorded_mu = qr.GetVal<double>("MU", 0);
     
-    // Verify the costs match the expected preferences
-    EXPECT_DOUBLE_EQ(recorded_orig_cost, 1.0 / orig_pref);
-    EXPECT_DOUBLE_EQ(recorded_adj_cost, 1.0 / adj_pref);
-    EXPECT_NE(recorded_orig_cost, recorded_adj_cost);  // Should be different
+    // Verify the adjusted MC and MU values are recorded (not the originals)
+    EXPECT_DOUBLE_EQ(recorded_mc, adj_mc);
+    EXPECT_DOUBLE_EQ(recorded_mu, adj_mu);
+    EXPECT_NE(recorded_mc, orig_pref);  // Adjusted MC should differ from original bid preference
   }
   
   // Cleanup

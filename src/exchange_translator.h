@@ -1,6 +1,7 @@
 #ifndef CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_
 #define CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_
 
+#include <algorithm>
 #include <sstream>
 
 #include "bid.h"
@@ -69,36 +70,56 @@ template <class T> class ExchangeTranslator {
         AddArc(req, bid, graph);
       }
     }
+    
+    // Now update all arcs with the computed arc weight and store it in pref 
+    // for backward compatibility
+    std::vector<Arc>& arcs = graph->arcs();
+    std::map<ExchangeNode::Ptr, std::vector<Arc>>& node_arc_map = graph->node_arc_map();
+    std::vector<Arc>::iterator it = arcs.begin();
+    while (it != arcs.end()) {
+      double arc_weight = it->mc() - it->mu();
+      it->pref(arc_weight);
+      ++it;
+    }
+
+    // Also update arc weights in node_arc_map_ to keep it in sync
+    for (std::map<ExchangeNode::Ptr, std::vector<Arc>>::iterator map_it = node_arc_map.begin();
+         map_it != node_arc_map.end(); ++map_it) {
+      for (std::vector<Arc>::iterator arc_it = map_it->second.begin();
+           arc_it != map_it->second.end(); ++arc_it) {
+        // Find matching arc in arcs_ vector and copy its pref value
+        for (std::vector<Arc>::iterator arcs_it = arcs.begin();
+             arcs_it != arcs.end(); ++arcs_it) {
+          if (*arc_it == *arcs_it) {
+            arc_it->pref(arcs_it->pref());
+            break;
+          }
+        }
+      }
+    }
 
     return graph;
   }
 
-  /// @brief adds a bid-request arc to a graph, if the preference for the arc is
-  /// non-negative
+  /// @brief adds a bid-request arc to a graph, using MC and MU values
   void AddArc(Request<T>* req, Bid<T>* bid, ExchangeGraph::Ptr graph) {
-    double pref = ex_ctx_->trader_prefs.at(req->requester())[req][bid];
-    // TODO: make the following check `pref <=0` and remove the `else if` block
-    // before release 1.5
-    if (pref < 0) {
-      CLOG(LEV_DEBUG1) << "Removing arc because of negative preference.";
-      return;
-    } else if (pref == 0) {
+    // Get MC and MU from exchange context
+    auto& mc_map = ex_ctx_->trader_mc[req->requester()][req];
+    auto& mu_map = ex_ctx_->trader_mu[req->requester()][req];
+    
+    auto mc_it = mc_map.find(bid);
+    auto mu_it = mu_map.find(bid);
+    if (mc_it == mc_map.end() || mu_it == mu_map.end()) {
       std::stringstream ss;
-      ss << "0-valued preferences have been deprecated. "
-         << "Please make preference value positive."
-         << "This message will go away in before the next release (1.5).";
+      ss << "Bid not found in exchange context for arc addition.";
       throw ValueError(ss.str());
     }
-    // get translated arc
-    Arc a = TranslateArc(xlation_ctx_, bid, pref);
-    a.unode()->prefs[a] = pref;  // request node is a.unode()
-    int n_prefs = a.unode()->prefs.size();
-
-    CLOG(LEV_DEBUG5) << "Updating preference for one of "
-                     << req->requester()->manager()->prototype()
-                     << "'s trade nodes:";
-    CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
-
+    
+    double mc = mc_it->second;
+    double mu = mu_it->second;
+    
+    Arc a = TranslateArc(xlation_ctx_, bid, mc, mu);
+    CLOG(LEV_DEBUG5) << "Adding arc with MC=" << mc << ", MU=" << mu;
     graph->AddArc(a);
   }
 
@@ -219,18 +240,16 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
 /// updates the unit capacities for the associated nodes on the arc
 template <class T>
 Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
-                 Bid<T>* bid) {
-  return TranslateArc<T>(translation_ctx, bid, 1);
-}
-
-template <class T>
-Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
-                 Bid<T>* bid, double pref) {
+                 Bid<T>* bid, double mc, double mu) {
   Request<T>* req = bid->request();
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
   Arc arc(unode, vnode);
-  arc.pref(pref);
+  arc.mc(mc);
+  arc.mu(mu);
+  
+  // This gets overwritten in the translation step so we just set it to 0.0
+  arc.pref(0.0);
 
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();

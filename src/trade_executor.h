@@ -105,34 +105,45 @@ template <class T> class TradeExecutor {
         Trade<T>& trade = v_it->first;
         typename T::Ptr rsrc = v_it->second;
         if (rsrc->quantity() > cyclus::eps_rsrc()) {
-          // Get the original bid preference
-          double original_preference = trade.bid->preference();
-
-          // If the bid has NaN preference, use the request preference
-          if (std::isnan(original_preference)) {
-            original_preference = trade.request->preference();
+          // Get original MC and MU
+          double original_mc = trade.bid->preference();
+          if (std::isnan(original_mc)) {
+            original_mc = 0.0;  // NaN means no cost
           }
+          double original_mu = trade.request->preference();
 
-          // Start with the original preference as the adjusted preference
-          double adjusted_preference = original_preference;
-
-          // If we have access to the exchange context, use the adjusted
-          // preference that was actually used by the solver
+          // Get adjusted MC and MU from exchange context
+          double adjusted_mc = original_mc;
+          double adjusted_mu = original_mu;
+          
           if (ex_ctx) {
-            auto trader_it = ex_ctx->trader_prefs.find(trade.request->requester());
-            if (trader_it != ex_ctx->trader_prefs.end()) {
+            auto trader_it = ex_ctx->trader_mc.find(trade.request->requester());
+            if (trader_it != ex_ctx->trader_mc.end()) {
               auto request_it = trader_it->second.find(trade.request);
               if (request_it != trader_it->second.end()) {
                 auto bid_it = request_it->second.find(trade.bid);
                 if (bid_it != request_it->second.end()) {
-                  adjusted_preference = bid_it->second;
+                  adjusted_mc = bid_it->second;
                 }
               }
             }
-            // If any of the keys are not found, adjusted_preference remains
-            // the original preference
+            
+            trader_it = ex_ctx->trader_mu.find(trade.request->requester());
+            if (trader_it != ex_ctx->trader_mu.end()) {
+              auto request_it = trader_it->second.find(trade.request);
+              if (request_it != trader_it->second.end()) {
+                auto bid_it = request_it->second.find(trade.bid);
+                if (bid_it != request_it->second.end()) {
+                  adjusted_mu = bid_it->second;
+                }
+              }
+            }
           }
-
+          
+          // Set the resource's unit value to the trade's marginal cost
+          rsrc->SetUnitValue(adjusted_mc);
+          
+          // Record MC and MU. ArcWeight can be computed from these if needed.
           ctx->NewDatum("Transactions")
               ->AddVal("TransactionId", ctx->NextTransactionID())
               ->AddVal("SenderId", supplier->id())
@@ -140,8 +151,8 @@ template <class T> class TradeExecutor {
               ->AddVal("ResourceId", rsrc->state_id())
               ->AddVal("Commodity", trade.request->commodity())
               ->AddVal("Time", ctx->time())
-              ->AddVal("BidCost", 1 / original_preference)
-              ->AddVal("AdjustedCost", 1 / adjusted_preference)
+              ->AddVal("MC", adjusted_mc)
+              ->AddVal("MU", adjusted_mu)
               ->Record();
         }
       }

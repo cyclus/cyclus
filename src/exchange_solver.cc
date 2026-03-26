@@ -2,15 +2,23 @@
 
 #include <vector>
 #include <map>
+#include <limits>
 
 #include "context.h"
 #include "exchange_graph.h"
+#include "error.h"
 
 namespace cyclus {
 
 double ExchangeSolver::Cost(const Arc& a, bool exclusive_orders) {
-  return (exclusive_orders && a.exclusive()) ? a.excl_val() / a.pref()
-                                             : 1.0 / a.pref();
+  // Use stored arc weight from pref() which is set during translation.
+  double arc_weight = a.pref();
+  
+  if (exclusive_orders && a.exclusive()) {
+    // For exclusive arcs, scale by excl_val if needed
+    return arc_weight * (a.excl_val() > 0 ? 1.0 / a.excl_val() : 1.0);
+  }
+  return arc_weight;
 }
 
 double ExchangeSolver::PseudoCost() {
@@ -66,12 +74,11 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
         }
       }
 
-      // update max_pref_
-      std::map<Arc, double>& prefs = (*n_it)->prefs;
-      for (p_it = prefs.begin(); p_it != prefs.end(); ++p_it) {
-        pref = p_it->second;
-        const Arc& a = p_it->first;
-        coeff = ArcCost(a);
+      // update max_coeff by checking all arcs connected to this node
+      std::vector<Arc>& node_arcs = graph_->node_arc_map()[*n_it];
+      for (std::vector<Arc>::iterator arc_it = node_arcs.begin(); 
+           arc_it != node_arcs.end(); ++arc_it) {
+        coeff = ArcCost(*arc_it);
         if (coeff > max_coeff) max_coeff = coeff;
       }
     }
@@ -87,8 +94,10 @@ double ExchangeSolver::PseudoCostByPref(double cost_factor) {
     const Arc& a = arcs[i];
     // remove exclusive value factor from costs for preferences that are less
     // than unity. otherwise they can artificially raise the maximum cost.
+    // Guard excl_val > 0 to avoid division by zero (excl_val can be 0 when
+    // request/bid quantities don't match).
     double factor =
-        (a.exclusive() && a.excl_val() < 1) ? 1 / a.excl_val() : 1.0;
+        (a.exclusive() && a.excl_val() > 0 && a.excl_val() < 1) ? 1 / a.excl_val() : 1.0;
     max_cost = std::max(max_cost, ArcCost(a) * factor);
   }
   return max_cost * (1 + cost_factor);
