@@ -20,14 +20,14 @@
 
 namespace cyclus {
 
-template <class T> struct PrefMap {
+template <class T> struct ArcCostMap {
   typedef std::map<Request<T>*, std::map<Bid<T>*, double>> type;
   typedef Request<T>* request_ptr;
   typedef Bid<T>* bid_ptr;
 };
 
 /// @brief Maps for storing unit cost and unit value adjustments
-/// These use the same structure as PrefMap but are semantically different:
+/// These use the same structure as ArcCostMap but are semantically different:
 /// - UnitCostMap stores unit cost adjustments (from bids)
 /// - UnitValueMap stores unit value adjustments (from requests)
 template <class T> struct UnitCostMap {
@@ -52,7 +52,7 @@ template <class T> struct CommodMap {
 /// provide introspection into the requests and bids it collects. Specifically,
 /// this class is designed to assist in phases of the Dynamic Resource
 /// Exchange. The second phase, Response to Request for Bids, is assisted by
-/// grouping requests by commodity type. The third phase, preference adjustment,
+/// grouping requests by commodity type. The third phase, adjustment,
 /// is assisted by grouping bids by the requester being responded to.
 template <class T> struct ExchangeContext {
  public:

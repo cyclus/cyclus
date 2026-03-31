@@ -26,19 +26,16 @@ template <class T> class Bid {
   /// @param bidder the bidder
   /// @param portfolio the porftolio of which this bid is a part
   /// @param exclusive flag for whether the bid is exclusive
-  /// @param preference specifies the preference of a bid in a request
-  ///        to bid arc. If NaN the request preference is used.
-  ///        WARNING: This should only be set by the bidder using the
-  ///        requests callback cost function. Bidders should not
-  ///        arbitrarily set this preference.
+  /// @param unit_cost the unit_cost associated with providing the resource 
+  ///                  from the request. 
   inline static Bid<T>* Create(Request<T>* request,
                                boost::shared_ptr<T>
                                    offer,
                                Trader* bidder,
                                typename BidPortfolio<T>::Ptr portfolio,
                                bool exclusive,
-                               double preference) {
-    return new Bid<T>(request, offer, bidder, portfolio, exclusive, preference);
+                               double unit_cost) {
+    return new Bid<T>(request, offer, bidder, portfolio, exclusive, unit_cost);
   }
 
   /// @brief a factory method for a bid
@@ -57,13 +54,13 @@ template <class T> class Bid {
     return Create(request, offer, bidder, portfolio, exclusive,
                   std::numeric_limits<double>::quiet_NaN(), package);
   }
-  /// @brief a factory method for a bid for a bid without a portfolio
+  /// @brief a factory method for a bid without a portfolio
   /// @warning this factory should generally only be used for testing
   inline static Bid<T>* Create(Request<T>* request, boost::shared_ptr<T> offer,
                                Trader* bidder, bool exclusive,
-                               double preference,
+                               double unit_cost,
                                Package::Ptr package = Package::unpackaged()) {
-    return new Bid<T>(request, offer, bidder, exclusive, preference, package);
+    return new Bid<T>(request, offer, bidder, exclusive, unit_cost, package);
   }
   /// @brief a factory method for a bid for a bid without a portfolio
   /// @warning this factory should generally only be used for testing
@@ -89,19 +86,19 @@ template <class T> class Bid {
   /// @return whether or not this an exclusive bid
   inline bool exclusive() const { return exclusive_; }
 
-  /// @return the preference of this bid
-  inline double preference() const { return preference_; }
+  /// @return the arc_cost of this bid
+  inline double unit_cost() const { return unit_cost_; }
 
  private:
   /// @brief constructors are private to require use of factory methods
   Bid(Request<T>* request, boost::shared_ptr<T> offer, Trader* bidder,
-      bool exclusive, double preference,
+      bool exclusive, double unit_cost,
       Package::Ptr package = Package::unpackaged())
       : request_(request),
         offer_(offer),
         bidder_(bidder),
         exclusive_(exclusive),
-        preference_(preference),
+        unit_cost(unit_cost),
         package_(package) {}
   /// @brief constructors are private to require use of factory methods
   Bid(Request<T>* request, boost::shared_ptr<T> offer, Trader* bidder,
@@ -110,18 +107,18 @@ template <class T> class Bid {
         offer_(offer),
         bidder_(bidder),
         exclusive_(exclusive),
-        preference_(std::numeric_limits<double>::quiet_NaN()),
+        unit_cost(std::numeric_limits<double>::quiet_NaN()),
         package_(package) {}
 
   Bid(Request<T>* request, boost::shared_ptr<T> offer, Trader* bidder,
       typename BidPortfolio<T>::Ptr portfolio, bool exclusive,
-      double preference, Package::Ptr package = Package::unpackaged())
+      double unit_cost, Package::Ptr package = Package::unpackaged())
       : request_(request),
         offer_(offer),
         bidder_(bidder),
         portfolio_(portfolio),
         exclusive_(exclusive),
-        preference_(preference),
+        unit_cost_(unit_cost),
         package_(package) {}
 
   Bid(Request<T>* request, boost::shared_ptr<T> offer, Trader* bidder,
@@ -132,7 +129,7 @@ template <class T> class Bid {
         bidder_(bidder),
         portfolio_(portfolio),
         exclusive_(exclusive),
-        preference_(std::numeric_limits<double>::quiet_NaN()),
+        unit_cost_(std::numeric_limits<double>::quiet_NaN()),
         package_(package) {}
 
   Request<T>* request_;
@@ -140,7 +137,7 @@ template <class T> class Bid {
   Trader* bidder_;
   boost::weak_ptr<BidPortfolio<T>> portfolio_;
   bool exclusive_;
-  double preference_;
+  double unit_cost;
   Package::Ptr package_;
 };
 

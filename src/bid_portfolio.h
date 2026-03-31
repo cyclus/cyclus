@@ -49,14 +49,13 @@ class BidPortfolio : public boost::enable_shared_from_this<BidPortfolio<T>> {
   /// @param offer the resource being offered in response to the request
   /// @param bidder the bidder
   /// @param exclusive indicates whether the bid is exclusive
-  /// @param preference sets the preference of the bid on a request
-  ///        bid arc.
+  /// @param arc_cost the weight assigned to the request-bid arc.
   /// @throws KeyError if a bid is added from a different bidder than the
   /// original
   Bid<T>* AddBid(Request<T>* request, boost::shared_ptr<T> offer,
-                 Trader* bidder, bool exclusive, double preference) {
+                 Trader* bidder, bool exclusive, double arc_cost) {
     Bid<T>* b = Bid<T>::Create(request, offer, bidder, this->shared_from_this(),
-                               exclusive, preference);
+                               exclusive, arc_cost);
     VerifyResponder_(b);
     if (offer->quantity() > 0)
       bids_.insert(b);
