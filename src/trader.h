@@ -50,16 +50,16 @@ class Trader {
   }
 
   /// default implementation for material preferences.
-  /// @param mc_prefs map for adjusting marginal costs (from bids)
-  /// @param mu_prefs map for adjusting marginal utilities (from requests)
-  virtual void AdjustMatlPrefs(MCMap<Material>::type& mc_prefs,
-                               MUMap<Material>::type& mu_prefs) {}
+  /// @param unit_costs map for adjusting unit costs (from bids)
+  /// @param unit_values map for adjusting unit values (from requests)
+  virtual void AdjustMatlPrefs(UnitCostMap<Material>::type& unit_costs,
+                               UnitValueMap<Material>::type& unit_values) {}
 
   /// default implementation for product preferences.
-  /// @param mc_prefs map for adjusting marginal costs (from bids)
-  /// @param mu_prefs map for adjusting marginal utilities (from requests)
-  virtual void AdjustProductPrefs(MCMap<Product>::type& mc_prefs,
-                                  MUMap<Product>::type& mu_prefs) {}
+  /// @param unit_costs map for adjusting unit costs (from bids)
+  /// @param unit_values map for adjusting unit values (from requests)
+  virtual void AdjustProductPrefs(UnitCostMap<Product>::type& unit_costs,
+                                  UnitValueMap<Product>::type& unit_values) {}
 
   /// @brief default implementation for responding to material trades
   /// @param trades all trades in which this trader is the supplier

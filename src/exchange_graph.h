@@ -81,8 +81,8 @@ class Arc {
     vnode_ = other.vnode();
     exclusive_ = other.exclusive();
     excl_val_ = other.excl_val();
-    mc_ = other.mc();
-    mu_ = other.mu();
+    unit_cost_ = other.get_unit_cost();
+    unit_value_ = other.get_unit_value();
     pref_ = other.pref();
     return *this;
   }
@@ -101,13 +101,13 @@ class Arc {
   inline bool exclusive() const { return exclusive_; }
   inline double excl_val() const { return excl_val_; }
   
-  /// @brief marginal cost (from bid node)
-  inline double mc() const { return mc_; }
-  inline void mc(double mc) { mc_ = mc; }
+  /// @brief unit cost (from bid node)
+  inline double get_unit_cost() const { return unit_cost_; }
+  inline void set_unit_cost(double unit_cost) { unit_cost_ = unit_cost; }
   
-  /// @brief marginal utility (from request node)
-  inline double mu() const { return mu_; }
-  inline void mu(double mu) { mu_ = mu; }
+  /// @brief unit value (from request node)
+  inline double get_unit_value() const { return unit_value_; }
+  inline void set_unit_value(double unit_value) { unit_value_ = unit_value; }
   
   /// @brief returns the arc weight
   inline double pref() const { return pref_; }
@@ -119,8 +119,8 @@ class Arc {
   boost::weak_ptr<ExchangeNode> vnode_;
   bool exclusive_;
   double excl_val_;
-  double mc_;  ///< marginal cost from bid
-  double mu_;  ///< marginal utility from request
+  double unit_cost_;  
+  double unit_value_; 
   double pref_;  ///< arc weight used in objective function
 };
 

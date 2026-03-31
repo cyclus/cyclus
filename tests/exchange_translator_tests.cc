@@ -308,9 +308,9 @@ TEST(ExXlateTests, XlateArc) {
   ExchangeNodeGroup::Ptr bset =
       TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
-  double mc = std::isnan(bid->preference()) ? 0.0 : bid->preference();
-  double mu = req->preference();
-  Arc a = TranslateArc(xlator.translation_ctx(), bid, mc, mu);
+  double unit_cost = std::isnan(bid->preference()) ? 0.0 : bid->preference();
+  double unit_value = req->preference();
+  Arc a = TranslateArc(xlator.translation_ctx(), bid, unit_cost, unit_value);
 
   EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.vnode());
   EXPECT_EQ(xlator.translation_ctx().request_to_node[req], a.unode());
@@ -361,61 +361,61 @@ TEST(ExXlateTests, XlateArcExclusive) {
   TranslateRequestPortfolio(xlator.translation_ctx(), rport);
   TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
-  // Helper to get MC and MU for TranslateArc
-  auto get_mc_mu = [](Bid<Material>* b) -> std::pair<double, double> {
-    double mc = std::isnan(b->preference()) ? 0.0 : b->preference();
-    double mu = b->request()->preference();
-    return std::make_pair(mc, mu);
+  // Helper to get unit_cost and unit_value for TranslateArc
+  auto get_cost_value = [](Bid<Material>* b) -> std::pair<double, double> {
+    double unit_cost = std::isnan(b->preference()) ? 0.0 : b->preference();
+    double unit_value = b->request()->preference();
+    return std::make_pair(unit_cost, unit_value);
   };
   
   // bid > request && req exclusive && bid !exclusive,
   // so excl_val set to request qty
-  auto mc_mu1 = get_mc_mu(bid1);
-  Arc a1 = TranslateArc(xlator.translation_ctx(), bid1, mc_mu1.first, mc_mu1.second);
+  auto cost_value1 = get_cost_value(bid1);
+  Arc a1 = TranslateArc(xlator.translation_ctx(), bid1, cost_value1.first, cost_value1.second);
   EXPECT_TRUE(a1.exclusive());
   EXPECT_DOUBLE_EQ(a1.excl_val(), qty);
   // bid == request && req exclusive && bid !exclusive,
   // so excl_val set to request qty
-  auto mc_mu2 = get_mc_mu(bid2);
-  Arc a2 = TranslateArc(xlator.translation_ctx(), bid2, mc_mu2.first, mc_mu2.second);
+  auto cost_value2 = get_cost_value(bid2);
+  Arc a2 = TranslateArc(xlator.translation_ctx(), bid2, cost_value2.first, cost_value2.second);
   EXPECT_TRUE(a2.exclusive());
   EXPECT_DOUBLE_EQ(a2.excl_val(), qty);
   // request < bid && req exclusive && bid !exclusive,
   // so arc excl_val is set to 0
-  auto mc_mu3 = get_mc_mu(bid3);
-  Arc a3 = TranslateArc(xlator.translation_ctx(), bid3, mc_mu3.first, mc_mu3.second);
+  auto cost_value3 = get_cost_value(bid3);
+  Arc a3 = TranslateArc(xlator.translation_ctx(), bid3, cost_value3.first, cost_value3.second);
   EXPECT_TRUE(a3.exclusive());
   EXPECT_DOUBLE_EQ(a3.excl_val(), 0.0);
 
   // bid != request && req exclusive && bid exclusive,
   // so excl_val set to 0
-  auto mc_mu4 = get_mc_mu(bid4);
-  Arc a4 = TranslateArc(xlator.translation_ctx(), bid4, mc_mu4.first, mc_mu4.second);
+  auto cost_value4 = get_cost_value(bid4);
+  Arc a4 = TranslateArc(xlator.translation_ctx(), bid4, cost_value4.first, cost_value4.second);
   EXPECT_TRUE(a4.exclusive());
   EXPECT_DOUBLE_EQ(a4.excl_val(), 0);
   // bid == request && req exclusive && bid exclusive,
   // so excl_val set to request qty
-  auto mc_mu5 = get_mc_mu(bid5);
-  Arc a5 = TranslateArc(xlator.translation_ctx(), bid5, mc_mu5.first, mc_mu5.second);
+  auto cost_value5 = get_cost_value(bid5);
+  Arc a5 = TranslateArc(xlator.translation_ctx(), bid5, cost_value5.first, cost_value5.second);
   EXPECT_TRUE(a5.exclusive());
   EXPECT_DOUBLE_EQ(a5.excl_val(), qty);
 
   // bid < request && bid exclusive && req !exclusive,
   // so excl_val set to bid qty
-  auto mc_mu6 = get_mc_mu(bid6);
-  Arc a6 = TranslateArc(xlator.translation_ctx(), bid6, mc_mu6.first, mc_mu6.second);
+  auto cost_value6 = get_cost_value(bid6);
+  Arc a6 = TranslateArc(xlator.translation_ctx(), bid6, cost_value6.first, cost_value6.second);
   EXPECT_TRUE(a6.exclusive());
   EXPECT_DOUBLE_EQ(a6.excl_val(), qty - 1);
   // bid == request && bid exclusive && req !exclusive,
   // so excl_val set to bid qty
-  auto mc_mu7 = get_mc_mu(bid7);
-  Arc a7 = TranslateArc(xlator.translation_ctx(), bid7, mc_mu7.first, mc_mu7.second);
+  auto cost_value7 = get_cost_value(bid7);
+  Arc a7 = TranslateArc(xlator.translation_ctx(), bid7, cost_value7.first, cost_value7.second);
   EXPECT_TRUE(a7.exclusive());
   EXPECT_DOUBLE_EQ(a7.excl_val(), qty);
   // bid > request && bid exclusive && req !exclusive,
   // so excl_val set to 0
-  auto mc_mu8 = get_mc_mu(bid8);
-  Arc a8 = TranslateArc(xlator.translation_ctx(), bid8, mc_mu8.first, mc_mu8.second);
+  auto cost_value8 = get_cost_value(bid8);
+  Arc a8 = TranslateArc(xlator.translation_ctx(), bid8, cost_value8.first, cost_value8.second);
   EXPECT_TRUE(a8.exclusive());
   EXPECT_DOUBLE_EQ(a8.excl_val(), 0);
 }
@@ -448,15 +448,17 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(1, graph->arcs().size());
   EXPECT_EQ(0, graph->matches().size());
   const Arc& a = *graph->arcs().begin();
-  // After Translate(), arc.pref() contains arc_weight = MC - MU
-  // In this test: MC = 0 (bid has no explicit preference), MU = pref = 4.5
+  // After Translate(), arc.pref() contains unit_cost - unit_value
+  // In this test: 
+  // --> unit_cost = 0 (bid has no explicit preference),
+  // --> unit_value = pref = 4.5
   // So arc_weight = 0 - 4.5 = -4.5
-  // Verify that MU matches the request preference
-  EXPECT_EQ(pref, a.mu());
-  // Verify that MC is 0 (bid has no explicit preference, defaults to 0)
-  EXPECT_EQ(0.0, a.mc());
-  // Verify that arc_weight is calculated correctly: MC - MU
-  double expected_arc_weight = a.mc() - a.mu();
+  // Verify that unit_value matches the request preference
+  EXPECT_EQ(pref, a.get_unit_value());
+  // Verify that unit_cost is 0 (bid has no explicit preference, defaults to 0)
+  EXPECT_EQ(0.0, a.get_unit_cost());
+  // Verify that arc_cost is calculated correctly: unit_cost - unit_value
+  double expected_arc_weight = a.get_unit_cost() - a.get_unit_value();
   EXPECT_DOUBLE_EQ(expected_arc_weight, a.pref());
 }
 

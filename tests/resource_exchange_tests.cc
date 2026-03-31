@@ -28,8 +28,8 @@ using cyclus::ExchangeContext;
 using cyclus::Facility;
 using cyclus::Material;
 using cyclus::Agent;
-using cyclus::MCMap;
-using cyclus::MUMap;
+using cyclus::UnitCostMap;
+using cyclus::UnitValueMap;
 using cyclus::PrefMap;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
@@ -63,12 +63,12 @@ class Requester: public TestFacility {
     return rps;
   }
 
-  // increments counter and squares all MC values (marginal costs from bids)
-  virtual void AdjustMatlPrefs(MCMap<Material>::type& mc_prefs,
-                                MUMap<Material>::type& mu_prefs) {
+  // increments counter and squares all unit costs (from bids)
+  virtual void AdjustMatlPrefs(UnitCostMap<Material>::type& unit_costs,
+                                UnitValueMap<Material>::type& unit_values) {
     std::map<Request<Material>*,
              std::map<Bid<Material>*, double> >::iterator p_it;
-    for (p_it = mc_prefs.begin(); p_it != mc_prefs.end(); ++p_it) {
+    for (p_it = unit_costs.begin(); p_it != unit_costs.end(); ++p_it) {
       std::map<Bid<Material>*, double>& map = p_it->second;
       std::map<Bid<Material>*, double>::iterator m_it;
       for (m_it = map.begin(); m_it != map.end(); ++m_it) {
@@ -292,8 +292,8 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   Bidder* bidr = new Bidder(tc.get(), commod);
 
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  // Set bid preferences to match request preference so MC has a value to adjust
-  // MC comes from bid preference, so setting it to request preference (2.4) for testing
+  // Set bid preferences to match request preference so unit_cost has a value to adjust
+  // unit_cost comes from bid preference, so setting it to request preference (2.4) for testing
   Bid<Material>* pbid = bp->AddBid(preq, mat, bidr, false, preq->preference());
   Bid<Material>* cbid = bp->AddBid(creq, mat, bidr, false, creq->preference());
 

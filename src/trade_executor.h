@@ -115,45 +115,45 @@ template <class T> class TradeExecutor {
 
         typename T::Ptr rsrc = v_it->second;
         if (rsrc->quantity() > cyclus::eps_rsrc()) {
-          // Get original MC and MU
-          double original_mc = trade.bid->preference();
-          if (std::isnan(original_mc)) {
-            original_mc = 0.0;  // NaN means no cost
+          // Get original unit_cost and unit_value
+          double original_unit_cost = trade.bid->preference();
+          if (std::isnan(original_unit_cost)) {
+            original_unit_cost = 0.0;  // NaN means no cost
           }
-          double original_mu = trade.request->preference();
+          double original_unit_value = trade.request->preference();
 
-          // Get adjusted MC and MU from exchange context
-          double adjusted_mc = original_mc;
-          double adjusted_mu = original_mu;
+          // Get adjusted unit_cost and unit_value from exchange context
+          double adjusted_unit_cost = original_unit_cost;
+          double adjusted_unit_value = original_unit_value;
           
           if (ex_ctx) {
-            auto trader_it = ex_ctx->trader_mc.find(trade.request->requester());
-            if (trader_it != ex_ctx->trader_mc.end()) {
+            auto trader_it = ex_ctx->trader_costs.find(trade.request->requester());
+            if (trader_it != ex_ctx->trader_costs.end()) {
               auto request_it = trader_it->second.find(trade.request);
               if (request_it != trader_it->second.end()) {
                 auto bid_it = request_it->second.find(trade.bid);
                 if (bid_it != request_it->second.end()) {
-                  adjusted_mc = bid_it->second;
+                  adjusted_unit_cost = bid_it->second;
                 }
               }
             }
             
-            trader_it = ex_ctx->trader_mu.find(trade.request->requester());
-            if (trader_it != ex_ctx->trader_mu.end()) {
+            trader_it = ex_ctx->trader_values.find(trade.request->requester());
+            if (trader_it != ex_ctx->trader_values.end()) {
               auto request_it = trader_it->second.find(trade.request);
               if (request_it != trader_it->second.end()) {
                 auto bid_it = request_it->second.find(trade.bid);
                 if (bid_it != request_it->second.end()) {
-                  adjusted_mu = bid_it->second;
+                  adjusted_unit_value = bid_it->second;
                 }
               }
             }
           }
           
           // Set the resource's unit value to the trade's marginal cost
-          rsrc->SetUnitValue(adjusted_mc);
+          rsrc->SetUnitValue(adjusted_unit_cost);
           
-          // Record MC and MU. ArcWeight can be computed from these if needed.
+          // Record unit_cost and unit_value. arc_cost can be computed from these if needed.
           ctx->NewDatum("Transactions")
               ->AddVal("TransactionId", ctx->NextTransactionID())
               ->AddVal("SenderId", supplier->id())
@@ -161,8 +161,8 @@ template <class T> class TradeExecutor {
               ->AddVal("ResourceId", rsrc->state_id())
               ->AddVal("Commodity", trade.request->commodity())
               ->AddVal("Time", ctx->time())
-              ->AddVal("MC", adjusted_mc)
-              ->AddVal("MU", adjusted_mu)
+              ->AddVal("UnitCost", adjusted_unit_cost)
+              ->AddVal("UnitValue", adjusted_unit_value)
               ->Record();
         }
       }

@@ -19,23 +19,23 @@ namespace cyclus {
 /// @brief Preference adjustment method helpers to convert from templates to the
 /// Agent inheritance hierarchy
 template <class T>
-inline static void AdjustPrefs(Agent* m, typename MCMap<T>::type& mc_prefs,
-                                typename MUMap<T>::type& mu_prefs) {}
-inline static void AdjustPrefs(Agent* m, MCMap<Material>::type& mc_prefs,
-                                MUMap<Material>::type& mu_prefs) {
-  m->AdjustMatlPrefs(mc_prefs, mu_prefs);
+inline static void AdjustPrefs(Agent* m, typename UnitCostMap<T>::type& unit_costs,
+                                typename UnitValueMap<T>::type& unit_values) {}
+inline static void AdjustPrefs(Agent* m, UnitCostMap<Material>::type& unit_costs,
+                                UnitValueMap<Material>::type& unit_values) {
+  m->AdjustMatlPrefs(unit_costs, unit_values);
 }
-inline static void AdjustPrefs(Agent* m, MCMap<Product>::type& mc_prefs,
-                                MUMap<Product>::type& mu_prefs) {
-  m->AdjustProductPrefs(mc_prefs, mu_prefs);
+inline static void AdjustPrefs(Agent* m, UnitCostMap<Product>::type& unit_costs,
+                                UnitValueMap<Product>::type& unit_values) {
+  m->AdjustProductPrefs(unit_costs, unit_values);
 }
-inline static void AdjustPrefs(Trader* t, MCMap<Material>::type& mc_prefs,
-                                MUMap<Material>::type& mu_prefs) {
-  t->AdjustMatlPrefs(mc_prefs, mu_prefs);
+inline static void AdjustPrefs(Trader* t, UnitCostMap<Material>::type& unit_costs,
+                                UnitValueMap<Material>::type& unit_values) {
+  t->AdjustMatlPrefs(unit_costs, unit_values);
 }
-inline static void AdjustPrefs(Trader* t, MCMap<Product>::type& mc_prefs,
-                                MUMap<Product>::type& mu_prefs) {
-  t->AdjustProductPrefs(mc_prefs, mu_prefs);
+inline static void AdjustPrefs(Trader* t, UnitCostMap<Product>::type& unit_costs,
+                                UnitValueMap<Product>::type& unit_values) {
+  t->AdjustProductPrefs(unit_costs, unit_values);
 }
 
 /// @class ResourceExchange
@@ -139,16 +139,16 @@ template <class T> class ResourceExchange {
   /// @brief allows a trader and its parents to adjust any preferences in the
   /// system
   void AdjustPrefs_(Trader* t) {
-    typename MCMap<T>::type& mc_prefs = ex_ctx_.trader_mc[t];
-    typename MUMap<T>::type& mu_prefs = ex_ctx_.trader_mu[t];
-    AdjustPrefs(t, mc_prefs, mu_prefs);
+    typename UnitCostMap<T>::type& unit_costs = ex_ctx_.trader_costs[t];
+    typename UnitValueMap<T>::type& unit_values = ex_ctx_.trader_values[t];
+    AdjustPrefs(t, unit_costs, unit_values);
     Agent* m = t->manager()->parent();
     while (m != NULL) {
-      AdjustPrefs(m, mc_prefs, mu_prefs);
+      AdjustPrefs(m, unit_costs, unit_values);
       m = m->parent();
     }
-    // Update trader_prefs to mirror trader_mc for backward compatibility
-    ex_ctx_.trader_prefs[t] = mc_prefs;
+    // Update trader_prefs to mirror trader_costs for backward compatibility
+    ex_ctx_.trader_prefs[t] = unit_costs;
   }
 
   struct trader_compare {

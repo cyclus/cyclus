@@ -22,8 +22,8 @@ using std::vector;
 using cyclus::Bid;
 using cyclus::BidPortfolio;
 using cyclus::ExchangeContext;
-using cyclus::MCMap;
-using cyclus::MUMap;
+using cyclus::UnitCostMap;
+using cyclus::UnitValueMap;
 using cyclus::PrefMap;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
@@ -143,7 +143,7 @@ TEST_F(ExchangeContextTests, AddBid1) {
   EXPECT_TRUE(context.bids_by_request[req1].empty());
 
   BidPortfolio<Resource>::Ptr bp1(new BidPortfolio<Resource>());
-  double bid_pref = 2.5;  // MC value to test
+  double bid_pref = 2.5;  // unit_cost value to test
   Bid<Resource>* bid = bp1->AddBid(req1, get_mat(), fac1, false, bid_pref);
 
   context.AddBidPortfolio(bp1);
@@ -163,13 +163,13 @@ TEST_F(ExchangeContextTests, AddBid1) {
   bidders.insert(fac1);
   EXPECT_EQ(bidders, context.bidders);
 
-  MCMap<Resource>::type obs_mc;
-  obs_mc[req1].insert(std::make_pair(bid, bid_pref));
-  EXPECT_EQ(context.trader_prefs[req1->requester()], obs_mc);
+  UnitCostMap<Resource>::type obs_cost;
+  obs_cost[req1].insert(std::make_pair(bid, bid_pref));
+  EXPECT_EQ(context.trader_prefs[req1->requester()], obs_cost);
   
-  MUMap<Resource>::type obs_mu;
-  obs_mu[req1].insert(std::make_pair(bid, req1->preference()));
-  EXPECT_EQ(context.trader_mu[req1->requester()], obs_mu);
+  UnitValueMap<Resource>::type obs_value;
+  obs_value[req1].insert(std::make_pair(bid, req1->preference()));
+  EXPECT_EQ(context.trader_values[req1->requester()], obs_value);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

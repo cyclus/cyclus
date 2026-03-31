@@ -34,15 +34,14 @@ TEST(ProgTranslatorTests, translation) {
   int nrows = 8;
   int nexcl = 3;
 
-  // Marginal cost (MC) and marginal utility (MU) values for each arc
-  // MC comes from bid, MU comes from request
-  double mc_vals[] = {5.0, 2.0, 1.0, 0.5, 1.5};  // MC values (non-negative)
-  double mu_vals[] = {0.0, 0.5, 0.0, 0.0, 0.2};  // MU values
+  // unit value (from bid) and unit value (from request) for each arc
+  double unit_cost_vals[] = {5.0, 2.0, 1.0, 0.5, 1.5};  
+  double unit_value_vals[] = {0.0, 0.5, 0.0, 0.0, 0.2}; 
   
-  // Calculate arc_weight = MC - MU for each arc
+  // Calculate arc_weight = unit_cost - unit_value for each arc
   double arc_weights[narcs];
   for (int i = 0; i != narcs; i++) {
-    arc_weights[i] = mc_vals[i] - mu_vals[i];
+    arc_weights[i] = unit_cost_vals[i] - unit_value_vals[i];
   }
 
   double ucaps_a_0[] = {0.5, 0.4};
@@ -100,24 +99,24 @@ TEST(ProgTranslatorTests, translation) {
   ExchangeNode::Ptr d1(new ExchangeNode());
 
   Arc x0(a0, c0);
-  x0.mc(mc_vals[0]);
-  x0.mu(mu_vals[0]);
-  x0.pref(arc_weights[0]);  // arc_weight = MC - MU
+  x0.set_unit_cost(unit_cost_vals[0]);
+  x0.set_unit_value(unit_value_vals[0]);
+  x0.pref(arc_weights[0]);
   Arc x1(b0, c1);
-  x1.mc(mc_vals[1]);
-  x1.mu(mu_vals[1]);
+  x1.set_unit_cost(unit_cost_vals[1]);
+  x1.set_unit_value(unit_value_vals[1]);
   x1.pref(arc_weights[1]);
   Arc x2(b1, c2);
-  x2.mc(mc_vals[2]);
-  x2.mu(mu_vals[2]);
+  x2.set_unit_cost(unit_cost_vals[2]);
+  x2.set_unit_value(unit_value_vals[2]);
   x2.pref(arc_weights[2]);
   Arc x3(a1, d0);
-  x3.mc(mc_vals[3]);
-  x3.mu(mu_vals[3]);
+  x3.set_unit_cost(unit_cost_vals[3]);
+  x3.set_unit_value(unit_value_vals[3]);
   x3.pref(arc_weights[3]);
   Arc x4(b1, d1);
-  x4.mc(mc_vals[4]);
-  x4.mu(mu_vals[4]);
+  x4.set_unit_cost(unit_cost_vals[4]);
+  x4.set_unit_value(unit_value_vals[4]);
   x4.pref(arc_weights[4]);
 
   a0->unit_capacities[x0] = std::vector<double>(

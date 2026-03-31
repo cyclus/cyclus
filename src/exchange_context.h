@@ -26,14 +26,14 @@ template <class T> struct PrefMap {
   typedef Bid<T>* bid_ptr;
 };
 
-/// @brief Maps for storing marginal cost (MC) and marginal utility (MU) adjustments
+/// @brief Maps for storing unit cost and unit value adjustments
 /// These use the same structure as PrefMap but are semantically different:
-/// - MCMap stores marginal cost adjustments (from bids)
-/// - MUMap stores marginal utility adjustments (from requests)
-template <class T> struct MCMap {
+/// - UnitCostMap stores unit cost adjustments (from bids)
+/// - UnitValueMap stores unit value adjustments (from requests)
+template <class T> struct UnitCostMap {
   typedef std::map<Request<T>*, std::map<Bid<T>*, double>> type;
 };
-template <class T> struct MUMap {
+template <class T> struct UnitValueMap {
   typedef std::map<Request<T>*, std::map<Bid<T>*, double>> type;
 };
 
@@ -87,8 +87,8 @@ template <class T> struct ExchangeContext {
     }
   }
 
-  /// @brief adds a bid to the appropriate containers, default marginal cost (MC)
-  /// and marginal utility (MU) are set
+  /// @brief adds a bid to the appropriate containers, default unit cost
+  /// and unit value are set
   /// @param pb the bid
   void AddBid(Bid<T>* pb) {
     assert(pb->bidder() != NULL);
@@ -96,23 +96,23 @@ template <class T> struct ExchangeContext {
 
     bids_by_request[pb->request()].push_back(pb);
 
-    // MC comes from bid preference (or 0.0 if NaN)
+    // unit cost comes from bid preference (or 0.0 if NaN)
     double bid_pref = pb->preference();
-    double mc = std::isnan(bid_pref) ? 0.0 : bid_pref;
+    double unit_cost = std::isnan(bid_pref) ? 0.0 : bid_pref;
     
-    // MU comes from request preference
+    // unit value comes from request preference
     double req_pref = pb->request()->preference();
-    double mu = std::isnan(req_pref) ? 0.0 : req_pref;
+    double unit_value = std::isnan(req_pref) ? 0.0 : req_pref;
     
-    // Store MC and MU separately
-    trader_mc[pb->request()->requester()][pb->request()].insert(
-        std::make_pair(pb, mc));
-    trader_mu[pb->request()->requester()][pb->request()].insert(
-        std::make_pair(pb, mu));
+    // Store unit cost and unit value separately
+    trader_costs[pb->request()->requester()][pb->request()].insert(
+        std::make_pair(pb, unit_cost));
+    trader_values[pb->request()->requester()][pb->request()].insert(
+        std::make_pair(pb, unit_value));
     
     // Keep trader_prefs for backward compatibility during transition
     trader_prefs[pb->request()->requester()][pb->request()].insert(
-        std::make_pair(pb, mc));
+        std::make_pair(pb, unit_cost));
   }
 
   /// @brief a reference to an exchange's set of requests
@@ -133,13 +133,13 @@ template <class T> struct ExchangeContext {
   /// @brief maps request to all bids for request
   std::map<Request<T>*, std::vector<Bid<T>*>> bids_by_request;
 
-  /// @brief maps trader to request to bid to marginal cost (MC) adjustments
-  std::map<Trader*, typename MCMap<T>::type> trader_mc;
+  /// @brief maps trader to request to bid to unit cost adjustments
+  std::map<Trader*, typename UnitCostMap<T>::type> trader_costs;
   
-  /// @brief maps trader to request to bid to marginal utility (MU) adjustments
-  std::map<Trader*, typename MUMap<T>::type> trader_mu;
+  /// @brief maps trader to request to bid to unit value adjustments
+  std::map<Trader*, typename UnitValueMap<T>::type> trader_values;
   
-  /// @deprecated Use trader_mc and trader_mu instead. Kept for backward compatibility.
+  /// @deprecated Use trader_costs and trader_values instead. Kept for backward compatibility.
   std::map<Trader*, typename PrefMap<T>::type> trader_prefs;
 };
 
