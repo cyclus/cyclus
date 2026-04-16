@@ -11,8 +11,8 @@
 namespace cyclus {
 
 double ExchangeSolver::Cost(const Arc& a, bool exclusive_orders) {
-  // Use stored arc weight from pref() which is set during translation.
-  double arc_weight = a.pref();
+  // Use stored arc cost which is set during translation.
+  double arc_weight = a.ArcCost();
   
   if (exclusive_orders && a.exclusive()) {
     // For exclusive arcs, scale by excl_val if needed
@@ -26,7 +26,7 @@ double ExchangeSolver::PseudoCost() {
 }
 
 double ExchangeSolver::PseudoCost(double cost_factor) {
-  return PseudoCostByPref(cost_factor);
+  return PseudoCostByArcCost(cost_factor);
 }
 
 double ExchangeSolver::PseudoCostByCap(double cost_factor) {
@@ -35,7 +35,7 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
   std::map<Arc, double>::iterator p_it;
   std::vector<RequestGroup::Ptr>::iterator rg_it;
   std::vector<ExchangeNodeGroup::Ptr>::iterator sg_it;
-  double min_cap, pref, coeff;
+  double min_cap, coeff;
 
   double max_coeff = std::numeric_limits<double>::min();
   double min_unit_cap = std::numeric_limits<double>::max();
@@ -87,12 +87,12 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
   return max_coeff / min_unit_cap * (1 + cost_factor);
 }
 
-double ExchangeSolver::PseudoCostByPref(double cost_factor) {
+double ExchangeSolver::PseudoCostByArcCost(double cost_factor) {
   double max_cost = 0;
   std::vector<Arc>& arcs = graph_->arcs();
   for (int i = 0; i != arcs.size(); i++) {
     const Arc& a = arcs[i];
-    // remove exclusive value factor from costs for preferences that are less
+    // remove exclusive value factor from costs for arc costs that are less
     // than unity. otherwise they can artificially raise the maximum cost.
     // Guard excl_val > 0 to avoid division by zero (excl_val can be 0 when
     // request/bid quantities don't match).

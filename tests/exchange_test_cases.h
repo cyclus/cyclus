@@ -139,8 +139,8 @@ class Case2h: public Case2 {
 /// Case 3:
 /// 2 suppliers (2 nodes) with capacity, c1 & c2
 /// 1 requester (1 node) with request quantity, q
-/// requester pref for s1 := p1
-/// requester pref for s2 := p2
+/// requester arc cost for s1 := p1
+/// requester arc cost for s2 := p2
 /// flow from s1 -> r := f1
 /// flow from s2 -> r := f2
 class Case3: public ExchangeCase {

@@ -104,21 +104,19 @@ class RequestPortfolio
   /// @param target the target resource associated with this request
   /// @param requester the requester
   /// @param commodity the commodity associated with this request
-  /// @param preference the preference associated with this request (relative to
-  /// others in the portfolio)
+  /// @param unit_value the unit_value associated with this request
   /// @param exclusive a flag denoting that this request must be met
-  /// exclusively,
-  /// i.e., in its entirety by a single offer
+  /// exclusively, i.e., in its entirety by a single offer
   /// @param cost_function The cost function that the requester sets so that the
   /// bidder may evaluate many potential resources.
   /// @throws KeyError if a request is added from a different requester than the
   /// original or if the request quantity is different than the original
   Request<T>* AddRequest(boost::shared_ptr<T> target, Trader* requester,
-                         std::string commodity, double preference,
+                         std::string commodity, double unit_value,
                          bool exclusive, cost_function_t cost_function) {
     Request<T>* r =
         Request<T>::Create(target, requester, this->shared_from_this(),
-                           commodity, preference, exclusive, cost_function);
+                           commodity, unit_value, exclusive, cost_function);
     VerifyRequester_(r);
     requests_.push_back(r);
     mass_coeffs_[r] = 1;
@@ -129,18 +127,16 @@ class RequestPortfolio
   /// @param target the target resource associated with this request
   /// @param requester the requester
   /// @param commodity the commodity associated with this request
-  /// @param preference the preference associated with this request (relative to
-  /// others in the portfolio)
+  /// @param unit_value the unit_value associated with this request
   /// @param exclusive a flag denoting that this request must be met
-  /// exclusively,
-  /// i.e., in its entirety by a single offer
+  /// exclusively, i.e., in its entirety by a single offer
   /// @throws KeyError if a request is added from a different requester than the
   /// original or if the request quantity is different than the original
   Request<T>* AddRequest(boost::shared_ptr<T> target, Trader* requester,
                          std::string commodity = "",
-                         double preference = kDefaultPref,
+                         double unit_value = kDefaultUnitValue,
                          bool exclusive = false) {
-    return AddRequest(target, requester, commodity, preference, exclusive,
+    return AddRequest(target, requester, commodity, unit_value, exclusive,
                       NULL);
   }
 

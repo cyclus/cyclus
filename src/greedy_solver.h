@@ -20,21 +20,21 @@ void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
 ///     return 0;
 /// }
 
-/// @brief A comparison functor for sorting a container of Arcs by arc weight,
+/// @brief A comparison functor for sorting a container of Arcs by arc cost,
 /// in ascending order (i.e., lowest cost Arc first). In the case of a tie, a
 /// lexicalgraphic ordering of node ids is used.
-/// Note: Lower arc weight (MC - MU) is better, so we sort ascending.
-struct ReqPrefComp {
-  ReqPrefComp() {}
+/// Note: Lower arc costis better, so we sort ascending.
+struct ReqCostComp {
+  ReqCostComp() {}
   bool operator()(const Arc& l, const Arc& r) const {
     int lu = l.unode()->agent_id;
     int lv = l.vnode()->agent_id;
     int ru = r.unode()->agent_id;
     int rv = r.vnode()->agent_id;
-    // Use stored arc weight from pref() to avoid recalculation
-    double lweight = l.pref();
-    double rweight = r.pref();
-    return (lweight != rweight) ? (lweight < rweight)
+    // Use stored arc cost
+    double l_cost = l.ArcCost();
+    double r_cost = r.ArcCost();
+    return (l_cost != r_cost) ? (l_cost < r_cost)
                                 : (lu > ru || (lu == ru && lv > rv));
   }
 };
@@ -43,16 +43,16 @@ struct ReqPrefComp {
 /// in ascending order (i.e., lowest cost Node first). In the case of a tie, a
 /// lexicalgraphic ordering of node ids is used.
 /// Note: This requires the graph to be available, so it's not a simple inline function
-struct AvgPrefComp {
+struct AvgArcCostComp {
   ExchangeGraph* graph_;
-  AvgPrefComp(ExchangeGraph* graph) : graph_(graph) {}
+  AvgArcCostComp(ExchangeGraph* graph) : graph_(graph) {}
   bool operator()(ExchangeNode::Ptr l, ExchangeNode::Ptr r) const {
     int lid = l->agent_id;
     int rid = r->agent_id;
-    double lpref = AvgPref(l, graph_);
-    double rpref = AvgPref(r, graph_);
+    double l_cost = AvgCost(l, graph_);
+    double r_cost = AvgCost(r, graph_);
     // Lower arc weight is better, so we sort ascending
-    return (lpref != rpref) ? (lpref < rpref) : (lid > rid);
+    return (l_cost != r_cost) ? (l_cost < r_cost) : (lid > rid);
   }
 };
 
@@ -66,7 +66,7 @@ class GreedyPreconditioner;
 /// RequestGroup in the graph, matching request nodes "greedily" with supply
 /// nodes. Each request node will attempt to be supplied by supplier arcs as
 /// long as those supplier arcs have some excess capacity. The possible
-/// suppliers will be ordered by descending preference. The algorithm terminates
+/// suppliers will be ordered by ascending arc cost. The algorithm terminates
 /// when one of the following conditions is met:
 ///   1) All RequestGroups are satisfied
 ///   2) All SupplySets are at capacity
@@ -90,7 +90,7 @@ class GreedySolver : public ExchangeSolver {
 
   /// Uses the provided (or a default) GreedyPreconditioner to condition the
   /// solver's ExchangeGraph so that RequestGroups are ordered by average
-  /// preference and commodity weight.
+  /// arc cost and commodity weight.
   ///
   /// @warning this function is called during the Solve step and should most
   /// likely not be called independently thereof (except for testing)

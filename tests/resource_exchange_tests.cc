@@ -45,7 +45,7 @@ class Requester: public TestFacility {
       : TestFacility(ctx),
         i_(i),
         req_ctr_(0),
-        pref_ctr_(0) {}
+        arc_cost_ctr_(0) {}
 
   virtual cyclus::Agent* Clone() {
     Requester* m = new Requester(context());
@@ -64,8 +64,7 @@ class Requester: public TestFacility {
   }
 
   // increments counter and squares all unit costs (from bids)
-  virtual void AdjustMatlPrefs(UnitCostMap<Material>::type& unit_costs,
-                                UnitValueMap<Material>::type& unit_values) {
+  virtual void AdjustMatlCosts(UnitCostMap<Material>::type& unit_costs) {
     std::map<Request<Material>*,
              std::map<Bid<Material>*, double> >::iterator p_it;
     for (p_it = unit_costs.begin(); p_it != unit_costs.end(); ++p_it) {
@@ -75,12 +74,12 @@ class Requester: public TestFacility {
         m_it->second = std::pow(m_it->second, 2);
       }
     }
-    pref_ctr_++;
+    arc_cost_ctr_++;
   }
 
   RequestPortfolio<Material>::Ptr port_;
   int i_;
-  int pref_ctr_;
+  int arc_cost_ctr_;
   int req_ctr_;
 };
 
@@ -120,14 +119,14 @@ class ResourceExchangeTests: public ::testing::Test {
   Bidder* bidr;
   ResourceExchange<Material>* exchng;
   string commod;
-  double pref;
+  double unit_value;
   Material::Ptr mat;
   Request<Material>* req;
   Bid<Material>* bid;
 
   virtual void SetUp() {
     commod = "name";
-    pref = 2.4;
+    unit_value = 2.4;
     cyclus::CompMap cm;
     cm[92235] = 1.0;
     Composition::Ptr comp = Composition::CreateFromMass(cm);
@@ -146,7 +145,7 @@ class ResourceExchangeTests: public ::testing::Test {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, Requests) {
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
-  req = rp->AddRequest(mat, reqr, commod, pref);
+  req = rp->AddRequest(mat, reqr, commod, unit_value);
   reqr->port_ = rp;
 
   Facility* clone = dynamic_cast<Facility*>(reqr->Clone());
@@ -177,8 +176,8 @@ TEST_F(ResourceExchangeTests, Bids) {
   ExchangeContext<Material>& ctx = exchng->ex_ctx();
 
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
-  req = rp->AddRequest(mat, reqr, commod, pref);
-  Request<Material>* req1 = rp->AddRequest(mat, reqr, commod, pref);
+  req = rp->AddRequest(mat, reqr, commod, unit_value);
+  Request<Material>* req1 = rp->AddRequest(mat, reqr, commod, unit_value);
   ctx.AddRequestPortfolio(rp);
   const std::vector<Request<Material>*>& reqs = ctx.commod_requests[commod];
   EXPECT_EQ(2, reqs.size());
@@ -227,7 +226,7 @@ TEST_F(ResourceExchangeTests, Bids) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResourceExchangeTests, PrefCalls) {
+TEST_F(ResourceExchangeTests, ArcCostCalls) {
   Facility* parent = dynamic_cast<Facility*>(reqr->Clone());
   Facility* child = dynamic_cast<Facility*>(reqr->Clone());
   parent->Build(NULL);
@@ -245,10 +244,10 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
 
   // doin a little magic to simulate each requester making their own request
   RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
-  Request<Material>* preq = rp1->AddRequest(mat, pcast, commod, pref);
+  Request<Material>* preq = rp1->AddRequest(mat, pcast, commod, unit_value);
   pcast->port_ = rp1;
   RequestPortfolio<Material>::Ptr rp2(new RequestPortfolio<Material>());
-  Request<Material>* creq = rp2->AddRequest(mat, ccast, commod, pref);
+  Request<Material>* creq = rp2->AddRequest(mat, ccast, commod, unit_value);
   ccast->port_ = rp2;
 
   EXPECT_EQ(0, pcast->req_ctr_);
@@ -258,21 +257,21 @@ TEST_F(ResourceExchangeTests, PrefCalls) {
   EXPECT_EQ(1, pcast->req_ctr_);
   EXPECT_EQ(1, ccast->req_ctr_);
 
-  EXPECT_EQ(0, pcast->pref_ctr_);
-  EXPECT_EQ(0, ccast->pref_ctr_);
+  EXPECT_EQ(0, pcast->arc_cost_ctr_);
+  EXPECT_EQ(0, ccast->arc_cost_ctr_);
   EXPECT_NO_THROW(exchng->AdjustAll());
 
   // child gets to adjust once - its own request
   // parent gets called twice - its request and adjusting its child's request
-  EXPECT_EQ(2, pcast->pref_ctr_);
-  EXPECT_EQ(1, ccast->pref_ctr_);
+  EXPECT_EQ(2, pcast->arc_cost_ctr_);
+  EXPECT_EQ(1, ccast->arc_cost_ctr_);
 
   child->Decommission();
   parent->Decommission();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ResourceExchangeTests, PrefValues) {
+TEST_F(ResourceExchangeTests, ArcCostValues) {
   Facility* parent = dynamic_cast<Facility*>(reqr->Clone());
   Facility* child = dynamic_cast<Facility*>(reqr->Clone());
   parent->Build(NULL);
@@ -283,19 +282,19 @@ TEST_F(ResourceExchangeTests, PrefValues) {
 
   // doin a little magic to simulate each requester making their own request
   RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
-  Request<Material>* preq = rp1->AddRequest(mat, pcast, commod, pref);
+  Request<Material>* preq = rp1->AddRequest(mat, pcast, commod, unit_value);
   pcast->port_ = rp1;
   RequestPortfolio<Material>::Ptr rp2(new RequestPortfolio<Material>());
-  Request<Material>* creq = rp2->AddRequest(mat, ccast, commod, pref);
+  Request<Material>* creq = rp2->AddRequest(mat, ccast, commod, unit_value);
   ccast->port_ = rp2;
 
   Bidder* bidr = new Bidder(tc.get(), commod);
 
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  // Set bid preferences to match request preference so unit_cost has a value to adjust
-  // unit_cost comes from bid preference, so setting it to request preference (2.4) for testing
-  Bid<Material>* pbid = bp->AddBid(preq, mat, bidr, false, preq->preference());
-  Bid<Material>* cbid = bp->AddBid(creq, mat, bidr, false, creq->preference());
+  // Set bid unit cost to match request unit_value so unit_cost has a value to adjust
+  // unit_cost comes from bid, so setting it to request unit_value (2.4) for testing
+  Bid<Material>* pbid = bp->AddBid(preq, mat, bidr, false, preq->UnitValue());
+  Bid<Material>* cbid = bp->AddBid(creq, mat, bidr, false, creq->UnitValue());
 
   std::vector<Bid<Material>*> bids;
   bids.push_back(pbid);
@@ -309,9 +308,9 @@ TEST_F(ResourceExchangeTests, PrefValues) {
   EXPECT_NO_THROW(exchng->AddAllBids());
 
   PrefMap<Material>::type pobs;
-  pobs[preq].insert(std::make_pair(pbid, preq->preference()));
+  pobs[preq].insert(std::make_pair(pbid, preq->UnitValue()));
   PrefMap<Material>::type cobs;
-  cobs[creq].insert(std::make_pair(cbid, creq->preference()));
+  cobs[creq].insert(std::make_pair(cbid, creq->UnitValue()));
 
   ExchangeContext<Material>& context = exchng->ex_ctx();
   EXPECT_EQ(context.trader_prefs[parent], pobs);
@@ -319,8 +318,8 @@ TEST_F(ResourceExchangeTests, PrefValues) {
 
   EXPECT_NO_THROW(exchng->AdjustAll());
 
-  pobs[preq].begin()->second = std::pow(preq->preference(), 2);
-  cobs[creq].begin()->second = std::pow(std::pow(creq->preference(), 2), 2);
+  pobs[preq].begin()->second = std::pow(preq->UnitValue(), 2);
+  cobs[creq].begin()->second = std::pow(std::pow(creq->UnitValue(), 2), 2);
   EXPECT_EQ(context.trader_prefs[parent], pobs);
   EXPECT_EQ(context.trader_prefs[child], cobs);
 

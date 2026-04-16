@@ -42,8 +42,8 @@ struct ExchangeNode {
   /// the resource object from which this ExchangeNode was translated.
   std::map<Arc, std::vector<double>> unit_capacities;
 
-  /// @brief preference values for arcs
-  std::map<Arc, double> prefs;
+  /// @brief arc cost values for arcs
+  std::map<Arc, double> arc_costs;
 
   /// @brief whether this node represents an exclusive request or offer
   bool exclusive;
@@ -83,7 +83,7 @@ class Arc {
     excl_val_ = other.excl_val();
     unit_cost_ = other.get_unit_cost();
     unit_value_ = other.get_unit_value();
-    pref_ = other.pref();
+    arc_cost_ = other.ArcCost();
     return *this;
   }
 
@@ -109,10 +109,10 @@ class Arc {
   inline double get_unit_value() const { return unit_value_; }
   inline void set_unit_value(double unit_value) { unit_value_ = unit_value; }
   
-  /// @brief returns the arc weight
-  inline double pref() const { return pref_; }
-  /// @brief sets the arc weight arbitrarily
-  inline void pref(double pref) { pref_ = pref; }
+  /// @brief returns the arc cost
+  inline double ArcCost() const { return arc_cost_; }
+  /// @brief sets the arc cost arbitrarily
+  inline void ArcCost(double arc_cost) { arc_cost_ = arc_cost; }
 
  private:
   boost::weak_ptr<ExchangeNode> unode_;
@@ -121,7 +121,7 @@ class Arc {
   double excl_val_;
   double unit_cost_;  
   double unit_value_; 
-  double pref_;  ///< arc weight used in objective function
+  double arc_cost_;
 };
 
 /// @brief ExchangeNode-ExchangeNode equality operator

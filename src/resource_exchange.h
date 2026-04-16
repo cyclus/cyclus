@@ -19,25 +19,34 @@ namespace cyclus {
 /// @brief Preference adjustment method helpers to convert from templates to the
 /// Agent inheritance hierarchy
 template <class T>
-inline static void AdjustPrefs(Agent* m, typename UnitCostMap<T>::type& unit_costs,
-                                typename UnitValueMap<T>::type& unit_values) {}
-inline static void AdjustPrefs(Agent* m, UnitCostMap<Material>::type& unit_costs,
-                                UnitValueMap<Material>::type& unit_values) {
-  m->AdjustMatlPrefs(unit_costs, unit_values);
+inline static void AdjustCosts(Agent* m, typename UnitCostMap<T>::type& unit_costs) {}
+inline static void AdjustCosts(Agent* m, UnitCostMap<Material>::type& unit_costs) {
+  m->AdjustMatlCosts(unit_costs);
 }
-inline static void AdjustPrefs(Agent* m, UnitCostMap<Product>::type& unit_costs,
-                                UnitValueMap<Product>::type& unit_values) {
-  m->AdjustProductPrefs(unit_costs, unit_values);
+inline static void AdjustCosts(Agent* m, UnitCostMap<Product>::type& unit_costs) {
+  m->AdjustProductCosts(unit_costs);
 }
-inline static void AdjustPrefs(Trader* t, UnitCostMap<Material>::type& unit_costs,
-                                UnitValueMap<Material>::type& unit_values) {
-  t->AdjustMatlPrefs(unit_costs, unit_values);
+inline static void AdjustCosts(Trader* t, UnitCostMap<Material>::type& unit_costs) {
+  t->AdjustMatlCosts(unit_costs);
 }
-inline static void AdjustPrefs(Trader* t, UnitCostMap<Product>::type& unit_costs,
-                                UnitValueMap<Product>::type& unit_values) {
-  t->AdjustProductPrefs(unit_costs, unit_values);
+inline static void AdjustCosts(Trader* t, UnitCostMap<Product>::type& unit_costs) {
+  t->AdjustProductCosts(unit_costs);
 }
 
+template <class T>
+inline static void AdjustValues(Agent* m, typename UnitValueMap<T>::type& unit_values) {}
+inline static void AdjustValues(Agent* m, UnitValueMap<Material>::type& unit_values) {
+  m->AdjustMatlValues(unit_values);
+}
+inline static void AdjustValues(Agent* m, UnitValueMap<Product>::type& unit_values) {
+  m->AdjustProductValues(unit_values);
+}
+inline static void AdjustValues(Trader* t, UnitValueMap<Material>::type& unit_values) {
+  t->AdjustMatlValues(unit_values);
+}
+inline static void AdjustValues(Trader* t, UnitValueMap<Product>::type& unit_values) {
+  t->AdjustProductValues(unit_values);
+}
 /// @class ResourceExchange
 ///
 /// The ResourceExchange class manages the communication for the supply and
@@ -91,13 +100,13 @@ template <class T> class ResourceExchange {
                             std::placeholders::_1));
   }
 
-  /// @brief adjust preferences for requests given bid responses
+  /// @brief adjust costs and values for requests given bid responses
   void AdjustAll() {
     InitTraders();
     std::set<Trader*> traders = ex_ctx_.requesters;
     std::for_each(traders.begin(),
                   traders.end(),
-                  std::bind(&cyclus::ResourceExchange<T>::AdjustPrefs_,
+                  std::bind(&cyclus::ResourceExchange<T>::Adjust_,
                             this,
                             std::placeholders::_1));
   }
@@ -136,20 +145,20 @@ template <class T> class ResourceExchange {
     }
   }
 
-  /// @brief allows a trader and its parents to adjust any preferences in the
-  /// system
-  void AdjustPrefs_(Trader* t) {
-    typename UnitCostMap<T>::type& unit_costs = ex_ctx_.trader_costs[t];
-    typename UnitValueMap<T>::type& unit_values = ex_ctx_.trader_values[t];
-    AdjustPrefs(t, unit_costs, unit_values);
-    Agent* m = t->manager()->parent();
-    while (m != NULL) {
-      AdjustPrefs(m, unit_costs, unit_values);
-      m = m->parent();
-    }
-    // Update trader_prefs to mirror trader_costs for backward compatibility
-    ex_ctx_.trader_prefs[t] = unit_costs;
+  void Adjust_(Trader* t) {
+  typename UnitCostMap<T>::type& unit_costs = ex_ctx_.trader_costs[t];
+  typename UnitValueMap<T>::type& unit_values = ex_ctx_.trader_values[t];
+
+  AdjustCosts(t, unit_costs);
+  AdjustValues(t, unit_values);
+
+  Agent* m = t->manager()->parent();
+  while (m != NULL) {
+    AdjustCosts(m, unit_costs);
+    AdjustValues(m, unit_values);
+    m = m->parent();
   }
+}
 
   struct trader_compare {
     bool operator()(Trader* lhs, Trader* rhs) const {

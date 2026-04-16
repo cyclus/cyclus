@@ -19,9 +19,7 @@ class ExchangeSolver {
   /// default value to allow exclusive orders or not
   static const bool kDefaultExclusive = true;
 
-  /// return the arc weight (cost) of an arc. 
-  /// The objective function is: arc_weight = MC - MU
-  /// where MC is marginal cost, and MU is marginal utility.
+  /// return the arc cost of an arc. 
   /// @param a the arc
   /// @param exclusive_orders whether to apply exclusive order scaling
   static double Cost(const Arc& a, bool exclusive_orders = kDefaultExclusive);
@@ -58,7 +56,7 @@ class ExchangeSolver {
   double PseudoCost();
   double PseudoCost(double cost_factor);
   double PseudoCostByCap(double cost_factor);
-  double PseudoCostByPref(double cost_factor);
+  double PseudoCostByArcCost(double cost_factor);
   /// @}
 
   /// return the cost of an arc (instance method that uses the solver's graph)

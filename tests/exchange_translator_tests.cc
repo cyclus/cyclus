@@ -78,13 +78,13 @@ struct MatConverter2 : public Converter<Material> {
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(ExXlateTests, NegPref) {
+TEST(ExXlateTests, NegArcCost) {
   TestContext tc;
   TestFacility* trader = tc.trader();
-  double pref = -1;
+  double unit_value = -1;
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>* req =
-      rp->AddRequest(get_mat(u235, qty), trader, "", pref);
+      rp->AddRequest(get_mat(u235, qty), trader, "", unit_value);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
 
@@ -95,24 +95,24 @@ TEST(ExXlateTests, NegPref) {
 
   ExchangeGraph::Ptr graph = xlator.Translate();
 
-  // We no longer reject negative pref arcs, so the one we added should be there
+  // We no longer reject negative cost arcs, so the one we added should be there
   EXPECT_EQ(graph->arcs().size(), 1);
 }
 
-/// this test checks the condition of an arc with a zero-valued preference value
-/// being added to an exchange graph. the throw check is neccesary because of
+/// this test checks the condition of an arc with a zero-valued arc_cost value
+/// being added to an exchange graph. The throw check is neccesary because of
 /// transition from simulation backwards incompatability from releases 1.3 to
 /// 1.5.
 ///
 /// TODO: check that arcs().size() is zero instead of throwing before release
 /// 1.5
-TEST(ExXlateTests, ZeroPref) {
+TEST(ExXlateTests, ZeroArcCost) {
   TestContext tc;
   TestFacility* trader = tc.trader();
-  double pref = 0;
+  double unit_value = 0;
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>* req =
-      rp->AddRequest(get_mat(u235, qty), trader, "", pref);
+      rp->AddRequest(get_mat(u235, qty), trader, "", unit_value);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
 
@@ -308,8 +308,8 @@ TEST(ExXlateTests, XlateArc) {
   ExchangeNodeGroup::Ptr bset =
       TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
-  double unit_cost = std::isnan(bid->preference()) ? 0.0 : bid->preference();
-  double unit_value = req->preference();
+  double unit_cost = std::isnan(bid->UnitCost()) ? 0.0 : bid->UnitCost();
+  double unit_value = req->UnitValue();
   Arc a = TranslateArc(xlator.translation_ctx(), bid, unit_cost, unit_value);
 
   EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.vnode());
@@ -363,8 +363,8 @@ TEST(ExXlateTests, XlateArcExclusive) {
 
   // Helper to get unit_cost and unit_value for TranslateArc
   auto get_cost_value = [](Bid<Material>* b) -> std::pair<double, double> {
-    double unit_cost = std::isnan(b->preference()) ? 0.0 : b->preference();
-    double unit_value = b->request()->preference();
+    double unit_cost = std::isnan(b->UnitCost()) ? 0.0 : b->UnitCost();
+    double unit_value = b->request()->UnitValue();
     return std::make_pair(unit_cost, unit_value);
   };
   
@@ -426,10 +426,10 @@ TEST(ExXlateTests, SimpleXlate) {
   TestFacility* trader = tc.trader();
 
   std::string commod = "c";
-  double pref = 4.5;
+  double unit_value = 4.5;
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
   Request<Material>* req =
-      rport->AddRequest(get_mat(u235, qty), trader, commod, pref);
+      rport->AddRequest(get_mat(u235, qty), trader, commod, unit_value);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
   bport->AddBid(req, get_mat(u235, qty), trader);
@@ -448,18 +448,13 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(1, graph->arcs().size());
   EXPECT_EQ(0, graph->matches().size());
   const Arc& a = *graph->arcs().begin();
-  // After Translate(), arc.pref() contains unit_cost - unit_value
-  // In this test: 
-  // --> unit_cost = 0 (bid has no explicit preference),
-  // --> unit_value = pref = 4.5
-  // So arc_weight = 0 - 4.5 = -4.5
-  // Verify that unit_value matches the request preference
-  EXPECT_EQ(pref, a.get_unit_value());
-  // Verify that unit_cost is 0 (bid has no explicit preference, defaults to 0)
+  // After Translate(), arc.ArcCost() contains unit_cost - unit_value
+  EXPECT_EQ(unit_value, a.get_unit_value());
+  // Bid has no explicit unit_cost, defaults to 0
   EXPECT_EQ(0.0, a.get_unit_cost());
-  // Verify that arc_cost is calculated correctly: unit_cost - unit_value
+  
   double expected_arc_weight = a.get_unit_cost() - a.get_unit_value();
-  EXPECT_DOUBLE_EQ(expected_arc_weight, a.pref());
+  EXPECT_DOUBLE_EQ(expected_arc_weight, a.ArcCost());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

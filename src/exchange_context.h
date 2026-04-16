@@ -20,14 +20,15 @@
 
 namespace cyclus {
 
-template <class T> struct ArcCostMap {
+  //This is kept as PrefMap for backwards compatibility with pyagents
+template <class T> struct PrefMap {
   typedef std::map<Request<T>*, std::map<Bid<T>*, double>> type;
   typedef Request<T>* request_ptr;
   typedef Bid<T>* bid_ptr;
 };
 
 /// @brief Maps for storing unit cost and unit value adjustments
-/// These use the same structure as ArcCostMap but are semantically different:
+/// These use the same structure as PrefMap but are semantically different:
 /// - UnitCostMap stores unit cost adjustments (from bids)
 /// - UnitValueMap stores unit value adjustments (from requests)
 template <class T> struct UnitCostMap {
@@ -96,20 +97,19 @@ template <class T> struct ExchangeContext {
 
     bids_by_request[pb->request()].push_back(pb);
 
-    // unit cost comes from bid preference (or 0.0 if NaN)
-    double bid_pref = pb->preference();
-    double unit_cost = std::isnan(bid_pref) ? 0.0 : bid_pref;
-    
-    // unit value comes from request preference
-    double req_pref = pb->request()->preference();
-    double unit_value = std::isnan(req_pref) ? 0.0 : req_pref;
-    
+    // unit cost comes from bid
+    double unit_cost = pb->UnitCost();
+  
+    // unit value comes from request
+    double unit_value = pb->request()->UnitValue();
+   
     // Store unit cost and unit value separately
     trader_costs[pb->request()->requester()][pb->request()].insert(
         std::make_pair(pb, unit_cost));
     trader_values[pb->request()->requester()][pb->request()].insert(
         std::make_pair(pb, unit_value));
     
+    // TODO: Test if we need this still
     // Keep trader_prefs for backward compatibility during transition
     trader_prefs[pb->request()->requester()][pb->request()].insert(
         std::make_pair(pb, unit_cost));

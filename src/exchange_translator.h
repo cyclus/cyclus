@@ -71,14 +71,13 @@ template <class T> class ExchangeTranslator {
       }
     }
     
-    // Now update all arcs with the computed arc weight and store it in pref 
-    // for backward compatibility
+    // Now update all arcs with the computed arc cost and store it in the arc
     std::vector<Arc>& arcs = graph->arcs();
     std::map<ExchangeNode::Ptr, std::vector<Arc>>& node_arc_map = graph->node_arc_map();
     std::vector<Arc>::iterator it = arcs.begin();
     while (it != arcs.end()) {
       double arc_weight = it->get_unit_cost() - it->get_unit_value();
-      it->pref(arc_weight);
+      it->ArcCost(arc_weight);
       ++it;
     }
 
@@ -87,11 +86,11 @@ template <class T> class ExchangeTranslator {
          map_it != node_arc_map.end(); ++map_it) {
       for (std::vector<Arc>::iterator arc_it = map_it->second.begin();
            arc_it != map_it->second.end(); ++arc_it) {
-        // Find matching arc in arcs_ vector and copy its pref value
+        // Find matching arc in arcs_ vector and copy its arc_cost value
         for (std::vector<Arc>::iterator arcs_it = arcs.begin();
              arcs_it != arcs.end(); ++arcs_it) {
           if (*arc_it == *arcs_it) {
-            arc_it->pref(arcs_it->pref());
+            arc_it->ArcCost(arcs_it->ArcCost());
             break;
           }
         }
@@ -249,7 +248,7 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
   arc.set_unit_value(unit_value);
   
   // This gets overwritten in the translation step so we just set it to 0.0
-  arc.pref(0.0);
+  arc.ArcCost(0.0);
 
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();

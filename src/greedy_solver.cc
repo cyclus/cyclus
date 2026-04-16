@@ -131,7 +131,7 @@ void GreedySolver::GetCaps(ExchangeNodeGroup::Ptr g) {
 
 void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
   std::vector<ExchangeNode::Ptr>& nodes = prs->nodes();
-  std::stable_sort(nodes.begin(), nodes.end(), AvgPrefComp(graph_));
+  std::stable_sort(nodes.begin(), nodes.end(), AvgArcCostComp(graph_));
 
   std::vector<ExchangeNode::Ptr>::iterator req_it = nodes.begin();
   double target = prs->qty();
@@ -152,7 +152,7 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
     if (graph_->node_arc_map().count(*req_it) > 0) {
       const std::vector<Arc>& arcs = graph_->node_arc_map().at(*req_it);
       sorted = std::vector<Arc>(arcs);  // make a copy for now
-      std::stable_sort(sorted.begin(), sorted.end(), ReqPrefComp());
+      std::stable_sort(sorted.begin(), sorted.end(), ReqCostComp());
       arc_it = sorted.begin();
 
       while ((match <= target) && (arc_it != sorted.end())) {
@@ -187,8 +187,7 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
           graph_->AddMatch(a, tomatch);
 
           match += tomatch;
-          // Use stored arc weight from pref() to avoid recalculation and ensure consistency
-          UpdateObj(tomatch, a.pref());
+          UpdateObj(tomatch, a.ArcCost());
         }
         ++arc_it;
       }  // while( (match =< target) && (arc_it != arcs.end()) )

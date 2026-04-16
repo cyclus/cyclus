@@ -6,7 +6,7 @@
 #include "error.h"
 
 using cyclus::Arc;
-using cyclus::AvgPrefComp;
+using cyclus::AvgArcCostComp;
 using cyclus::ExchangeGraph;
 using cyclus::ExchangeNode;
 using cyclus::ExchangeNodeGroup;
@@ -15,7 +15,7 @@ using cyclus::GreedySolver;
 using cyclus::GreedyPreconditioner;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST(GreedySolverTests, AvgPref) {
+TEST(GreedySolverTests, AvgCost) {
   ExchangeNode::Ptr u1(new ExchangeNode());
   ExchangeNode::Ptr u2(new ExchangeNode());
   ExchangeNode::Ptr v(new ExchangeNode());
@@ -23,8 +23,8 @@ TEST(GreedySolverTests, AvgPref) {
   Arc a1(u1, v);
   Arc a2(u2, v);
   
-  a1.pref(1.0);  
-  a2.pref(2.0); 
+  a1.ArcCost(1.0);  
+  a2.ArcCost(2.0); 
 
   ExchangeGraph g;
   RequestGroup::Ptr rg(new RequestGroup());
@@ -40,7 +40,7 @@ TEST(GreedySolverTests, AvgPref) {
 
   EXPECT_EQ(nodes[0], u2);
   EXPECT_EQ(nodes[1], u1);
-  std::sort(nodes.begin(), nodes.end(), AvgPrefComp(&g));
+  std::sort(nodes.begin(), nodes.end(), AvgArcCostComp(&g));
   EXPECT_EQ(nodes[0], u1);
   EXPECT_EQ(nodes[1], u2);
 }
@@ -54,8 +54,8 @@ TEST(GreedySolverTests, General) {
   Arc a1(u1, v);
   Arc a2(u2, v);
 
-  a1.pref(1.0);
-  a2.pref(2.0);
+  a1.ArcCost(1.0);
+  a2.ArcCost(2.0);
   
   u1->unit_capacities[a1].push_back(1);
   u2->unit_capacities[a2].push_back(1);
@@ -92,7 +92,7 @@ TEST(GreedySolverTests, General) {
   
   s.Condition();  
   // With ascending sort (lower weights first):
-  // gu1 has lower weight (pref 1.0 -> weight ~1.5) than gu2 (pref 2.0 -> weight ~1.667)
+  // gu1 has lower weight (arc_cost 1.0 -> weight ~1.5) than gu2 (arc_cost 2.0 -> weight ~1.667)
   EXPECT_EQ(g.request_groups()[0], gu1);
   EXPECT_EQ(g.request_groups()[1], gu2);
 }

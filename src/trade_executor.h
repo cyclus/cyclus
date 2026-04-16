@@ -64,8 +64,7 @@ template <class T> class TradeExecutor {
   /// responses to requesters
   void ExecuteTrades(Context* ctx) { ExecuteTrades(ctx, NULL); }
 
-  /// @brief execute all trades with access to exchange context for adjusted
-  /// preferences
+  /// @brief execute all trades with access to exchange context for adjusted vals
   void ExecuteTrades(Context* ctx, ExchangeContext<T>* ex_ctx) {
     GroupTradesBySupplier(trade_ctx_, trades_);
     GetTradeResponses(trade_ctx_);
@@ -81,12 +80,11 @@ template <class T> class TradeExecutor {
   /// occur
   void RecordTrades(Context* ctx) { RecordTrades(ctx, NULL); }
 
-  /// @brief Record all trades with the appropriate backends, using adjusted
-  /// preferences
+  /// @brief Record all trades with appropriate backends, using adjusted vals
   ///
   /// @param ctx the Context through which communication with backends will
   /// occur
-  /// @param ex_ctx the ExchangeContext containing the adjusted preferences used
+  /// @param ex_ctx the ExchangeContext containing the adjusted values used
   /// by the solver
   void RecordTrades(Context* ctx, ExchangeContext<T>* ex_ctx) {
     // record all trades
@@ -116,11 +114,11 @@ template <class T> class TradeExecutor {
         typename T::Ptr rsrc = v_it->second;
         if (rsrc->quantity() > cyclus::eps_rsrc()) {
           // Get original unit_cost and unit_value
-          double original_unit_cost = trade.bid->preference();
+          double original_unit_cost = trade.bid->UnitCost();
           if (std::isnan(original_unit_cost)) {
             original_unit_cost = 0.0;  // NaN means no cost
           }
-          double original_unit_value = trade.request->preference();
+          double original_unit_value = trade.request->UnitValue();
 
           // Get adjusted unit_cost and unit_value from exchange context
           double adjusted_unit_cost = original_unit_cost;

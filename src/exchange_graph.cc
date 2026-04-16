@@ -48,7 +48,7 @@ bool operator==(const ExchangeNode& lhs, const ExchangeNode& rhs) {
 Arc::Arc(boost::shared_ptr<ExchangeNode> unode,
          boost::shared_ptr<ExchangeNode>
              vnode)
-    : unode_(unode), vnode_(vnode), unit_cost_(0.0), unit_value_(0.0), pref_(0.0) {
+    : unode_(unode), vnode_(vnode), unit_cost_(0.0), unit_value_(0.0), arc_cost_(0.0) {
   exclusive_ = unode->exclusive || vnode->exclusive;
   if (exclusive_) {
     double fqty = unode->qty;
@@ -76,7 +76,7 @@ Arc::Arc(const Arc& other)
       excl_val_(other.excl_val()),
       unit_cost_(other.get_unit_cost()),
       unit_value_(other.get_unit_value()),
-      pref_(other.pref()) {}
+      arc_cost_(other.ArcCost()) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeNodeGroup::AddExchangeNode(ExchangeNode::Ptr node) {
