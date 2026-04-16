@@ -15,7 +15,7 @@ namespace l = boost::lambda;
 namespace cyclus {
 
 double AvgCost(ExchangeNode::Ptr n, ExchangeGraph* graph) {
-  // Compute average arc weight across all arcs connected to this node
+  // Compute average arc costs across all arcs connected to this node
   if (graph == NULL) {
     return 0.0;
   }

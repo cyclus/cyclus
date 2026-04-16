@@ -148,7 +148,8 @@ template <class T> class TradeExecutor {
             }
           }
           
-          // Set the resource's unit value to the trade's marginal cost
+          // Set the resource's unit value (different from req.UnitValue()) to 
+          // the successful trade's unit cost
           rsrc->SetUnitValue(adjusted_unit_cost);
           
           // Record unit_cost and unit_value. arc_cost can be computed from these if needed.

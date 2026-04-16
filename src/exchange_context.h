@@ -19,8 +19,6 @@
 #endif
 
 namespace cyclus {
-
-  //This is kept as PrefMap for backwards compatibility with pyagents
 template <class T> struct PrefMap {
   typedef std::map<Request<T>*, std::map<Bid<T>*, double>> type;
   typedef Request<T>* request_ptr;
@@ -109,8 +107,6 @@ template <class T> struct ExchangeContext {
     trader_values[pb->request()->requester()][pb->request()].insert(
         std::make_pair(pb, unit_value));
     
-    // TODO: Test if we need this still
-    // Keep trader_prefs for backward compatibility during transition
     trader_prefs[pb->request()->requester()][pb->request()].insert(
         std::make_pair(pb, unit_cost));
   }

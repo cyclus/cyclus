@@ -24,7 +24,6 @@ using cyclus::BidPortfolio;
 using cyclus::ExchangeContext;
 using cyclus::UnitCostMap;
 using cyclus::UnitValueMap;
-using cyclus::PrefMap;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
 using cyclus::Resource;
@@ -165,7 +164,7 @@ TEST_F(ExchangeContextTests, AddBid1) {
 
   UnitCostMap<Resource>::type obs_cost;
   obs_cost[req1].insert(std::make_pair(bid, unit_cost));
-  EXPECT_EQ(context.trader_prefs[req1->requester()], obs_cost);
+  EXPECT_EQ(context.trader_costs[req1->requester()], obs_cost);
   
   UnitValueMap<Resource>::type obs_value;
   obs_value[req1].insert(std::make_pair(bid, req1->UnitValue()));

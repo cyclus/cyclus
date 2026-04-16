@@ -16,8 +16,8 @@
 
 namespace cyclus {
 
-/// @brief Preference adjustment method helpers to convert from templates to the
-/// Agent inheritance hierarchy
+/// @brief Cost and Value adjustment method helpers to convert from templates
+/// to the Agent inheritance hierarchy
 template <class T>
 inline static void AdjustCosts(Agent* m, typename UnitCostMap<T>::type& unit_costs) {}
 inline static void AdjustCosts(Agent* m, UnitCostMap<Material>::type& unit_costs) {
@@ -58,8 +58,8 @@ inline static void AdjustValues(Trader* t, UnitValueMap<Product>::type& unit_val
 /// -# Response to Request for Bids
 ///     Agents that supply resources of a given type respond to\n
 ///     those requests
-/// -# Preference Adjustment
-///     Preferences for each request-bid pair are set, informing\n
+/// -# Adjustment
+///     Costs and Values for each request-bid pair are set, informing\n
 ///     the evenutal soluation mechanism
 ///
 /// For example, assuming a simulation Context, ctx, and resource type,

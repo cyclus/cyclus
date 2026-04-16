@@ -452,9 +452,9 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(unit_value, a.get_unit_value());
   // Bid has no explicit unit_cost, defaults to 0
   EXPECT_EQ(0.0, a.get_unit_cost());
-  
-  double expected_arc_weight = a.get_unit_cost() - a.get_unit_value();
-  EXPECT_DOUBLE_EQ(expected_arc_weight, a.ArcCost());
+
+  double expected_arc_cost = a.get_unit_cost() - a.get_unit_value();
+  EXPECT_DOUBLE_EQ(expected_arc_cost, a.ArcCost());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

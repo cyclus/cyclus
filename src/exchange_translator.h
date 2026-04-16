@@ -76,12 +76,12 @@ template <class T> class ExchangeTranslator {
     std::map<ExchangeNode::Ptr, std::vector<Arc>>& node_arc_map = graph->node_arc_map();
     std::vector<Arc>::iterator it = arcs.begin();
     while (it != arcs.end()) {
-      double arc_weight = it->get_unit_cost() - it->get_unit_value();
-      it->ArcCost(arc_weight);
+      double arc_cost = it->get_unit_cost() - it->get_unit_value();
+      it->ArcCost(arc_cost);
       ++it;
     }
 
-    // Also update arc weights in node_arc_map_ to keep it in sync
+    // Also update arc costs in node_arc_map_ to keep it in sync
     for (std::map<ExchangeNode::Ptr, std::vector<Arc>>::iterator map_it = node_arc_map.begin();
          map_it != node_arc_map.end(); ++map_it) {
       for (std::vector<Arc>::iterator arc_it = map_it->second.begin();

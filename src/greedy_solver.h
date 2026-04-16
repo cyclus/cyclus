@@ -39,7 +39,7 @@ struct ReqCostComp {
   }
 };
 
-/// @brief A comparison function for sorting a container of Nodes by average arc weight
+/// @brief A comparison function for sorting a container of Nodes by average arc cost
 /// in ascending order (i.e., lowest cost Node first). In the case of a tie, a
 /// lexicalgraphic ordering of node ids is used.
 /// Note: This requires the graph to be available, so it's not a simple inline function
@@ -51,7 +51,7 @@ struct AvgArcCostComp {
     int rid = r->agent_id;
     double l_cost = AvgCost(l, graph_);
     double r_cost = AvgCost(r, graph_);
-    // Lower arc weight is better, so we sort ascending
+    // Lower arc cost is better, so we sort ascending
     return (l_cost != r_cost) ? (l_cost < r_cost) : (lid > rid);
   }
 };
@@ -160,7 +160,7 @@ class GreedySolver : public ExchangeSolver {
   void GetCaps(ExchangeNodeGroup::Ptr prs);
   void GreedilySatisfySet(RequestGroup::Ptr prs);
   void UpdateCapacity(ExchangeNode::Ptr n, const Arc& a, double qty);
-  void UpdateObj(double qty, double arc_weight);
+  void UpdateObj(double qty, double arc_cost);
 
   GreedyPreconditioner* conditioner_;
   std::map<ExchangeNode::Ptr, double> n_qty_;

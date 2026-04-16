@@ -198,9 +198,9 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
   unmatched_ += target - match;
 }
 
-void GreedySolver::UpdateObj(double qty, double arc_weight) {
-  // updates minimizing objective (arc_weight is the cost and the objective is cost * flow)
-  obj_ += qty * arc_weight;
+void GreedySolver::UpdateObj(double qty, double arc_cost) {
+  // updates minimizing objective (arc_cost is the cost and the objective is cost * flow)
+  obj_ += qty * arc_cost;
 }
 
 void GreedySolver::UpdateCapacity(ExchangeNode::Ptr n, const Arc& a,
