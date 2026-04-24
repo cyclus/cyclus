@@ -78,7 +78,7 @@ class BidPortfolio : public boost::enable_shared_from_this<BidPortfolio<T>> {
   Bid<T>* AddBid(Request<T>* request, boost::shared_ptr<T> offer,
                  Trader* bidder, bool exclusive = false) {
     return AddBid(request, offer, bidder, exclusive,
-                  std::numeric_limits<double>::quiet_NaN());
+                  cyclus::kDefaultUnitCost);
   }
 
   /// @brief add a capacity constraint associated with the portfolio

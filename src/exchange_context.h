@@ -25,7 +25,7 @@ template <class T> struct PrefMap {
   typedef Bid<T>* bid_ptr;
 };
 
-/// @brief A map for storing adjustments
+/// @brief A map between requests, bids, and their associated arc_cost
 template <class T> struct RequestBidMap {
   typedef std::map<Request<T>*, std::map<Bid<T>*, double>> type;
 };

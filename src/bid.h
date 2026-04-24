@@ -91,6 +91,10 @@ template <class T> class Bid {
   /// @return the unit_cost of this bid
   inline double UnitCost() const { return unit_cost_; }
 
+  /// @brief Set the unit_cost of this bid
+  /// @param unit_cost 
+  inline void SetUnitCost(double unit_cost) {unit_cost_ = unit_cost;}
+
  private:
   /// @brief constructors are private to require use of factory methods
   Bid(Request<T>* request, boost::shared_ptr<T> offer, Trader* bidder,

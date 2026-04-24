@@ -44,7 +44,7 @@ class Requester: public TestFacility {
       : TestFacility(ctx),
         i_(i),
         req_ctr_(0),
-        arc_cost_ctr_(0) {}
+        arc_ctr_(0) {}
 
   virtual cyclus::Agent* Clone() {
     Requester* m = new Requester(context());
@@ -62,23 +62,20 @@ class Requester: public TestFacility {
     return rps;
   }
 
-  // increments counter and squares all unit costs (from bids)
-  virtual void AdjustMatlCosts(RequestBidMap<Material>::type& unit_costs) {
+  // increments counter and squares all unit values (from requests)
+  virtual void AdjustMatlValues(RequestBidMap<Material>::type& map) {
     std::map<Request<Material>*,
-             std::map<Bid<Material>*, double> >::iterator p_it;
-    for (p_it = unit_costs.begin(); p_it != unit_costs.end(); ++p_it) {
-      std::map<Bid<Material>*, double>& map = p_it->second;
-      std::map<Bid<Material>*, double>::iterator m_it;
-      for (m_it = map.begin(); m_it != map.end(); ++m_it) {
-        m_it->second = std::pow(m_it->second, 2);
-      }
+             std::map<Bid<Material>*, double> >::iterator m_it;
+    for (m_it = map.begin(); m_it != map.end(); ++m_it) {
+      Request<Material>* req = m_it->first;
+      req->SetUnitValue(std::pow(req->UnitValue(), 2));
     }
-    arc_cost_ctr_++;
+    arc_ctr_++;
   }
 
   RequestPortfolio<Material>::Ptr port_;
   int i_;
-  int arc_cost_ctr_;
+  int arc_ctr_;
   int req_ctr_;
 };
 
@@ -256,14 +253,14 @@ TEST_F(ResourceExchangeTests, ArcCostCalls) {
   EXPECT_EQ(1, pcast->req_ctr_);
   EXPECT_EQ(1, ccast->req_ctr_);
 
-  EXPECT_EQ(0, pcast->arc_cost_ctr_);
-  EXPECT_EQ(0, ccast->arc_cost_ctr_);
+  EXPECT_EQ(0, pcast->arc_ctr_);
+  EXPECT_EQ(0, ccast->arc_ctr_);
   EXPECT_NO_THROW(exchng->AdjustAll());
 
   // child gets to adjust once - its own request
   // parent gets called twice - its request and adjusting its child's request
-  EXPECT_EQ(2, pcast->arc_cost_ctr_);
-  EXPECT_EQ(1, ccast->arc_cost_ctr_);
+  EXPECT_EQ(2, pcast->arc_ctr_);
+  EXPECT_EQ(1, ccast->arc_ctr_);
 
   child->Decommission();
   parent->Decommission();
@@ -306,21 +303,25 @@ TEST_F(ResourceExchangeTests, ArcCostValues) {
   EXPECT_NO_THROW(exchng->AddAllRequests());
   EXPECT_NO_THROW(exchng->AddAllBids());
 
-  PrefMap<Material>::type pobs;
+  RequestBidMap<Material>::type pobs;
   pobs[preq].insert(std::make_pair(pbid, preq->UnitValue()));
-  PrefMap<Material>::type cobs;
+  RequestBidMap<Material>::type cobs;
   cobs[creq].insert(std::make_pair(cbid, creq->UnitValue()));
 
   ExchangeContext<Material>& context = exchng->ex_ctx();
-  EXPECT_EQ(context.trader_prefs[parent], pobs);
-  EXPECT_EQ(context.trader_prefs[child], cobs);
+  EXPECT_EQ(context.trader_values[parent], pobs);
+  EXPECT_EQ(context.trader_values[child], cobs);
 
   EXPECT_NO_THROW(exchng->AdjustAll());
 
-  pobs[preq].begin()->second = std::pow(preq->UnitValue(), 2);
-  cobs[creq].begin()->second = std::pow(std::pow(creq->UnitValue(), 2), 2);
-  EXPECT_EQ(context.trader_prefs[parent], pobs);
-  EXPECT_EQ(context.trader_prefs[child], cobs);
+  // Note (DK 23 April, 2026): These next two tests may need another look after
+  // AdjustMatlVals change.
+  EXPECT_EQ(context.trader_values[parent], pobs);
+  EXPECT_EQ(context.trader_values[child], cobs);
+
+  // preq unit value should be squared, creq unit value should be squared twice
+  EXPECT_EQ(preq->UnitValue(), std::pow(unit_value, 2));
+  EXPECT_EQ(creq->UnitValue(), std::pow(std::pow(unit_value, 2), 2));
 
   child->Decommission();
   parent->Decommission();
