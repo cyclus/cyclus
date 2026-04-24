@@ -86,7 +86,7 @@ class TestTrader : public TestFacility {
     }
   }
 
-  virtual void AdjustMatlCosts(UnitCostMap<Material>::type& unit_costs) {
+  virtual void AdjustMatlCosts(RequestBidMap<Material>::type& unit_costs) {
     bid = (*unit_costs[req].begin()).first;  // obs bid
     adjusts++;
   }

@@ -25,14 +25,8 @@ template <class T> struct PrefMap {
   typedef Bid<T>* bid_ptr;
 };
 
-/// @brief Maps for storing unit cost and unit value adjustments
-/// These use the same structure as PrefMap but are semantically different:
-/// - UnitCostMap stores unit cost adjustments (from bids)
-/// - UnitValueMap stores unit value adjustments (from requests)
-template <class T> struct UnitCostMap {
-  typedef std::map<Request<T>*, std::map<Bid<T>*, double>> type;
-};
-template <class T> struct UnitValueMap {
+/// @brief A map for storing adjustments
+template <class T> struct RequestBidMap {
   typedef std::map<Request<T>*, std::map<Bid<T>*, double>> type;
 };
 
@@ -130,10 +124,10 @@ template <class T> struct ExchangeContext {
   std::map<Request<T>*, std::vector<Bid<T>*>> bids_by_request;
 
   /// @brief maps trader to request to bid to unit cost adjustments
-  std::map<Trader*, typename UnitCostMap<T>::type> trader_costs;
+  std::map<Trader*, typename RequestBidMap<T>::type> trader_costs;
   
   /// @brief maps trader to request to bid to unit value adjustments
-  std::map<Trader*, typename UnitValueMap<T>::type> trader_values;
+  std::map<Trader*, typename RequestBidMap<T>::type> trader_values;
   
   /// @deprecated Use trader_costs and trader_values instead. Kept for backward compatibility.
   std::map<Trader*, typename PrefMap<T>::type> trader_prefs;

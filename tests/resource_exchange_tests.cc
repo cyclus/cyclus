@@ -28,8 +28,7 @@ using cyclus::ExchangeContext;
 using cyclus::Facility;
 using cyclus::Material;
 using cyclus::Agent;
-using cyclus::UnitCostMap;
-using cyclus::UnitValueMap;
+using cyclus::RequestBidMap;
 using cyclus::PrefMap;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
@@ -64,7 +63,7 @@ class Requester: public TestFacility {
   }
 
   // increments counter and squares all unit costs (from bids)
-  virtual void AdjustMatlCosts(UnitCostMap<Material>::type& unit_costs) {
+  virtual void AdjustMatlCosts(RequestBidMap<Material>::type& unit_costs) {
     std::map<Request<Material>*,
              std::map<Bid<Material>*, double> >::iterator p_it;
     for (p_it = unit_costs.begin(); p_it != unit_costs.end(); ++p_it) {

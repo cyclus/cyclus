@@ -19,32 +19,32 @@ namespace cyclus {
 /// @brief Cost and Value adjustment method helpers to convert from templates
 /// to the Agent inheritance hierarchy
 template <class T>
-inline static void AdjustCosts(Agent* m, typename UnitCostMap<T>::type& unit_costs) {}
-inline static void AdjustCosts(Agent* m, UnitCostMap<Material>::type& unit_costs) {
+inline static void AdjustCosts(Agent* m, typename RequestBidMap<T>::type& unit_costs) {}
+inline static void AdjustCosts(Agent* m, RequestBidMap<Material>::type& unit_costs) {
   m->AdjustMatlCosts(unit_costs);
 }
-inline static void AdjustCosts(Agent* m, UnitCostMap<Product>::type& unit_costs) {
+inline static void AdjustCosts(Agent* m, RequestBidMap<Product>::type& unit_costs) {
   m->AdjustProductCosts(unit_costs);
 }
-inline static void AdjustCosts(Trader* t, UnitCostMap<Material>::type& unit_costs) {
+inline static void AdjustCosts(Trader* t, RequestBidMap<Material>::type& unit_costs) {
   t->AdjustMatlCosts(unit_costs);
 }
-inline static void AdjustCosts(Trader* t, UnitCostMap<Product>::type& unit_costs) {
+inline static void AdjustCosts(Trader* t, RequestBidMap<Product>::type& unit_costs) {
   t->AdjustProductCosts(unit_costs);
 }
 
 template <class T>
-inline static void AdjustValues(Agent* m, typename UnitValueMap<T>::type& unit_values) {}
-inline static void AdjustValues(Agent* m, UnitValueMap<Material>::type& unit_values) {
+inline static void AdjustValues(Agent* m, typename RequestBidMap<T>::type& unit_values) {}
+inline static void AdjustValues(Agent* m, RequestBidMap<Material>::type& unit_values) {
   m->AdjustMatlValues(unit_values);
 }
-inline static void AdjustValues(Agent* m, UnitValueMap<Product>::type& unit_values) {
+inline static void AdjustValues(Agent* m, RequestBidMap<Product>::type& unit_values) {
   m->AdjustProductValues(unit_values);
 }
-inline static void AdjustValues(Trader* t, UnitValueMap<Material>::type& unit_values) {
+inline static void AdjustValues(Trader* t, RequestBidMap<Material>::type& unit_values) {
   t->AdjustMatlValues(unit_values);
 }
-inline static void AdjustValues(Trader* t, UnitValueMap<Product>::type& unit_values) {
+inline static void AdjustValues(Trader* t, RequestBidMap<Product>::type& unit_values) {
   t->AdjustProductValues(unit_values);
 }
 /// @class ResourceExchange
@@ -146,8 +146,8 @@ template <class T> class ResourceExchange {
   }
 
   void Adjust_(Trader* t) {
-  typename UnitCostMap<T>::type& unit_costs = ex_ctx_.trader_costs[t];
-  typename UnitValueMap<T>::type& unit_values = ex_ctx_.trader_values[t];
+  typename RequestBidMap<T>::type& unit_costs = ex_ctx_.trader_costs[t];
+  typename RequestBidMap<T>::type& unit_values = ex_ctx_.trader_values[t];
 
   AdjustCosts(t, unit_costs);
   AdjustValues(t, unit_values);
