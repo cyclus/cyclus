@@ -25,11 +25,6 @@ template <class T> struct PrefMap {
   typedef Bid<T>* bid_ptr;
 };
 
-/// @brief A map between requests, bids, and their associated arc_cost
-template <class T> struct RequestBidMap {
-  typedef std::map<Request<T>*, std::map<Bid<T>*, double>> type;
-};
-
 template <class T> struct CommodMap {
   typedef std::map<std::string, std::vector<Request<T>*>> type;
   typedef Request<T>* request_ptr;
@@ -94,15 +89,12 @@ template <class T> struct ExchangeContext {
   
     // unit value comes from request
     double unit_value = pb->request()->UnitValue();
-   
-    // Store unit cost and unit value separately
-    trader_costs[pb->request()->requester()][pb->request()].insert(
-        std::make_pair(pb, unit_cost));
-    trader_values[pb->request()->requester()][pb->request()].insert(
-        std::make_pair(pb, unit_value));
+
+    // define arc_cost as unit_cost - unit_value
+    double arc_cost = unit_cost - unit_value;
     
     trader_prefs[pb->request()->requester()][pb->request()].insert(
-        std::make_pair(pb, unit_cost));
+        std::make_pair(pb, arc_cost));
   }
 
   /// @brief a reference to an exchange's set of requests
@@ -122,14 +114,8 @@ template <class T> struct ExchangeContext {
 
   /// @brief maps request to all bids for request
   std::map<Request<T>*, std::vector<Bid<T>*>> bids_by_request;
-
-  /// @brief maps trader to request to bid to unit cost adjustments
-  std::map<Trader*, typename RequestBidMap<T>::type> trader_costs;
   
-  /// @brief maps trader to request to bid to unit value adjustments
-  std::map<Trader*, typename RequestBidMap<T>::type> trader_values;
-  
-  /// @deprecated Use trader_costs and trader_values instead. Kept for backward compatibility.
+  /// @brief maps (requests --> (bids --> arc_costs))
   std::map<Trader*, typename PrefMap<T>::type> trader_prefs;
 };
 

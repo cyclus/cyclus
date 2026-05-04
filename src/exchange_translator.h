@@ -103,19 +103,10 @@ template <class T> class ExchangeTranslator {
   /// @brief adds a bid-request arc to a graph, using unit costs and unit values
   void AddArc(Request<T>* req, Bid<T>* bid, ExchangeGraph::Ptr graph) {
     // Get unit cost and unit value from exchange context
-    auto& cost_map = ex_ctx_->trader_costs[req->requester()][req];
-    auto& value_map = ex_ctx_->trader_values[req->requester()][req];
+    auto& map = ex_ctx_->trader_prefs[req->requester()][req];
     
-    auto cost_it = cost_map.find(bid);
-    auto value_it = value_map.find(bid);
-    if (cost_it == cost_map.end() || value_it == value_map.end()) {
-      std::stringstream ss;
-      ss << "Bid not found in exchange context for arc addition.";
-      throw ValueError(ss.str());
-    }
-    
-    double unit_cost = cost_it->second;
-    double unit_value = value_it->second;
+    double unit_cost = bid->UnitCost();
+    double unit_value = req->UnitValue();
     
     Arc a = TranslateArc(xlation_ctx_, bid, unit_cost, unit_value);
     CLOG(LEV_DEBUG5) << "Adding arc with Unit Cost =" << unit_cost << ", Unit Value =" << unit_value;

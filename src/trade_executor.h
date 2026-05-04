@@ -113,36 +113,22 @@ template <class T> class TradeExecutor {
 
         typename T::Ptr rsrc = v_it->second;
         if (rsrc->quantity() > cyclus::eps_rsrc()) {
-          // Get original unit_cost and unit_value
-          double original_unit_cost = trade.bid->UnitCost();
-          if (std::isnan(original_unit_cost)) {
-            original_unit_cost = 0.0;  // NaN means no cost
-          }
-          double original_unit_value = trade.request->UnitValue();
+          // Get adjusted unit_cost and unit_value
+          double adjusted_unit_cost = trade.bid->UnitCost();
+          double adjusted_unit_value = trade.request->UnitValue();
 
-          // Get adjusted unit_cost and unit_value from exchange context
-          double adjusted_unit_cost = original_unit_cost;
-          double adjusted_unit_value = original_unit_value;
-          
+          // Normally the arc_cost is going to be this, however...
+          double adjusted_arc_cost = adjusted_unit_cost - adjusted_unit_value;
+      
+          // It's possible to change the arc_cost directly durring Adjustment
           if (ex_ctx) {
-            auto trader_it = ex_ctx->trader_costs.find(trade.request->requester());
-            if (trader_it != ex_ctx->trader_costs.end()) {
+            auto trader_it = ex_ctx->trader_prefs.find(trade.request->requester());
+            if (trader_it != ex_ctx->trader_prefs.end()) {
               auto request_it = trader_it->second.find(trade.request);
               if (request_it != trader_it->second.end()) {
                 auto bid_it = request_it->second.find(trade.bid);
                 if (bid_it != request_it->second.end()) {
-                  adjusted_unit_cost = bid_it->second;
-                }
-              }
-            }
-            
-            trader_it = ex_ctx->trader_values.find(trade.request->requester());
-            if (trader_it != ex_ctx->trader_values.end()) {
-              auto request_it = trader_it->second.find(trade.request);
-              if (request_it != trader_it->second.end()) {
-                auto bid_it = request_it->second.find(trade.bid);
-                if (bid_it != request_it->second.end()) {
-                  adjusted_unit_value = bid_it->second;
+                  adjusted_arc_cost = bid_it->second;
                 }
               }
             }
@@ -152,7 +138,7 @@ template <class T> class TradeExecutor {
           // the successful trade's unit cost
           rsrc->SetUnitValue(adjusted_unit_cost);
           
-          // Record unit_cost and unit_value. arc_cost can be computed from these if needed.
+          // Record adjusted unit cost/value and the solver arc cost.
           ctx->NewDatum("Transactions")
               ->AddVal("TransactionId", ctx->NextTransactionID())
               ->AddVal("SenderId", supplier->id())
@@ -162,6 +148,7 @@ template <class T> class TradeExecutor {
               ->AddVal("Time", ctx->time())
               ->AddVal("UnitCost", adjusted_unit_cost)
               ->AddVal("UnitValue", adjusted_unit_value)
+              ->AddVal("ArcCost", adjusted_arc_cost)
               ->Record();
         }
       }

@@ -16,37 +16,23 @@
 
 namespace cyclus {
 
-/// @brief Cost and Value adjustment method helpers to convert from templates
+/// @brief Adjustment method helpers to convert from templates
 /// to the Agent inheritance hierarchy
 template <class T>
-inline static void AdjustCosts(Agent* m, typename RequestBidMap<T>::type& unit_costs) {}
-inline static void AdjustCosts(Agent* m, RequestBidMap<Material>::type& unit_costs) {
-  m->AdjustMatlCosts(unit_costs);
+inline static void Adjust(Agent* m, typename PrefMap<T>::type& map) {}
+inline static void Adjust(Agent* m, PrefMap<Material>::type& map) {
+  m->AdjustMatlParams(map);
 }
-inline static void AdjustCosts(Agent* m, RequestBidMap<Product>::type& unit_costs) {
-  m->AdjustProductCosts(unit_costs);
+inline static void Adjust(Agent* m, PrefMap<Product>::type& map) {
+  m->AdjustProductParams(map);
 }
-inline static void AdjustCosts(Trader* t, RequestBidMap<Material>::type& unit_costs) {
-  t->AdjustMatlCosts(unit_costs);
+inline static void Adjust(Trader* t, PrefMap<Material>::type& map) {
+  t->AdjustMatlParams(map);
 }
-inline static void AdjustCosts(Trader* t, RequestBidMap<Product>::type& unit_costs) {
-  t->AdjustProductCosts(unit_costs);
+inline static void Adjust(Trader* t, PrefMap<Product>::type& map) {
+  t->AdjustProductParams(map);
 }
 
-template <class T>
-inline static void AdjustValues(Agent* m, typename RequestBidMap<T>::type& unit_values) {}
-inline static void AdjustValues(Agent* m, RequestBidMap<Material>::type& unit_values) {
-  m->AdjustMatlValues(unit_values);
-}
-inline static void AdjustValues(Agent* m, RequestBidMap<Product>::type& unit_values) {
-  m->AdjustProductValues(unit_values);
-}
-inline static void AdjustValues(Trader* t, RequestBidMap<Material>::type& unit_values) {
-  t->AdjustMatlValues(unit_values);
-}
-inline static void AdjustValues(Trader* t, RequestBidMap<Product>::type& unit_values) {
-  t->AdjustProductValues(unit_values);
-}
 /// @class ResourceExchange
 ///
 /// The ResourceExchange class manages the communication for the supply and
@@ -146,16 +132,13 @@ template <class T> class ResourceExchange {
   }
 
   void Adjust_(Trader* t) {
-  typename RequestBidMap<T>::type& unit_costs = ex_ctx_.trader_costs[t];
-  typename RequestBidMap<T>::type& unit_values = ex_ctx_.trader_values[t];
+  typename PrefMap<T>::type& map = ex_ctx_.trader_prefs[t];
 
-  AdjustCosts(t, unit_costs);
-  AdjustValues(t, unit_values);
+  Adjust(t, map);
 
   Agent* m = t->manager()->parent();
   while (m != NULL) {
-    AdjustCosts(m, unit_costs);
-    AdjustValues(m, unit_values);
+    Adjust(m, map);
     m = m->parent();
   }
 }

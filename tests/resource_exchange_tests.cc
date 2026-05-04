@@ -28,7 +28,7 @@ using cyclus::ExchangeContext;
 using cyclus::Facility;
 using cyclus::Material;
 using cyclus::Agent;
-using cyclus::RequestBidMap;
+using cyclus::PrefMap;
 using cyclus::PrefMap;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
@@ -62,13 +62,16 @@ class Requester: public TestFacility {
     return rps;
   }
 
-  // increments counter and squares all unit values (from requests)
-  virtual void AdjustMatlValues(RequestBidMap<Material>::type& map) {
+  // increments counter and squares all arc_costs directly
+  virtual void AdjustMatlParams(PrefMap<Material>::type& map) {
     std::map<Request<Material>*,
              std::map<Bid<Material>*, double> >::iterator m_it;
     for (m_it = map.begin(); m_it != map.end(); ++m_it) {
-      Request<Material>* req = m_it->first;
-      req->SetUnitValue(std::pow(req->UnitValue(), 2));
+      std::map<Bid<Material>*, double>& bid_map = m_it->second; 
+      std::map<Bid<Material>*, double>::iterator b_it;
+      for (b_it = bid_map.begin(); b_it != bid_map.end(); ++b_it) {
+        b_it->second = std::pow(b_it->second, 2);
+      }
     }
     arc_ctr_++;
   }
@@ -287,10 +290,10 @@ TEST_F(ResourceExchangeTests, ArcCostValues) {
   Bidder* bidr = new Bidder(tc.get(), commod);
 
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  // Set bid unit cost to match request unit_value so unit_cost has a value to adjust
-  // unit_cost comes from bid, so setting it to request unit_value (2.4) for testing
-  Bid<Material>* pbid = bp->AddBid(preq, mat, bidr, false, preq->UnitValue());
-  Bid<Material>* cbid = bp->AddBid(creq, mat, bidr, false, creq->UnitValue());
+
+  // Bids without a unit_cost default to unit_cost = 0
+  Bid<Material>* pbid = bp->AddBid(preq, mat, bidr, false);
+  Bid<Material>* cbid = bp->AddBid(creq, mat, bidr, false);
 
   std::vector<Bid<Material>*> bids;
   bids.push_back(pbid);
@@ -303,25 +306,24 @@ TEST_F(ResourceExchangeTests, ArcCostValues) {
   EXPECT_NO_THROW(exchng->AddAllRequests());
   EXPECT_NO_THROW(exchng->AddAllBids());
 
-  RequestBidMap<Material>::type pobs;
-  pobs[preq].insert(std::make_pair(pbid, preq->UnitValue()));
-  RequestBidMap<Material>::type cobs;
-  cobs[creq].insert(std::make_pair(cbid, creq->UnitValue()));
+  double p_arc_cost = pbid->UnitCost() - preq->UnitValue();
+  double c_arc_cost = cbid->UnitCost() - creq->UnitValue();
+
+  PrefMap<Material>::type pobs;
+  pobs[preq].insert(std::make_pair(pbid, p_arc_cost));
+  PrefMap<Material>::type cobs;
+  cobs[creq].insert(std::make_pair(cbid, c_arc_cost));
 
   ExchangeContext<Material>& context = exchng->ex_ctx();
-  EXPECT_EQ(context.trader_values[parent], pobs);
-  EXPECT_EQ(context.trader_values[child], cobs);
+  EXPECT_EQ(context.trader_prefs[parent], pobs);
+  EXPECT_EQ(context.trader_prefs[child], cobs);
 
   EXPECT_NO_THROW(exchng->AdjustAll());
 
-  // Note (DK 23 April, 2026): These next two tests may need another look after
-  // AdjustMatlVals change.
-  EXPECT_EQ(context.trader_values[parent], pobs);
-  EXPECT_EQ(context.trader_values[child], cobs);
-
-  // preq unit value should be squared, creq unit value should be squared twice
-  EXPECT_EQ(preq->UnitValue(), std::pow(unit_value, 2));
-  EXPECT_EQ(creq->UnitValue(), std::pow(std::pow(unit_value, 2), 2));
+  pobs[preq].begin()->second = std::pow(p_arc_cost, 2);
+  cobs[creq].begin()->second = std::pow(std::pow(c_arc_cost, 2), 2);
+  EXPECT_EQ(context.trader_prefs[parent], pobs);
+  EXPECT_EQ(context.trader_prefs[child], cobs);
 
   child->Decommission();
   parent->Decommission();

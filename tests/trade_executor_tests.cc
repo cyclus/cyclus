@@ -298,9 +298,10 @@ TEST_F(TradeExecutorDatabaseTests, WrapperFunctionAndBasicRecording) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedUnitCost) {
+TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedArcCost) {
   // Create one trade to test ExchangeContext functionality
   double orig_unit_cost = 2.5;
+  double orig_unit_val = 4.5;
   double trade_amt = 2.0;
   
   Request<Material>* req = Request<Material>::Create(fac_.mat, r1_);
@@ -315,12 +316,10 @@ TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedUnitCost) {
   ex_ctx.AddBid(bid);
   
   // Set different adjusted unit cost and unit value
-  double adj_cost = 4.2;
-  double adj_value = 1.8;
+  double adj_arc_cost = 4.2;
   
   // Set adjusted unit cost and unit value in ExchangeContext
-  ex_ctx.trader_costs[r1_][req][bid] = adj_cost;
-  ex_ctx.trader_values[r1_][req][bid] = adj_value;
+  ex_ctx.trader_prefs[r1_][req][bid] = adj_arc_cost;
   
   TradeExecutor<Material> exec(trades);
   
@@ -338,11 +337,13 @@ TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedUnitCost) {
   if (qr.rows.size() > 0) {
     double recorded_cost = qr.GetVal<double>("UnitCost", 0);
     double recorded_value = qr.GetVal<double>("UnitValue", 0);
-    
-    // Verify the adjusted unit cost and unit value are recorded (not the originals)
-    EXPECT_DOUBLE_EQ(recorded_cost, adj_cost);
-    EXPECT_DOUBLE_EQ(recorded_value, adj_value);
-    EXPECT_NE(recorded_cost, orig_unit_cost);
+    double recorded_arc_cost = qr.GetVal<double>("ArcCost", 0);
+
+    // We changed the arc_cost directly here, so the original unit cost/value
+    // should persist, with a new adjusted_arc_cost
+    EXPECT_DOUBLE_EQ(recorded_cost, orig_unit_cost);
+    EXPECT_DOUBLE_EQ(recorded_value, cyclus::kDefaultUnitValue);
+    EXPECT_DOUBLE_EQ(recorded_arc_cost, adj_arc_cost);
   }
   
   // Cleanup

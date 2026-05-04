@@ -22,7 +22,7 @@ using std::vector;
 using cyclus::Bid;
 using cyclus::BidPortfolio;
 using cyclus::ExchangeContext;
-using cyclus::RequestBidMap;
+using cyclus::PrefMap;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
 using cyclus::Resource;
@@ -161,13 +161,10 @@ TEST_F(ExchangeContextTests, AddBid1) {
   bidders.insert(fac1);
   EXPECT_EQ(bidders, context.bidders);
 
-  RequestBidMap<Resource>::type obs_cost;
-  obs_cost[req1].insert(std::make_pair(bid, unit_cost));
-  EXPECT_EQ(context.trader_costs[req1->requester()], obs_cost);
-  
-  RequestBidMap<Resource>::type obs_value;
-  obs_value[req1].insert(std::make_pair(bid, req1->UnitValue()));
-  EXPECT_EQ(context.trader_values[req1->requester()], obs_value);
+  PrefMap<Resource>::type obs_cost;
+  obs_cost[req1].insert(std::make_pair(bid, unit_cost - unit_value));
+  EXPECT_EQ(context.trader_prefs[req1->requester()], obs_cost);
+
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

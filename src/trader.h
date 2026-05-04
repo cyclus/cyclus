@@ -51,19 +51,11 @@ class Trader {
 
   /// default implementation for adjusting costs of materials.
   /// @param unit_costs map for adjusting unit costs (from bids)
-  virtual void AdjustMatlCosts(RequestBidMap<Material>::type& unit_costs) {}
-
-  /// default implementation for adjusting value of materials.
-  /// @param unit_values map for adjusting unit costs (from bids)
-  virtual void AdjustMatlValues(RequestBidMap<Material>::type& unit_values) {}
+  virtual void AdjustMatlParams(PrefMap<Material>::type& map) {}
 
   /// default implementation for adusting costs of products.
   /// @param unit_costs map for adjusting unit costs (from bids)
-  virtual void AdjustProductCosts(RequestBidMap<Product>::type& unit_costs) {}
-
-  /// default implementation for adusting value of products.
-  /// @param unit_values map for adjusting unit costs (from bids)
-  virtual void AdjustProductValues(RequestBidMap<Product>::type& unit_values) {}
+  virtual void AdjustProductParams(PrefMap<Product>::type& map) {}
 
   /// @brief default implementation for responding to material trades
   /// @param trades all trades in which this trader is the supplier
