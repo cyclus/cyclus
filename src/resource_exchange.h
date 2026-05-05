@@ -132,7 +132,7 @@ template <class T> class ResourceExchange {
   }
 
   void Adjust_(Trader* t) {
-  typename RequestBidMap<T>::type& map = ex_ctx_.trader_prefs[t];
+  typename RequestBidMap<T>::type& map = ex_ctx_.trader_arc_costs[t];
 
   Adjust(t, map);
 

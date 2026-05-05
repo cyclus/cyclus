@@ -319,7 +319,7 @@ TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedArcCost) {
   double adj_arc_cost = 4.2;
   
   // Set adjusted unit cost and unit value in ExchangeContext
-  ex_ctx.trader_prefs[r1_][req][bid] = adj_arc_cost;
+  ex_ctx.trader_arc_costs[r1_][req][bid] = adj_arc_cost;
   
   TradeExecutor<Material> exec(trades);
   

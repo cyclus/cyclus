@@ -93,7 +93,7 @@ template <class T> struct ExchangeContext {
     // define arc_cost as unit_cost - unit_value
     double arc_cost = unit_cost - unit_value;
     
-    trader_prefs[pb->request()->requester()][pb->request()].insert(
+    trader_arc_costs[pb->request()->requester()][pb->request()].insert(
         std::make_pair(pb, arc_cost));
   }
 
@@ -116,7 +116,7 @@ template <class T> struct ExchangeContext {
   std::map<Request<T>*, std::vector<Bid<T>*>> bids_by_request;
   
   /// @brief maps (requests --> (bids --> arc_costs))
-  std::map<Trader*, typename RequestBidMap<T>::type> trader_prefs;
+  std::map<Trader*, typename RequestBidMap<T>::type> trader_arc_costs;
 };
 
 }  // namespace cyclus

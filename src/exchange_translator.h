@@ -103,7 +103,7 @@ template <class T> class ExchangeTranslator {
   /// @brief adds a bid-request arc to a graph, using unit costs and unit values
   void AddArc(Request<T>* req, Bid<T>* bid, ExchangeGraph::Ptr graph) {
     // Get unit cost and unit value from exchange context
-    auto& map = ex_ctx_->trader_prefs[req->requester()][req];
+    auto& map = ex_ctx_->trader_arc_costs[req->requester()][req];
     
     double unit_cost = bid->UnitCost();
     double unit_value = req->UnitValue();

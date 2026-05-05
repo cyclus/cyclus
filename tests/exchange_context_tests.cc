@@ -163,7 +163,7 @@ TEST_F(ExchangeContextTests, AddBid1) {
 
   RequestBidMap<Resource>::type obs_cost;
   obs_cost[req1].insert(std::make_pair(bid, unit_cost - unit_value));
-  EXPECT_EQ(context.trader_prefs[req1->requester()], obs_cost);
+  EXPECT_EQ(context.trader_arc_costs[req1->requester()], obs_cost);
 
 }
 

@@ -315,15 +315,15 @@ TEST_F(ResourceExchangeTests, ArcCostValues) {
   cobs[creq].insert(std::make_pair(cbid, c_arc_cost));
 
   ExchangeContext<Material>& context = exchng->ex_ctx();
-  EXPECT_EQ(context.trader_prefs[parent], pobs);
-  EXPECT_EQ(context.trader_prefs[child], cobs);
+  EXPECT_EQ(context.trader_arc_costs[parent], pobs);
+  EXPECT_EQ(context.trader_arc_costs[child], cobs);
 
   EXPECT_NO_THROW(exchng->AdjustAll());
 
   pobs[preq].begin()->second = std::pow(p_arc_cost, 2);
   cobs[creq].begin()->second = std::pow(std::pow(c_arc_cost, 2), 2);
-  EXPECT_EQ(context.trader_prefs[parent], pobs);
-  EXPECT_EQ(context.trader_prefs[child], cobs);
+  EXPECT_EQ(context.trader_arc_costs[parent], pobs);
+  EXPECT_EQ(context.trader_arc_costs[child], cobs);
 
   child->Decommission();
   parent->Decommission();
