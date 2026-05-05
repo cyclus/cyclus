@@ -147,18 +147,18 @@ class MatlBuyPolicy : public Trader {
   MatlBuyPolicy& ResetBehavior();
 
   /// Instructs the policy to fill its buffer with requests on the given
-  /// commodity of composition c and the given preference.  This must be called
+  /// commodity of composition c and the given unit value.  This must be called
   /// at least once or the policy will do nothing.  The policy can request on an
   /// arbitrary number of commodities by calling Set multiple times.  Re-calling
-  /// Set to modify the composition or preference of a commodity that has been
+  /// Set to modify the composition or unit value of a commodity that has been
   /// set previously is allowed.
   /// @param commod the commodity name
   /// @param c the composition to request for the given commodity
-  /// @param pref the preference value for the commodity
+  /// @param unit_value the unit value for the commodity
   /// @{
   MatlBuyPolicy& Set(std::string commod);
   MatlBuyPolicy& Set(std::string commod, Composition::Ptr c);
-  MatlBuyPolicy& Set(std::string commod, Composition::Ptr c, double pref);
+  MatlBuyPolicy& Set(std::string commod, Composition::Ptr c, double unit_value);
   /// @}
 
   /// Instructs the policy to stop requesting a speific commodity
@@ -229,7 +229,7 @@ class MatlBuyPolicy : public Trader {
  private:
   struct CommodDetail {
     Composition::Ptr comp;
-    double pref;
+    double unit_value;
   };
 
   void set_manager(Agent* m);
