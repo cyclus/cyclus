@@ -28,8 +28,8 @@ using cyclus::ExchangeContext;
 using cyclus::Facility;
 using cyclus::Material;
 using cyclus::Agent;
-using cyclus::PrefMap;
-using cyclus::PrefMap;
+using cyclus::RequestBidMap;
+using cyclus::RequestBidMap;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
 using cyclus::ResourceExchange;
@@ -63,7 +63,7 @@ class Requester: public TestFacility {
   }
 
   // increments counter and squares all arc_costs directly
-  virtual void AdjustMatlParams(PrefMap<Material>::type& map) {
+  virtual void AdjustMatlParams(RequestBidMap<Material>::type& map) {
     std::map<Request<Material>*,
              std::map<Bid<Material>*, double> >::iterator m_it;
     for (m_it = map.begin(); m_it != map.end(); ++m_it) {
@@ -309,9 +309,9 @@ TEST_F(ResourceExchangeTests, ArcCostValues) {
   double p_arc_cost = pbid->UnitCost() - preq->UnitValue();
   double c_arc_cost = cbid->UnitCost() - creq->UnitValue();
 
-  PrefMap<Material>::type pobs;
+  RequestBidMap<Material>::type pobs;
   pobs[preq].insert(std::make_pair(pbid, p_arc_cost));
-  PrefMap<Material>::type cobs;
+  RequestBidMap<Material>::type cobs;
   cobs[creq].insert(std::make_pair(cbid, c_arc_cost));
 
   ExchangeContext<Material>& context = exchng->ex_ctx();

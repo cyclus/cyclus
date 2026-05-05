@@ -324,11 +324,11 @@ class Agent : public StateWrangler, virtual public Ider, public EconomicEntity {
 
   /// default implementation for adjusting material trade parameters.
   /// @param unit_costs map for adjusting unit costs (from bids)
-  virtual void AdjustMatlParams(PrefMap<Material>::type& map) {}
+  virtual void AdjustMatlParams(RequestBidMap<Material>::type& map) {}
 
   /// default implementation for adjusting Product trade parameters.
   /// @param unit_values map for adjusting unit costs (from bids)
-  virtual void AdjustProductParams(PrefMap<Product>::type& map) {}
+  virtual void AdjustProductParams(RequestBidMap<Product>::type& map) {}
 
 
   /// Returns an agent's xml rng schema for initializing from input files. All

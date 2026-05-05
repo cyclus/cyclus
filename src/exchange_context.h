@@ -19,7 +19,7 @@
 #endif
 
 namespace cyclus {
-template <class T> struct PrefMap {
+template <class T> struct RequestBidMap {
   typedef std::map<Request<T>*, std::map<Bid<T>*, double>> type;
   typedef Request<T>* request_ptr;
   typedef Bid<T>* bid_ptr;
@@ -116,7 +116,7 @@ template <class T> struct ExchangeContext {
   std::map<Request<T>*, std::vector<Bid<T>*>> bids_by_request;
   
   /// @brief maps (requests --> (bids --> arc_costs))
-  std::map<Trader*, typename PrefMap<T>::type> trader_prefs;
+  std::map<Trader*, typename RequestBidMap<T>::type> trader_prefs;
 };
 
 }  // namespace cyclus

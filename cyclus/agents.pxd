@@ -31,8 +31,8 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):  # C++CONSTR
     void EnterNotify() except *
     void BuildNotify() except *
     void DecomNotify() except *
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&) except *
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except *
+    void AdjustMatlPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type&) except *
+    void AdjustProductPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type&) except *
     # Extra interface
     PyObject* self  # the Python object we are shimming
 
@@ -57,8 +57,8 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):  # C++CON
     void EnterNotify() except *
     void BuildNotify() except *
     void DecomNotify() except *
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&) except *
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except *
+    void AdjustMatlPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type&) except *
+    void AdjustProductPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type&) except *
     void Tick() except *
     void Tock() except *
     void Decision() except *
@@ -87,8 +87,8 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
     void EnterNotify() except *
     void BuildNotify() except *
     void DecomNotify() except *
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&) except *
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except *
+    void AdjustMatlPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type&) except *
+    void AdjustProductPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type&) except *
     void Tick() except *
     void Tock() except *
     void Decision() except *
@@ -117,8 +117,8 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):  # 
     void EnterNotify() except *
     void BuildNotify() except *
     void DecomNotify() except *
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type&) except *
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type&) except *
+    void AdjustMatlPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type&) except *
+    void AdjustProductPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type&) except *
     void Tick() except *
     void Tock() except *
     void Decision() except *

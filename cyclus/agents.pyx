@@ -44,11 +44,11 @@ _SCHEMA = SchemaFilter()
 
 
 cdef int _GET_MAT_PREFS_TIME = -9999999999
-cdef cpp_cyclus.PrefMap[cpp_cyclus.Material].type* _GET_MAT_PREFS_PTR = NULL
+cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type* _GET_MAT_PREFS_PTR = NULL
 cdef dict _GET_MAT_PREFS = {}
 
 cdef int _GET_PROD_PREFS_TIME = -9999999999
-cdef cpp_cyclus.PrefMap[cpp_cyclus.Product].type* _GET_PROD_PREFS_PTR = NULL
+cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type* _GET_PROD_PREFS_PTR = NULL
 cdef dict _GET_PROD_PREFS = {}
 
 
@@ -135,11 +135,11 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
     void DecomNotify() except *:
         (<object> this.self).decom_notify()
 
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except *:
+    void AdjustMatlPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_MAT_PREFS_TIME, _GET_MAT_PREFS_PTR, _GET_MAT_PREFS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Material].type* curr_ptr = &prefs
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type* curr_ptr = &prefs
         if curr_time == _GET_MAT_PREFS_TIME and curr_ptr == _GET_MAT_PREFS_PTR:
             pyprefs = _GET_MAT_PREFS
         else:
@@ -156,11 +156,11 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
         for (req, bid), pref in updates.items():
             prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
 
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except *:
+    void AdjustProductPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_PROD_PREFS_TIME, _GET_PROD_PREFS_PTR, _GET_PROD_PREFS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Product].type* curr_ptr = &prefs
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type* curr_ptr = &prefs
         if curr_time == _GET_PROD_PREFS_TIME and curr_ptr == _GET_PROD_PREFS_PTR:
             pyprefs = _GET_PROD_PREFS
         else:
@@ -259,11 +259,11 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
     void DecomNotify() except *:
         (<object> this.self).decom_notify()
 
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except *:
+    void AdjustMatlPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_MAT_PREFS_TIME, _GET_MAT_PREFS_PTR, _GET_MAT_PREFS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Material].type* curr_ptr = &prefs
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type* curr_ptr = &prefs
         if curr_time == _GET_MAT_PREFS_TIME and curr_ptr == _GET_MAT_PREFS_PTR:
             pyprefs = _GET_MAT_PREFS
         else:
@@ -280,11 +280,11 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
         for (req, bid), pref in updates.items():
             prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
 
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except *:
+    void AdjustProductPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_PROD_PREFS_TIME, _GET_PROD_PREFS_PTR, _GET_PROD_PREFS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Product].type* curr_ptr = &prefs
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type* curr_ptr = &prefs
         if curr_time == _GET_PROD_PREFS_TIME and curr_ptr == _GET_PROD_PREFS_PTR:
             pyprefs = _GET_PROD_PREFS
         else:
@@ -395,11 +395,11 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
     void DecomNotify() except *:
         (<object> this.self).decom_notify()
 
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except *:
+    void AdjustMatlPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_MAT_PREFS_TIME, _GET_MAT_PREFS_PTR, _GET_MAT_PREFS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Material].type* curr_ptr = &prefs
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type* curr_ptr = &prefs
         if curr_time == _GET_MAT_PREFS_TIME and curr_ptr == _GET_MAT_PREFS_PTR:
             pyprefs = _GET_MAT_PREFS
         else:
@@ -416,11 +416,11 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
         for (req, bid), pref in updates.items():
             prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
 
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except *:
+    void AdjustProductPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_PROD_PREFS_TIME, _GET_PROD_PREFS_PTR, _GET_PROD_PREFS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Product].type* curr_ptr = &prefs
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type* curr_ptr = &prefs
         if curr_time == _GET_PROD_PREFS_TIME and curr_ptr == _GET_PROD_PREFS_PTR:
             pyprefs = _GET_PROD_PREFS
         else:
@@ -540,11 +540,11 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
     void DecomNotify() except *:
         (<object> this.self).decom_notify()
 
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except *:
+    void AdjustMatlPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_MAT_PREFS_TIME, _GET_MAT_PREFS_PTR, _GET_MAT_PREFS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Material].type* curr_ptr = &prefs
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type* curr_ptr = &prefs
         if curr_time == _GET_MAT_PREFS_TIME and curr_ptr == _GET_MAT_PREFS_PTR:
             pyprefs = _GET_MAT_PREFS
         else:
@@ -561,11 +561,11 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
         for (req, bid), pref in updates.items():
             prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
 
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except *:
+    void AdjustProductPrefs(cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type& prefs) except *:
         # cache the commod_reqs wrappers globally
         global _GET_PROD_PREFS_TIME, _GET_PROD_PREFS_PTR, _GET_PROD_PREFS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Product].type* curr_ptr = &prefs
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type* curr_ptr = &prefs
         if curr_time == _GET_PROD_PREFS_TIME and curr_ptr == _GET_PROD_PREFS_PTR:
             pyprefs = _GET_PROD_PREFS
         else:

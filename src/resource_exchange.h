@@ -19,17 +19,17 @@ namespace cyclus {
 /// @brief Adjustment method helpers to convert from templates
 /// to the Agent inheritance hierarchy
 template <class T>
-inline static void Adjust(Agent* m, typename PrefMap<T>::type& map) {}
-inline static void Adjust(Agent* m, PrefMap<Material>::type& map) {
+inline static void Adjust(Agent* m, typename RequestBidMap<T>::type& map) {}
+inline static void Adjust(Agent* m, RequestBidMap<Material>::type& map) {
   m->AdjustMatlParams(map);
 }
-inline static void Adjust(Agent* m, PrefMap<Product>::type& map) {
+inline static void Adjust(Agent* m, RequestBidMap<Product>::type& map) {
   m->AdjustProductParams(map);
 }
-inline static void Adjust(Trader* t, PrefMap<Material>::type& map) {
+inline static void Adjust(Trader* t, RequestBidMap<Material>::type& map) {
   t->AdjustMatlParams(map);
 }
-inline static void Adjust(Trader* t, PrefMap<Product>::type& map) {
+inline static void Adjust(Trader* t, RequestBidMap<Product>::type& map) {
   t->AdjustProductParams(map);
 }
 
@@ -132,7 +132,7 @@ template <class T> class ResourceExchange {
   }
 
   void Adjust_(Trader* t) {
-  typename PrefMap<T>::type& map = ex_ctx_.trader_prefs[t];
+  typename RequestBidMap<T>::type& map = ex_ctx_.trader_prefs[t];
 
   Adjust(t, map);
 

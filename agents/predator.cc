@@ -36,7 +36,7 @@ Predator::GetProductRequests() {
 }
 
 void Predator::AdjustProductPrefs(
-    cyclus::PrefMap<cyclus::Product>::type& prefs) {
+    cyclus::RequestBidMap<cyclus::Product>::type& prefs) {
   if (prefs.size() == 0)
     return;
   Request<Product>* req = prefs.begin()->first;
