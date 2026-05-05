@@ -334,6 +334,9 @@ class Context {
     solver_->sim_ctx(this);
   }
 
+  /// Returns whether the timer is in quiet mode
+  bool TimerIsQuiet() const;
+
   /// @return the number of agents of a given prototype currently in the
   /// simulation
   inline int n_prototypes(std::string type) { return n_prototypes_[type]; }
@@ -341,6 +344,9 @@ class Context {
   /// @return the number of agents of a given implementation currently in the
   /// simulation
   inline int n_specs(std::string impl) { return n_specs_[impl]; }
+
+  /// @return a const reference to the set of all agents in the simulation
+  inline const std::set<Agent*>& GetAgentList() const { return agent_list_; }
 
  private:
   /// Registers an agent as a participant in the simulation.

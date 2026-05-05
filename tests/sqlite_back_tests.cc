@@ -620,3 +620,34 @@ TEST_F(SqliteBackTests, ListPairIntInt) {
   EXPECT_EQ(std::make_pair(4, 2), l.front());
   EXPECT_EQ(std::make_pair(5, 3), l.back());
 }
+
+TEST_F(SqliteBackTests, MapStringPairDoubleMapStringDouble) {
+  typedef std::map<std::string, std::pair<double, std::map<std::string, double> > > TariffMap;
+  
+  TariffMap tariff_config;
+  std::map<std::string, double> germany_commodities;
+  germany_commodities["steel"] = 0.25;
+  germany_commodities["copper"] = 0.14;
+  tariff_config["Germany"] = std::make_pair(0.10, germany_commodities);
+  
+  std::map<std::string, double> france_commodities;
+  france_commodities["uranium"] = 0.12;
+  tariff_config["France"] = std::make_pair(0.05, france_commodities);
+
+  r.NewDatum("TariffTest")
+      ->AddVal("tariffs", tariff_config)
+      ->Record();
+
+  r.Close();
+  cyclus::QueryResult qr = b->Query("TariffTest", NULL);
+  TariffMap retrieved = qr.GetVal<TariffMap>("tariffs", 0);
+
+  ASSERT_EQ(2, retrieved.size());
+  EXPECT_EQ(0.10, retrieved["Germany"].first);
+  ASSERT_EQ(2, retrieved["Germany"].second.size());
+  EXPECT_DOUBLE_EQ(0.25, retrieved["Germany"].second["steel"]);
+  EXPECT_DOUBLE_EQ(0.14, retrieved["Germany"].second["copper"]);
+  EXPECT_EQ(0.05, retrieved["France"].first);
+  ASSERT_EQ(1, retrieved["France"].second.size());
+  EXPECT_DOUBLE_EQ(0.12, retrieved["France"].second["uranium"]);
+}

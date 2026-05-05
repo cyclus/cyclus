@@ -32,7 +32,6 @@ TEST_P(AgentTests, Schema) {
   schema << "<element name=\"foo\">\n";
   schema << agent_->schema();
   schema << "</element>\n</grammar>\n";
-  std::cout << schema.str();
   cyclus::XMLParser p;
   EXPECT_NO_THROW(p.Init(schema));
 }

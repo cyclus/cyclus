@@ -7,8 +7,11 @@ Since last release
 
 **Added:**
 * Added progress bar to the simulation loop (#1912)
+* Added a new datatype to the backend for tariff region (#1922)
+* Added Functions to access region and institution from facilities and institutions (#1914)
+* Added a unit value to Resource, Material, and Product objects (#1894)
 * Added clang-format protections to .cycpp.h and query_backend.h files, modified .clang-format file (#1880)
-* Added a function to facility_cost.cycpp.h to calculate unit price of a DRE bid (#1870 ,#1877, #1884, #1889)
+* Added a function to facility_cost.cycpp.h to calculate unit price of a DRE bid (#1870 ,#1877, #1884, #1889, #1890)
 * Added code injection for matl_buy/sell_policy (#1866)
 * Added set of basic finance math function to EconomicEntity (#1864)
 * Added Composition functions to get printable material composition information (#1868)
@@ -32,7 +35,10 @@ Since last release
 * Allow multiple archetype blocks to facilitate includes (#1874)
 
 **Changed:**
+* Changed the schema for recipes to require oneOrMore instead of zeroOrMore (#1940)
+* Made the Unit Tests far less verbose by suppressing log output during RunSim (#1927)
 * Changed Dockerfile to use boost and boost-cpp instead of libboost-devel (#1906)
+* Changed TradeExecutor to use adjusted preferences from ExchangeContext (#1897)
 * Ran clang-format on src directory (#1881, #1893)
 * Changed README.rst installation instructions, tested on fresh Ubuntu-22.04 system with Python3.11 (#1744)
 * Rely on ``python3`` in environment instead of ``python`` (#1747)
@@ -57,6 +63,7 @@ Since last release
 
 **Fixed:**
 
+* Removed retired macos-13 runner for CI tests and added macos-15-intel and macos-latest (#1938)
 * Removed unnecessary records being added to the Resource database by packaging process (#1761)
 * Removed GTest source code from code coverage reports (#1759)
 * Extended new GTest handling to Institutions and Facilities as they were done in Regions (#1836)

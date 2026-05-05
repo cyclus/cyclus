@@ -38,6 +38,12 @@ class Timer {
   /// Runs the simulation.
   void RunSim();
 
+  /// Sets quiet mode, suppressing log output during RunSim (errors still printed).
+  void SetQuiet(bool quiet) { quiet_ = quiet; }
+  
+  /// Returns whether quiet mode is enabled.
+  bool IsQuiet() const { return quiet_; }
+
   /// Registers an agent to receive tick/tock notifications every timestep.
   /// Agents should register from their Deploy method.
   void RegisterTimeListener(TimeListener* agent);
@@ -123,6 +129,8 @@ class Timer {
 
   /// Progress bar for simulation progress
   ProgressBar* progress_bar_;
+
+  bool quiet_ = false;
 };
 
 }  // namespace cyclus
