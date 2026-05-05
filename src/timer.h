@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <vector>
+#include <memory>
 
 #include "context.h"
 #include "exchange_manager.h"
@@ -11,7 +12,7 @@
 #include "infile_tree.h"
 #include "time_listener.h"
 #include "comp_math.h"
-#include "progress_bar.h"
+#include "indicators.hpp"
 
 class SimInitTest;
 
@@ -128,7 +129,12 @@ class Timer {
   std::map<int, std::vector<Agent*>> decom_queue_;
 
   /// Progress bar for simulation progress
-  ProgressBar* progress_bar_;
+  std::unique_ptr<indicators::ProgressBar> progress_bar_;
+  int progress_update_frequency_;
+  /// First timestep index in this run (0, or branch_time when restarting).
+  int progress_origin_;
+  /// Number of timesteps this run will execute (si_.duration - progress_origin_).
+  int progress_span_;
 
   bool quiet_ = false;
 };

@@ -2,8 +2,10 @@
 // Implements the Timer class
 #include "timer.h"
 
+#include <algorithm>
 #include <iostream>
 #include <string>
+#include <cstdlib>
 #if CYCLUS_IS_PARALLEL
 #include <omp.h>
 #endif  // CYCLUS_IS_PARALLEL
@@ -15,6 +17,34 @@
 #include "sim_init.h"
 
 namespace cyclus {
+
+namespace {
+// Simulation time is int throughout Cyclus; indicators::ProgressBar uses size_t
+// for set_progress / max_progress only because that is the library API.
+inline size_t IndicatorProgress(int n) {
+  return static_cast<size_t>(std::max(n, 0));
+}
+
+bool ProgressBarEnabled() {
+  const char* env_var = std::getenv("CYCLUS_PROGRESS_BAR");
+  if (env_var) {
+    std::string val(env_var);
+    return !(val == "0" || val == "false" || val == "no" || val == "off");
+  }
+
+  // Disable with verbose logging to avoid interfering with debug output.
+  return cyclus::Logger::ReportLevel() <= cyclus::LEV_WARN;
+}
+
+int ProgressUpdateFrequency(int duration) {
+  if (duration > 100) {
+    return 10;
+  } else if (duration > 20) {
+    return 5;
+  }
+  return 1;
+}
+}  // namespace
 
 void Timer::RunSim() {
   LogLevel saved_level = Logger::ReportLevel();
@@ -30,26 +60,17 @@ void Timer::RunSim() {
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
 
-  // Initialize progress bar if not already done
-  if (!progress_bar_) {
-    progress_bar_ = new ProgressBar(si_.duration, 50, true, true);
-    // Set update frequency based on simulation duration
-    if (si_.duration > 100) {
-      progress_bar_->SetUpdateFrequency(
-          10);  // Update every 10 timesteps for long simulations
-    } else if (si_.duration > 20) {
-      progress_bar_->SetUpdateFrequency(
-          5);  // Update every 5 timesteps for medium simulations
-    }
-    // For short simulations, update every timestep (frequency = 1)
+  if (!progress_bar_ && ProgressBarEnabled()) {
+    progress_span_ = std::max(si_.duration - time_, 1);
+    progress_bar_.reset(new indicators::ProgressBar{
+        indicators::option::BarWidth{50},
+        indicators::option::MaxProgress{IndicatorProgress(progress_span_)},
+        indicators::option::ShowPercentage{true},
+    });
+    progress_update_frequency_ = ProgressUpdateFrequency(si_.duration);
   }
 
   while (time_ < si_.duration) {
-    // Update progress bar
-    if (progress_bar_) {
-      progress_bar_->Update(time_);
-    }
-
     CLOG(LEV_INFO1) << "Current time: " << time_;
 
     if (want_snapshot_) {
@@ -73,6 +94,25 @@ void Timer::RunSim() {
     EventLoop();
 #endif
 
+    // Progress reflects timesteps completed this iteration (loop uses
+    // time_ in [progress_origin_, si_.duration), so the last step reaches
+    // progress_span_ / progress_span_).
+    if (progress_bar_) {
+      const int completed_now = time_ - progress_origin_ + 1;
+      const int capped =
+          std::min(std::max(completed_now, 0), progress_span_);
+      if (completed_now % progress_update_frequency_ == 0 ||
+          completed_now == progress_span_) {
+        // Postfix must be set before set_progress: set_option does not redraw,
+        // but set_progress calls print_progress() which reads postfix_text.
+        progress_bar_->set_option(
+            indicators::option::PostfixText{
+                " (" + std::to_string(completed_now) + "/" +
+                std::to_string(progress_span_) + ")"});
+        progress_bar_->set_progress(IndicatorProgress(capped));
+      }
+    }
+
     time_++;
 
     if (want_kill_) {
@@ -80,10 +120,20 @@ void Timer::RunSim() {
     }
   }
 
-  // Finalize progress bar
+  // Finalize progress bar: leave the cursor on a new line. Only redraw if we
+  // did not already print 100% in the loop.
   if (progress_bar_) {
-    progress_bar_->Update(time_ - 1);  // Update to final time
-    progress_bar_->Clear();            // Clear the progress bar
+    const int completed_steps =
+        std::min(time_ - progress_origin_, progress_span_);
+    const int pc = std::max(completed_steps, 0);
+    if (pc < progress_span_) {
+      progress_bar_->set_option(
+          indicators::option::PostfixText{
+              " (" + std::to_string(pc) + "/" +
+              std::to_string(progress_span_) + ")"});
+      progress_bar_->set_progress(IndicatorProgress(pc));
+    }
+    std::cout << std::endl;
   }
 
   ctx_->NewDatum("Finish")
@@ -297,10 +347,7 @@ void Timer::Reset() {
   decom_queue_.clear();
   si_ = SimInfo(0);
 
-  if (progress_bar_) {
-    delete progress_bar_;
-    progress_bar_ = NULL;
-  }
+  progress_bar_.reset();
 }
 
 void Timer::Initialize(Context* ctx, SimInfo si) {
@@ -317,20 +364,18 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
     time_ = si.branch_time;
   }
 
-  // Initialize progress bar
-  if (progress_bar_) {
-    delete progress_bar_;
+  progress_origin_ = time_;
+  progress_span_ = std::max(si.duration - progress_origin_, 1);
+
+  progress_bar_.reset();
+  progress_update_frequency_ = ProgressUpdateFrequency(si.duration);
+  if (ProgressBarEnabled()) {
+    progress_bar_.reset(new indicators::ProgressBar{
+        indicators::option::BarWidth{50},
+        indicators::option::MaxProgress{IndicatorProgress(progress_span_)},
+        indicators::option::ShowPercentage{true},
+    });
   }
-  progress_bar_ = new ProgressBar(si.duration, 50, true, true);
-  // Set update frequency based on simulation duration
-  if (si.duration > 100) {
-    progress_bar_->SetUpdateFrequency(
-        10);  // Update every 10 timesteps for long simulations
-  } else if (si.duration > 20) {
-    progress_bar_->SetUpdateFrequency(
-        5);  // Update every 5 timesteps for medium simulations
-  }
-  // For short simulations, update every timestep (frequency = 1)
 }
 
 int Timer::dur() {
@@ -342,13 +387,11 @@ Timer::Timer()
       si_(0),
       want_snapshot_(false),
       want_kill_(false),
-      progress_bar_(NULL) {}
+      progress_bar_(nullptr),
+      progress_update_frequency_(1),
+      progress_origin_(0),
+      progress_span_(1) {}
 
-Timer::~Timer() {
-  if (progress_bar_ != NULL) {
-    delete progress_bar_;
-    progress_bar_ = NULL;
-  }
-}
+Timer::~Timer() {}
 
 }  // namespace cyclus
