@@ -100,7 +100,7 @@ class Facility : public TimeListener, public Agent, public Trader {
 
   /// facilities over write this method if a condition must be met
   /// before their destructors can be called
-  //virtual bool CheckDecommissionCondition(); MEG 
+  virtual bool CheckDecommissionCondition(); 
 
   /// every agent should be able to print a verbose description
   virtual std::string str();
@@ -126,6 +126,12 @@ class Facility : public TimeListener, public Agent, public Trader {
       CommodMap<Product>::type& commod_requests) {
     return std::set<BidPortfolio<Product>::Ptr>();
   }
+
+  virtual void EventRequest(){context()->RegisterRequesters(context()->time() + 1, this);}
+
+  virtual void Tock();
+
+  virtual void Tick();
 
   /// default implementation for material preferences.
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}

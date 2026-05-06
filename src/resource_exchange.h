@@ -67,10 +67,10 @@ template <class T> class ResourceExchange {
   inline ExchangeContext<T>& ex_ctx() { return ex_ctx_; }
 
   /// @brief queries traders and collects all requests for bids
-  void AddAllRequests() {
+  void AddAllRequests() { //MEG I think we should add the collect other commodity consumers of type a into the mix with this as well. Have some function below within init requesters 
     InitRequesters();
-    std::for_each(requesters_.begin(), //requesters_
-                  requesters_.end(), //requesters _
+    std::for_each(requesters_.begin(),
+                  requesters_.end(), 
                   std::bind(&cyclus::ResourceExchange<T>::AddRequests_,
                             this,
                             std::placeholders::_1));
@@ -111,27 +111,7 @@ template <class T> class ResourceExchange {
       }
     }
   }
-// MEG HAVE TO FIX THIS LINe SO THAT WE GET THE CORRECT ELEMMENT IN The MAP
-  // void InitRequesters() {
-  //   auto map = sim_ctx_->EventRequesters();
-  //   if(map.count(sim_ctx_->time())!=0){
-  //     std::set<Trader*> orig = map.at(sim_ctx_->time());
-  //     std::set<Trader*>::iterator it;
-  //     for (it = orig.begin(); it != orig.end(); ++it) {
-  //       requesters_.insert(*it);
-  //     } ;}
-  //     else {
-  //       return;
-  //     }
-  //   }
-    // if (requesters_.size() == 0) {
-    //   auto map = sim_ctx_->EventRequesters();
-    //   std::set<Trader*> orig = map.at(sim_ctx_->time());
-    //   std::set<Trader*>::iterator it;
-    //   for (it = orig.begin(); it != orig.end(); ++it) {
-    //     requesters_.insert(*it);
-    //   }
-    // }
+
   void InitRequesters() {
     auto map = sim_ctx_->EventRequesters();
     std::set<Trader*> orig = map.at(sim_ctx_->time());

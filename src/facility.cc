@@ -25,12 +25,16 @@ void Facility::InitFrom(Facility* m) {
 
 void Facility::Build(Agent* parent) {
   Agent::Build(parent);
+  if (lifetime() >= 0 && CheckDecommissionCondition() == NULL) { 
+    context()->SchedDecom(this, exit_time());
+  }
 }
 
 void Facility::EnterNotify() {
   Agent::EnterNotify();
   context()->RegisterTrader(dynamic_cast<Trader*>(this));
   context()->RegisterTimeListener(this);
+  // maybe have a context()->RegisterCommodityConsumer(this); 
 }
 
 std::string Facility::str() {
@@ -41,20 +45,26 @@ std::string Facility::str() {
 }
 
 void Facility::Decommission() {
-  if (!CheckDecommissionCondition()) { //MEG should be able to keep this 
+  if (!CheckDecommissionCondition()) { //check what happens w NULL
     throw Error("Cannot decommission " + prototype());
   }
 
   context()->UnregisterTrader(dynamic_cast<Trader*>(this));
-  //unregister requester 
   context()->UnregisterTimeListener(this);
   Agent::Decommission();
 }
 
-//MEG
-// bool Facility::CheckDecommissionCondition() {
-//   return true;
-// }
+bool Facility::CheckDecommissionCondition() {
+  return NULL;
+}
+
+void Facility::Tock(){
+  EventRequest();
+}
+
+void Facility::Tick(){
+  SetTraded(false);
+}
 
 Region* Facility::GetParentRegion(int layer) {
   return dynamic_cast<Region*>(GetAncestorOfKind("Region", layer));

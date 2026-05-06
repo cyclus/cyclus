@@ -80,9 +80,14 @@ class Trader {
 
   virtual void EventRequest(){} // MEG can be overridden 
   
+  bool Traded;
+
+  void SetTraded(bool status){Traded = status;}
+
+  bool ReturnTraded(){return Traded;}
+
  protected:
   Agent* manager_;
-
  private:
   /// @warning this function is hidden to prevent an invalid signature that can
   /// raise difficult to find bugs

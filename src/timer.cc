@@ -17,7 +17,6 @@
 namespace cyclus {
 
 void Timer::RunSim() {
-  auto start = std::chrono::high_resolution_clock::now();
   LogLevel saved_level = Logger::ReportLevel();
   if (quiet_) {
     // Set log level below LEV_ERROR (lowest level) to suppress all CLOG output
@@ -36,8 +35,8 @@ void Timer::RunSim() {
   ctx_->SchedPopulate(dur()+1); 
   build_queue_[dur()+1]; // find a better home 
   decom_queue_[dur()+1]; // find a better home 
+
   while (time_ < si_.duration) {
-    std::cout<<time_ <<"\n";
     CLOG(LEV_INFO1) << "Current time: " << time_;
     if (want_snapshot_) {
       want_snapshot_ = false;
@@ -54,7 +53,6 @@ void Timer::RunSim() {
     CLOG(LEV_INFO2) << "Beginning Decision for time: " << time_;
     DoDecision();
     DoDecom();
-    DoLookAhead();
 
 #ifdef CYCLUS_WITH_PYTHON
     EventLoop();
@@ -78,11 +76,6 @@ void Timer::RunSim() {
   if (quiet_) {
     Logger::SetReportLevel(saved_level);
   }
-  auto stop = std::chrono::high_resolution_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-
-  std::cout << "Time taken by function: "
-         << duration.count() << " microseconds" << std::endl;
 }
 
 void Timer::DoBuild() {
@@ -116,9 +109,7 @@ void Timer::DoTick() {
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
   auto reg_traders = ctx_->EventRequesters(); // MEG 
-  ctx_->Populate(time_);
   if(reg_traders.at(time_).size()>0){
-      std::cout<<"registered to trade " << reg_traders.at(time_).size() << "\n";
       matmgr->Execute();
       genmgr->Execute();
     }
@@ -144,6 +135,14 @@ void Timer::DoTock() {
       if (a->enter_time() != -1) {
         RecordInventories(a);
       }
+    }
+  }
+  auto reg_traders = ctx_->EventRequesters();
+  if(reg_traders.at(time_).size()>0){
+    ctx_->EventComplete(time_);
+
+    if(reg_traders.count(reg_traders.lower_bound(time_ +1)->first) == 0){ // 
+      ctx_->EventComplete(reg_traders.lower_bound(time_ + 1)->first);
     }
   }
 }
@@ -236,18 +235,6 @@ void Timer::UnregisterTimeListener(TimeListener* tl) {
         std::remove(cpp_tickers_.begin(), cpp_tickers_.end(), tl),
         cpp_tickers_.end());
   }
-}
-
-void Timer::DoLookAhead() {
-  ctx_->EventComplete(time_);
-  std::set<Trader*> all_traders = ctx_->traders();
-  for(Trader* m : all_traders){
-    m->EventRequest();
-  };
-  auto reg_traders = ctx_->EventRequesters();
-  if(reg_traders.count(time_+1) == 0){
-    ctx_->SchedPopulate(NextEvent()); 
-  };
 }
 
 int Timer::NextEvent(){
