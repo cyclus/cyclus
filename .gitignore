@@ -86,3 +86,15 @@ cyclus/cycpp.py
 # Rever
 rever/
 .vscode
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+pixi.lock
+pixi.toml
+
+#MEG build 
+lib/*
+include/*
+bin/*
+share/cyclus/*
+.gitattributes

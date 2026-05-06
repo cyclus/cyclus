@@ -19,7 +19,6 @@
 #include "pyhooks.h"
 #include "recorder.h"
 #include "package.h"
-//#include "timer.h" MEG
 
 // Defined as 4 seconds longer than a Gaussian year (to make division by 12
 // a round number)

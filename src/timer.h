@@ -50,8 +50,6 @@ class Timer {
   /// Agents should unregister from their Decommission method.
   void UnregisterTimeListener(TimeListener* tl);
 
-  void DoLookAhead();
-
   int NextEvent();
 
   /// Schedules the named prototype to be built for the specified parent at

@@ -44,13 +44,13 @@ void Institution::Decommission() {
   Agent::Decommission();
 }
 
-void Institution::Tock() { 
-  std::set<Agent*>::iterator it; 
+void Institution::Tock() {
+  std::set<Agent*>::iterator it;
   for (it = children().begin(); it != children().end(); ++it) {
     Agent* a = *it;
     if (a->lifetime() != -1 && context()->time() >= a->exit_time()) {
       Facility* fac = dynamic_cast<Facility*>(a);
-      if (fac == NULL || fac->CheckDecommissionCondition()) { // any faciilty without overwritten checkdecomcondition expects a NULL, only true will pass || 
+      if (fac == NULL || fac->CheckDecommissionCondition()) { // any facility without overwritten checkdecomcondition expects a NULL, only true will pass || 
         CLOG(LEV_INFO3) << a->prototype()
                         << " has reached the end of its lifetime";
         context()->SchedDecom(a);

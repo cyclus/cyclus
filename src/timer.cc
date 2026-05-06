@@ -108,7 +108,7 @@ void Timer::DoTick() {
 
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
-  auto reg_traders = ctx_->EventRequesters(); // MEG 
+  auto reg_traders = ctx_->EventRequesters();  
   if(reg_traders.at(time_).size()>0){
       matmgr->Execute();
       genmgr->Execute();
@@ -121,7 +121,6 @@ void Timer::DoTock() {
   }
 
 #pragma omp parallel for
-// change this so that it is just 
   for (size_t i = 0; i < cpp_tickers_.size(); ++i) {
     cpp_tickers_[i]->Tock();
   }
@@ -215,7 +214,7 @@ void Timer::DoDecom() {
     m->Decommission();
   }
 }
-// I want this to go every time event 
+
 void Timer::RegisterTimeListener(TimeListener* agent) {
   tickers_[agent->id()] = agent;
   if (agent->IsShim()) {
