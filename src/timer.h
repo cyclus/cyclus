@@ -108,7 +108,6 @@ class Timer {
   /// The current time, measured in months from when the simulation
   /// started.
   int time_;
-  int prev_time_;
   SimInfo si_;
 
   bool want_snapshot_;
