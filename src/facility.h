@@ -127,7 +127,8 @@ class Facility : public TimeListener, public Agent, public Trader {
     return std::set<BidPortfolio<Product>::Ptr>();
   }
 
-  virtual void EventRequest(){context()->RegisterRequesters(context()->time() + 1, this);}
+  // this is intended to be a default behavior should an archetype developer not invoke their own "EventRequest "
+  virtual void EventRequest(){context()->RegisterRequesters(context()->time() + 1, this);} 
 
   virtual void Tock();
 

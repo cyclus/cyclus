@@ -78,13 +78,13 @@ class Trader {
   virtual void AcceptProductTrades(
       const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {}
 
-  virtual void EventRequest(){} // MEG can be overridden 
+  virtual void EventRequest(){} // can be overridden ? 
   
-  bool Traded;
+  bool Traded; //follows DRE to assess whether trader completed trades
 
-  void SetTraded(bool status){Traded = status;}
+  void SetTraded(bool status){Traded = status;} //setter for Traded
 
-  bool ReturnTraded(){return Traded;}
+  bool ReturnTraded(){return Traded;} //getter for Traded 
 
  protected:
   Agent* manager_;

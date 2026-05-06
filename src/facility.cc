@@ -24,10 +24,13 @@ void Facility::InitFrom(Facility* m) {
 }
 
 void Facility::Build(Agent* parent) {
-  Agent::Build(parent);
+  Agent::Build(parent); 
+  //for agents WITHOUT the need for a checkdecom function, they can easily schedule decom at build (only reactor/separations use this right now)
   if (lifetime() >= 0 && CheckDecommissionCondition() == NULL) { 
     context()->SchedDecom(this, exit_time());
   }
+  //all agents who have been build should want to immediately trade 
+  EventRequest();
 }
 
 void Facility::EnterNotify() {
@@ -58,12 +61,12 @@ bool Facility::CheckDecommissionCondition() {
   return NULL;
 }
 
-void Facility::Tock(){
+void Facility::Tock(){ // archetype developers need to invoke this method in tock 
   EventRequest();
 }
 
 void Facility::Tick(){
-  SetTraded(false);
+  SetTraded(false); //archetype developers need to invoke this method in tick
 }
 
 Region* Facility::GetParentRegion(int layer) {

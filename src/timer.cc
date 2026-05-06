@@ -30,8 +30,10 @@ void Timer::RunSim() {
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
 
+  // following two lines are for primary initialization of "requesters" map in context
   ctx_->SchedPopulate(0);
   ctx_->Populate(0); //find better home for this line
+  //the following 3 lines are to add an upper limit to the 3 event maps
   ctx_->SchedPopulate(dur()+1); 
   build_queue_[dur()+1]; // find a better home 
   decom_queue_[dur()+1]; // find a better home 
@@ -238,7 +240,7 @@ void Timer::UnregisterTimeListener(TimeListener* tl) {
 
 int Timer::NextEvent(){
   auto reg_traders = ctx_->EventRequesters();
-  int t_p = time_ +1; // time plus +1 
+  int t_p = time_ +1;  
   std::vector<int> event_lists = {decom_queue_.lower_bound(t_p)->first,build_queue_.lower_bound(t_p)->first,
                                   reg_traders.lower_bound(t_p)->first};
   return *std::min_element(event_lists.begin(), event_lists.end());
