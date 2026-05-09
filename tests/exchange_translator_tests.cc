@@ -126,6 +126,102 @@ TEST(ExXlateTests, ZeroArcCost) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Erasing an entry from trader_arc_costs (the convention used in
+// AdjustMatlParams / AdjustProductParams to "remove this arc from the graph")
+// should cause the translator to skip arc creation for that (request, bid)
+// pair while leaving the request and bid themselves intact.
+TEST(ExXlateTests, ArcRemoval) {
+  TestContext tc;
+  TestFacility* trader = tc.trader();
+  RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
+  Request<Material>* req =
+      rp->AddRequest(get_mat(u235, qty), trader, "", 1.0);
+  BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
+  Bid<Material>* bid1 = bp->AddBid(req, get_mat(u235, qty), trader);
+  Bid<Material>* bid2 = bp->AddBid(req, get_mat(u235, qty), trader);
+
+  ExchangeContext<Material> ctx;
+  ctx.AddRequestPortfolio(rp);
+  ctx.AddBidPortfolio(bp);
+
+  // simulate a trader's AdjustMatlParams erasing bid1 to remove its arc
+  ctx.trader_arc_costs[trader][req].erase(bid1);
+
+  ExchangeTranslator<Material> xlator(&ctx);
+  ExchangeGraph::Ptr graph = xlator.Translate();
+
+  // bid2's arc survives, bid1's does not
+  EXPECT_EQ(1, graph->arcs().size());
+  EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid2],
+            graph->arcs()[0].vnode());
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Erasing an entire request entry from trader_arc_costs should remove every
+// arc on that request from the graph in one shot.
+TEST(ExXlateTests, FullRequestArcRemoval) {
+  TestContext tc;
+  TestFacility* trader = tc.trader();
+  RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
+  Request<Material>* req =
+      rp->AddRequest(get_mat(u235, qty), trader, "", 1.0);
+  BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
+  bp->AddBid(req, get_mat(u235, qty), trader);
+  bp->AddBid(req, get_mat(u235, qty), trader);
+  bp->AddBid(req, get_mat(u235, qty), trader);
+
+  ExchangeContext<Material> ctx;
+  ctx.AddRequestPortfolio(rp);
+  ctx.AddBidPortfolio(bp);
+
+  ctx.trader_arc_costs[trader].erase(req);
+
+  ExchangeTranslator<Material> xlator(&ctx);
+  ExchangeGraph::Ptr graph = xlator.Translate();
+
+  EXPECT_EQ(0, graph->arcs().size());
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Mutating the arc_cost value in trader_arc_costs (as AdjustMatlParams does)
+// should propagate through to Arc::ArcCost on the translated graph,
+// independently of unit_cost - unit_value.
+TEST(ExXlateTests, AdjustedArcCost) {
+  TestContext tc;
+  TestFacility* trader = tc.trader();
+  double unit_value = 4.5;
+  RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
+  Request<Material>* req =
+      rp->AddRequest(get_mat(u235, qty), trader, "", unit_value);
+  BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
+  Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
+
+  ExchangeContext<Material> ctx;
+  ctx.AddRequestPortfolio(rp);
+  ctx.AddBidPortfolio(bp);
+
+  // simulate adjustment overriding the arc cost with a value unrelated to
+  // unit_cost - unit_value
+  double override_cost = 99.5;
+  ctx.trader_arc_costs[trader][req][bid] = override_cost;
+
+  ExchangeTranslator<Material> xlator(&ctx);
+  ExchangeGraph::Ptr graph = xlator.Translate();
+
+  ASSERT_EQ(1, graph->arcs().size());
+  const Arc& a = graph->arcs()[0];
+  EXPECT_DOUBLE_EQ(override_cost, a.ArcCost());
+  // unit_cost / unit_value remain what the bid and request themselves report
+  EXPECT_DOUBLE_EQ(unit_value, a.get_unit_value());
+
+  // the per-node arc list (used by solvers) must agree with arcs_
+  const std::vector<Arc>& node_arcs =
+      graph->node_arc_map().at(a.unode());
+  ASSERT_EQ(1, node_arcs.size());
+  EXPECT_DOUBLE_EQ(override_cost, node_arcs[0].ArcCost());
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateCapacities) {
   Material::Ptr mat = get_mat(u235, qty);
 

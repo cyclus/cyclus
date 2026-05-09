@@ -55,7 +55,7 @@ void Predator::AdjustProductPrefs(
                                      << " removing " << n_drop << " bids "
                                      << " out of " << prefs[req].size();
   for (int i = 0; i != n_drop; i++) {
-    prefs[req][bids[i]] = -1;
+    prefs[req].erase(bids[i]);
   }
 }
 
