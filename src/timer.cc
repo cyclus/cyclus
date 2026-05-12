@@ -295,11 +295,11 @@ int Timer::CalcTimeDiff(int year, int month) {
 
   int timediff_ = 0;
   if (year >= 0) {
-    timediff_ += (year - si_.y0) * kMonthsPerYear;
+    timediff_ += (year - si_.y0) * cyclusYear;
   }
   
   if (month >= 0) {
-    timediff_ += month - si_.m0;
+    timediff_ += (month - si_.m0) * cyclusYear / kMonthsPerYear;
   }
 
   return timediff_;

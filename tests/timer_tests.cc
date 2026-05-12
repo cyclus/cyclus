@@ -129,27 +129,27 @@ TEST_P(TimerTestsFixture, TimeShiftTest) {
   EXPECT_EQ(exp, obs);
 
   obs = ti.CalcTimeDiff(2010, 2);
-  exp = 1;
+  exp = 1 * kDefaultTimeStepDur;
   EXPECT_EQ(exp, obs);
 
   obs = ti.CalcTimeDiff(2011,1);
-  exp = 12;
+  exp = 12 * kDefaultTimeStepDur;
   EXPECT_EQ(exp, obs);
 
   obs = ti.CalcTimeDiff(2011,5);
-  exp = 16;
+  exp = 16 * kDefaultTimeStepDur;
   EXPECT_EQ(exp, obs);
 
   obs = ti.CalcTimeDiff(2009,1);
-  exp = -12;
+  exp = -12 * kDefaultTimeStepDur;
   EXPECT_EQ(exp, obs);
 
   obs = ti.CalcTimeDiff(2009,11);
-  exp = -2;
+  exp = -2 * kDefaultTimeStepDur;
   EXPECT_EQ(exp, obs);
 
   obs = ti.CalcTimeDiff(2008,6);
-  exp = -19;
+  exp = -19 * kDefaultTimeStepDur;
   EXPECT_EQ(exp, obs);
 
 }
