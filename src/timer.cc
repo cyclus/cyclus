@@ -302,7 +302,8 @@ int Timer::CalcTimeDiff(int year, int month) {
     timediff_ += (month - si_.m0) * cyclusYear / kMonthsPerYear;
   }
 
-  return timediff_;
+  // Casting because ctx_->dt() is uint64_t and so negatives don't play nice
+  return static_cast<int>(timediff_ / static_cast<int64_t>(ctx_->dt()));
 
 }
 

@@ -129,27 +129,48 @@ TEST_P(TimerTestsFixture, TimeShiftTest) {
   EXPECT_EQ(exp, obs);
 
   obs = ti.CalcTimeDiff(2010, 2);
-  exp = 1 * kDefaultTimeStepDur;
+  exp = 1;
   EXPECT_EQ(exp, obs);
 
   obs = ti.CalcTimeDiff(2011,1);
-  exp = 12 * kDefaultTimeStepDur;
+  exp = 12;
   EXPECT_EQ(exp, obs);
 
   obs = ti.CalcTimeDiff(2011,5);
-  exp = 16 * kDefaultTimeStepDur;
+  exp = 16;
   EXPECT_EQ(exp, obs);
 
   obs = ti.CalcTimeDiff(2009,1);
-  exp = -12 * kDefaultTimeStepDur;
+  exp = -12;
   EXPECT_EQ(exp, obs);
 
   obs = ti.CalcTimeDiff(2009,11);
-  exp = -2 * kDefaultTimeStepDur;
+  exp = -2;
   EXPECT_EQ(exp, obs);
 
   obs = ti.CalcTimeDiff(2008,6);
-  exp = -19 * kDefaultTimeStepDur;
+  exp = -19;
+  EXPECT_EQ(exp, obs);
+
+
+  // Create and initialize a new timer with a non-default timestep
+  cyclus::Timer non_default_ti;
+  cyclus::Context ctx2(&non_default_ti, &rec);
+
+  non_default_ti.Initialize(&ctx2, cyclus::SimInfo(5, 2010, 1, "", 1));
+
+  obs = non_default_ti.CalcTimeDiff(2010, 8);
+  exp = 7 * kDefaultTimeStepDur / ctx2.dt();
+  EXPECT_EQ(exp, obs);
+
+    // Create and initialize a new timer with a weird non-default timestep
+  cyclus::Timer weird_non_default_ti;
+  cyclus::Context ctx3(&weird_non_default_ti, &rec);
+
+  non_default_ti.Initialize(&ctx3, cyclus::SimInfo(5, 2010, 1, "", 13));
+
+  obs = non_default_ti.CalcTimeDiff(2010, 8);
+  exp = 7 * kDefaultTimeStepDur / ctx3.dt();
   EXPECT_EQ(exp, obs);
 
 }
