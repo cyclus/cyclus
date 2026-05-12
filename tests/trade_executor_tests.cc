@@ -304,6 +304,7 @@ TEST_F(SelfTradingWarningTest, SelfTradingWarningIssued) {
   delete bid;
   delete req;
 }
+
 TEST_F(TradeExecutorDatabaseTests, WrapperFunctionAndBasicRecording) {
   
   double orig_pref = 3.14;
@@ -430,23 +431,3 @@ TEST_F(TradeExecutorDatabaseTests, MixedPreferenceScenarios) {
   delete bid_explicit;
   delete req;
 }
-
-// This test was a part of a previous iteration of Trade testing, but its not
-// clear if this throwing behavior is what we want. I'm leaving it here for now
-// in case it needs to be picked up again. MJG - 11/26/13
-// // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TEST(TradeTests, OfferThrow) {
-//   TestContext tc;
-
-//   Material::Ptr mat = get_mat();
-//   Receiver* r = new Receiver(tc.get(), mat);
-//   Request<Material>* req = Request<Material>::Create(mat, r);
-
-//   Sender* s = new Sender(tc.get(), true);
-//   Bid<Material>* bid = Bid<Material>::Create(req, mat, s);
-
-//   Trade<Material> trade(req, bid, mat->quantity());
-//   EXPECT_THROW(cyclus::ExecuteTrade(trade), cyclus::ValueError);
-//   delete s;
-//   delete r;
-// }
