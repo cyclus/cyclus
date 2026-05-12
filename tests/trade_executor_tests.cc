@@ -16,7 +16,6 @@
 #include "test_context.h"
 #include "test_agents/test_facility.h"
 #include "test_trader.h"
-#include "self_trading_test_facility.h"
 #include "trade.h"
 #include "trade_executor.h"
 #include "trader.h"
@@ -243,13 +242,13 @@ class SelfTradingWarningTest : public ::testing::Test {
 
     tc_ = std::make_unique<TestContext>();
     
-    facility_ = new SelfTradingTestFacility(tc_->get());
+    facility_ = new TestTrader(tc_->get());
     
     facility_->Build(nullptr);
     facility_->EnterNotify();
 
     // Create a second test facility
-    facility2_ = new SelfTradingTestFacility(tc_->get());
+    facility2_ = new TestTrader(tc_->get());
     facility2_->Build(nullptr);
     facility2_->EnterNotify();
     
@@ -268,8 +267,8 @@ class SelfTradingWarningTest : public ::testing::Test {
 
  protected:
   std::unique_ptr<TestContext> tc_;
-  SelfTradingTestFacility* facility_;
-  SelfTradingTestFacility* facility2_;
+  TestTrader* facility_;
+  TestTrader* facility2_;
   Material::Ptr test_mat_;
   
   // Test constants
