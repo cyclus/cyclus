@@ -61,6 +61,7 @@ void RunSim(std::string infile, SqliteBack* back) {
     l.LoadSim();
   }
   si.Init(&r, back);
+  si.timer()->SetQuiet(true);
   si.timer()->RunSim();
   r.Flush();
   PyStop();
@@ -130,6 +131,18 @@ TEST_P(IntegTestsFixture, CustomSeed) {
     QueryResult qr = back.Query("Info", NULL);
     EXPECT_EQ(20240101, qr.GetVal<int>("Seed"));
     EXPECT_EQ(1234, qr.GetVal<int>("Stride"));
+}
+
+TEST_P(IntegTestsFixture, RecipeCheck) {
+  {
+    SqliteBack back(":memory:");
+    // no_recipe.xml is identical to predator.xml minus the recipe block
+    try {
+      RunSim("no_recipe.xml", &back);
+    } catch (std::exception& ex) {
+      EXPECT_STREQ("Document failed schema validation", ex.what());
+    }
+  }
 }
 
 #if CYCLUS_IS_PARALLEL

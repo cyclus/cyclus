@@ -67,21 +67,22 @@ double ProgSolver::SolveGraph() {
     xlator.ToProg();
     if (mps_) WriteMPS();
 
-    // set noise level
+    // set noise level - respect quiet mode from timer if available
+    bool actually_verbose = verbose_ && !sim_ctx_->TimerIsQuiet();
     CoinMessageHandler h;
     h.setLogLevel(0);
-    if (verbose_) {
+    if (actually_verbose) {
       Report(iface_);
       h.setLogLevel(4);
     }
     iface_->passInMessageHandler(&h);
-    if (verbose_) {
+    if (actually_verbose) {
       std::cout << "Solving problem, message handler has log level of "
                 << iface_->messageHandler()->logLevel() << "\n";
     }
 
     // solve and back translate
-    SolveProg(iface_, greedy_obj, verbose_);
+    SolveProg(iface_, greedy_obj, actually_verbose);
 
     xlator.FromProg();
   } catch (...) {

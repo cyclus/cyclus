@@ -210,7 +210,7 @@
       </element>
     </oneOrMore>
 
-    <zeroOrMore>
+    <oneOrMore>
       <element name="recipe">
         <a:documentation>A material composition recipe that can be reused in other places in the simulation.</a:documentation>
         <interleave>
@@ -235,7 +235,7 @@
           </oneOrMore>
         </interleave>
       </element>
-    </zeroOrMore>
+    </oneOrMore>
 
     <zeroOrMore>
       <element name="package">

@@ -50,6 +50,7 @@ cyclus/system.py
 tests/libcyclus-orig.h5
 tests/libcyclus-orig.sqlite
 tests/libcyclus-test.h5
+tests/gen_db.h5
 tests/libcyclus-test.sqlite
 tests/dummy.json
 tests/dummy.h5

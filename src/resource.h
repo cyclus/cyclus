@@ -26,7 +26,8 @@ class Resource {
  public:
   typedef boost::shared_ptr<Resource> Ptr;
 
-  Resource() : state_id_(nextstate_id_++), obj_id_(nextobj_id_++) {}
+  Resource()
+      : state_id_(nextstate_id_++), unit_value_(0.0), obj_id_(nextobj_id_++) {}
 
   virtual ~Resource() {}
 
@@ -34,6 +35,12 @@ class Resource {
   /// to track and/or associate other information with this resource object.
   /// You should NOT track resources by pointer.
   const int obj_id() const { return obj_id_; }
+
+  /// Returns the unit value of this resource.
+  double UnitValue() const { return unit_value_; }
+
+  /// Sets the unit value of this resource.
+  void SetUnitValue(double unit_value) { unit_value_ = unit_value; }
 
   /// Returns the unique id corresponding to this resource and its current
   /// state.  All resource id's are unique - even across different resource
@@ -108,7 +115,12 @@ class Resource {
   /// restrictions, the remainder is left in the resource object.
   template <class T> std::vector<typename T::Ptr> Package(Package::Ptr pkg);
 
+ protected:
+  constexpr static double kUnsetUnitValue =
+      std::numeric_limits<double>::quiet_NaN();
+
  private:
+  double unit_value_;
   static int nextstate_id_;
   static int nextobj_id_;
   int state_id_;
