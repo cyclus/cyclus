@@ -26,6 +26,8 @@ const uint64_t cyclusYear = 31558200;
 
 const uint64_t kMonthsPerYear = 12;
 
+const uint64_t cyclusMonth = cyclusYear/kMonthsPerYear;
+
 const uint64_t kDefaultTimeStepDur = cyclusYear / kMonthsPerYear;
 
 const uint64_t kDefaultSeed = 20160212;

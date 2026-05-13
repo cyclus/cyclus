@@ -156,21 +156,25 @@ TEST_P(TimerTestsFixture, TimeShiftTest) {
   // Create and initialize a new timer with a non-default timestep
   cyclus::Timer non_default_ti;
   cyclus::Context ctx2(&non_default_ti, &rec);
+  cyclus::SimInfo short_timestep(5);
+  short_timestep.dt = 1;
 
-  non_default_ti.Initialize(&ctx2, cyclus::SimInfo(5, 2010, 1, "", 1));
+  non_default_ti.Initialize(&ctx2, short_timestep);
 
   obs = non_default_ti.CalcTimeDiff(2010, 8);
-  exp = 7 * kDefaultTimeStepDur / ctx2.dt();
+  exp = 7 * cyclusMonth / ctx2.dt();
   EXPECT_EQ(exp, obs);
 
     // Create and initialize a new timer with a weird non-default timestep
   cyclus::Timer weird_non_default_ti;
   cyclus::Context ctx3(&weird_non_default_ti, &rec);
+  cyclus::SimInfo weird_timestep(5);
+  weird_timestep.dt = 13;
 
-  non_default_ti.Initialize(&ctx3, cyclus::SimInfo(5, 2010, 1, "", 13));
+  weird_non_default_ti.Initialize(&ctx3, weird_timestep);
 
-  obs = non_default_ti.CalcTimeDiff(2010, 8);
-  exp = 7 * kDefaultTimeStepDur / ctx3.dt();
+  obs = weird_non_default_ti.CalcTimeDiff(2010, 8);
+  exp = 7 * cyclusMonth / ctx3.dt();
   EXPECT_EQ(exp, obs);
 
 }

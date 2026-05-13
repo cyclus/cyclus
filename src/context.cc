@@ -50,21 +50,6 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
       seed(kDefaultSeed),
       stride(kDefaultStride) {}
 
-SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, int timestep)
-    : duration(dur),
-      y0(y0),
-      m0(m0),
-      dt(timestep),
-      decay("manual"),
-      branch_time(-1),
-      handle(handle),
-      explicit_inventory(false),
-      explicit_inventory_compact(false),
-      parent_sim(boost::uuids::nil_uuid()),
-      parent_type("init"),
-      seed(kDefaultSeed),
-      stride(kDefaultStride) {}
-
 SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d)
     : duration(dur),
       y0(y0),
