@@ -26,9 +26,9 @@ const uint64_t cyclusYear = 31558200;
 
 const uint64_t kMonthsPerYear = 12;
 
-const uint64_t cyclusMonth = cyclusYear/kMonthsPerYear;
+const uint64_t cyclusMonth = cyclusYear / kMonthsPerYear;
 
-const uint64_t kDefaultTimeStepDur = cyclusYear / kMonthsPerYear;
+const uint64_t kDefaultTimeStepDur = cyclusMonth;
 
 const uint64_t kDefaultSeed = 20160212;
 
@@ -63,16 +63,6 @@ class SimInfo {
   /// @param handle is this simulation's unique simulation handle
   /// @return a SimInfo instance
   SimInfo(int dur, int y0 = 2010, int m0 = 1, std::string handle = "");
-
-  /// @brief constructs a SimInfo instance using some default variables
-  /// @param dur simulation duration in number of timesteps
-  /// @param y0 start year for the simulation
-  /// @param m0 start month for the simulation
-  /// @param handle is this simulation's unique simulation handle
-  /// @param timestep is the length of the timestep in seconds
-  /// @return a SimInfo instance
-  SimInfo(int dur, int y0, int m0, std::string handle, 
-          int timestep = kDefaultTimeStepDur);
 
   /// @brief constructs a SimInfo instance using no default variables
   /// @param dur simulation duration in number of timesteps
