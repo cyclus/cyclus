@@ -303,7 +303,7 @@ int Timer::CalcTimeDiff(int year, int month) {
   }
 
   // Casting because ctx_->dt() is uint64_t and so negatives don't play nice
-  return static_cast<int>(timediff_ / static_cast<int64_t>(ctx_->dt()));
+  return timediff_ / static_cast<int>(ctx_->dt());
 
 }
 
