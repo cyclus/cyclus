@@ -10,6 +10,7 @@
 #include "institution.h"
 #include "logger.h"
 #include "timer.h"
+#include "toolkit/scheduling_function.h"
 
 namespace cyclus {
 
@@ -30,7 +31,7 @@ void Facility::Build(Agent* parent) {
     context()->SchedDecom(this, exit_time());
   }
   //all agents who have been build should want to immediately trade 
-  EventRequest();
+  InitialTrade(); 
 }
 
 void Facility::EnterNotify() {
@@ -67,6 +68,30 @@ void Facility::Tock(){ // archetype developers need to invoke this method in toc
 
 void Facility::Tick(){
   SetTraded(false); //archetype developers need to invoke this method in tick
+}
+
+std::set<int> Facility::GetSchedulingTime(){ 
+  cyclus::toolkit::SchedulingFunctions sc(this); //not ideal.... this class instance will be made every tock... 
+  sc.FixIncSchedule(); //FixIncSchedule schedules like cyclus 1.6v 
+  std::set<int> EventTime = sc.EventTime();
+  sc.clear();
+  return EventTime;
+}
+
+void Facility::EventRequest(){
+  for(int i: GetSchedulingTime()){
+    context()->RegisterRequesters(i, this);
+    selftimes_.insert(i);
+  }
+}
+
+void Facility::InitialTrade(){
+  if(context()->time() ==0){
+    context()->RegisterRequesters(1,this); //if sim_tims (t=0) register for time =1
+  }
+  else if (context()->time()>0){ //if during sim_time >0 register for sim_time
+    context()->RegisterRequesters(context()->time(),this);
+  }
 }
 
 Region* Facility::GetParentRegion(int layer) {

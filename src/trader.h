@@ -80,7 +80,8 @@ class Trader {
 
   virtual void EventRequest(){} // can be overridden ? 
   
-  bool Traded; //follows DRE to assess whether trader completed trades
+  bool Traded; //follows DRE to assess whether trader completed trades; 
+  // archetype devs may want to use this to assess event scheduling
 
   void SetTraded(bool status){Traded = status;} //setter for Traded
 

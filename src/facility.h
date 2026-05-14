@@ -127,13 +127,30 @@ class Facility : public TimeListener, public Agent, public Trader {
     return std::set<BidPortfolio<Product>::Ptr>();
   }
 
-  // this is intended to be a default behavior should an archetype developer not invoke their own "EventRequest "
-  virtual void EventRequest(){context()->RegisterRequesters(context()->time() + 1, this);} 
+  virtual void EventRequest(); //maybe an archetype dev will want to replace this
+
+  // this is intended to be a default behavior should an archetype developer not invoke their own "Scheduling Function "
+  virtual std::set<int> GetSchedulingTime(); 
+  //within cycamore
+  // std::set<int> GetSchedulingTime(){
+  // cyclus::toolkit::SchedulingFuncs sc(this);
+  // std::set<int> scheduletime = sc.<chosen function>();};
+  // sc.clear() //(for next schedule time)
+  // return scheduletime;
+  //}
+
+  void InitialTrade();
 
   virtual void Tock();
 
   virtual void Tick();
 
+  //return all future events scheduled for some facility (this function is useful for deregistration context()->DeregisterRequesters(--)
+  // purposes and for archetype developer scheduled facility behavior)
+  const std::set<int>& GetFutureEvents() const {
+    return selftimes_;
+  }
+  
   /// default implementation for material preferences.
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
 
@@ -200,6 +217,10 @@ class Facility : public TimeListener, public Agent, public Trader {
   /// @brief Returns all parent facilities by traversing up the hierarchy
   /// @return Vector of all parent facilities, ordered from closest to farthest
   std::vector<Facility*> GetAllParentFacilities();
+
+
+  private: 
+  std::set<int> selftimes_;
 };
 
 }  // namespace cyclus

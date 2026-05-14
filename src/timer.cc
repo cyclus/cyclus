@@ -110,7 +110,7 @@ void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
   auto reg_traders = ctx_->EventRequesters();  
   //still unclear: do decom events require secondary registration for trades? 
-  if(reg_traders.at(time_).size()>0){
+  if(reg_traders[time_].size()>0){
       matmgr->Execute();
       genmgr->Execute();
     }
@@ -139,7 +139,7 @@ void Timer::DoTock() {
     }
   }
   auto reg_traders = ctx_->EventRequesters();
-  if(reg_traders.at(time_).size()>0){
+  if(reg_traders[time_].size()>0){
     ctx_->EventComplete(time_); //to dereference some pointers, maybe applied to build/decom maps too
 
     if(reg_traders.count(reg_traders.lower_bound(time_ +1)->first) == 0){ 
