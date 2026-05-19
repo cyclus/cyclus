@@ -207,7 +207,11 @@ void Material::Decay(int curr_time) {
     return;
   }
 
-  double eps = 1e-3;
+  // eps_decay defined such that tritium (12.32 yr half life) decays over 1 day
+  // NOTE: If in the future something like support for medical isotopes is
+  // wanted, change this value and the MaterialTest.DecaySmallAmounts test 
+  // accordingly.
+  double eps_decay = 1e-4;
   const CompMap c = comp_->atom();
 
   // If composition has too many nuclides (i.e. > 100), it is cheaper to
@@ -221,8 +225,8 @@ void Material::Decay(int curr_time) {
 
   if (!decay) {
     // Only do the decay calc if one of the nuclides would change in number
-    // density more than fraction eps.
-    // i.e. decay if   (1 - eps) > exp(-lambda*dt)
+    // density more than fraction eps_decay.
+    // i.e. decay if   (1 - eps_decay) > exp(-lambda*dt)
     CompMap::const_reverse_iterator it;
     for (it = c.rbegin(); it != c.rend(); ++it) {
       int nuc = it->first;
@@ -230,7 +234,7 @@ void Material::Decay(int curr_time) {
           pyne::decay_const(nuc) * static_cast<double>(secs_per_timestep);
       double change =
           1.0 - std::exp(-lambda_timesteps * static_cast<double>(dt));
-      if (change >= eps) {
+      if (change >= eps_decay) {
         decay = true;
         break;
       }

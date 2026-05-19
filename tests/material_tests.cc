@@ -440,6 +440,31 @@ TEST_F(MaterialTest, DecayHeatTest) {
   ASSERT_NEAR(3.614E-14 , dec_heat, 0.0005);
 }
 
+TEST_F(MaterialTest, DecaySmallAmount) {
+  // eps_decay is defined such that tritium can decay on a 1 day time step
+  const int tritium_id = 10030000;
+  const double qty = 1; //kg, NOTE: fractional amounts all that matter 
+
+  CompMap v;
+  v[tritium_id] = 1.0;
+  Composition::Ptr tritium_comp = Composition::CreateFromMass(v);
+
+  Material::Ptr tritium = Material::Create(fac_day_timestep, qty, tritium_comp);
+
+  cyclus::toolkit::MatQuery mq(tritium);
+  double start_qty = mq.mass(tritium_id);
+  EXPECT_EQ(qty, start_qty);
+
+  // Decay forward by one day (we use the one day time step facility)
+  tritium->Decay(1);
+  double decayed_qty = mq.mass(tritium_id);
+
+  // NOTE: we've already tested that Decay is decaying the correct amt, so we
+  // can just make sure that any decay happens here and be satisfied that it's
+  // correct.
+  EXPECT_LT(decayed_qty, start_qty); // First entry < second enty
+}
+
 TEST_F(MaterialTest, GetNormalizedCompAtom) {
   double val = 1.5 * units::kg;
   Material::Ptr m1 = Material::CreateUntracked(val, diff_comp_);
