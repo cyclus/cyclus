@@ -183,17 +183,68 @@ class Context {
   /// @return the current set of traders registered for resource exchange.
   inline const std::set<Trader*>& traders() const { return traders_; }
 
-  inline void RegisterRequesters(int time, Trader* e) {request_queue_[time].insert(e); } //conditions to register an event is up to archetype dev
+  ////////////////////////////////////////////////////////// discrete cyclus functions ///////////////////
+
+  inline void RegisterCommodityConsumer(std::string in_commod, Trader* e){commodity_consumers_[in_commod].insert(e);}
+
+  void UnregisterCommodityConsumer(std::set<std::string> in_commods, Trader* e);
+
+  inline const std::map<std::string, std::set<Trader*>>& consumers() const {return commodity_consumers_;}
+
+
+  void RegisterCommoditiesTraded(int t, std::set<std::string> trade_commods);
+
+  std::set<std::string>& CommoditiesTraded(int t) {std::cout << "CTX REGISTER: " << this << "\n"; return commodities_traded_.at(t);}
+
+void test(int commod)
+{
+    testing.insert(std::move(commod));
+}
+
+inline const std::set<int>& GetTest() const
+{
+    return testing;
+}
+
+// void test(int commod)
+// {
+//     testing = commod;
+// }
+
+// inline int& GetTest()
+// {
+//     return testing;
+// }
+
+void stringtest(const std::string& commod)
+{
+    stringtesting = commod;
+}
+
+inline const std::string& GetStringTest() const
+{
+    return stringtesting;
+}
+
+  inline void RegisterRequesters(int time, Trader* e) {
+    std::cout<<"iam requesting \n" ; request_queue_[time].insert(e);
+  } //conditions to register an event is up to archetype dev
 
   inline void EventComplete(int t) {request_queue_.erase(t);} // fit this so it purges any 0 entries as well as the most current completed event ! 
 
-  inline const std::map<int, std::set<Trader*>>& EventRequesters() const { return request_queue_; }
+  inline const std::set<Trader*>& EventRequesters(int t) const {std::cout << "CTX REGISTER: " << this << "\n"; return request_queue_.at(t); }
+  
+  inline const std::map<int,std::set<Trader*>>& EventTimeline() const { return request_queue_; }
+
+  //// currently unused 
 
   inline void Populate(int t) {if (pop_sched_.count(t)>0){request_queue_.at(t) = traders();};}  //there are more use cases for this 
 
   inline void SchedPopulate(int next_event) {pop_sched_.insert(next_event); request_queue_[next_event];} // there are more use cases for this
 
-  inline void DeregisterRequesters(int time, Trader* e) {request_queue_[time].erase(e);} //conditions to deregister an event is up to archetype dev
+  inline void DeregisterRequesters(int time, Trader* e) {request_queue_.at(time).erase(e);} //conditions to deregister an event is up to archetype dev
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /// Create a new agent by cloning the named prototype. The returned agent is
   /// not initialized as a simulation participant.
@@ -382,10 +433,16 @@ class Context {
   std::map<std::string, TransportUnit::Ptr> transport_units_;
   std::set<Agent*> agent_list_;
   std::set<Trader*> traders_;
+
   std::map<int, std::set<Trader*>> request_queue_;
+  std::map<std::string, std::set<Trader*>> commodity_consumers_;
+  std::map<int,std::set<std::string>> commodities_traded_;
+  std::set<int> pop_sched_;
+  std::set<int> testing;
+  std::string stringtesting;
+
   std::map<std::string, int> n_prototypes_;
   std::map<std::string, int> n_specs_;
-  std::set<int> pop_sched_;
   SimInfo si_;
   Timer* ti_;
   ExchangeSolver* solver_;

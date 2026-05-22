@@ -10,11 +10,12 @@
 #include "institution.h"
 #include "logger.h"
 #include "timer.h"
-#include "toolkit/scheduling_function.h"
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace cyclus {
 
-Facility::Facility(Context* ctx) : Trader(this), Agent(ctx) {
+Facility::Facility(Context* ctx) : Trader(this), Agent(ctx), schedule_helper_(this) {
   kind_ = std::string("Facility");
 }
 
@@ -26,19 +27,37 @@ void Facility::InitFrom(Facility* m) {
 
 void Facility::Build(Agent* parent) {
   Agent::Build(parent); 
-  //for agents WITHOUT the need for a checkdecom function, they can easily schedule decom at build (only reactor/separations use this right now)
-  if (lifetime() >= 0 && CheckDecommissionCondition() == NULL) { 
-    context()->SchedDecom(this, exit_time());
+  //for agents WITHOUT the need for a checkdecom status, they can easily schedule decom at build (only reactor/separations use this right now)
+  // if (lifetime() >= 0 && CheckDecommissionCondition() == NULL) { 
+  //   context()->SchedDecom(this, exit_time());
+  // }
+  for (auto& requests: GetMatlRequests()) {
+    if(requests){
+      for(auto& request : requests->requests()) {
+  // //hopefully this is a dry run with no impact on DRE (ie adding porfolios)
+      std::string commodity = request->commodity();
+      context()->RegisterCommodityConsumer(commodity,this);
+      FillInCommods(1); //("commodity"); //any repeats should be
+      std::cout<<commodity<< "\n\n\n";
+      context()->test(17);
+      context()->stringtest("velma");
+      }
+    }
   }
-  //all agents who have been build should want to immediately trade 
-  InitialTrade(); 
+  std::cout<< GetInCommods().size()<<"in fac the incommods in trader is \n\n\n";
+  std::cout<<context()->GetStringTest()<<"getting string test in build \n\n\n";
+  context()->RegisterCommoditiesTraded(context()->time(), {"spent_uox"});//GetInCommods());
+  std::cout<<(context()->CommoditiesTraded(0)).size()<<"commodities traded in f\n";
+  std::cout<<context()<<"commodity size for fac \n";
 }
 
 void Facility::EnterNotify() {
   Agent::EnterNotify();
+    std::cout<<context()<<"commodity size for fac \n";
   context()->RegisterTrader(dynamic_cast<Trader*>(this));
   context()->RegisterTimeListener(this);
-  // maybe have a context()->RegisterCommodityConsumer(this); 
+  schedule_helper_.InitialTrade(); 
+  //all agents who have been build should want to immediately trade 
 }
 
 std::string Facility::str() {
@@ -55,6 +74,8 @@ void Facility::Decommission() {
 
   context()->UnregisterTrader(dynamic_cast<Trader*>(this));
   context()->UnregisterTimeListener(this);
+  //context()->UnregisterCommodityConsumer(in_commods_,this);
+
   Agent::Decommission();
 }
 
@@ -67,31 +88,17 @@ void Facility::Tock(){ // archetype developers need to invoke this method in toc
 }
 
 void Facility::Tick(){
+  //std::cout<<(context()->GetTest()).size()<<"\n\n";
+  std::cout<<context()->GetStringTest()<<"getting string test \n\n\n";
+  std::cout<< GetInCommods().size()<<"in fac tick the incommods in trader is \n\n\n";
   SetTraded(false); //archetype developers need to invoke this method in tick
 }
 
-std::set<int> Facility::GetSchedulingTime(){ 
-  cyclus::toolkit::SchedulingFunctions sc(this); //not ideal.... this class instance will be made every tock... 
-  sc.FixIncSchedule(); //FixIncSchedule schedules like cyclus 1.6v 
-  std::set<int> EventTime = sc.EventTime();
-  sc.clear();
-  return EventTime;
-}
-
 void Facility::EventRequest(){
-  for(int i: GetSchedulingTime()){
-    context()->RegisterRequesters(i, this);
-    selftimes_.insert(i);
-  }
-}
-
-void Facility::InitialTrade(){
-  if(context()->time() ==0){
-    context()->RegisterRequesters(1,this); //if sim_tims (t=0) register for time =1
-  }
-  else if (context()->time()>0){ //if during sim_time >0 register for sim_time
-    context()->RegisterRequesters(context()->time(),this);
-  }
+  // schedule_helper_.FixIncSchedule(); //FixIncSchedule schedules like cyclus 1.6v 
+  // for(int i: schedule_helper_.EventTime()){ //probably needed in future... 
+  //   selftimes_.insert(i);
+  // }
 }
 
 Region* Facility::GetParentRegion(int layer) {

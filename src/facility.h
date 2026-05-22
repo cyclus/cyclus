@@ -8,6 +8,7 @@
 #include "agent.h"
 #include "time_listener.h"
 #include "trader.h"
+#include "toolkit/scheduling_function.h"
 
 namespace cyclus {
 
@@ -128,29 +129,25 @@ class Facility : public TimeListener, public Agent, public Trader {
   }
 
   virtual void EventRequest(); //maybe an archetype dev will want to replace this
-
   // this is intended to be a default behavior should an archetype developer not invoke their own "Scheduling Function "
-  virtual std::set<int> GetSchedulingTime(); 
   //within cycamore
-  // std::set<int> GetSchedulingTime(){
-  // cyclus::toolkit::SchedulingFuncs sc(this);
-  // std::set<int> scheduletime = sc.<chosen function>();};
-  // sc.clear() //(for next schedule time)
-  // return scheduletime;
+  // void EventRequest(){
+  //schedule_helper_.<chosen function>(args);;
+  // or more directly schedule_helper.schedule(time,commods)
   //}
-
-  void InitialTrade();
 
   virtual void Tock();
 
   virtual void Tick();
 
+  // inline const std::set<std::string>& GetInCommods() const {return in_commods_;}
+
   //return all future events scheduled for some facility (this function is useful for deregistration context()->DeregisterRequesters(--)
   // purposes and for archetype developer scheduled facility behavior)
-  const std::set<int>& GetFutureEvents() const {
+  inline const std::set<int>& GetFutureEvents() const {
     return selftimes_;
   }
-  
+
   /// default implementation for material preferences.
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
 
@@ -221,6 +218,8 @@ class Facility : public TimeListener, public Agent, public Trader {
 
   private: 
   std::set<int> selftimes_;
+  // std::set<std::string> in_commods_;
+  toolkit::SchedulingFunctions schedule_helper_;
 };
 
 }  // namespace cyclus

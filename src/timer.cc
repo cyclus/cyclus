@@ -89,7 +89,6 @@ void Timer::DoBuild() {
     if (parent != NULL) {
       parent->BuildNotify(m);
     } else {
-      CLOG(LEV_DEBUG1) << "Hey! Listen! Built an Agent without a Parent.";
     }
   }
 }
@@ -108,9 +107,16 @@ void Timer::DoTick() {
 
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
-  auto reg_traders = ctx_->EventRequesters();  
+  auto reg_traders = ctx_->EventRequesters(time_);  
+  std::cout <<"TESTING:"<< (ctx_->GetTest()).size()<<"\n\n\n\n";
+  std::cout <<"TESTING string:"<< (ctx_->GetStringTest())<<"\n\n\n\n";
+  for (auto& trader : reg_traders){
+    std::cout<< (trader->GetInCommods()).size()<<"\n\n\n";
+  }
+  std::cout<<reg_traders.size()<<"reg traders size \n\n\n";
+  std::cout <<"HERE n SHIT"<< (ctx_->CommoditiesTraded(0)).size()<<"\n\n\n\n";
   //still unclear: do decom events require secondary registration for trades? 
-  if(reg_traders[time_].size()>0){
+  if(reg_traders.size()>0){
       matmgr->Execute();
       genmgr->Execute();
     }
@@ -138,7 +144,7 @@ void Timer::DoTock() {
       }
     }
   }
-  auto reg_traders = ctx_->EventRequesters();
+  auto reg_traders = ctx_->EventTimeline();
   if(reg_traders[time_].size()>0){
     ctx_->EventComplete(time_); //to dereference some pointers, maybe applied to build/decom maps too
 
@@ -243,7 +249,7 @@ void Timer::UnregisterTimeListener(TimeListener* tl) {
 }
 
 int Timer::NextEvent(){
-  auto reg_traders = ctx_->EventRequesters();
+  auto reg_traders = ctx_->EventTimeline();
   int t_p = time_ +1;  
   std::vector<int> event_lists = {decom_queue_.lower_bound(t_p)->first,build_queue_.lower_bound(t_p)->first,
                                   reg_traders.lower_bound(t_p)->first};

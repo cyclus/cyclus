@@ -113,13 +113,22 @@ template <class T> class ResourceExchange {
   }
 
   void InitRequesters() {
-    auto map = sim_ctx_->EventRequesters();
-    std::set<Trader*> orig = map.at(sim_ctx_->time());
+    auto orig = InitRequestersAdjacent(); //we do not need the whole ass map tbh. 
     std::set<Trader*>::iterator it;
     for (it = orig.begin(); it != orig.end(); ++it) {
       requesters_.insert(*it);
     } 
-    }
+  }
+  
+  std::set<Trader*> InitRequestersAdjacent() { 
+    std::set<Trader*> traders;
+    // auto commod_map = sim_ctx_->consumers(); 
+    // auto map2 = sim_ctx_->CommoditiesTraded(sim_ctx_->time());
+    // for (std::string commods : map2){
+    //   traders.merge(commod_map[commods]);
+    // }
+    return traders;
+  }
 
   /// @brief queries a given facility agent for
   void AddRequests_(Trader* t) {

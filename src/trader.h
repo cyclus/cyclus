@@ -87,8 +87,14 @@ class Trader {
 
   bool ReturnTraded(){return Traded;} //getter for Traded 
 
- protected:
+  void FillInCommods(int commod){std::cout<< "here in trader FillCommods:"; in_commods_.insert(commod);}
+
+  std::set<int> GetInCommods() {return in_commods_;}
+  std::set<int> in_commods_;
+
+  protected:
   Agent* manager_;
+
  private:
   /// @warning this function is hidden to prevent an invalid signature that can
   /// raise difficult to find bugs
