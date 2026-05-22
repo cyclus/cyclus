@@ -208,9 +208,6 @@ void Material::Decay(int curr_time) {
   }
 
   // eps_decay defined such that tritium (12.32 yr half life) decays over 1 day
-  // NOTE: If in the future something like support for medical isotopes is
-  // wanted, change this value and the MaterialTest.DecaySmallAmounts test 
-  // accordingly.
   double eps_decay = 1e-4;
   const CompMap c = comp_->atom();
 

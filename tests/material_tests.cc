@@ -338,7 +338,7 @@ TEST_F(MaterialTest, DecayShortcut) {
 
   double sec_per_month = 2629152;
   double u235_lambda = pyne::decay_const(u235) * sec_per_month;  // per month
-  double eps = 1e-3;
+  double eps = 1e-4;
   double threshold = -1 * std::log(1-eps) / u235_lambda;
 
   // If delta t is small w.r.t. composition's decay constants, no decay is
