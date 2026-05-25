@@ -29,8 +29,7 @@ void BuildingManager::SetUp_(OsiCbcSolverInterface& iface,
                              ProgTranslatorContext& ctx,
                              std::map<CommodityProducer*, Builder*>& p_to_b,
                              std::map<int, CommodityProducer*>& idx_to_p,
-                             Commodity& commodity,
-                             double demand) {
+                             Commodity& commodity, double demand) {
   CoinPackedVector caps;
   std::set<Builder*>::iterator bit;
   std::set<CommodityProducer*>::iterator pit;

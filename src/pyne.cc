@@ -9411,8 +9411,7 @@ int pyne::id_from_level(int nuc, double level, std::string special) {
   // by default return input nuc_id with level stripped
   int ret_id = nuc;
   for (std::map<std::pair<int, double>, level_data>::iterator it = nuc_lower;
-       it != nuc_upper;
-       ++it) {
+       it != nuc_upper; ++it) {
     if ((std::abs(level - it->second.level) < minv) &&
         ((char)it->second.special == special.c_str()[0]) &&
         !isnan(it->second.level)) {
@@ -9447,8 +9446,7 @@ int pyne::metastable_id(int nuc, int m) {
   nuc_upper =
       level_data_lvl_map.upper_bound(std::make_pair(nostate + 9999, DBL_MAX));
   for (std::map<std::pair<int, double>, level_data>::iterator it = nuc_lower;
-       it != nuc_upper;
-       ++it) {
+       it != nuc_upper; ++it) {
     if (it->second.metastable == m) return it->second.nuc_id;
   }
 
@@ -10808,8 +10806,7 @@ Reader::Reader() : features_(Features::all()) {}
 
 Reader::Reader(const Features &features) : features_(features) {}
 
-bool Reader::parse(const std::string &document,
-                   Value &root,
+bool Reader::parse(const std::string &document, Value &root,
                    bool collectComments) {
   document_ = document;
   const char *begin = document_.c_str();
@@ -11039,8 +11036,7 @@ bool Reader::readComment() {
   return true;
 }
 
-void Reader::addComment(Location begin,
-                        Location end,
+void Reader::addComment(Location begin, Location end,
                         CommentPlacement placement) {
   assert(collectComments_);
   if (placement == commentAfterOnSameLine) {
@@ -11296,10 +11292,8 @@ bool Reader::decodeString(Token &token, std::string &decoded) {
   return true;
 }
 
-bool Reader::decodeUnicodeCodePoint(Token &token,
-                                    Location &current,
-                                    Location end,
-                                    unsigned int &unicode) {
+bool Reader::decodeUnicodeCodePoint(Token &token, Location &current,
+                                    Location end, unsigned int &unicode) {
   if (!decodeUnicodeEscapeSequence(token, current, end, unicode)) return false;
   if (unicode >= 0xD800 && unicode <= 0xDBFF) {
     // surrogate pairs
@@ -11322,10 +11316,8 @@ bool Reader::decodeUnicodeCodePoint(Token &token,
   return true;
 }
 
-bool Reader::decodeUnicodeEscapeSequence(Token &token,
-                                         Location &current,
-                                         Location end,
-                                         unsigned int &unicode) {
+bool Reader::decodeUnicodeEscapeSequence(Token &token, Location &current,
+                                         Location end, unsigned int &unicode) {
   if (end - current < 4)
     return addError(
         "Bad unicode escape sequence in string: four digits expected.", token,
@@ -11348,8 +11340,7 @@ bool Reader::decodeUnicodeEscapeSequence(Token &token,
   return true;
 }
 
-bool Reader::addError(const std::string &message,
-                      Token &token,
+bool Reader::addError(const std::string &message, Token &token,
                       Location extra) {
   ErrorInfo info;
   info.token_ = token;
@@ -11371,8 +11362,7 @@ bool Reader::recoverFromError(TokenType skipUntilToken) {
   return false;
 }
 
-bool Reader::addErrorAndRecover(const std::string &message,
-                                Token &token,
+bool Reader::addErrorAndRecover(const std::string &message, Token &token,
                                 TokenType skipUntilToken) {
   addError(message, token);
   return recoverFromError(skipUntilToken);
@@ -11387,8 +11377,7 @@ Reader::Char Reader::getNextChar() {
   return *current_++;
 }
 
-void Reader::getLocationLineAndColumn(Location location,
-                                      int &line,
+void Reader::getLocationLineAndColumn(Location location, int &line,
                                       int &column) const {
   Location current = begin_;
   Location lastLineStart = current;
@@ -11425,8 +11414,7 @@ std::string Reader::getFormatedErrorMessages() const {
 std::string Reader::getFormattedErrorMessages() const {
   std::string formattedMessage;
   for (Errors::const_iterator itError = errors_.begin();
-       itError != errors_.end();
-       ++itError) {
+       itError != errors_.end(); ++itError) {
     const ErrorInfo &error = *itError;
     formattedMessage +=
         "* " + getLocationLineAndColumn(error.token_.start_) + "\n";
@@ -13161,12 +13149,9 @@ PathArgument::PathArgument(const std::string &key)
 // class Path
 // //////////////////////////////////////////////////////////////////
 
-Path::Path(const std::string &path,
-           const PathArgument &a1,
-           const PathArgument &a2,
-           const PathArgument &a3,
-           const PathArgument &a4,
-           const PathArgument &a5) {
+Path::Path(const std::string &path, const PathArgument &a1,
+           const PathArgument &a2, const PathArgument &a3,
+           const PathArgument &a4, const PathArgument &a5) {
   InArgs in;
   in.push_back(&a1);
   in.push_back(&a2);
@@ -13206,8 +13191,7 @@ void Path::makePath(const std::string &path, const InArgs &in) {
   }
 }
 
-void Path::addPathInArg(const std::string &path,
-                        const InArgs &in,
+void Path::addPathInArg(const std::string &path, const InArgs &in,
                         InArgs::const_iterator &itInArg,
                         PathArgument::Kind kind) {
   if (itInArg == in.end()) {
@@ -13993,14 +13977,10 @@ THE SOFTWARE.
 
 namespace Json {
 
-CustomWriter::CustomWriter(std::string opencurly,
-                           std::string closecurly,
-                           std::string opensquare,
-                           std::string closesquare,
-                           std::string colon,
-                           std::string comma,
-                           std::string indent,
-                           int maxWidth)
+CustomWriter::CustomWriter(std::string opencurly, std::string closecurly,
+                           std::string opensquare, std::string closesquare,
+                           std::string colon, std::string comma,
+                           std::string indent, int maxWidth)
     : opencurly_(opencurly),
       closecurly_(closecurly),
       opensquare_(opensquare),

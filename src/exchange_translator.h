@@ -154,8 +154,7 @@ RequestGroup::Ptr TranslateRequestPortfolio(
   for (r_it = rp->requests().begin(); r_it != rp->requests().end(); ++r_it) {
     Request<T>* r = *r_it;
     ExchangeNode::Ptr n(new ExchangeNode(r->target()->quantity(),
-                                         r->exclusive(),
-                                         r->commodity(),
+                                         r->exclusive(), r->commodity(),
                                          r->requester()->manager()->id()));
     rs->AddExchangeNode(n);
 
@@ -186,8 +185,7 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
   typename std::set<Bid<T>*>::const_iterator b_it;
   for (b_it = bp->bids().begin(); b_it != bp->bids().end(); ++b_it) {
     Bid<T>* b = *b_it;
-    ExchangeNode::Ptr n(new ExchangeNode(b->offer()->quantity(),
-                                         b->exclusive(),
+    ExchangeNode::Ptr n(new ExchangeNode(b->offer()->quantity(), b->exclusive(),
                                          b->request()->commodity(),
                                          b->bidder()->manager()->id()));
     bs->AddExchangeNode(n);
@@ -263,8 +261,7 @@ Trade<T> BackTranslateMatch(
 template <typename T>
 void TranslateCapacities(typename T::Ptr offer,
                          const typename std::set<CapacityConstraint<T>>& constr,
-                         ExchangeNode::Ptr n,
-                         const Arc& a,
+                         ExchangeNode::Ptr n, const Arc& a,
                          const ExchangeTranslationContext<T>& ctx) {
   typename std::set<CapacityConstraint<T>>::const_iterator it;
   for (it = constr.begin(); it != constr.end(); ++it) {

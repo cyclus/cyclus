@@ -175,9 +175,9 @@ struct delimiters<::std::tr1::unordered_set<T, THash, TEqual, TAllocator>,
 };
 
 template <typename T, typename THash, typename TEqual, typename TAllocator>
-const delimiters_values<char>
-    delimiters<::std::tr1::unordered_set<T, THash, TEqual, TAllocator>,
-               char>::values = {"{", ", ", "}"};
+const delimiters_values<char> delimiters<
+    ::std::tr1::unordered_set<T, THash, TEqual, TAllocator>, char>::values = {
+    "{", ", ", "}"};
 
 template <typename T, typename THash, typename TEqual, typename TAllocator>
 struct delimiters<::std::tr1::unordered_set<T, THash, TEqual, TAllocator>,
@@ -261,8 +261,7 @@ template <typename T, size_t N> const T *end(const T (&x)[N]) {
 // Functor to print containers. You can use this directly if you want to
 // specificy a non-default delimiters type.
 
-template <typename T,
-          typename TChar = char,
+template <typename T, typename TChar = char,
           typename TCharTraits = ::std::char_traits<TChar>,
           typename TDelimiters = delimiters<T, TChar>>
 struct print_container_helper {
@@ -311,17 +310,12 @@ struct custom_delims_wrapper : public custom_delims_base {
   custom_delims_wrapper(const T &t_) : t(t_) {}
 
   ::std::ostream &stream(::std::ostream &s) {
-    return s << ::pretty_print::print_container_helper<T,
-                                                       char,
-                                                       ::std::char_traits<char>,
-                                                       Delims>(t);
+    return s << ::pretty_print::print_container_helper<
+               T, char, ::std::char_traits<char>, Delims>(t);
   }
   ::std::wostream &stream(::std::wostream &s) {
     return s << ::pretty_print::print_container_helper<
-               T,
-               wchar_t,
-               ::std::char_traits<wchar_t>,
-               Delims>(t);
+               T, wchar_t, ::std::char_traits<wchar_t>, Delims>(t);
   }
 
  private:
@@ -358,14 +352,12 @@ inline std::basic_ostream<TChar, TCharTraits> &operator<<(
 namespace std {
 // Prints a print_container_helper to the specified stream.
 
-template <typename T,
-          typename TChar,
-          typename TCharTraits,
+template <typename T, typename TChar, typename TCharTraits,
           typename TDelimiters>
 inline basic_ostream<TChar, TCharTraits> &operator<<(
     basic_ostream<TChar, TCharTraits> &stream,
-    const ::pretty_print::
-        print_container_helper<T, TChar, TCharTraits, TDelimiters> &helper) {
+    const ::pretty_print::print_container_helper<T, TChar, TCharTraits,
+                                                 TDelimiters> &helper) {
   helper(stream);
   return stream;
 }
@@ -459,8 +451,7 @@ inline basic_ostream<TChar, TCharTraits> &operator<<(
 
   ::pretty_print::pretty_tuple_helper<
       const tr1::tuple<TUPLE_ARGS> &,
-      tr1::tuple_size<tr1::tuple<TUPLE_ARGS>>::value,
-      TChar,
+      tr1::tuple_size<tr1::tuple<TUPLE_ARGS>>::value, TChar,
       TCharTraits>::print(stream, value);
 
   if (::pretty_print::delimiters<::pretty_print::tuple_dummy_pair,

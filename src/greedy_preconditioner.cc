@@ -26,7 +26,7 @@ double AvgPref(ExchangeNode::Ptr n) {
              : 0;
 }
 
-GreedyPreconditioner::GreedyPreconditioner(){};
+GreedyPreconditioner::GreedyPreconditioner() {};
 
 GreedyPreconditioner::GreedyPreconditioner(
     const std::map<std::string, double>& commod_weights)
@@ -78,13 +78,11 @@ void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void GreedyPreconditioner::ProcessWeights_(WgtOrder order) {
-  double min = std::min_element(commod_weights_.begin(),
-                                commod_weights_.end(),
+  double min = std::min_element(commod_weights_.begin(), commod_weights_.end(),
                                 SecondLT<std::pair<std::string, double>>())
                    ->second;
 
-  double max = std::max_element(commod_weights_.begin(),
-                                commod_weights_.end(),
+  double max = std::max_element(commod_weights_.begin(), commod_weights_.end(),
                                 SecondLT<std::pair<std::string, double>>())
                    ->second;
 
@@ -108,8 +106,7 @@ void GreedyPreconditioner::ProcessWeights_(WgtOrder order) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double GroupWeight(RequestGroup::Ptr g,
-                   std::map<std::string, double>* weights,
+double GroupWeight(RequestGroup::Ptr g, std::map<std::string, double>* weights,
                    std::map<ExchangeNode::Ptr, double>* avg_prefs) {
   std::vector<ExchangeNode::Ptr>& nodes = g->nodes();
   double sum = 0;
@@ -123,8 +120,7 @@ double GroupWeight(RequestGroup::Ptr g,
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double NodeWeight(ExchangeNode::Ptr n,
-                  std::map<std::string, double>* weights,
+double NodeWeight(ExchangeNode::Ptr n, std::map<std::string, double>* weights,
                   double avg_pref) {
   double commod_weight = (weights->size() != 0) ? (*weights)[n->commod] : 1;
   double node_weight = commod_weight * (1 + avg_pref / (1 + avg_pref));

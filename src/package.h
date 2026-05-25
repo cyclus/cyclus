@@ -100,8 +100,7 @@ class Package {
   void SetDistribution();
 
  private:
-  Package(std::string name,
-          double fill_min = 0,
+  Package(std::string name, double fill_min = 0,
           double fill_max = std::numeric_limits<double>::max(),
           std::string strategy = "first");
 
@@ -164,8 +163,7 @@ class TransportUnit {
   static Ptr& unrestricted();
 
  private:
-  TransportUnit(std::string name,
-                int fill_min = 0,
+  TransportUnit(std::string name, int fill_min = 0,
                 int fill_max = std::numeric_limits<int>::max(),
                 std::string strategy = "hybrid");
 

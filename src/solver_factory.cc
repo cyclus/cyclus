@@ -27,12 +27,12 @@ int CbcCallBack(CbcModel* model, int from) {
 }
 
 ObjValueHandler::ObjValueHandler(double obj, double time, bool found)
-    : obj_(obj), time_(time), found_(found){};
+    : obj_(obj), time_(time), found_(found) {};
 
 ObjValueHandler::ObjValueHandler(double obj)
-    : obj_(obj), time_(0), found_(false){};
+    : obj_(obj), time_(0), found_(false) {};
 
-ObjValueHandler::~ObjValueHandler(){};
+ObjValueHandler::~ObjValueHandler() {};
 
 ObjValueHandler::ObjValueHandler(const ObjValueHandler& other)
     : CbcEventHandler(other) {

@@ -32,6 +32,8 @@ Since last release
 * Support for OpenMP parallelized simulations (#1709)
 * Command-line option to make a new blank input file referencing a current schema (#1861)
 * Allow multiple archetype blocks to facilitate includes (#1874)
+* Add Housekeeping to Check Code Style with `clang-format` (#1674)
+
 
 **Changed:**
 * Changed the epsilon (eps) in Material::Decay to 1e-4 allowing 1 day decay of tritium (#1946)

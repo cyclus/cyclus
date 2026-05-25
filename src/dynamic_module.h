@@ -56,7 +56,7 @@ class DynamicModule {
   };
 
   /// Do-nothing constructor
-  DynamicModule(){};
+  DynamicModule() {};
 
   /// Returns a newly constructed agent for the given module spec.
   static Agent* Make(Context* ctx, AgentSpec spec);
