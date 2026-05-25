@@ -34,6 +34,7 @@ Since last release
 * Allow multiple archetype blocks to facilitate includes (#1874)
 
 **Changed:**
+* Changed the epsilon (eps) in Material::Decay to 1e-4 allowing 1 day decay of tritium (#1946)
 * Changed the schema for recipes to require oneOrMore instead of zeroOrMore (#1940)
 * Made the Unit Tests far less verbose by suppressing log output during RunSim (#1927)
 * Changed Dockerfile to use boost and boost-cpp instead of libboost-devel (#1906)
