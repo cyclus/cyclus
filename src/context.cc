@@ -15,6 +15,7 @@
 #include "timer.h"
 #include "random_number_generator.h"
 #include "version.h"
+#include <chrono>
 
 namespace cyclus {
 
@@ -325,6 +326,12 @@ double Context::random_01() {
 
 int Context::random_uniform_int(int low, int high) {
   return rng_->random_uniform_int(low, high);
+}
+
+int Context::date_time_int(){
+  auto time = std::chrono::system_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch());
+  return duration.count();
 }
 
 double Context::random_uniform_real(double low, double high) {
