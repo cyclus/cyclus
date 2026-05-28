@@ -18,34 +18,6 @@
 
 namespace cyclus {
 
-namespace {
-// Simulation time is int throughout Cyclus; indicators::ProgressBar uses size_t
-// for set_progress / max_progress only because that is the library API.
-inline size_t IndicatorProgress(int n) {
-  return static_cast<size_t>(std::max(n, 0));
-}
-
-bool ProgressBarEnabled() {
-  const char* env_var = std::getenv("CYCLUS_PROGRESS_BAR");
-  if (env_var) {
-    std::string val(env_var);
-    return !(val == "0" || val == "false" || val == "no" || val == "off");
-  }
-
-  // Disable with verbose logging to avoid interfering with debug output.
-  return cyclus::Logger::ReportLevel() <= cyclus::LEV_WARN;
-}
-
-int ProgressUpdateFrequency(int duration) {
-  if (duration > 100) {
-    return 10;
-  } else if (duration > 20) {
-    return 5;
-  }
-  return 1;
-}
-}  // namespace
-
 void Timer::RunSim() {
   LogLevel saved_level = Logger::ReportLevel();
   if (quiet_) {
@@ -64,7 +36,7 @@ void Timer::RunSim() {
     progress_span_ = std::max(si_.duration - time_, 1);
     progress_bar_.reset(new indicators::ProgressBar{
         indicators::option::BarWidth{50},
-        indicators::option::MaxProgress{IndicatorProgress(progress_span_)},
+        indicators::option::MaxProgress{ProgressValue(progress_span_)},
         indicators::option::ShowPercentage{true},
     });
     progress_update_frequency_ = ProgressUpdateFrequency(si_.duration);
@@ -94,13 +66,12 @@ void Timer::RunSim() {
     EventLoop();
 #endif
 
-    // Progress reflects timesteps completed this iteration (loop uses
-    // time_ in [progress_origin_, si_.duration), so the last step reaches
-    // progress_span_ / progress_span_).
+    time_++;
+
+    // Progress reflects timesteps completed so far. After incrementing time_,
+    // time_ - progress_origin_ is the number of completed timesteps.
     if (progress_bar_) {
-      const int completed_now = time_ - progress_origin_ + 1;
-      const int capped =
-          std::min(std::max(completed_now, 0), progress_span_);
+      const int completed_now = time_ - progress_origin_;
       if (completed_now % progress_update_frequency_ == 0 ||
           completed_now == progress_span_) {
         // Postfix must be set before set_progress: set_option does not redraw,
@@ -109,11 +80,10 @@ void Timer::RunSim() {
             indicators::option::PostfixText{
                 " (" + std::to_string(completed_now) + "/" +
                 std::to_string(progress_span_) + ")"});
-        progress_bar_->set_progress(IndicatorProgress(capped));
+        progress_bar_->set_progress(ProgressValue(completed_now));
       }
     }
 
-    time_++;
 
     if (want_kill_) {
       break;
@@ -123,15 +93,14 @@ void Timer::RunSim() {
   // Finalize progress bar: leave the cursor on a new line. Only redraw if we
   // did not already print 100% in the loop.
   if (progress_bar_) {
-    const int completed_steps =
-        std::min(time_ - progress_origin_, progress_span_);
-    const int pc = std::max(completed_steps, 0);
-    if (pc < progress_span_) {
+    const int completed_steps = time_ - progress_origin_;
+    const size_t progress = ProgressValue(completed_steps);
+    if (progress < static_cast<size_t>(progress_span_)) {
       progress_bar_->set_option(
           indicators::option::PostfixText{
-              " (" + std::to_string(pc) + "/" +
+              " (" + std::to_string(progress) + "/" +
               std::to_string(progress_span_) + ")"});
-      progress_bar_->set_progress(IndicatorProgress(pc));
+      progress_bar_->set_progress(progress);
     }
     std::cout << std::endl;
   }
@@ -372,10 +341,35 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   if (ProgressBarEnabled()) {
     progress_bar_.reset(new indicators::ProgressBar{
         indicators::option::BarWidth{50},
-        indicators::option::MaxProgress{IndicatorProgress(progress_span_)},
+        indicators::option::MaxProgress{ProgressValue(progress_span_)},
         indicators::option::ShowPercentage{true},
     });
   }
+}
+
+bool Timer::ProgressBarEnabled() {
+  const char* env_var = std::getenv("CYCLUS_PROGRESS_BAR");
+  if (env_var) {
+    std::string val(env_var);
+    return !(val == "0" || val == "false" || val == "no" || val == "off");
+  }
+
+  // Disable with verbose logging to avoid interfering with debug output.
+  return cyclus::Logger::ReportLevel() <= cyclus::LEV_WARN;
+}
+
+int Timer::ProgressUpdateFrequency(int duration) {
+  if (duration > 100) {
+    return 10;
+  } else if (duration > 20) {
+    return 5;
+  }
+  return 1;
+}
+
+size_t Timer::ProgressValue(int completed_steps) {
+  return static_cast<size_t>(
+      std::min(std::max(completed_steps, 0), progress_span_));
 }
 
 int Timer::dur() {
