@@ -33,6 +33,7 @@ Since last release
 * Command-line option to make a new blank input file referencing a current schema (#1861)
 * Allow multiple archetype blocks to facilitate includes (#1874)
 * New composition specification based on single nuclide (#1949) 
+* New function for searching agent by prototype name (#1951)
 
 **Changed:**
 * Changed the epsilon (eps) in Material::Decay to 1e-4 allowing 1 day decay of tritium (#1946)
