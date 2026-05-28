@@ -116,6 +116,16 @@ void Context::DelAgent(Agent* m) {
   }
 }
 
+Agent* Context::GetAgentByName(std::string name){
+  std::set<Agent*>::iterator it;
+  for (it = agent_list_.begin(); it != agent_list_.end(); ++it){
+    if((*it)->prototype() == name){
+      return (*it);
+    }
+  }
+  cyclus::Warn<KEY_WARNING>("Agent set does not contain " + name + " name");
+}
+
 void Context::SchedBuild(Agent* parent, std::string proto_name, int t) {
 #pragma omp critical
   {

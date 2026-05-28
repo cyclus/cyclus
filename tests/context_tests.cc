@@ -178,3 +178,26 @@ TEST_F(ContextTests, GetAgentList) {
   delete ctx;
   EXPECT_EQ(3, DonutShop::destruct_count);
 }
+
+TEST_F(ContextTests, GetAgentByName) {
+  Timer ti;
+  Recorder rec;
+  Context* ctx = new Context(&ti, &rec);
+
+  Agent* agent1 = new DonutShop(ctx, "chocolate");
+  Agent* agent2 = new DonutShop(ctx, "chocolate");
+  Agent* agent3 = new DonutShop(ctx, "chocolate");
+
+  agent1->prototype("dunkin donuts");
+  agent2->prototype("krispy kreme");
+  agent3->prototype("voodoo donut");
+
+  ASSERT_NO_THROW(ctx->GetAgentByName("dunkin donuts"));
+
+  cyclus::warn_as_error = true;
+  EXPECT_THROW(ctx->GetAgentByName("donut shop"), cyclus::KeyError);
+
+  cyclus::warn_as_error = false;
+               
+  delete ctx;
+}
