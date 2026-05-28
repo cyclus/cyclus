@@ -397,7 +397,10 @@ class PragmaCyclusErrorFilter(Filter):
     """Filter for handling invalid #pragma cyclus. This should be the last filter."""
     regex = re.compile(r'\s*#\s*pragma\s+cyclus(.*)')
 
-    directives = frozenset(['var', 'note', 'exec', 'decl', 'def', 'impl'])
+    directives = frozenset(['var', 'note', 'exec', 'decl', 'def', 'impl',
+                            'clone', 'initfromcopy', 'initfromdb',
+                            'infiletodb', 'schema', 'annotations',
+                            'initinv', 'snapshotinv', 'snapshot'])
 
     def isvalid(self, statement):
         """Checks if a statement is valid for this fliter."""
@@ -407,7 +410,8 @@ class PragmaCyclusErrorFilter(Filter):
         g1 = m.group(1).strip()
         if len(g1) == 0:
             return False
-        s0 = g1.split(None, 1)[0]
+        m0 = re.match(r'(\w+)', g1)
+        s0 = m0.group(1) if m0 is not None else ''
         return s0 not in self.directives
 
     def transform(self, statement, sep):
@@ -472,7 +476,7 @@ class VarDecorationFilter(DecorationFilter):
     This evals the contents of dict and puts them in state.var_annotations, to be
     consumed by the next match with VarDeclarationFilter.
     """
-    regex = re.compile(r"\s*#\s*pragma\s+cyclus\s+var\s+(.*)")
+    regex = re.compile(r"\s*#\s*pragma\s+cyclus\s+var\s*(.+)")
 
     def transform(self, statement, sep):
         state = self.machine
@@ -485,7 +489,19 @@ class VarDeclarationFilter(Filter):
     """State varible declaration.  Only operates if state.var_annotations is
     not None. Access for member variable must be public.
     """
-    regex = re.compile(r"(.*\w+.*?)\s+(\w+)")
+    regex = re.compile(r"\s*(.+?)\s+(\w+)\s*(?:=.*)?$")
+
+    def isvalid(self, statement):
+        state = self.machine
+        if state.var_annotations is None:
+            self.match = None
+            return False
+        stripped = statement.lstrip()
+        if (stripped.startswith('#') or stripped.startswith('//') or
+                stripped.startswith('/*')):
+            self.match = None
+            return False
+        return super(VarDeclarationFilter, self).isvalid(statement)
 
     def transform_pass2(self, statement, sep):
         state = self.machine
