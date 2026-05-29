@@ -33,6 +33,7 @@ Since last release
 * Command-line option to make a new blank input file referencing a current schema (#1861)
 * Allow multiple archetype blocks to facilitate includes (#1874)
 * New composition specification based on single nuclide (#1949) 
+* Users can specify for random seed to be created for random number generation (#1950)
 
 **Changed:**
 * Modified cycpp.py to fix a few whitespace-related bugs, and allow cyclus vars to be initialized (#1954)

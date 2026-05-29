@@ -512,7 +512,8 @@ void XMLFileLoader::LoadControlParams() {
   cy_eps_rsrc = si.eps_rsrc = eps_rsrc_;
 
   // get seed
-  si.seed = OptionalQuery<int>(qe, "seed", kDefaultSeed);
+  int seed_inp = OptionalQuery<int>(qe, "seed", kDefaultSeed);
+  si.seed = (seed_inp == 0) ? ctx_->date_time_int() : seed_inp;
 
   // get stride
   si.stride = OptionalQuery<int>(qe, "stride", kDefaultStride);
