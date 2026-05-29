@@ -203,16 +203,28 @@ def test_vdeclarfilter():
     m = MockMachine()
     f = VarDeclarationFilter(m)
     assert not f.isvalid("one ")
+    assert not f.isvalid("one two")
 
     statement, sep = "one two", "\n"
     m.var_annotations = {}
     assert  f.isvalid(statement)
+
+
+def test_vdeclarfilter_consumes_pending_annotation():
+    """Test VarDeclarationFilter consumes a pending state var annotation"""
+    m = StateAccumulator()
     m.classes = [(0, "trader")]
-    m.access = {"trader": "public"}
-    # m.var_annotations = {'name': 'James Bond'}
-    m.var_annotations = None
+    m.superclasses["trader"] = set()
+    m.access = {tuple(m.classes): "public"}
+    m.var_annotations = {'doc': 'some state variable'}
+    f = VarDeclarationFilter(m)
+
+    statement, sep = "double foo", "\n"
+    assert f.isvalid(statement)
     f.transform(statement, sep)
-    assert m.var_annotations == None
+    assert m.var_annotations is None
+    assert m.context["trader"]["vars"]["foo"]["type"] == "double"
+    assert m.context["trader"]["vars"]["foo"]["doc"] == "some state variable"
 
 def test_vdeclarfilter_initialized_member():
     """Test VarDeclarationFilter with a C++ default member initializer"""
