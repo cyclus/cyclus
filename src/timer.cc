@@ -293,17 +293,11 @@ int Timer::dur() {
 
 int Timer::CalcTimeDiff(int year, int month) {
 
-  int timediff_ = 0;
-  if (year >= 0) {
-    timediff_ += (year - si_.y0) * cyclusYear;
-  }
-  
-  if (month >= 0) {
-    timediff_ += (month - si_.m0) * cyclusMonth;
-  }
+  int start_time = si_.y0 * cyclusYear + si_.m0 * cyclusMonth;
+  int time = year * cyclusYear + month * cyclusMonth;
 
   // Casting because ctx_->dt() is uint64_t and so negatives don't play nice
-  return timediff_ / static_cast<int>(ctx_->dt());
+  return (time - start_time) / static_cast<int>(ctx_->dt());
 
 }
 
