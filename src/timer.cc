@@ -294,7 +294,15 @@ int Timer::dur() {
 int Timer::CalcTimeDiff(int year, int month) {
 
   int start_time = si_.y0 * cyclusYear + si_.m0 * cyclusMonth;
-  int time = year * cyclusYear + month * cyclusMonth;
+  int time = std::min(year,0) * cyclusYear + std::min(month,0) * cyclusMonth;
+
+  // if time is 0, then invalid combination of year and month were given
+  if time == 0 {
+    CLOG(LEV_WARN) << "Invalid year and month combination given to Timer::CalcTimeDiff. Returning 0. "
+                   "Year: " << year << " Month: " << month;
+
+    return 0;
+  } 
 
   // Casting because ctx_->dt() is uint64_t and so negatives don't play nice
   return (time - start_time) / static_cast<int>(ctx_->dt());
