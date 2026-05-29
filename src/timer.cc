@@ -297,7 +297,7 @@ int Timer::CalcTimeDiff(int year, int month) {
   int time = std::min(year,0) * cyclusYear + std::min(month,0) * cyclusMonth;
 
   // if time is 0, then invalid combination of year and month were given
-  if time == 0 {
+  if (time == 0) {
     CLOG(LEV_WARN) << "Invalid year and month combination given to Timer::CalcTimeDiff. Returning 0. "
                    "Year: " << year << " Month: " << month;
 
