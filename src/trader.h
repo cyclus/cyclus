@@ -87,10 +87,9 @@ class Trader {
 
   bool ReturnTraded(){return Traded;} //getter for Traded 
 
-  void FillInCommods(int commod){std::cout<< "here in trader FillCommods:"; in_commods_.insert(commod);}
+  void FillInCommods(std::string commod){in_commods_.insert(commod);}
 
-  std::set<int> GetInCommods() {return in_commods_;}
-  std::set<int> in_commods_;
+  std::set<std::string> GetInCommods() {return in_commods_;}
 
   protected:
   Agent* manager_;
@@ -98,6 +97,8 @@ class Trader {
  private:
   /// @warning this function is hidden to prevent an invalid signature that can
   /// raise difficult to find bugs
+  std::set<std::string> in_commods_;
+  
   virtual std::set<BidPortfolio<Material>::Ptr> GetMatlBids(
       const CommodMap<Material>::type& commod_requests) {
     return std::set<BidPortfolio<Material>::Ptr>();

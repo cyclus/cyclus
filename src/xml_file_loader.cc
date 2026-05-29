@@ -465,9 +465,7 @@ void XMLFileLoader::LoadInitialAgents() {
 
 Agent* XMLFileLoader::BuildAgent(std::string proto, Agent* parent) {
   Agent* m = ctx_->CreateAgent<Agent>(proto);
-  std::cout<<"\033[92m PEEPEE\n";
   m->Build(parent);
-  std::cout<<"POOPOO\033[0m\n";
   if (parent != NULL) {
     parent->BuildNotify(m);
   }

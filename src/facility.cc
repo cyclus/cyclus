@@ -28,32 +28,27 @@ void Facility::InitFrom(Facility* m) {
 void Facility::Build(Agent* parent) {
   Agent::Build(parent); 
   //for agents WITHOUT the need for a checkdecom status, they can easily schedule decom at build (only reactor/separations use this right now)
-  // if (lifetime() >= 0 && CheckDecommissionCondition() == NULL) { 
-  //   context()->SchedDecom(this, exit_time());
-  // }
+  if (lifetime() >= 0 && CheckDecommissionCondition() == NULL) { 
+    context()->SchedDecom(this, exit_time());
+  }
   for (auto& requests: GetMatlRequests()) {
     if(requests){
       for(auto& request : requests->requests()) {
   // //hopefully this is a dry run with no impact on DRE (ie adding porfolios)
       std::string commodity = request->commodity();
       context()->RegisterCommodityConsumer(commodity,this);
-      FillInCommods(1); //("commodity"); //any repeats should be
-      std::cout<<commodity<< "\n\n\n";
-      context()->test(17);
-      context()->stringtest("velma");
+      FillInCommods(commodity); //any repeats should be
       }
     }
   }
-  std::cout<< GetInCommods().size()<<"in fac the incommods in trader is \n\n\n";
-  std::cout<<context()->GetStringTest()<<"getting string test in build \n\n\n";
-  context()->RegisterCommoditiesTraded(context()->time(), {"spent_uox"});//GetInCommods());
-  std::cout<<(context()->CommoditiesTraded(0)).size()<<"commodities traded in f\n";
-  std::cout<<context()<<"commodity size for fac \n";
+  std::cout<<"Agent of type" << prototype()<< " has " << GetInCommods().size()<<" in_commods_ size in Trader \n\n\n";
+  // FORCEFULLY SET THE COMMOD MAP (not relying on tick/tock event request)
+  context()-> RegisterCommoditiesTraded(context()->time(), GetInCommods());
+  std::cout <<"Context commodity map size called in Facility::Build is "<< (context()->CommoditiesTraded(context()->time())).size()<<" (not empty) \n\n\n\n";
 }
 
 void Facility::EnterNotify() {
   Agent::EnterNotify();
-    std::cout<<context()<<"commodity size for fac \n";
   context()->RegisterTrader(dynamic_cast<Trader*>(this));
   context()->RegisterTimeListener(this);
   schedule_helper_.InitialTrade(); 
@@ -74,7 +69,7 @@ void Facility::Decommission() {
 
   context()->UnregisterTrader(dynamic_cast<Trader*>(this));
   context()->UnregisterTimeListener(this);
-  //context()->UnregisterCommodityConsumer(in_commods_,this);
+  context()->UnregisterCommodityConsumer(GetInCommods(),this);
 
   Agent::Decommission();
 }
@@ -88,17 +83,14 @@ void Facility::Tock(){ // archetype developers need to invoke this method in toc
 }
 
 void Facility::Tick(){
-  //std::cout<<(context()->GetTest()).size()<<"\n\n";
-  std::cout<<context()->GetStringTest()<<"getting string test \n\n\n";
-  std::cout<< GetInCommods().size()<<"in fac tick the incommods in trader is \n\n\n";
   SetTraded(false); //archetype developers need to invoke this method in tick
 }
 
 void Facility::EventRequest(){
-  // schedule_helper_.FixIncSchedule(); //FixIncSchedule schedules like cyclus 1.6v 
-  // for(int i: schedule_helper_.EventTime()){ //probably needed in future... 
-  //   selftimes_.insert(i);
-  // }
+  schedule_helper_.FixIncSchedule(); //FixIncSchedule schedules like cyclus 1.6v 
+  for(int i: schedule_helper_.EventTime()){ //probably needed in future... 
+    selftimes_.insert(i);
+  }
 }
 
 Region* Facility::GetParentRegion(int layer) {

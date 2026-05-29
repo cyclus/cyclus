@@ -194,45 +194,14 @@ class Context {
 
   void RegisterCommoditiesTraded(int t, std::set<std::string> trade_commods);
 
-  std::set<std::string>& CommoditiesTraded(int t) {std::cout << "CTX REGISTER: " << this << "\n"; return commodities_traded_.at(t);}
+  inline std::set<std::string>& CommoditiesTraded(int t) {return commodities_traded_.at(t);}
 
-void test(int commod)
-{
-    testing.insert(std::move(commod));
-}
-
-inline const std::set<int>& GetTest() const
-{
-    return testing;
-}
-
-// void test(int commod)
-// {
-//     testing = commod;
-// }
-
-// inline int& GetTest()
-// {
-//     return testing;
-// }
-
-void stringtest(const std::string& commod)
-{
-    stringtesting = commod;
-}
-
-inline const std::string& GetStringTest() const
-{
-    return stringtesting;
-}
-
-  inline void RegisterRequesters(int time, Trader* e) {
-    std::cout<<"iam requesting \n" ; request_queue_[time].insert(e);
+  inline void RegisterRequesters(int time, Trader* e) {request_queue_[time].insert(e);
   } //conditions to register an event is up to archetype dev
 
   inline void EventComplete(int t) {request_queue_.erase(t);} // fit this so it purges any 0 entries as well as the most current completed event ! 
 
-  inline const std::set<Trader*>& EventRequesters(int t) const {std::cout << "CTX REGISTER: " << this << "\n"; return request_queue_.at(t); }
+  inline const std::set<Trader*>& EventRequesters(int t) const {return request_queue_.at(t); }
   
   inline const std::map<int,std::set<Trader*>>& EventTimeline() const { return request_queue_; }
 
@@ -438,8 +407,6 @@ inline const std::string& GetStringTest() const
   std::map<std::string, std::set<Trader*>> commodity_consumers_;
   std::map<int,std::set<std::string>> commodities_traded_;
   std::set<int> pop_sched_;
-  std::set<int> testing;
-  std::string stringtesting;
 
   std::map<std::string, int> n_prototypes_;
   std::map<std::string, int> n_specs_;

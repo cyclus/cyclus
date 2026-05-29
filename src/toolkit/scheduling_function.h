@@ -23,9 +23,9 @@ public:
 
 // deconstructor .. 
 
-// void DemandDrivenRequests(ResBuf<cyclus::Material> res,std::set<std::string> commods);
+void DemandDrivenRequests(ResBuf<cyclus::Material> res,std::set<std::string> commods);
 
-// void ConstantRequest(int cycle_length, std::set<std::string> commods);
+void ConstantRequest(int cycle_length, std::set<std::string> commods);
 
 void FixIncSchedule();
 
@@ -37,7 +37,7 @@ int FacilityTime();
 
 void Scheduler(int t, std::set<std::string> in_commods);
 
-//void PredefinedSchedule(std::set<int> sched);
+void PredefinedSchedule(std::set<int> sched);
 
 const std::set<int>& EventTime() const {//schedule
     return t_;
@@ -46,7 +46,6 @@ const std::set<int>& EventTime() const {//schedule
 private:
     Facility* f_;
     std::set<int> t_; //this may be sketchy with clear(), should i not have a variable and just have sched. func return event times? 
-    std::set<std::string> in_commods_;
 };
 
 }  // namespace toolkit

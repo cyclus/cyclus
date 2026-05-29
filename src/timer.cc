@@ -108,13 +108,8 @@ void Timer::DoTick() {
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
   auto reg_traders = ctx_->EventRequesters(time_);  
-  std::cout <<"TESTING:"<< (ctx_->GetTest()).size()<<"\n\n\n\n";
-  std::cout <<"TESTING string:"<< (ctx_->GetStringTest())<<"\n\n\n\n";
-  for (auto& trader : reg_traders){
-    std::cout<< (trader->GetInCommods()).size()<<"\n\n\n";
-  }
-  std::cout<<reg_traders.size()<<"reg traders size \n\n\n";
-  std::cout <<"HERE n SHIT"<< (ctx_->CommoditiesTraded(0)).size()<<"\n\n\n\n";
+  std::cout <<"Context commodity map size called in Timer is"<< (ctx_->CommoditiesTraded(time_)).size()<<" (empty) \n\n\n\n";
+  std::cout<<"Context discrete-registered traders map size is "<<reg_traders.size()<<" (not empty?)\n\n\n";
   //still unclear: do decom events require secondary registration for trades? 
   if(reg_traders.size()>0){
       matmgr->Execute();

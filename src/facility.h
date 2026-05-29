@@ -140,8 +140,6 @@ class Facility : public TimeListener, public Agent, public Trader {
 
   virtual void Tick();
 
-  // inline const std::set<std::string>& GetInCommods() const {return in_commods_;}
-
   //return all future events scheduled for some facility (this function is useful for deregistration context()->DeregisterRequesters(--)
   // purposes and for archetype developer scheduled facility behavior)
   inline const std::set<int>& GetFutureEvents() const {
@@ -160,7 +158,6 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual void GetMatlTrades(
       const std::vector<Trade<Material>>& trades,
       std::vector<std::pair<Trade<Material>, Material::Ptr>>& responses) {
-    std::cout << "in material facility getmatltrades\n";
   }
 
   /// @brief default implementation for responding to product trades
@@ -218,7 +215,6 @@ class Facility : public TimeListener, public Agent, public Trader {
 
   private: 
   std::set<int> selftimes_;
-  // std::set<std::string> in_commods_;
   toolkit::SchedulingFunctions schedule_helper_;
 };
 

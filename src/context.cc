@@ -82,7 +82,7 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim, int branch_time,
       stride(kDefaultStride) {}
 
 Context::Context(Timer* ti, Recorder* rec)
-    : ti_(ti), rec_(rec), solver_(NULL), trans_id_(0), si_(0), testing({}) {
+    : ti_(ti), rec_(rec), solver_(NULL), trans_id_(0), si_(0) {
   rng_ = new RandomNumberGenerator();
 }
 
@@ -356,9 +356,7 @@ void Context::UnregisterCommodityConsumer(std::set<std::string> in_commods, Trad
   }
 
 void Context::RegisterCommoditiesTraded(int t, std::set<std::string> trade_commods){
-  std::cout<<trade_commods.size()<<"context commod filling \n\n\n";
-  commodities_traded_[t].merge(trade_commods); //is this merge not working (what does this represent again )
-  std::cout<<commodities_traded_[t].size()<<"size of the fill \n\n";
+  commodities_traded_[t].merge(trade_commods);
 }
 
 Datum* Context::NewDatum(std::string title) {

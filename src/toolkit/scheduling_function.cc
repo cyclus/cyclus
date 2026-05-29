@@ -16,35 +16,35 @@ void SchedulingFunctions::Scheduler(int t, std::set<std::string> in_commods){
 } //archetype developers can also call this method to schedule some time directly with context
 // from their own scheduling function/parameters
 
-// void SchedulingFunctions::FixIncSchedule(){
-//     Scheduler(FacilityTime()+  1, f_->GetInCommods());
-// }
+void SchedulingFunctions::FixIncSchedule(){
+    Scheduler(FacilityTime()+  1, f_->GetInCommods());
+}
 
-// void SchedulingFunctions::ConstantRequest(int cycle_length, std::set<std::string> commods){
-//     Scheduler(FacilityTime() + cycle_length, commods);
-// }
+void SchedulingFunctions::ConstantRequest(int cycle_length, std::set<std::string> commods){
+    Scheduler(FacilityTime() + cycle_length, commods);
+}
 
-// void SchedulingFunctions::DemandDrivenRequests(ResBuf<cyclus::Material> res,std::set<std::string> commods){
-//     if (res.space() > eps_rsrc()) {
-//         Scheduler(FacilityTime()+1, commods);
-//     }
-//     else {
-//         return;
-//     }
-// }
+void SchedulingFunctions::DemandDrivenRequests(ResBuf<cyclus::Material> res,std::set<std::string> commods){
+    if (res.space() > eps_rsrc()) {
+        Scheduler(FacilityTime()+1, commods);
+    }
+    else {
+        return;
+    }
+}
 
-// void SchedulingFunctions::PredefinedSchedule(std::set<int> sched){
-//     //in order to use this function the entire schedule of a facilities requests should be mapped. 
-//     //do not invoke parent tock in facilities that use this. Add additional EventSchedule() to EnterNotify() instead. 
-//     t_ = sched;
-// }
+void SchedulingFunctions::PredefinedSchedule(std::set<int> sched){
+    //in order to use this function the entire schedule of a facilities requests should be mapped. 
+    //do not invoke parent tock in facilities that use this. Add additional EventSchedule() to EnterNotify() instead. 
+    t_ = sched;
+}
 
 void SchedulingFunctions::clear(){
     t_.clear();
 }
 
 void SchedulingFunctions::InitialTrade(){
-    f_-> context()-> RegisterRequesters(FacilityTime(), f_);
+    Scheduler(FacilityTime(),f_->GetInCommods());
     //i changed this from the original
 //   if(FacilityTime() == 0){ 
 //     Scheduler(1, f_->GetInCommods());  
