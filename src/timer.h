@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <vector>
+#include <memory>
 
 #include "context.h"
 #include "exchange_manager.h"
@@ -11,6 +12,7 @@
 #include "infile_tree.h"
 #include "time_listener.h"
 #include "comp_math.h"
+#include "indicators.hpp"
 
 class SimInitTest;
 
@@ -24,6 +26,7 @@ class Timer {
 
  public:
   Timer();
+  ~Timer();
 
   /// Sets intial time-related parameters for the simulation.
   ///
@@ -101,6 +104,23 @@ class Timer {
   /// decommissions all agents queued for the current timestep.
   void DoDecom();
 
+  /// @brief Determines whether or not to print the progress bar
+  /// @return false if CYCLUS_PROGRESS_BAR is set to 0, false, no, or off;
+  /// otherwise false when log verbosity is greater than LEV_WARN.
+  bool ProgressBarEnabled();
+
+  /// @brief Defines how often to "update" the progress bar's progress
+  /// @param duration duration of the simulation
+  /// @return how many timesteps to wait between updates to the bar
+  int ProgressUpdateFrequency(int duration); 
+
+  /// @brief clamps progress to 0 <= progress <= progress_span_ and 
+  /// converts to size_t for the indicators API requirement.
+  /// @param n current progress as an int
+  /// @return current progress as a size_t
+  size_t ProgressValue(int completed_steps);
+
+
   Context* ctx_;
 
   /// The current time, measured in months from when the simulation
@@ -124,6 +144,14 @@ class Timer {
 
   // std::map<time,std::vector<config> >
   std::map<int, std::vector<Agent*>> decom_queue_;
+
+  /// Progress bar for simulation progress
+  std::unique_ptr<indicators::ProgressBar> progress_bar_;
+  int progress_update_frequency_;
+  /// First timestep index in this run (0, or branch_time when restarting).
+  int progress_origin_;
+  /// Number of timesteps this run will execute (si_.duration - progress_origin_).
+  int progress_span_;
 
   bool quiet_ = false;
 };

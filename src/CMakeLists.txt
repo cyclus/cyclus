@@ -248,7 +248,8 @@ file(WRITE "${CMAKE_BINARY_DIR}/includes.txt" "${incdirs}")
 
 FILE(GLOB h_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 FILE(GLOB hpp_files "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
-SET(h_files ${h_files} ${hpp_files})
+FILE(GLOB public_hpp_files "${PROJECT_SOURCE_DIR}/include/*.hpp")
+SET(h_files ${h_files} ${hpp_files} ${public_hpp_files})
 
 INSTALL(FILES ${h_files} DESTINATION include/cyclus COMPONENT core)
 

@@ -6,6 +6,7 @@ Since last release
 ====================
 
 **Added:**
+* Added progress bar to the simulation loop (#1912)
 * Added a new datatype to the backend for tariff region (#1922)
 * Added Functions to access region and institution from facilities and institutions (#1914)
 * Added a unit value to Resource, Material, and Product objects (#1894)

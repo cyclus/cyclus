@@ -2,8 +2,10 @@
 // Implements the Timer class
 #include "timer.h"
 
+#include <algorithm>
 #include <iostream>
 #include <string>
+#include <cstdlib>
 #if CYCLUS_IS_PARALLEL
 #include <omp.h>
 #endif  // CYCLUS_IS_PARALLEL
@@ -29,6 +31,17 @@ void Timer::RunSim() {
 
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
+
+  if (!progress_bar_ && ProgressBarEnabled()) {
+    progress_span_ = std::max(si_.duration - time_, 1);
+    progress_bar_.reset(new indicators::ProgressBar{
+        indicators::option::BarWidth{50},
+        indicators::option::MaxProgress{ProgressValue(progress_span_)},
+        indicators::option::ShowPercentage{true},
+    });
+    progress_update_frequency_ = ProgressUpdateFrequency(si_.duration);
+  }
+
   while (time_ < si_.duration) {
     CLOG(LEV_INFO1) << "Current time: " << time_;
 
@@ -55,9 +68,41 @@ void Timer::RunSim() {
 
     time_++;
 
+    // Progress reflects timesteps completed so far. After incrementing time_,
+    // time_ - progress_origin_ is the number of completed timesteps.
+    if (progress_bar_) {
+      const int completed_now = time_ - progress_origin_;
+      if (completed_now % progress_update_frequency_ == 0 ||
+          completed_now == progress_span_) {
+        // Postfix must be set before set_progress: set_option does not redraw,
+        // but set_progress calls print_progress() which reads postfix_text.
+        progress_bar_->set_option(
+            indicators::option::PostfixText{
+                " (" + std::to_string(completed_now) + "/" +
+                std::to_string(progress_span_) + ")"});
+        progress_bar_->set_progress(ProgressValue(completed_now));
+      }
+    }
+
+
     if (want_kill_) {
       break;
     }
+  }
+
+  // Finalize progress bar: leave the cursor on a new line. Only redraw if we
+  // did not already print 100% in the loop.
+  if (progress_bar_) {
+    const int completed_steps = time_ - progress_origin_;
+    const size_t progress = ProgressValue(completed_steps);
+    if (progress < static_cast<size_t>(progress_span_)) {
+      progress_bar_->set_option(
+          indicators::option::PostfixText{
+              " (" + std::to_string(progress) + "/" +
+              std::to_string(progress_span_) + ")"});
+      progress_bar_->set_progress(progress);
+    }
+    std::cout << std::endl;
   }
 
   ctx_->NewDatum("Finish")
@@ -270,6 +315,8 @@ void Timer::Reset() {
   build_queue_.clear();
   decom_queue_.clear();
   si_ = SimInfo(0);
+
+  progress_bar_.reset();
 }
 
 void Timer::Initialize(Context* ctx, SimInfo si) {
@@ -285,12 +332,60 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   if (si.branch_time > -1) {
     time_ = si.branch_time;
   }
+
+  progress_origin_ = time_;
+  progress_span_ = std::max(si.duration - progress_origin_, 1);
+
+  progress_bar_.reset();
+  progress_update_frequency_ = ProgressUpdateFrequency(si.duration);
+  if (ProgressBarEnabled()) {
+    progress_bar_.reset(new indicators::ProgressBar{
+        indicators::option::BarWidth{50},
+        indicators::option::MaxProgress{ProgressValue(progress_span_)},
+        indicators::option::ShowPercentage{true},
+    });
+  }
+}
+
+bool Timer::ProgressBarEnabled() {
+  const char* env_var = std::getenv("CYCLUS_PROGRESS_BAR");
+  if (env_var) {
+    std::string val(env_var);
+    return !(val == "0" || val == "false" || val == "no" || val == "off");
+  }
+
+  // Disable with verbose logging to avoid interfering with debug output.
+  return cyclus::Logger::ReportLevel() <= cyclus::LEV_WARN;
+}
+
+int Timer::ProgressUpdateFrequency(int duration) {
+  if (duration > 100) {
+    return 10;
+  } else if (duration > 20) {
+    return 5;
+  }
+  return 1;
+}
+
+size_t Timer::ProgressValue(int completed_steps) {
+  return static_cast<size_t>(
+      std::min(std::max(completed_steps, 0), progress_span_));
 }
 
 int Timer::dur() {
   return si_.duration;
 }
 
-Timer::Timer() : time_(0), si_(0), want_snapshot_(false), want_kill_(false) {}
+Timer::Timer()
+    : time_(0),
+      si_(0),
+      want_snapshot_(false),
+      want_kill_(false),
+      progress_bar_(nullptr),
+      progress_update_frequency_(1),
+      progress_origin_(0),
+      progress_span_(1) {}
+
+Timer::~Timer() {}
 
 }  // namespace cyclus
