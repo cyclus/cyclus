@@ -50,7 +50,7 @@ void Institution::Tock() {
     Agent* a = *it;
     if (a->lifetime() != -1 && context()->time() >= a->exit_time()) {
       Facility* fac = dynamic_cast<Facility*>(a);
-      if (fac == NULL || fac->CheckDecommissionCondition()) {
+      if (fac == NULL || fac->CheckDecommissionCondition()) { // any facility without overwritten checkdecomcondition expects a NULL, only true will pass || 
         CLOG(LEV_INFO3) << a->prototype()
                         << " has reached the end of its lifetime";
         context()->SchedDecom(a);

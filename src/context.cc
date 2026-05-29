@@ -348,6 +348,17 @@ void Context::UnregisterTimeListener(TimeListener* tl) {
   ti_->UnregisterTimeListener(tl);
 }
 
+void Context::UnregisterCommodityConsumer(std::set<std::string> in_commods, Trader* e){
+  return;
+  for (std::string commod : in_commods){
+      commodity_consumers_.at(commod).erase(e);
+    }
+  }
+
+void Context::RegisterCommoditiesTraded(int t, std::set<std::string> trade_commods){
+  commodities_traded_[t].merge(trade_commods);
+}
+
 Datum* Context::NewDatum(std::string title) {
   return rec_->NewDatum(title);
 }

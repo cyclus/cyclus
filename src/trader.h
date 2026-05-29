@@ -78,12 +78,27 @@ class Trader {
   virtual void AcceptProductTrades(
       const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {}
 
- protected:
+  virtual void EventRequest(){} // can be overridden ? 
+  
+  bool Traded; //follows DRE to assess whether trader completed trades; 
+  // archetype devs may want to use this to assess event scheduling
+
+  void SetTraded(bool status){Traded = status;} //setter for Traded
+
+  bool ReturnTraded(){return Traded;} //getter for Traded 
+
+  void FillInCommods(std::string commod){in_commods_.insert(commod);}
+
+  std::set<std::string> GetInCommods() {return in_commods_;}
+
+  protected:
   Agent* manager_;
 
  private:
   /// @warning this function is hidden to prevent an invalid signature that can
   /// raise difficult to find bugs
+  std::set<std::string> in_commods_;
+  
   virtual std::set<BidPortfolio<Material>::Ptr> GetMatlBids(
       const CommodMap<Material>::type& commod_requests) {
     return std::set<BidPortfolio<Material>::Ptr>();

@@ -67,10 +67,10 @@ template <class T> class ResourceExchange {
   inline ExchangeContext<T>& ex_ctx() { return ex_ctx_; }
 
   /// @brief queries traders and collects all requests for bids
-  void AddAllRequests() {
-    InitTraders();
-    std::for_each(traders_.begin(),
-                  traders_.end(),
+  void AddAllRequests() { // I think we should add other commodity consumers of type a into the mix within InitRequesters() as well.  
+    InitRequesters();
+    std::for_each(requesters_.begin(),
+                  requesters_.end(), 
                   std::bind(&cyclus::ResourceExchange<T>::AddRequests_,
                             this,
                             std::placeholders::_1));
@@ -110,6 +110,24 @@ template <class T> class ResourceExchange {
         traders_.insert(*it);
       }
     }
+  }
+
+  void InitRequesters() {
+    auto orig = InitRequestersAdjacent(); //we do not need the whole ass map tbh. 
+    std::set<Trader*>::iterator it;
+    for (it = orig.begin(); it != orig.end(); ++it) {
+      requesters_.insert(*it);
+    } 
+  }
+  
+  std::set<Trader*> InitRequestersAdjacent() { 
+    std::set<Trader*> traders;
+    auto commod_map = sim_ctx_->consumers(); 
+    auto map2 = sim_ctx_->CommoditiesTraded(sim_ctx_->time());
+    for (std::string commods : map2){
+      traders.merge(commod_map[commods]);
+    }
+    return traders;
   }
 
   /// @brief queries a given facility agent for
@@ -160,7 +178,7 @@ template <class T> class ResourceExchange {
   // determinism of Cyclus overall.  This allows all traders' resource
   // exchange functions are called in a much closer to deterministic order.
   std::set<Trader*, trader_compare> traders_;
-
+  std::set<Trader*,trader_compare> requesters_; 
   Context* sim_ctx_;
   ExchangeContext<T> ex_ctx_;
 };

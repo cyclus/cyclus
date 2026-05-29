@@ -8,6 +8,7 @@
 #include "agent.h"
 #include "time_listener.h"
 #include "trader.h"
+#include "toolkit/scheduling_function.h"
 
 namespace cyclus {
 
@@ -100,7 +101,7 @@ class Facility : public TimeListener, public Agent, public Trader {
 
   /// facilities over write this method if a condition must be met
   /// before their destructors can be called
-  virtual bool CheckDecommissionCondition();
+  virtual bool CheckDecommissionCondition(); 
 
   /// every agent should be able to print a verbose description
   virtual std::string str();
@@ -127,6 +128,24 @@ class Facility : public TimeListener, public Agent, public Trader {
     return std::set<BidPortfolio<Product>::Ptr>();
   }
 
+  virtual void EventRequest(); //maybe an archetype dev will want to replace this
+  // this is intended to be a default behavior should an archetype developer not invoke their own "Scheduling Function "
+  //within cycamore
+  // void EventRequest(){
+  //schedule_helper_.<chosen function>(args);;
+  // or more directly schedule_helper.schedule(time,commods)
+  //}
+
+  virtual void Tock();
+
+  virtual void Tick();
+
+  //return all future events scheduled for some facility (this function is useful for deregistration context()->DeregisterRequesters(--)
+  // purposes and for archetype developer scheduled facility behavior)
+  inline const std::set<int>& GetFutureEvents() const {
+    return selftimes_;
+  }
+
   /// default implementation for material preferences.
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
 
@@ -139,7 +158,6 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual void GetMatlTrades(
       const std::vector<Trade<Material>>& trades,
       std::vector<std::pair<Trade<Material>, Material::Ptr>>& responses) {
-    std::cout << "in material facility getmatltrades\n";
   }
 
   /// @brief default implementation for responding to product trades
@@ -193,6 +211,11 @@ class Facility : public TimeListener, public Agent, public Trader {
   /// @brief Returns all parent facilities by traversing up the hierarchy
   /// @return Vector of all parent facilities, ordered from closest to farthest
   std::vector<Facility*> GetAllParentFacilities();
+
+
+  private: 
+  std::set<int> selftimes_;
+  toolkit::SchedulingFunctions schedule_helper_;
 };
 
 }  // namespace cyclus
