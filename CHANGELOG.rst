@@ -35,6 +35,7 @@ Since last release
 * New composition specification based on single nuclide (#1949) 
 
 **Changed:**
+* Modified cycpp.py to fix a few whitespace-related bugs, and allow cyclus vars to be initialized (#1954)
 * Changed the epsilon (eps) in Material::Decay to 1e-4 allowing 1 day decay of tritium (#1946)
 * Changed the schema for recipes to require oneOrMore instead of zeroOrMore (#1940)
 * Made the Unit Tests far less verbose by suppressing log output during RunSim (#1927)
