@@ -348,6 +348,8 @@ class Context {
   /// @return a const reference to the set of all agents in the simulation
   inline const std::set<Agent*>& GetAgentList() const { return agent_list_; }
 
+  Agent* GetAgentByName(std::string name);
+
  private:
   /// Registers an agent as a participant in the simulation.
   inline void RegisterAgent(Agent* a) {
