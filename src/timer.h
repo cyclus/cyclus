@@ -109,6 +109,16 @@ class Timer {
   /// otherwise false when log verbosity is greater than LEV_WARN.
   bool ProgressBarEnabled();
 
+  /// @brief Sets progress tracking state and creates the progress bar if
+  /// enabled.
+  void SetupProgressBar();
+
+  /// @brief Determines whether the current completed timestep should be printed.
+  bool ShouldUpdateProgressBar(int completed_steps);
+
+  /// @brief Redraws the progress bar at the requested completed timestep.
+  void RedrawProgressBar(int completed_steps);
+
   /// @brief Defines how often to "update" the progress bar's progress
   /// @param duration duration of the simulation
   /// @return how many timesteps to wait between updates to the bar
@@ -116,7 +126,7 @@ class Timer {
 
   /// @brief clamps progress to 0 <= progress <= progress_span_ and 
   /// converts to size_t for the indicators API requirement.
-  /// @param n current progress as an int
+  /// @param completed_steps current progress as an int
   /// @return current progress as a size_t
   size_t ProgressValue(int completed_steps);
 

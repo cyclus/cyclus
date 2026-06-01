@@ -32,14 +32,8 @@ void Timer::RunSim() {
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
 
-  if (!progress_bar_ && ProgressBarEnabled()) {
-    progress_span_ = std::max(si_.duration - time_, 1);
-    progress_bar_.reset(new indicators::ProgressBar{
-        indicators::option::BarWidth{50},
-        indicators::option::MaxProgress{ProgressValue(progress_span_)},
-        indicators::option::ShowPercentage{true},
-    });
-    progress_update_frequency_ = ProgressUpdateFrequency(si_.duration);
+  if (!progress_bar_) {
+    SetupProgressBar();
   }
 
   while (time_ < si_.duration) {
@@ -68,22 +62,10 @@ void Timer::RunSim() {
 
     time_++;
 
-    // Progress reflects timesteps completed so far. After incrementing time_,
-    // time_ - progress_origin_ is the number of completed timesteps.
-    if (progress_bar_) {
-      const int completed_now = time_ - progress_origin_;
-      if (completed_now % progress_update_frequency_ == 0 ||
-          completed_now == progress_span_) {
-        // Postfix must be set before set_progress: set_option does not redraw,
-        // but set_progress calls print_progress() which reads postfix_text.
-        progress_bar_->set_option(
-            indicators::option::PostfixText{
-                " (" + std::to_string(completed_now) + "/" +
-                std::to_string(progress_span_) + ")"});
-        progress_bar_->set_progress(ProgressValue(completed_now));
-      }
+    const int completed_now = time_ - progress_origin_;
+    if (ShouldUpdateProgressBar(completed_now)) {
+      RedrawProgressBar(completed_now);
     }
-
 
     if (want_kill_) {
       break;
@@ -96,11 +78,7 @@ void Timer::RunSim() {
     const int completed_steps = time_ - progress_origin_;
     const size_t progress = ProgressValue(completed_steps);
     if (progress < static_cast<size_t>(progress_span_)) {
-      progress_bar_->set_option(
-          indicators::option::PostfixText{
-              " (" + std::to_string(progress) + "/" +
-              std::to_string(progress_span_) + ")"});
-      progress_bar_->set_progress(progress);
+      RedrawProgressBar(completed_steps);
     }
     std::cout << std::endl;
   }
@@ -333,18 +311,7 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
     time_ = si.branch_time;
   }
 
-  progress_origin_ = time_;
-  progress_span_ = std::max(si.duration - progress_origin_, 1);
-
-  progress_bar_.reset();
-  progress_update_frequency_ = ProgressUpdateFrequency(si.duration);
-  if (ProgressBarEnabled()) {
-    progress_bar_.reset(new indicators::ProgressBar{
-        indicators::option::BarWidth{50},
-        indicators::option::MaxProgress{ProgressValue(progress_span_)},
-        indicators::option::ShowPercentage{true},
-    });
-  }
+  SetupProgressBar();
 }
 
 bool Timer::ProgressBarEnabled() {
@@ -356,6 +323,38 @@ bool Timer::ProgressBarEnabled() {
 
   // Disable with verbose logging to avoid interfering with debug output.
   return cyclus::Logger::ReportLevel() <= cyclus::LEV_WARN;
+}
+
+void Timer::SetupProgressBar() {
+  progress_origin_ = time_;
+  progress_span_ = std::max(si_.duration - progress_origin_, 1);
+
+  progress_bar_.reset();
+  progress_update_frequency_ = ProgressUpdateFrequency(si_.duration);
+  if (ProgressBarEnabled()) {
+    progress_bar_.reset(new indicators::ProgressBar{
+        indicators::option::BarWidth{50},
+        indicators::option::MaxProgress{ProgressValue(progress_span_)},
+        indicators::option::ShowPercentage{true},
+    });
+  }
+}
+
+bool Timer::ShouldUpdateProgressBar(int completed_steps) {
+  return progress_bar_ &&
+         (completed_steps % progress_update_frequency_ == 0 ||
+          completed_steps == progress_span_);
+}
+
+void Timer::RedrawProgressBar(int completed_steps) {
+  const size_t progress = ProgressValue(completed_steps);
+  // Postfix must be set before set_progress: set_option does not redraw,
+  // but set_progress calls print_progress() which reads postfix_text.
+  progress_bar_->set_option(
+      indicators::option::PostfixText{
+          " (" + std::to_string(progress) + "/" +
+          std::to_string(progress_span_) + ")"});
+  progress_bar_->set_progress(progress);
 }
 
 int Timer::ProgressUpdateFrequency(int duration) {
