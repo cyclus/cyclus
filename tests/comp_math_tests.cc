@@ -4,10 +4,48 @@
 #include "composition.h"
 #include "cyc_limits.h"
 #include "error.h"
+#include "pyne.h"
 
 namespace cm = cyclus::compmath;
 using cyclus::Composition;
 using cyclus::CompMap;
+
+TEST(CompMathTests, ExpandElementAtomMass) {
+  CompMap e;
+  e[60000000] = 1;
+  e[922350000] = 1;
+  e[942410000] = 1;
+  //will not be normalized here 
+
+  CompMap expand_set = cm::MaterialAF(e);
+
+  float c12_atom_abund = 0.98938;
+  float c13_atom_abund = 0.01078;
+  EXPECT_NEAR(expand_set[60120000],c12_atom_abund,1e-4);
+  EXPECT_NEAR(expand_set[942410000],1,1e-4); 
+  EXPECT_NEAR(expand_set[60130000],c13_atom_abund,1e-4);
+}
+
+TEST(CompMathTests, ExpandElementMass) {
+  CompMap e;
+  e[60000000] = 1;
+  e[922350000] = 1;
+  e[942410000] = 1;
+  //will not be normalized here 
+
+  CompMap expand_set = cm::MaterialMF(e);
+
+  float c12_atom_abund = 0.98938;
+  float c13_atom_abund = 0.01078;
+  float c12_wo_abund = pyne::atomic_mass(60120000)*c12_atom_abund/pyne::atomic_mass(60000000);
+  float c13_wo_abund = pyne::atomic_mass(60130000)*c13_atom_abund/pyne::atomic_mass(60000000);
+
+  CompMap::iterator it;
+
+  EXPECT_NEAR(expand_set[60120000],c12_wo_abund,1e-4);
+  EXPECT_NEAR(expand_set[942410000],1,1e-4); 
+  EXPECT_NEAR(expand_set[60130000],c13_wo_abund,1e-4);
+}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(CompMathTests, SubSame) {

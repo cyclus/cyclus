@@ -110,6 +110,7 @@ class Composition {
   bool recorded_;
   CompMap atom_;
   CompMap mass_;
+  CompMap element_;
 
   /// the total time delta this composition has been decayed from its root
   /// ancestor.

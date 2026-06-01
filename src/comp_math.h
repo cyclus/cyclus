@@ -24,7 +24,7 @@ namespace compmath {
 ///
 CompMap Add(const CompMap& v1, const CompMap& v2);
 
-/// Does component-wise subtraction of the nuclide quantities of v1 and v2 and
+/// Does component-wise subtraction of the nuclide quantities of v1 and v2 ancdd
 /// returns the result.  No normalization is done.
 CompMap Sub(const CompMap& v1, const CompMap& v2);
 
@@ -38,8 +38,15 @@ void ApplyThreshold(CompMap* v, double threshold);
 /// The sum of quantities of all nuclides of v is normalized to val.
 void Normalize(CompMap* v, double val = 1.0);
 
-/// Returns true if all nuclide keys in v are valid.
-bool ValidNucs(const CompMap& v);
+/// creates pyne material and returns nuclide-mass frac map
+//in case an element needs to be expanded
+CompMap MaterialMF(const CompMap& v);
+
+/// creates pyne material and returns nuclide-atom frac map
+//in case an element needs to be expanded
+CompMap MaterialAF(const CompMap& v);
+
+bool ValidSpecies(const CompMap& v);
 
 /// Returns true if all nuclides in v have quantities greater than or equal to
 /// zero.
