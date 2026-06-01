@@ -24,7 +24,7 @@ namespace compmath {
 ///
 CompMap Add(const CompMap& v1, const CompMap& v2);
 
-/// Does component-wise subtraction of the nuclide quantities of v1 and v2 ancdd
+/// Does component-wise subtraction of the nuclide quantities of v1 and v2 and
 /// returns the result.  No normalization is done.
 CompMap Sub(const CompMap& v1, const CompMap& v2);
 
@@ -46,6 +46,7 @@ CompMap MaterialMF(const CompMap& v);
 //in case an element needs to be expanded
 CompMap MaterialAF(const CompMap& v);
 
+//returns true if all nuclide or element keys are valid
 bool ValidSpecies(const CompMap& v);
 
 /// Returns true if all nuclides in v have quantities greater than or equal to

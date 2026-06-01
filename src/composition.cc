@@ -22,7 +22,6 @@ Composition::Ptr Composition::CreateFromAtom(CompMap v) {
     throw ValueError("negative quantity in CompMap");
 
   Composition::Ptr c(new Composition());
-
   c->atom_ = v_adjust;
   return c;
 }
@@ -35,7 +34,6 @@ Composition::Ptr Composition::CreateFromMass(CompMap v) {
     throw ValueError("negative quantity in CompMap");
 
   Composition::Ptr c(new Composition());
-
   c->mass_ = v_adjust;
   return c;
 }

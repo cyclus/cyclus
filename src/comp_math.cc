@@ -72,7 +72,7 @@ void Normalize(CompMap* v, double val) {
 
 CompMap MaterialAF(const CompMap& v) {
   pyne::Material zz;
-  zz.from_atom_frac(v); //pyne materials assume mass-frac compmap
+  zz.from_atom_frac(v); //pyne materials assume mass-frac for expand_elements 
   pyne::Material zz_expand = zz.expand_elements();
   CompMap nuclides = zz_expand.to_atom_frac();
   return nuclides;
