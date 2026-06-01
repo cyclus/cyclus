@@ -32,18 +32,30 @@ class MaterialTest : public ::testing::Test {
   double u235_g_per_mol_;
 
   cyclus::Timer ti;
+  cyclus::Timer ti_day_timestep;
   cyclus::Recorder rec;
   cyclus::Context* ctx;
   TestFacility* fac;
   cyclus::Context* ctx_no_decay;
   TestFacility* fac_no_decay;
+  cyclus::Context* ctx_day_timestep;
+  TestFacility* fac_day_timestep;
   // dur 100, y0 = 2015, m0=1, handle="", d="never"
   SimInfo si;
+  SimInfo si_day_timestep;
 
   virtual void SetUp() {
     PyStart();
     ctx = new cyclus::Context(&ti, &rec);
     fac = new TestFacility(ctx);
+
+    // Set up the one day time step context
+    int one_day = 86400;
+    si_day_timestep = SimInfo(100, 2015, 1, "", "manual");
+    si_day_timestep.dt = one_day;
+    ctx_day_timestep = new cyclus::Context(&ti_day_timestep, &rec);
+    ctx_day_timestep->InitSim(si_day_timestep);
+    fac_day_timestep = new TestFacility(ctx_day_timestep);
 
     si = SimInfo(100, 2015, 1, "", "never");
     ctx_no_decay = new cyclus::Context(&ti, &rec);
