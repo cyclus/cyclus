@@ -15,6 +15,7 @@ int main(int argc, char* argv[]) {
   using cyclus::Env;
   using cyclus::Logger;
   std::string path = Env::PathBase(argv[0]);
+  Env::SetNucDataPath();
   Logger::ReportLevel() = cyclus::LEV_ERROR;
 
   // Add the build path to the environment for testing

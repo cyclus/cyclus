@@ -15254,8 +15254,8 @@ pyne::Material pyne::Material::expand_elements() {
   comp_map newcomp;
   std::map<int, double>::iterator abund_itr, abund_end;
   if (pyne::natural_abund_map.empty()) pyne::_load_atomic_mass_map();
-  abund_itr = pyne::natural_abund_map.begin(); //abundance map must be converted from percentage
-  abund_end = pyne::natural_abund_map.end(); 
+  abund_itr = pyne::natural_abund_map.begin();
+  abund_end = pyne::natural_abund_map.end();
   zabund = nucname::znum((*abund_itr).first);
   for (comp_iter nuc = comp.begin(); nuc != comp.end(); nuc++) {
     if (abund_itr == abund_end)
@@ -15269,10 +15269,9 @@ pyne::Material pyne::Material::expand_elements() {
       }
       while (zabund <= znuc) {
         nabund = (*abund_itr).first;
-        zabund = nucname::znum(nabund);
         if (zabund == znuc && 0 != nucname::anum(nabund) &&
             0.0 != (*abund_itr).second)
-          newcomp[nabund] = (*abund_itr).second/100 * (*nuc).second *
+          newcomp[nabund] = (*abund_itr).second * (*nuc).second *
                             atomic_mass(nabund) / atomic_mass(n);
         else if (n == nabund && 0.0 == (*abund_itr).second)
           newcomp.insert(*nuc);
@@ -15281,6 +15280,7 @@ pyne::Material pyne::Material::expand_elements() {
           zabund = INT_MAX;
           break;
         }
+        zabund = nucname::znum(nabund);
       }
     } else
       newcomp.insert(*nuc);

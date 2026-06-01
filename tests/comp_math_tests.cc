@@ -5,6 +5,7 @@
 #include "cyc_limits.h"
 #include "error.h"
 #include "pyne.h"
+#include "env.h"
 
 namespace cm = cyclus::compmath;
 using cyclus::Composition;
