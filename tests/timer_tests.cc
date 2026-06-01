@@ -122,6 +122,7 @@ TEST_P(TimerTestsFixture, TimeShiftTest) {
   cyclus::Timer ti;
   cyclus::Context ctx(&ti, &rec);
 
+  // Default SimInfo starts in January 2010: year=2010, month=1
   ti.Initialize(&ctx, cyclus::SimInfo(5));
 
   int obs = ti.CalcTimeDiff(-1,-1);
@@ -165,7 +166,7 @@ TEST_P(TimerTestsFixture, TimeShiftTest) {
   exp = 7 * cyclusMonth / ctx2.dt();
   EXPECT_EQ(exp, obs);
 
-    // Create and initialize a new timer with a weird non-default timestep
+  // Create and initialize a new timer with a weird non-default timestep
   cyclus::Timer weird_non_default_ti;
   cyclus::Context ctx3(&weird_non_default_ti, &rec);
   cyclus::SimInfo weird_timestep(5);
