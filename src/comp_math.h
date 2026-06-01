@@ -47,7 +47,7 @@ CompMap MaterialMF(const CompMap& v);
 CompMap MaterialAF(const CompMap& v);
 
 //returns true if all nuclide or element keys are valid
-bool ValidSpecies(const CompMap& v);
+bool ValidNucs(const CompMap& v);
 
 /// Returns true if all nuclides in v have quantities greater than or equal to
 /// zero.

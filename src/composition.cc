@@ -15,7 +15,7 @@ namespace cyclus {
 int Composition::next_id_ = 1;
 
 Composition::Ptr Composition::CreateFromAtom(CompMap v) {
-   if (!compmath::ValidSpecies(v)) throw ValueError("invalid nuclide or element in CompMap");
+   if (!compmath::ValidNucs(v)) throw ValueError("invalid nuclide or element in CompMap");
   CompMap v_adjust = compmath::MaterialAF(v);
 
   if (!compmath::AllPositive(v))
@@ -27,7 +27,7 @@ Composition::Ptr Composition::CreateFromAtom(CompMap v) {
 }
 
 Composition::Ptr Composition::CreateFromMass(CompMap v) {
-  if (!compmath::ValidSpecies(v)) throw ValueError("invalid nuclide or element in CompMap");
+  if (!compmath::ValidNucs(v)) throw ValueError("invalid nuclide or element in CompMap");
   CompMap v_adjust = compmath::MaterialMF(v);
 
   if (!compmath::AllPositive(v))

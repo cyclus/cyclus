@@ -84,7 +84,7 @@ CompMap MaterialMF(const CompMap& v) {
   return zz_expand.mult_by_mass();
   }
 
-bool ValidSpecies(const CompMap& v) {
+bool ValidNucs(const CompMap& v) {
   CompMap::const_iterator it;
   for (it = v.begin(); it != v.end(); ++it) {
     if (!pyne::nucname::isnuclide(it->first) && !pyne::nucname::iselement(it->first)) {
