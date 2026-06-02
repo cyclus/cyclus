@@ -291,6 +291,9 @@ class Context {
   /// Returns a random number from a uniform integer distribution.
   int random_uniform_int(int low, int high);
 
+  //returns an integer representation of the date-time to seed the simulation
+  int date_time_int();
+
   /// Returns a random number from a uniform real distribution.
   double random_uniform_real(double low, double high);
 
