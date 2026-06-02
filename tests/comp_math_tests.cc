@@ -18,7 +18,7 @@ TEST(CompMathTests, ExpandElementAtomMass) {
   e[942410000] = 1;
   //will not be normalized here 
 
-  CompMap expand_set = cm::MaterialAF(e);
+  CompMap expand_set = cm::ExpandAtomComp(e);
 
   float c12_atom_abund = 0.98938;
   float c13_atom_abund = 0.01078;
@@ -34,7 +34,7 @@ TEST(CompMathTests, ExpandElementMass) {
   e[942410000] = 1;
   //will not be normalized here 
 
-  CompMap expand_set = cm::MaterialMF(e);
+  CompMap expand_set = cm::ExpandMassComp(e);
 
   float c12_atom_abund = 0.98938;
   float c13_atom_abund = 0.01078;
