@@ -40,11 +40,11 @@ void Normalize(CompMap* v, double val = 1.0);
 
 /// creates pyne material and returns nuclide-mass frac map
 //in case an element needs to be expanded
-CompMap MaterialMF(const CompMap& v);
+CompMap ExpandMassComp(const CompMap& v);
 
 /// creates pyne material and returns nuclide-atom frac map
 //in case an element needs to be expanded
-CompMap MaterialAF(const CompMap& v);
+CompMap ExpandAtomComp(const CompMap& v);
 
 //returns true if all nuclide or element keys are valid
 bool ValidNucs(const CompMap& v);
