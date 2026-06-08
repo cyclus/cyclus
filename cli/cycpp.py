@@ -203,7 +203,7 @@ class Filter(object):
         self.match = None
 
     def isvalid(self, statement):
-        """Checks if a statement is valid for this fliter."""
+        """Checks if a statement is valid for this filter."""
         self.match = m = self.regex.match(statement)
         return m is not None
 
@@ -288,7 +288,7 @@ class TypedefFilter(AliasFilter):
         state.aliases |= {(depth, typ, a) for a in g0[-1:] + g[1:]}
 
 class UsingFilter(AliasFilter):
-    """Filter for accumumating using aliases."""
+    """Filter for accumulating using aliases."""
     regex = re.compile(r"\s*using\s+(?!namespace\s+)([\w:]+)\s*")
 
     def transform(self, statement, sep):
@@ -298,7 +298,7 @@ class UsingFilter(AliasFilter):
             state.aliases.add((state.depth, name, name.rsplit('::', 1)[1]))
 
 class NamespaceFilter(Filter):
-    """Filter for accumumating namespace encapsulations."""
+    """Filter for accumulating namespace encapsulations."""
     # handles anonymous namespaces as group(1) is None
     regex = re.compile(r"\s*namespace(\s+\w*)?\s*[^=]*", re.DOTALL)
 
@@ -318,7 +318,7 @@ class NamespaceFilter(Filter):
             del state.namespaces[-1]
 
 class UsingNamespaceFilter(Filter):
-    """Filter for accumumating using namespace statement."""
+    """Filter for accumulating using namespace statement."""
     regex = re.compile(r"\s*using\s+namespace\s+([\w:]*)\s*")
 
     def transform(self, statement, sep):
@@ -337,7 +337,7 @@ class UsingNamespaceFilter(Filter):
                                    if d_ns[0] > depth}
 
 class NamespaceAliasFilter(AliasFilter):
-    """Filter for accumumating namespace renames."""
+    """Filter for accumulating namespace renames."""
     regex = re.compile(r"\s*namespace\s+(\w+)\s*=\s*([\w:]+)\s*")
 
     def transform(self, statement, sep):
@@ -380,7 +380,7 @@ class ClassAndSuperclassFilter(ClassFilter):
             for sup in superclasses:
                 trysup = state.canonize_class(sup)
                 if trysup is None:
-                    # We cannot raise an error here becuase there are too many
+                    # We cannot raise an error here because there are too many
                     # corner cases we do not and should not support in C++
                     continue
                 sc.add(trysup)
@@ -397,17 +397,21 @@ class PragmaCyclusErrorFilter(Filter):
     """Filter for handling invalid #pragma cyclus. This should be the last filter."""
     regex = re.compile(r'\s*#\s*pragma\s+cyclus(.*)')
 
-    directives = frozenset(['var', 'note', 'exec', 'decl', 'def', 'impl'])
+    directives = frozenset(['var', 'note', 'exec', 'decl', 'def', 'impl',
+                            'clone', 'initfromcopy', 'initfromdb',
+                            'infiletodb', 'schema', 'annotations',
+                            'initinv', 'snapshotinv', 'snapshot'])
 
     def isvalid(self, statement):
-        """Checks if a statement is valid for this fliter."""
+        """Checks if a statement is valid for this filter."""
         self.match = m = self.regex.match(statement)
         if m is None:
             return False
         g1 = m.group(1).strip()
         if len(g1) == 0:
             return False
-        s0 = g1.split(None, 1)[0]
+        m0 = re.match(r'(\w+)', g1)
+        s0 = m0.group(1) if m0 is not None else ''
         return s0 not in self.directives
 
     def transform(self, statement, sep):
@@ -472,7 +476,7 @@ class VarDecorationFilter(DecorationFilter):
     This evals the contents of dict and puts them in state.var_annotations, to be
     consumed by the next match with VarDeclarationFilter.
     """
-    regex = re.compile(r"\s*#\s*pragma\s+cyclus\s+var\s+(.*)")
+    regex = re.compile(r"\s*#\s*pragma\s+cyclus\s+var\s*(.+)")
 
     def transform(self, statement, sep):
         state = self.machine
@@ -482,10 +486,22 @@ class VarDecorationFilter(DecorationFilter):
         state.var_annotations = self._eval()
 
 class VarDeclarationFilter(Filter):
-    """State varible declaration.  Only operates if state.var_annotations is
+    """State variable declaration.  Only operates if state.var_annotations is
     not None. Access for member variable must be public.
     """
-    regex = re.compile(r"(.*\w+.*?)\s+(\w+)")
+    regex = re.compile(r"\s*(.+?)\s+(\w+)\s*(?:=.*)?$")
+
+    def isvalid(self, statement):
+        state = self.machine
+        if state.var_annotations is None:
+            self.match = None
+            return False
+        stripped = statement.lstrip()
+        if (stripped.startswith('#') or stripped.startswith('//') or
+                stripped.startswith('/*')):
+            self.match = None
+            return False
+        return super(VarDeclarationFilter, self).isvalid(statement)
 
     def transform_pass2(self, statement, sep):
         state = self.machine
@@ -711,7 +727,7 @@ class StateAccumulator(object):
             self.context[classname]['vars'] = OrderedDict()
 
     def accumulate(self, statement, sep):
-        """Modify the existing state by incoprorating the statement, which is
+        """Modify the existing state by incorporating the statement, which is
         partitioned from the next statement by sep.
         """
         self.nlines_since_linemarker += statement.count('\n') + sep.count('\n')
@@ -776,7 +792,7 @@ class StateAccumulator(object):
                 return self._canonize_targs(talias, targs)
             for d, nsa in sorted(self.using_namespaces, reverse=True):
                 if len(tname.split(scopz)) > len(nsa.split(scopz)):
-                    # fixed point of reccursion when type would be more scoped than
+                    # fixed point of recursion when type would be more scoped than
                     # the alias - which is impossible.
                     continue
                 try:
@@ -807,7 +823,7 @@ class StateAccumulator(object):
                 return self.canonize_type(talias, name)
             for d, nsa in sorted(self.using_namespaces, reverse=True):
                 if len(t.split(scopz)) > len(nsa.split(scopz)):
-                    # fixed point of reccursion when type would be more scoped than
+                    # fixed point of recursion when type would be more scoped than
                     # the alias - which is impossible.
                     continue
                 try:
@@ -947,7 +963,7 @@ class CodeGeneratorFilter(Filter):
         classname = groups[1] if len(groups) > 1 else None
         if classname is None:
             if len(cg.classes) == 0:
-                TypeError("{0}Classname could not determined".format(
+                TypeError("{0}Classname could not be determined".format(
                         cg.includeloc()))
             classname = cg.classname()
         classname = classname.strip().replace('.', '::')
@@ -1398,7 +1414,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
         else:
             val = alias[1][0]
 
-        # the extra assignment (bub, sub) is because we want the intial sub
+        # the extra assignment (bub, sub) is because we want the initial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
@@ -1432,7 +1448,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             val = alias[1]
         else:
             val = alias[1][0]
-        # the extra assignment (bub, sub) is because we want the intial sub
+        # the extra assignment (bub, sub) is because we want the initial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
@@ -1464,7 +1480,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             val = alias[1]
         else:
             val = alias[1][0]
-        # the extra assignment (bub, sub) is because we want the intial sub
+        # the extra assignment (bub, sub) is because we want the initial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
@@ -1493,7 +1509,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             alias[1] = 'first'
         if alias[2] is None:
             alias[2] = 'second'
-        # the extra assignment (bub, sub) is because we want the intial sub
+        # the extra assignment (bub, sub) is because we want the initial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         tree_idx = idx or '0'
@@ -1520,7 +1536,7 @@ class InfileToDbFilter(CodeGeneratorFilter):
             alias[1] = 'key'
         if alias[2] is None:
             alias[2] = 'val'
-        # the extra assignment (bub, sub) is because we want the intial sub
+        # the extra assignment (bub, sub) is because we want the initial sub
         # rhs to be from outer scope - otherwise the newly defined sub will be
         # in scope causing segfaults
         # subtree must be specified if in recursive level
@@ -2115,7 +2131,7 @@ class CodeGenerator(object):
         return s + "\n"
 
     def generate(self, statement, sep):
-        """Modify the existing statements list by incoprorating, modifying, or
+        """Modify the existing statements list by incorporating, modifying, or
         ignoring this statement, which is partitioned from the next statement by
         sep.
         """
@@ -2210,7 +2226,7 @@ class Proxy(MutableMapping):
         return key in self.__dict__['_d']
 
 def outter_split(s, open_brace='(', close_brace=')', separator=','):
-    """Takes a string and only split the outter most level."""
+    """Takes a string and only split the outermost level."""
     outter = []
     ns = s.split(separator)
     count = 0

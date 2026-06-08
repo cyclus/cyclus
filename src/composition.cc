@@ -40,6 +40,17 @@ int Composition::id() {
   return id_;
 }
 
+Composition::Ptr Composition::CreateFromNuclide(Nuc nuc){
+  if (!pyne::nucname::isnuclide(nuc)) {
+      throw ValueError("invalid nuclide in CompMap");
+    }
+  cyclus::CompMap comp;
+  comp[nuc] = 1.0;
+  Composition::Ptr c(new Composition());
+  c->atom_ = comp;
+  return c;
+}
+
 const CompMap& Composition::atom() {
   if (atom_.size() == 0) {
     CompMap::iterator it;

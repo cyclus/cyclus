@@ -6,7 +6,9 @@ Since last release
 ====================
 
 **Added:**
+
 * Added progress bar to the simulation loop (#1912)
+* Added a warning for when a facility trades with itself (#1895)
 * Added a new datatype to the backend for tariff region (#1922)
 * Added Functions to access region and institution from facilities and institutions (#1914)
 * Added a unit value to Resource, Material, and Product objects (#1894)
@@ -33,8 +35,13 @@ Since last release
 * Support for OpenMP parallelized simulations (#1709)
 * Command-line option to make a new blank input file referencing a current schema (#1861)
 * Allow multiple archetype blocks to facilitate includes (#1874)
+* New composition specification based on single nuclide (#1949) 
+* Added ability to calcuate a time shift between the start time and some other time stamp (#1907)
+* Users can specify for random seed to be created for random number generation (#1950)
 
 **Changed:**
+* Modified cycpp.py to fix a few whitespace-related bugs, and allow cyclus vars to be initialized (#1954)
+* Changed the epsilon (eps) in Material::Decay to 1e-4 allowing 1 day decay of tritium (#1946)
 * Changed the schema for recipes to require oneOrMore instead of zeroOrMore (#1940)
 * Made the Unit Tests far less verbose by suppressing log output during RunSim (#1927)
 * Changed Dockerfile to use boost and boost-cpp instead of libboost-devel (#1906)
