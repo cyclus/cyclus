@@ -72,17 +72,6 @@ void Timer::RunSim() {
     }
   }
 
-  // Finalize progress bar: leave the cursor on a new line. Only redraw if we
-  // did not already print 100% in the loop.
-  if (progress_bar_) {
-    const int completed_steps = time_ - progress_origin_;
-    const size_t progress = ProgressValue(completed_steps);
-    if (progress < static_cast<size_t>(progress_span_)) {
-      RedrawProgressBar(completed_steps);
-    }
-    std::cout << std::endl;
-  }
-
   ctx_->NewDatum("Finish")
       ->AddVal("EarlyTerm", want_kill_)
       ->AddVal("EndTime", time_ - 1)
