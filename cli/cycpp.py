@@ -58,6 +58,8 @@ from pprint import pprint, pformat
 import textwrap
 import difflib
 import xml.dom.expatbuilder
+from xml.sax.saxutils import escape
+
 
 try:
     import simplejson as json
@@ -1734,7 +1736,7 @@ class SchemaFilter(CodeGeneratorFilter):
             d_type = self._type(t, schematype or uitype)
             impl += '<element name="{0}">'.format(name)
             if docs:
-                impl += '<a:documentation>' + docs + '</a:documentation>'
+                impl += '<a:documentation>' + escape(docs) + '</a:documentation>'
             impl += '<data type="{0}" />'.format(d_type)
             impl += '</element>'
         elif t in ['std::list', 'std::set', 'std::vector']:
@@ -1742,6 +1744,8 @@ class SchemaFilter(CodeGeneratorFilter):
             if names[0] is not None:
                 name = names[0]
             impl += '<element name="{0}">'.format(name)
+            if docs:
+                impl += '<a:documentation>' + escape(docs) + '</a:documentation>'
             impl += '<oneOrMore>'
             impl += self._buildschema(cpptype[1], schematype[1], uitype[1], names[1])
             impl += '</oneOrMore>'
@@ -1760,6 +1764,8 @@ class SchemaFilter(CodeGeneratorFilter):
             if names[1] is not None:
                 valnames = names[2]
             impl += '<element name="{0}">'.format(name)
+            if docs:
+               impl += '<a:documentation>' + escape(docs) + '</a:documentation>'
             impl += '<oneOrMore>'
             impl += '<element name="{0}">'.format(itemname)
             impl += '<interleave>'
@@ -1780,6 +1786,8 @@ class SchemaFilter(CodeGeneratorFilter):
             if names[2] is not None:
                 secondname = names[2]
             impl += '<element name="{0}">'.format(name)
+            if docs:
+                impl += '<a:documentation>' + escape(docs) + '</a:documentation>'
             impl += '<interleave>'
             impl += self._buildschema(cpptype[1], schematype[1], uitype[1], firstname)
             impl += self._buildschema(cpptype[2], schematype[2], uitype[2], secondname)
