@@ -131,7 +131,7 @@
             <a:documentation>The name of a commodity being given priority treatment.</a:documentation>
             <text/> </element>
           <element name="solution_priority"> 
-            <a:documentation>The relative solution priority of this commodity. Higher values have higher priorit. (Default: -1)</a:documentation>
+            <a:documentation>The relative solution priority of this commodity. Higher values have higher priority. (Default: -1)</a:documentation>
             <data type="double"/> </element>
         </interleave>
       </element>
