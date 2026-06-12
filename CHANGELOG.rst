@@ -7,6 +7,18 @@ Since last release
 
 **Added:**
 
+**Changed:**
+
+**Fixed:**
+
+**Removed:**
+
+
+v1.6.1
+====================
+
+**Added:**
+
 * Added a warning for when a facility trades with itself (#1895)
 * Added a new datatype to the backend for tariff region (#1922)
 * Added Functions to access region and institution from facilities and institutions (#1914)
