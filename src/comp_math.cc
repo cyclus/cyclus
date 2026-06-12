@@ -70,10 +70,24 @@ void Normalize(CompMap* v, double val) {
   }
 }
 
+CompMap ExpandAtomComp(const CompMap& v) {
+  pyne::Material zz;
+  zz.from_atom_frac(v); //pyne materials assume mass-frac for expand_elements 
+  pyne::Material zz_expand = zz.expand_elements();
+  CompMap nuclides = zz_expand.to_atom_frac();
+  return nuclides;
+}
+
+CompMap ExpandMassComp(const CompMap& v) {
+  pyne::Material zz(v);
+  pyne::Material zz_expand = zz.expand_elements();
+  return zz_expand.mult_by_mass();
+  }
+
 bool ValidNucs(const CompMap& v) {
   CompMap::const_iterator it;
   for (it = v.begin(); it != v.end(); ++it) {
-    if (!pyne::nucname::isnuclide(it->first)) {
+    if (!pyne::nucname::isnuclide(it->first) && !pyne::nucname::iselement(it->first)) {
       return false;
     }
   }

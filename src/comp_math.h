@@ -38,7 +38,15 @@ void ApplyThreshold(CompMap* v, double threshold);
 /// The sum of quantities of all nuclides of v is normalized to val.
 void Normalize(CompMap* v, double val = 1.0);
 
-/// Returns true if all nuclide keys in v are valid.
+/// creates pyne material and returns nuclide-mass frac map
+//in case an element needs to be expanded
+CompMap ExpandMassComp(const CompMap& v);
+
+/// creates pyne material and returns nuclide-atom frac map
+//in case an element needs to be expanded
+CompMap ExpandAtomComp(const CompMap& v);
+
+//returns true if all nuclide or element keys are valid
 bool ValidNucs(const CompMap& v);
 
 /// Returns true if all nuclides in v have quantities greater than or equal to
