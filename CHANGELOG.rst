@@ -74,6 +74,7 @@ v1.6.1
 * Changed the way Position is added to the archetypes (#1510) (#1872)
 * Changed code coverage to occur in Ubnutu 24.04 instead of 22.04 (#1960)
 * Increased CMake minimum required version to 3.22 (#1960)
+* Allow some resilience in coverage tests (#1960)
 
 **Removed:**
 

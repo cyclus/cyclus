@@ -104,7 +104,7 @@ WORKDIR /cyclus
 
 RUN python3 install.py -j ${make_cores} --allow-milps --code-coverage ${build_flags}
 ENV PATH=/root/.local/bin:$PATH
-ENV LCOV_ARGS="--gcov-tool=${GCOV} --no-external"
+ENV LCOV_ARGS="--gcov-tool=${GCOV} --no-external  --ignore-errors mismatch --filter range"
 RUN lcov -c -d /cyclus -o initial_coverage.info --initial ${LCOV_ARGS} && \
     cyclus_unit_tests && \
     cd tests && python3 -m pytest && cd .. && \
