@@ -84,6 +84,7 @@ RUN mamba install -y "python<3.13" --no-pin && \
                pprintpp \
                pip \
                doxygen \
+               matplotlib \
                && \
     mamba clean -y --all
 RUN mkdir -p $(python3 -m site --user-site)
