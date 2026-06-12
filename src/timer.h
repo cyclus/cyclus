@@ -25,8 +25,6 @@ class Timer {
   friend class ::SimInitTest;
 
  public:
-  Timer();
-  ~Timer();
 
   /// Sets intial time-related parameters for the simulation.
   ///
@@ -126,7 +124,7 @@ class Timer {
   bool ShouldUpdateProgressBar(int completed_steps);
 
   /// @brief Redraws the progress bar at the requested completed timestep.
-  void RedrawProgressBar(int completed_steps);
+  void RedrawProgressBar();
 
   /// @brief Defines how often to "update" the progress bar's progress
   /// @param duration duration of the simulation
@@ -140,16 +138,16 @@ class Timer {
   size_t ProgressValue(int completed_steps);
 
 
-  Context* ctx_;
+  Context* ctx_ = nullptr;
 
   /// The current time, measured in months from when the simulation
   /// started.
-  int time_;
+  int time_ = 0;
 
-  SimInfo si_;
+  SimInfo si_{0};
 
-  bool want_snapshot_;
-  bool want_kill_;
+  bool want_snapshot_ = false;
+  bool want_kill_ = false;
 
   /// Concrete agents that desire to receive tick and tock notifications
   std::map<int, TimeListener*> tickers_;
@@ -165,12 +163,12 @@ class Timer {
   std::map<int, std::vector<Agent*>> decom_queue_;
 
   /// Progress bar for simulation progress
-  std::unique_ptr<indicators::ProgressBar> progress_bar_;
-  int progress_update_frequency_;
+  std::unique_ptr<indicators::ProgressBar> progress_bar_ = nullptr;
+  int progress_update_frequency_ = 1;
   /// First timestep index in this run (0, or branch_time when restarting).
-  int progress_origin_;
+  int progress_origin_ = 0;
   /// Number of timesteps this run will execute (si_.duration - progress_origin_).
-  int progress_span_;
+  int progress_span_ = 1;
 
   bool quiet_ = false;
 };

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <cmath>
 #if CYCLUS_IS_PARALLEL
 #include <omp.h>
 #endif  // CYCLUS_IS_PARALLEL
@@ -32,7 +33,7 @@ void Timer::RunSim() {
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
 
-  if (!progress_bar_) {
+  if (!progress_bar_ && ProgressBarEnabled()) {
     SetupProgressBar();
   }
 
@@ -61,11 +62,8 @@ void Timer::RunSim() {
 #endif
 
     time_++;
+    RedrawProgressBar();
 
-    const int completed_now = time_ - progress_origin_;
-    if (ShouldUpdateProgressBar(completed_now)) {
-      RedrawProgressBar(completed_now);
-    }
 
     if (want_kill_) {
       break;
@@ -299,8 +297,6 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   if (si.branch_time > -1) {
     time_ = si.branch_time;
   }
-
-  SetupProgressBar();
 }
 
 bool Timer::ProgressBarEnabled() {
@@ -320,39 +316,33 @@ void Timer::SetupProgressBar() {
 
   progress_bar_.reset();
   progress_update_frequency_ = ProgressUpdateFrequency(si_.duration);
-  if (ProgressBarEnabled()) {
-    progress_bar_.reset(new indicators::ProgressBar{
-        indicators::option::BarWidth{50},
-        indicators::option::MaxProgress{ProgressValue(progress_span_)},
-        indicators::option::ShowPercentage{true},
-    });
+  progress_bar_.reset(new indicators::ProgressBar{
+      indicators::option::BarWidth{50},
+      indicators::option::MaxProgress{ProgressValue(progress_span_)},
+      indicators::option::ShowPercentage{true},
+  });
+}
+
+void Timer::RedrawProgressBar() {
+  int completed_steps = time_ - progress_origin_;
+
+  if (progress_bar_ &&
+      (completed_steps % progress_update_frequency_ == 0 ||
+      completed_steps == progress_span_)) {
+
+    const size_t progress = ProgressValue(completed_steps);
+    // Postfix must be set before set_progress: set_option does not redraw,
+    // but set_progress calls print_progress() which reads postfix_text.
+    progress_bar_->set_option(
+        indicators::option::PostfixText{
+            " (" + std::to_string(progress) + "/" +
+            std::to_string(progress_span_) + ")"});
+    progress_bar_->set_progress(progress);
   }
-}
-
-bool Timer::ShouldUpdateProgressBar(int completed_steps) {
-  return progress_bar_ &&
-         (completed_steps % progress_update_frequency_ == 0 ||
-          completed_steps == progress_span_);
-}
-
-void Timer::RedrawProgressBar(int completed_steps) {
-  const size_t progress = ProgressValue(completed_steps);
-  // Postfix must be set before set_progress: set_option does not redraw,
-  // but set_progress calls print_progress() which reads postfix_text.
-  progress_bar_->set_option(
-      indicators::option::PostfixText{
-          " (" + std::to_string(progress) + "/" +
-          std::to_string(progress_span_) + ")"});
-  progress_bar_->set_progress(progress);
 }
 
 int Timer::ProgressUpdateFrequency(int duration) {
-  if (duration > 100) {
-    return 10;
-  } else if (duration > 20) {
-    return 5;
-  }
-  return 1;
+  return std::max(1, duration / 100);
 }
 
 size_t Timer::ProgressValue(int completed_steps) {
@@ -364,18 +354,6 @@ int Timer::dur() {
   return si_.duration;
 }
 
-Timer::Timer()
-    : time_(0),
-      si_(0),
-      want_snapshot_(false),
-      want_kill_(false),
-      progress_bar_(nullptr),
-      progress_update_frequency_(1),
-      progress_origin_(0),
-      progress_span_(1) {}
-
-Timer::~Timer() {}
-  
 int Timer::CalcTimeDiff(int year, int month) {
 
   int start_time = si_.y0 * cyclusYear + si_.m0 * cyclusMonth;
@@ -394,7 +372,5 @@ int Timer::CalcTimeDiff(int year, int month) {
 
 }
 
-
-Timer::Timer() : time_(0), si_(0), want_snapshot_(false), want_kill_(false) {}
 
 }  // namespace cyclus
