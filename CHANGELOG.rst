@@ -34,6 +34,7 @@ Since last release
 * Allow multiple archetype blocks to facilitate includes (#1874)
 * New composition specification based on single nuclide (#1949) 
 * Added ability to calcuate a time shift between the start time and some other time stamp (#1907)
+* Recipes can accept id entries as entries (#1956)
 
 **Changed:**
 * Modified cycpp.py to fix a few whitespace-related bugs, and allow cyclus vars to be initialized (#1954)
