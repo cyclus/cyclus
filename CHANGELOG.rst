@@ -7,6 +7,18 @@ Since last release
 
 **Added:**
 
+**Changed:**
+
+**Fixed:**
+
+**Removed:**
+
+
+v1.6.1
+====================
+
+**Added:**
+
 * Added a warning for when a facility trades with itself (#1895)
 * Added a new datatype to the backend for tariff region (#1922)
 * Added Functions to access region and institution from facilities and institutions (#1914)
@@ -60,12 +72,16 @@ Since last release
 * Modified Doxygen homepage (#1815)
 * Pin ``python<3.13`` in CI workflows (#1826)
 * Changed the way Position is added to the archetypes (#1510) (#1872)
+* Changed code coverage to occur in Ubnutu 24.04 instead of 22.04 (#1960)
+* Increased CMake minimum required version to 3.22 (#1960)
+* Allow some resilience in coverage tests (#1960)
 
 **Removed:**
 
 * Removed the ResourceBuff class and replaced its instances with ResBuf (#1755)
 * Removed reference to deprecated ``ProgTranslator::Context`` class (#1811)
 * Removed ``exclusive_orders_only`` from schema (#1816)
+* Removed CI support for Ubnutu 20.04 (#1960)
 
 **Fixed:**
 
