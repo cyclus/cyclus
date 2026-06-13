@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <vector>
+#include <memory>
 
 #include "context.h"
 #include "exchange_manager.h"
@@ -11,6 +12,7 @@
 #include "infile_tree.h"
 #include "time_listener.h"
 #include "comp_math.h"
+#include "indicators.hpp"
 
 class SimInitTest;
 
@@ -23,7 +25,6 @@ class Timer {
   friend class ::SimInitTest;
 
  public:
-  Timer();
 
   /// Sets intial time-related parameters for the simulation.
   ///
@@ -110,16 +111,43 @@ class Timer {
   /// decommissions all agents queued for the current timestep.
   void DoDecom();
 
-  Context* ctx_;
+  /// @brief Determines whether or not to print the progress bar
+  /// @return false if CYCLUS_PROGRESS_BAR is set to 0, false, no, or off;
+  /// otherwise false when log verbosity is greater than LEV_WARN.
+  bool ProgressBarEnabled();
+
+  /// @brief Sets progress tracking state and creates the progress bar if
+  /// enabled.
+  void SetupProgressBar();
+
+  /// @brief Determines whether the current completed timestep should be printed.
+  bool ShouldUpdateProgressBar(int completed_steps);
+
+  /// @brief Redraws the progress bar at the requested completed timestep.
+  void RedrawProgressBar();
+
+  /// @brief Defines how often to "update" the progress bar's progress
+  /// @param duration duration of the simulation
+  /// @return how many timesteps to wait between updates to the bar
+  int ProgressUpdateFrequency(int duration); 
+
+  /// @brief clamps progress to 0 <= progress <= progress_span_ and 
+  /// converts to size_t for the indicators API requirement.
+  /// @param completed_steps current progress as an int
+  /// @return current progress as a size_t
+  size_t ProgressValue(int completed_steps);
+
+
+  Context* ctx_ = nullptr;
 
   /// The current time, measured in months from when the simulation
   /// started.
-  int time_;
+  int time_ = 0;
 
-  SimInfo si_;
+  SimInfo si_{0};
 
-  bool want_snapshot_;
-  bool want_kill_;
+  bool want_snapshot_ = false;
+  bool want_kill_ = false;
 
   /// Concrete agents that desire to receive tick and tock notifications
   std::map<int, TimeListener*> tickers_;
@@ -133,6 +161,14 @@ class Timer {
 
   // std::map<time,std::vector<config> >
   std::map<int, std::vector<Agent*>> decom_queue_;
+
+  /// Progress bar for simulation progress
+  std::unique_ptr<indicators::ProgressBar> progress_bar_ = nullptr;
+  int progress_update_frequency_ = 1;
+  /// First timestep index in this run (0, or branch_time when restarting).
+  int progress_origin_ = 0;
+  /// Number of timesteps this run will execute (si_.duration - progress_origin_).
+  int progress_span_ = 1;
 
   bool quiet_ = false;
 };

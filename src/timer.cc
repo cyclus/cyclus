@@ -2,8 +2,11 @@
 // Implements the Timer class
 #include "timer.h"
 
+#include <algorithm>
 #include <iostream>
 #include <string>
+#include <cstdlib>
+#include <cmath>
 #if CYCLUS_IS_PARALLEL
 #include <omp.h>
 #endif  // CYCLUS_IS_PARALLEL
@@ -29,6 +32,11 @@ void Timer::RunSim() {
 
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
+
+  if (!progress_bar_ && ProgressBarEnabled()) {
+    SetupProgressBar();
+  }
+
   while (time_ < si_.duration) {
     CLOG(LEV_INFO1) << "Current time: " << time_;
 
@@ -54,6 +62,8 @@ void Timer::RunSim() {
 #endif
 
     time_++;
+    RedrawProgressBar();
+
 
     if (want_kill_) {
       break;
@@ -270,6 +280,8 @@ void Timer::Reset() {
   build_queue_.clear();
   decom_queue_.clear();
   si_ = SimInfo(0);
+
+  progress_bar_.reset();
 }
 
 void Timer::Initialize(Context* ctx, SimInfo si) {
@@ -285,6 +297,57 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   if (si.branch_time > -1) {
     time_ = si.branch_time;
   }
+}
+
+bool Timer::ProgressBarEnabled() {
+  const char* env_var = std::getenv("CYCLUS_PROGRESS_BAR");
+  if (env_var) {
+    std::string val(env_var);
+    return !(val == "0" || val == "false" || val == "no" || val == "off");
+  }
+
+  // Disable with verbose logging to avoid interfering with debug output.
+  return cyclus::Logger::ReportLevel() <= cyclus::LEV_WARN;
+}
+
+void Timer::SetupProgressBar() {
+  progress_origin_ = time_;
+  progress_span_ = std::max(si_.duration - progress_origin_, 1);
+
+  progress_bar_.reset();
+  progress_update_frequency_ = ProgressUpdateFrequency(si_.duration);
+  progress_bar_.reset(new indicators::ProgressBar{
+      indicators::option::BarWidth{50},
+      indicators::option::MaxProgress{ProgressValue(progress_span_)},
+      indicators::option::ShowPercentage{true},
+  });
+}
+
+void Timer::RedrawProgressBar() {
+  int completed_steps = time_ - progress_origin_;
+
+  if (progress_bar_ &&
+      (completed_steps % progress_update_frequency_ == 0 ||
+      completed_steps == progress_span_)) {
+
+    const size_t progress = ProgressValue(completed_steps);
+    // Postfix must be set before set_progress: set_option does not redraw,
+    // but set_progress calls print_progress() which reads postfix_text.
+    progress_bar_->set_option(
+        indicators::option::PostfixText{
+            " (" + std::to_string(progress) + "/" +
+            std::to_string(progress_span_) + ")"});
+    progress_bar_->set_progress(progress);
+  }
+}
+
+int Timer::ProgressUpdateFrequency(int duration) {
+  return std::max(1, duration / 100);
+}
+
+size_t Timer::ProgressValue(int completed_steps) {
+  return static_cast<size_t>(
+      std::min(std::max(completed_steps, 0), progress_span_));
 }
 
 int Timer::dur() {
@@ -309,7 +372,5 @@ int Timer::CalcTimeDiff(int year, int month) {
 
 }
 
-
-Timer::Timer() : time_(0), si_(0), want_snapshot_(false), want_kill_(false) {}
 
 }  // namespace cyclus
