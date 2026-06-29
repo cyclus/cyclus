@@ -93,7 +93,7 @@ template <class T> class Bid {
 
   /// @brief Set the unit_cost of this bid
   /// @param unit_cost 
-  inline void SetUnitCost(double unit_cost) {unit_cost_ = unit_cost;}
+  inline void unit_cost(double unit_cost) {unit_cost_ = unit_cost;}
 
  private:
   /// @brief constructors are private to require use of factory methods

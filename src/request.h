@@ -104,7 +104,7 @@ template <class T> class Request {
 
   /// @brief Sets the unit_value of this request
   /// @param unit_value 
-  inline void SetUnitValue(double unit_value) {unit_value_ = unit_value;}
+  inline void unit_value(double unit_value) {unit_value_ = unit_value;}
 
   /// @return the portfolio of which this request is a part
   inline typename RequestPortfolio<T>::Ptr portfolio() const {
