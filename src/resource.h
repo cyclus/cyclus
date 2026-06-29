@@ -27,7 +27,7 @@ class Resource {
   typedef boost::shared_ptr<Resource> Ptr;
 
   Resource()
-      : state_id_(nextstate_id_++), unit_value_(0.0), obj_id_(nextobj_id_++) {}
+      : state_id_(nextstate_id_++), unitA_value_(0.0), obj_id_(nextobj_id_++) {}
 
   virtual ~Resource() {}
 
@@ -37,10 +37,10 @@ class Resource {
   const int obj_id() const { return obj_id_; }
 
   /// Returns the unit value of this resource.
-  double unit_value() const { return unit_value_; }
+  double unitA_value() const { return unitA_value_; }
 
   /// Sets the unit value of this resource.
-  void unit_value(double unit_value) { unit_value_ = unit_value; }
+  void unitA_value(double unitA_value) { unitA_value_ = unitA_value; }
 
   /// Returns the unique id corresponding to this resource and its current
   /// state.  All resource id's are unique - even across different resource
@@ -120,7 +120,7 @@ class Resource {
       std::numeric_limits<double>::quiet_NaN();
 
  private:
-  double unit_value_;
+  double unitA_value_;
   static int nextstate_id_;
   static int nextobj_id_;
   int state_id_;

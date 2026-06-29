@@ -104,7 +104,7 @@ void ResTracker::Record(bool bumpId) {
       ->AddVal("TimeCreated", ctx_->time())
       ->AddVal("Quantity", res_->quantity())
       ->AddVal("Units", res_->units())
-      ->AddVal("UnitValue", res_->unit_value())
+      ->AddVal("UnitValue", res_->unitA_value())
       ->AddVal("QualId", res_->qual_id())
       ->AddVal("PackageName", res_->package_name())
       ->AddVal("Parent1", parent1_)

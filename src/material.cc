@@ -16,17 +16,17 @@ Material::~Material() {}
 
 Material::Ptr Material::Create(Agent* creator, double quantity,
                                Composition::Ptr c, std::string package_name,
-                               double unit_value) {
+                               double unitA_value) {
   Material::Ptr m(
-      new Material(creator->context(), quantity, c, package_name, unit_value));
+      new Material(creator->context(), quantity, c, package_name, unitA_value));
   m->tracker_.Create(creator);
   return m;
 }
 
 Material::Ptr Material::CreateUntracked(double quantity, Composition::Ptr c,
-                                        double unit_value) {
+                                        double unitA_value) {
   Material::Ptr m(
-      new Material(NULL, quantity, c, Package::unpackaged_name(), unit_value));
+      new Material(NULL, quantity, c, Package::unpackaged_name(), unitA_value));
   return m;
 }
 
@@ -91,7 +91,7 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
 
   qty_ -= qty;
   Material::Ptr other(
-      new Material(ctx_, qty, c, Package::unpackaged_name(), unit_value()));
+      new Material(ctx_, qty, c, Package::unpackaged_name(), unitA_value()));
 
   // Decay called on the extracted material should have the same dt as for
   // this material regardless of composition.
@@ -144,9 +144,9 @@ void Material::Absorb(Material::Ptr mat) {
   }
   
   double tot_mass = qty_ + mat->quantity();
-  double avg_unit_value =
-      (qty_ * unit_value() + mat->quantity() * mat->unit_value()) / tot_mass;
-  unit_value(avg_unit_value);
+  double avg_unitA_value =
+      (qty_ * unitA_value() + mat->quantity() * mat->unitA_value()) / tot_mass;
+  unitA_value(avg_unitA_value);
   qty_ = tot_mass;
 
   mat->qty_ = 0;
@@ -179,7 +179,7 @@ Resource::Ptr Material::PackageExtract(double qty,
 
   qty_ -= qty;
   Material::Ptr other(
-      new Material(ctx_, qty, comp_, new_package_name, unit_value()));
+      new Material(ctx_, qty, comp_, new_package_name, unitA_value()));
 
   // Decay called on the extracted material should have the same dt as for
   // this material regardless of composition.
@@ -311,14 +311,14 @@ Composition::Ptr Material::comp() {
 }
 
 Material::Material(Context* ctx, double quantity, Composition::Ptr c,
-                   std::string package_name, double unit_value)
+                   std::string package_name, double unitA_value)
     : qty_(quantity),
       comp_(c),
       tracker_(ctx, this),
       ctx_(ctx),
       prev_decay_time_(0),
       package_name_(package_name) {
-  this->unit_value(unit_value);
+  this->unitA_value(unitA_value);
   if (ctx != NULL) {
     prev_decay_time_ = ctx->time();
   } else {
