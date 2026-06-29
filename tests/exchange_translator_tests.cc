@@ -158,17 +158,24 @@ TEST(ExXlateTests, ArcRemoval) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Erasing an entire request entry from trader_arc_costs should remove every
-// arc on that request from the graph in one shot.
+// arc on that request from the graph in one shot. Doing this should not remove
+// identical, but separate arcs from the graph.
 TEST(ExXlateTests, FullRequestArcRemoval) {
   TestContext tc;
   TestFacility* trader = tc.trader();
+  TestFacility* trader_2 = tc.trader();
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>* req =
+      rp->AddRequest(get_mat(u235, qty), trader, "", 1.0);
+    Request<Material>* req_2 =
       rp->AddRequest(get_mat(u235, qty), trader, "", 1.0);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   bp->AddBid(req, get_mat(u235, qty), trader);
   bp->AddBid(req, get_mat(u235, qty), trader);
   bp->AddBid(req, get_mat(u235, qty), trader);
+
+  // This bid should remain, since it's a response to req_2
+  bp->AddBid(req_2, get_mat(u235, qty), trader);
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rp);
@@ -179,7 +186,7 @@ TEST(ExXlateTests, FullRequestArcRemoval) {
   ExchangeTranslator<Material> xlator(&ctx);
   ExchangeGraph::Ptr graph = xlator.Translate();
 
-  EXPECT_EQ(0, graph->arcs().size());
+  EXPECT_EQ(1, graph->arcs().size());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
