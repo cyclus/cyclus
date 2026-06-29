@@ -120,7 +120,7 @@ template <class T> class TradeExecutor {
           // Normally the arc_cost is going to be this, however...
           double adjusted_arc_cost = adjusted_unit_cost - adjusted_unit_value;
       
-          // It's possible to change the arc_cost directly durring Adjustment
+          // It's possible to change the arc_cost directly during Adjustment
           if (ex_ctx) {
             auto trader_it = ex_ctx->trader_arc_costs.find(trade.request->requester());
             if (trader_it != ex_ctx->trader_arc_costs.end()) {
