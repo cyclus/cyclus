@@ -89,8 +89,8 @@ template <class T> class ExchangeTranslator {
   /// (req, bid) entry exists in ex_ctx_->trader_arc_costs (which is the case
   /// after the bid loop's existence check in Translate()).
   void AddArc(Request<T>* req, Bid<T>* bid, ExchangeGraph::Ptr graph) {
-    double unit_cost = bid->UnitCost();
-    double unit_value = req->UnitValue();
+    double unit_cost = bid->unit_cost();
+    double unit_value = req->unit_value();
     double arc_cost =
         ex_ctx_->trader_arc_costs.at(req->requester()).at(req).at(bid);
 

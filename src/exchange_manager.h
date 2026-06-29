@@ -79,7 +79,7 @@ template <class T> class ExchangeManager {
             ->AddVal("ReqId", ss.str())
             ->AddVal("RequesterID", r->requester()->manager()->id())
             ->AddVal("Commodity", r->commodity())
-            ->AddVal("UnitValue", r->UnitValue())
+            ->AddVal("UnitValue", r->unit_value())
             ->AddVal("Exclusive", r->exclusive())
             ->AddVal("ResType", r->target()->type())
             ->AddVal("Quantity", r->target()->quantity())
@@ -102,7 +102,7 @@ template <class T> class ExchangeManager {
             ->AddVal("BidderId", b->bidder()->manager()->id())
             ->AddVal("BidQuantity", b->offer()->quantity())
             ->AddVal("Exclusive", b->exclusive())
-            ->AddVal("UnitCost", b->UnitCost())
+            ->AddVal("UnitCost", b->unit_cost())
             ->Record();
       }
     }

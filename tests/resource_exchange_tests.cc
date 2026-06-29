@@ -306,8 +306,8 @@ TEST_F(ResourceExchangeTests, ArcCostValues) {
   EXPECT_NO_THROW(exchng->AddAllRequests());
   EXPECT_NO_THROW(exchng->AddAllBids());
 
-  double p_arc_cost = pbid->UnitCost() - preq->UnitValue();
-  double c_arc_cost = cbid->UnitCost() - creq->UnitValue();
+  double p_arc_cost = pbid->unit_cost() - preq->unit_value();
+  double c_arc_cost = cbid->unit_cost() - creq->unit_value();
 
   RequestBidMap<Material>::type pobs;
   pobs[preq].insert(std::make_pair(pbid, p_arc_cost));

@@ -34,7 +34,7 @@ TEST(RequestTests, Defaults) {
 
   EXPECT_EQ("", r->commodity());
   EXPECT_FALSE(r->exclusive());
-  EXPECT_EQ(1., r->UnitValue());
+  EXPECT_EQ(1., r->unit_value());
   EXPECT_EQ(1., cyclus::kDefaultUnitValue);
 
   delete r;
@@ -57,7 +57,7 @@ TEST(RequestTests, MaterialGetSet) {
   EXPECT_EQ(commod, r->commodity());
   EXPECT_EQ(fac, r->requester());
   EXPECT_EQ(mat, r->target());
-  EXPECT_EQ(unit_value, r->UnitValue());
+  EXPECT_EQ(unit_value, r->unit_value());
 
   delete r;
 }
@@ -79,7 +79,7 @@ TEST(RequestTests, ProductGetSet) {
   EXPECT_EQ(commod, r->commodity());
   EXPECT_EQ(fac, r->requester());
   EXPECT_EQ(rsrc, r->target());
-  EXPECT_EQ(unit_value, r->UnitValue());
+  EXPECT_EQ(unit_value, r->unit_value());
 
   delete r;
 }

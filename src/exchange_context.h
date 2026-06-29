@@ -85,10 +85,10 @@ template <class T> struct ExchangeContext {
     bids_by_request[pb->request()].push_back(pb);
 
     // unit cost comes from bid
-    double unit_cost = pb->UnitCost();
+    double unit_cost = pb->unit_cost();
   
     // unit value comes from request
-    double unit_value = pb->request()->UnitValue();
+    double unit_value = pb->request()->unit_value();
 
     // define arc_cost as unit_cost - unit_value
     double arc_cost = unit_cost - unit_value;

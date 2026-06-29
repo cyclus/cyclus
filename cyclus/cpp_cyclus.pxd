@@ -456,7 +456,7 @@ cdef extern from "request.h" namespace "cyclus":
         shared_ptr[T] target()
         Trader* requester()
         std_string commodity()
-        double UnitValue()
+        double unit_value()
         shared_ptr[RequestPortfolio[T]] portfolio()
         cpp_bool exclusive()
         cost_function_t cost_function()
@@ -588,7 +588,7 @@ cdef extern from "bid.h" namespace "cyclus":
         Trader* bidder()
         shared_ptr[BidPortfolio[T]] portfolio()
         cpp_bool exclusive()
-        double UnitCost()
+        double unit_cost()
 
 
 cdef extern from "bid_portfolio.h" namespace "cyclus":

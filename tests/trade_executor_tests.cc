@@ -277,7 +277,7 @@ TEST_F(TradeExecutorDatabaseTests, WrapperFunctionAndBasicRecording) {
   recorder_.Flush();
   
   // Verify bid object retains original cost
-  EXPECT_DOUBLE_EQ(bid->UnitCost(), orig_unit_cost);
+  EXPECT_DOUBLE_EQ(bid->unit_cost(), orig_unit_cost);
   
   // Query database and verify UnitCost and UnitValue are recorded (no ExchangeContext means no adjustments)
   cyclus::QueryResult qr = backend_->Query("Transactions", NULL);
@@ -328,7 +328,7 @@ TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedArcCost) {
   recorder_.Flush();
   
   // Verify original bid unit cost is preserved
-  EXPECT_DOUBLE_EQ(bid->UnitCost(), orig_unit_cost);
+  EXPECT_DOUBLE_EQ(bid->unit_cost(), orig_unit_cost);
   
   // Query database and verify adjusted unit cost and unit value are recorded
   cyclus::QueryResult qr = backend_->Query("Transactions", NULL);
@@ -373,8 +373,8 @@ TEST_F(TradeExecutorDatabaseTests, MixedCostScenarios) {
   recorder_.Flush();
   
   // Verify unit cost preservation
-  EXPECT_DOUBLE_EQ(bid_explicit->UnitCost(), explicit_cost);
-  EXPECT_DOUBLE_EQ(bid_default->UnitCost(), cyclus::kDefaultUnitCost);
+  EXPECT_DOUBLE_EQ(bid_explicit->unit_cost(), explicit_cost);
+  EXPECT_DOUBLE_EQ(bid_default->unit_cost(), cyclus::kDefaultUnitCost);
   
   // Query database
   cyclus::QueryResult qr = backend_->Query("Transactions", NULL);

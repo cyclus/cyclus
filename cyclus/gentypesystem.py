@@ -2119,7 +2119,7 @@ cdef class _{{rclsname}}Request:
         """This request's unit_value"""
         if self._unit_value is not None:
             return self._unit_value
-        self._unit_value = self.ptx.UnitValue()
+        self._unit_value = self.ptx.unit_value()
         return self._unit_value
 
     @property
@@ -2275,7 +2275,7 @@ cdef class _{{rclsname}}Bid:
         """This bid's unit cost"""
         if self._unit_cost is not None:
             return self._unit_cost
-        self._unit_cost = self.ptx.UnitCost()
+        self._unit_cost = self.ptx.unit_cost()
         return self._unit_cost
 
     @property

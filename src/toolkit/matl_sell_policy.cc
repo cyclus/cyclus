@@ -234,9 +234,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       // Peek at resbuf to get current composition
       m = buf_->Peek();
 
-      // This is done outside of ClacUnitCost() because matl_sell_policy
-      // isn't a facility so it makes less sense to inherit that.
-      double bid_cost = cost_per_unit_ + m->UnitValue();
+      double bid_cost = cost_per_unit_ + m->unit_value();
 
       std::vector<double>::iterator bit;
       for (bit = bids.begin(); bit != bids.end(); ++bit) {

@@ -220,11 +220,11 @@ TEST_F(MatlBuyPolicyTests, MultipleReqs) {
   ASSERT_EQ((*obs.begin())->requests().size(), 2);
   Request<Material>* req = (*obs.begin())->requests().at(0);
   if (req->commodity() == commod1) {
-    ASSERT_FLOAT_EQ(req->UnitValue(), 1.);
-    ASSERT_FLOAT_EQ((*obs.begin())->requests().at(1)->UnitValue(), p2);
+    ASSERT_FLOAT_EQ(req->unit_value(), 1.);
+    ASSERT_FLOAT_EQ((*obs.begin())->requests().at(1)->unit_value(), p2);
   } else {
-    ASSERT_FLOAT_EQ(req->UnitValue(), p2);
-    ASSERT_FLOAT_EQ((*obs.begin())->requests().at(1)->UnitValue(), 1.);
+    ASSERT_FLOAT_EQ(req->unit_value(), p2);
+    ASSERT_FLOAT_EQ((*obs.begin())->requests().at(1)->unit_value(), 1.);
   }
   ASSERT_FALSE(req->exclusive());
   ASSERT_FLOAT_EQ(req->target()->quantity(), cap);

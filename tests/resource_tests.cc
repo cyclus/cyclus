@@ -90,15 +90,15 @@ TEST_F(ResourceTest, MaterialExtractGraphid) {
 }
 
 TEST_F(ResourceTest, MaterialUnitValue) {
-  EXPECT_EQ(m1->UnitValue(), 10);
-  EXPECT_EQ(m2->UnitValue(), 20);
+  EXPECT_EQ(m1->unit_value(), 10);
+  EXPECT_EQ(m2->unit_value(), 20);
   m1->Absorb(m2);
-  EXPECT_EQ(m1->UnitValue(), 17);
-  EXPECT_TRUE(std::isnan(m3->UnitValue()));
+  EXPECT_EQ(m1->unit_value(), 17);
+  EXPECT_TRUE(std::isnan(m3->unit_value()));
   Material::Ptr lm1 = boost::dynamic_pointer_cast<Material>(m1->Clone());
-  EXPECT_EQ(lm1->UnitValue(), 17);
+  EXPECT_EQ(lm1->unit_value(), 17);
   Material::Ptr lm2 = m1->ExtractQty(1);
-  EXPECT_EQ(lm2->UnitValue(), 17);
+  EXPECT_EQ(lm2->unit_value(), 17);
 }
 
 TEST_F(ResourceTest, ProductAbsorbTrackid) {
@@ -129,15 +129,15 @@ TEST_F(ResourceTest, ProductExtractGraphid) {
 }
 
 TEST_F(ResourceTest, ProductUnitValue) {
-  EXPECT_EQ(p1->UnitValue(), 10);
-  EXPECT_EQ(p2->UnitValue(), 20);
+  EXPECT_EQ(p1->unit_value(), 10);
+  EXPECT_EQ(p2->unit_value(), 20);
   p1->Absorb(p2);
-  EXPECT_EQ(p1->UnitValue(), 17);
-  EXPECT_TRUE(std::isnan(p3->UnitValue()));
+  EXPECT_EQ(p1->unit_value(), 17);
+  EXPECT_TRUE(std::isnan(p3->unit_value()));
   Product::Ptr lp1 = boost::dynamic_pointer_cast<Product>(p1->Clone());
-  EXPECT_EQ(lp1->UnitValue(), 17);
+  EXPECT_EQ(lp1->unit_value(), 17);
   Product::Ptr lp2 = p1->Extract(1);
-  EXPECT_EQ(lp2->UnitValue(), 17);
+  EXPECT_EQ(lp2->unit_value(), 17);
 }
 
 TEST_F(ResourceTest, DefaultPackageId) {

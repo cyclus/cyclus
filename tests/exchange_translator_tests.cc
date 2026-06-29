@@ -404,8 +404,8 @@ TEST(ExXlateTests, XlateArc) {
   ExchangeNodeGroup::Ptr bset =
       TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
-  double unit_cost = std::isnan(bid->UnitCost()) ? 0.0 : bid->UnitCost();
-  double unit_value = req->UnitValue();
+  double unit_cost = std::isnan(bid->unit_cost()) ? 0.0 : bid->unit_cost();
+  double unit_value = req->unit_value();
   Arc a = TranslateArc(xlator.translation_ctx(), bid, unit_cost, unit_value);
 
   EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.vnode());
@@ -459,8 +459,8 @@ TEST(ExXlateTests, XlateArcExclusive) {
 
   // Helper to get unit_cost and unit_value for TranslateArc
   auto get_cost_value = [](Bid<Material>* b) -> std::pair<double, double> {
-    double unit_cost = std::isnan(b->UnitCost()) ? 0.0 : b->UnitCost();
-    double unit_value = b->request()->UnitValue();
+    double unit_cost = std::isnan(b->unit_cost()) ? 0.0 : b->unit_cost();
+    double unit_value = b->request()->unit_value();
     return std::make_pair(unit_cost, unit_value);
   };
   

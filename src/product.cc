@@ -54,9 +54,9 @@ void Product::Absorb(Product::Ptr other) {
   }
   double tot_qty = quantity_ + other->quantity();
   double avg_unit_value =
-      (quantity_ * UnitValue() + other->quantity() * other->UnitValue()) /
+      (quantity_ * unit_value() + other->quantity() * other->unit_value()) /
       tot_qty;
-  SetUnitValue(avg_unit_value);
+  unit_value(avg_unit_value);
   quantity_ = tot_qty;
   other->quantity_ = 0;
 
@@ -72,7 +72,7 @@ Product::Ptr Product::Extract(double quantity) {
   quantity_ -= quantity;
 
   Product::Ptr other(
-      new Product(ctx_, quantity, quality_, package_name_, UnitValue()));
+      new Product(ctx_, quantity, quality_, package_name_, unit_value()));
   tracker_.Extract(&other->tracker_);
   return other;
 }
@@ -95,7 +95,7 @@ Resource::Ptr Product::PackageExtract(double qty,
 
   quantity_ -= qty;
   Product::Ptr other(
-      new Product(ctx_, qty, quality_, new_package_name, UnitValue()));
+      new Product(ctx_, qty, quality_, new_package_name, unit_value()));
 
   // this call to res_tracker must come first before the parent resource
   // state id gets modified
@@ -135,7 +135,7 @@ Product::Product(Context* ctx, double quantity, std::string quality,
       tracker_(ctx, this),
       ctx_(ctx),
       package_name_(package_name) {
-  SetUnitValue(unit_value);
+        this->unit_value(unit_value);
 }
 
 }  // namespace cyclus

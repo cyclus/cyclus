@@ -100,7 +100,7 @@ template <class T> class Request {
   inline std::string commodity() const { return commodity_; }
 
   /// @return the unit value for this request
-  inline double UnitValue() const { return unit_value_; }
+  inline double unit_value() const { return unit_value_; }
 
   /// @brief Sets the unit_value of this request
   /// @param unit_value 

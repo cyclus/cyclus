@@ -89,7 +89,7 @@ template <class T> class Bid {
   inline bool exclusive() const { return exclusive_; }
 
   /// @return the unit_cost of this bid
-  inline double UnitCost() const { return unit_cost_; }
+  inline double unit_cost() const { return unit_cost_; }
 
   /// @brief Set the unit_cost of this bid
   /// @param unit_cost 
