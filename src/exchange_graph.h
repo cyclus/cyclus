@@ -82,7 +82,7 @@ class Arc {
     exclusive_ = other.exclusive();
     excl_val_ = other.excl_val();
     unit_cost_ = other.unit_cost();
-    unit_value_ = other.unit_value();
+    unit_value_ = other.pref_mod();
     arc_cost_ = other.arc_cost();
     return *this;
   }
@@ -106,8 +106,8 @@ class Arc {
   inline void unit_cost(double unit_cost) { unit_cost_ = unit_cost; }
   
   /// @brief unit value (from request node)
-  inline double unit_value() const { return unit_value_; }
-  inline void set_unit_value(double unit_value) { unit_value_ = unit_value; }
+  inline double pref_mod() const { return unit_value_; }
+  inline void set_pref_mod(double unit_value) { unit_value_ = unit_value; }
   
   /// @brief returns the arc cost
   inline double arc_cost() const { return arc_cost_; }

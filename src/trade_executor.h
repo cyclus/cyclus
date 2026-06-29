@@ -115,7 +115,7 @@ template <class T> class TradeExecutor {
         if (rsrc->quantity() > cyclus::eps_rsrc()) {
           // Get adjusted unit_cost and unit_value
           double adjusted_unit_cost = trade.bid->unit_cost();
-          double adjusted_unit_value = trade.request->unit_value();
+          double adjusted_unit_value = trade.request->pref_mod();
 
           // Normally the arc_cost is going to be this, however...
           double adjusted_arc_cost = adjusted_unit_cost - adjusted_unit_value;
@@ -134,7 +134,7 @@ template <class T> class TradeExecutor {
             }
           }
           
-          // Set the resource's unit value (different from req.unit_value()) to 
+          // Set the resource's unit value (different from req.pref_mod()) to 
           // the successful trade's unit cost
           rsrc->unitA_value(adjusted_unit_cost);
           

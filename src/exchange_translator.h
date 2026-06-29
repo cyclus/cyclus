@@ -90,7 +90,7 @@ template <class T> class ExchangeTranslator {
   /// after the bid loop's existence check in Translate()).
   void AddArc(Request<T>* req, Bid<T>* bid, ExchangeGraph::Ptr graph) {
     double unit_cost = bid->unit_cost();
-    double unit_value = req->unit_value();
+    double unit_value = req->pref_mod();
     double arc_cost =
         ex_ctx_->trader_arc_costs.at(req->requester()).at(req).at(bid);
 
@@ -225,7 +225,7 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
   Arc arc(unode, vnode);
   arc.unit_cost(unit_cost);
-  arc.set_unit_value(unit_value);
+  arc.set_pref_mod(unit_value);
 
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();

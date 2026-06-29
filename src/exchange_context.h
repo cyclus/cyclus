@@ -88,7 +88,7 @@ template <class T> struct ExchangeContext {
     double unit_cost = pb->unit_cost();
   
     // unit value comes from request
-    double unit_value = pb->request()->unit_value();
+    double unit_value = pb->request()->pref_mod();
 
     // define arc_cost as unit_cost - unit_value
     double arc_cost = unit_cost - unit_value;

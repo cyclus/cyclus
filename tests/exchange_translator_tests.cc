@@ -212,7 +212,7 @@ TEST(ExXlateTests, AdjustedArcCost) {
   const Arc& a = graph->arcs()[0];
   EXPECT_DOUBLE_EQ(override_cost, a.arc_cost());
   // unit_cost / unit_value remain what the bid and request themselves report
-  EXPECT_DOUBLE_EQ(unit_value, a.unit_value());
+  EXPECT_DOUBLE_EQ(unit_value, a.pref_mod());
 
   // the per-node arc list (used by solvers) must agree with arcs_
   const std::vector<Arc>& node_arcs =
@@ -405,7 +405,7 @@ TEST(ExXlateTests, XlateArc) {
       TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
   double unit_cost = std::isnan(bid->unit_cost()) ? 0.0 : bid->unit_cost();
-  double unit_value = req->unit_value();
+  double unit_value = req->pref_mod();
   Arc a = TranslateArc(xlator.translation_ctx(), bid, unit_cost, unit_value);
 
   EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.vnode());
@@ -460,7 +460,7 @@ TEST(ExXlateTests, XlateArcExclusive) {
   // Helper to get unit_cost and unit_value for TranslateArc
   auto get_cost_value = [](Bid<Material>* b) -> std::pair<double, double> {
     double unit_cost = std::isnan(b->unit_cost()) ? 0.0 : b->unit_cost();
-    double unit_value = b->request()->unit_value();
+    double unit_value = b->request()->pref_mod();
     return std::make_pair(unit_cost, unit_value);
   };
   
@@ -545,11 +545,11 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(0, graph->matches().size());
   const Arc& a = *graph->arcs().begin();
   // After Translate(), arc.arc_cost() contains unit_cost - unit_value
-  EXPECT_EQ(unit_value, a.unit_value());
+  EXPECT_EQ(unit_value, a.pref_mod());
   // Bid has no explicit unit_cost, defaults to 0
   EXPECT_EQ(0.0, a.unit_cost());
 
-  double expected_arc_cost = a.unit_cost() - a.unit_value();
+  double expected_arc_cost = a.unit_cost() - a.pref_mod();
   EXPECT_DOUBLE_EQ(expected_arc_cost, a.arc_cost());
 }
 

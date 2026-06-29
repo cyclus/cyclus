@@ -100,11 +100,11 @@ template <class T> class Request {
   inline std::string commodity() const { return commodity_; }
 
   /// @return the unit value for this request
-  inline double unit_value() const { return unit_value_; }
+  inline double pref_mod() const { return unit_value_; }
 
   /// @brief Sets the unit_value of this request
   /// @param unit_value 
-  inline void unit_value(double unit_value) {unit_value_ = unit_value;}
+  inline void pref_mod(double unit_value) {unit_value_ = unit_value;}
 
   /// @return the portfolio of which this request is a part
   inline typename RequestPortfolio<T>::Ptr portfolio() const {

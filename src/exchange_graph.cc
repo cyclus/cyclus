@@ -75,7 +75,7 @@ Arc::Arc(const Arc& other)
       exclusive_(other.exclusive()),
       excl_val_(other.excl_val()),
       unit_cost_(other.unit_cost()),
-      unit_value_(other.unit_value()),
+      unit_value_(other.pref_mod()),
       arc_cost_(other.arc_cost()) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

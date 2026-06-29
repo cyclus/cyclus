@@ -2115,11 +2115,11 @@ cdef class _{{rclsname}}Request:
         return self._commodity
 
     @property
-    def unit_value(self):
+    def pref_mod(self):
         """This request's unit_value"""
         if self._unit_value is not None:
             return self._unit_value
-        self._unit_value = self.ptx.unit_value()
+        self._unit_value = self.ptx.pref_mod()
         return self._unit_value
 
     @property
