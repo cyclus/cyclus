@@ -71,12 +71,9 @@ template <class T> class ExchangeTranslator {
       for (b_it = bids.begin(); b_it != bids.end(); ++b_it) {
         Bid<T>* bid = *b_it;
         Request<T>* req = bid->request();
-        auto requester_it = ex_ctx_->trader_arc_costs.find(req->requester());
-        if (requester_it == ex_ctx_->trader_arc_costs.end()) continue;
-        auto request_it = requester_it->second.find(req);
-        if (request_it == requester_it->second.end()) continue;
-        if (request_it->second.find(bid) == request_it->second.end()) continue;
-        AddArc(req, bid, graph);
+        const double* arc_cost = ex_ctx_->GetArcCost(req, bid);
+        if (arc_cost == nullptr) continue;
+        AddArc(req, bid, *arc_cost, graph);
       }
     }
 
@@ -84,15 +81,11 @@ template <class T> class ExchangeTranslator {
   }
 
   /// @brief adds a bid-request arc to a graph, using the bid's unit cost,
-  /// the request's unit value, and the (possibly adjustment-modified) arc
-  /// cost from trader_arc_costs. The caller must guarantee that the
-  /// (req, bid) entry exists in ex_ctx_->trader_arc_costs (which is the case
-  /// after the bid loop's existence check in Translate()).
-  void AddArc(Request<T>* req, Bid<T>* bid, ExchangeGraph::Ptr graph) {
+  /// the request's unit value, and the possibly adjustment-modified arc cost.
+  void AddArc(Request<T>* req, Bid<T>* bid, double arc_cost,
+              ExchangeGraph::Ptr graph) {
     double unit_cost = bid->unit_cost();
     double unit_value = req->pref_mod();
-    double arc_cost =
-        ex_ctx_->trader_arc_costs.at(req->requester()).at(req).at(bid);
 
     Arc a = TranslateArc(xlation_ctx_, bid, unit_cost, unit_value);
     a.arc_cost(arc_cost);

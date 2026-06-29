@@ -122,15 +122,10 @@ template <class T> class TradeExecutor {
       
           // It's possible to change the arc_cost directly during Adjustment
           if (ex_ctx) {
-            auto trader_it = ex_ctx->trader_arc_costs.find(trade.request->requester());
-            if (trader_it != ex_ctx->trader_arc_costs.end()) {
-              auto request_it = trader_it->second.find(trade.request);
-              if (request_it != trader_it->second.end()) {
-                auto bid_it = request_it->second.find(trade.bid);
-                if (bid_it != request_it->second.end()) {
-                  adjusted_arc_cost = bid_it->second;
-                }
-              }
+            const double* arc_cost =
+                ex_ctx->GetArcCost(trade.request, trade.bid);
+            if (arc_cost != nullptr) {
+              adjusted_arc_cost = *arc_cost;
             }
           }
           

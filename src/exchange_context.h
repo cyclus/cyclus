@@ -97,6 +97,23 @@ template <class T> struct ExchangeContext {
         std::make_pair(pb, arc_cost));
   }
 
+  /// @brief gets the possibly adjustment-modified cost for a request-bid arc
+  /// @param req the request being responded to
+  /// @param bid the bid responding to the request
+  /// @return the arc cost if the entry exists, otherwise null
+  const double* GetArcCost(Request<T>* req, Bid<T>* bid) const {
+    auto requester_it = trader_arc_costs.find(req->requester());
+    if (requester_it == trader_arc_costs.end()) return nullptr;
+
+    auto request_it = requester_it->second.find(req);
+    if (request_it == requester_it->second.end()) return nullptr;
+
+    auto bid_it = request_it->second.find(bid);
+    if (bid_it == request_it->second.end()) return nullptr;
+
+    return &bid_it->second;
+  }
+
   /// @brief a reference to an exchange's set of requests
   std::vector<typename RequestPortfolio<T>::Ptr> requests;
 
