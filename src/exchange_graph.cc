@@ -74,8 +74,8 @@ Arc::Arc(const Arc& other)
       vnode_(other.vnode()),
       exclusive_(other.exclusive()),
       excl_val_(other.excl_val()),
-      unit_cost_(other.get_unit_cost()),
-      unit_value_(other.get_unit_value()),
+      unit_cost_(other.unit_cost()),
+      unit_value_(other.unit_value()),
       arc_cost_(other.ArcCost()) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

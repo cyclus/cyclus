@@ -99,23 +99,23 @@ TEST(ProgTranslatorTests, translation) {
   ExchangeNode::Ptr d1(new ExchangeNode());
 
   Arc x0(a0, c0);
-  x0.set_unit_cost(unit_cost_vals[0]);
+  x0.unit_cost(unit_cost_vals[0]);
   x0.set_unit_value(unit_value_vals[0]);
   x0.ArcCost(arc_costs[0]);
   Arc x1(b0, c1);
-  x1.set_unit_cost(unit_cost_vals[1]);
+  x1.unit_cost(unit_cost_vals[1]);
   x1.set_unit_value(unit_value_vals[1]);
   x1.ArcCost(arc_costs[1]);
   Arc x2(b1, c2);
-  x2.set_unit_cost(unit_cost_vals[2]);
+  x2.unit_cost(unit_cost_vals[2]);
   x2.set_unit_value(unit_value_vals[2]);
   x2.ArcCost(arc_costs[2]);
   Arc x3(a1, d0);
-  x3.set_unit_cost(unit_cost_vals[3]);
+  x3.unit_cost(unit_cost_vals[3]);
   x3.set_unit_value(unit_value_vals[3]);
   x3.ArcCost(arc_costs[3]);
   Arc x4(b1, d1);
-  x4.set_unit_cost(unit_cost_vals[4]);
+  x4.unit_cost(unit_cost_vals[4]);
   x4.set_unit_value(unit_value_vals[4]);
   x4.ArcCost(arc_costs[4]);
 

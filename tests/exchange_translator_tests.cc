@@ -212,7 +212,7 @@ TEST(ExXlateTests, AdjustedArcCost) {
   const Arc& a = graph->arcs()[0];
   EXPECT_DOUBLE_EQ(override_cost, a.ArcCost());
   // unit_cost / unit_value remain what the bid and request themselves report
-  EXPECT_DOUBLE_EQ(unit_value, a.get_unit_value());
+  EXPECT_DOUBLE_EQ(unit_value, a.unit_value());
 
   // the per-node arc list (used by solvers) must agree with arcs_
   const std::vector<Arc>& node_arcs =
@@ -545,11 +545,11 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(0, graph->matches().size());
   const Arc& a = *graph->arcs().begin();
   // After Translate(), arc.ArcCost() contains unit_cost - unit_value
-  EXPECT_EQ(unit_value, a.get_unit_value());
+  EXPECT_EQ(unit_value, a.unit_value());
   // Bid has no explicit unit_cost, defaults to 0
-  EXPECT_EQ(0.0, a.get_unit_cost());
+  EXPECT_EQ(0.0, a.unit_cost());
 
-  double expected_arc_cost = a.get_unit_cost() - a.get_unit_value();
+  double expected_arc_cost = a.unit_cost() - a.unit_value();
   EXPECT_DOUBLE_EQ(expected_arc_cost, a.ArcCost());
 }
 

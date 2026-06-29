@@ -81,8 +81,8 @@ class Arc {
     vnode_ = other.vnode();
     exclusive_ = other.exclusive();
     excl_val_ = other.excl_val();
-    unit_cost_ = other.get_unit_cost();
-    unit_value_ = other.get_unit_value();
+    unit_cost_ = other.unit_cost();
+    unit_value_ = other.unit_value();
     arc_cost_ = other.ArcCost();
     return *this;
   }
@@ -102,11 +102,11 @@ class Arc {
   inline double excl_val() const { return excl_val_; }
   
   /// @brief unit cost (from bid node)
-  inline double get_unit_cost() const { return unit_cost_; }
-  inline void set_unit_cost(double unit_cost) { unit_cost_ = unit_cost; }
+  inline double unit_cost() const { return unit_cost_; }
+  inline void unit_cost(double unit_cost) { unit_cost_ = unit_cost; }
   
   /// @brief unit value (from request node)
-  inline double get_unit_value() const { return unit_value_; }
+  inline double unit_value() const { return unit_value_; }
   inline void set_unit_value(double unit_value) { unit_value_ = unit_value; }
   
   /// @brief returns the arc cost
