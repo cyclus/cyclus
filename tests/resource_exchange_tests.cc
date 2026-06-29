@@ -63,18 +63,15 @@ class Requester: public TestFacility {
   }
 
   // increments counter and squares all arc_costs directly
-  virtual void AdjustMatlParams(RequestBidMap<Material>::type& map) {
-    std::map<Request<Material>*,
-             std::map<Bid<Material>*, double> >::iterator m_it;
-    for (m_it = map.begin(); m_it != map.end(); ++m_it) {
-      std::map<Bid<Material>*, double>& bid_map = m_it->second; 
-      std::map<Bid<Material>*, double>::iterator b_it;
-      for (b_it = bid_map.begin(); b_it != bid_map.end(); ++b_it) {
-        b_it->second = std::pow(b_it->second, 2);
-      }
+virtual void AdjustMatlParams(RequestBidMap<Material>::type& rb_map) {
+  for (auto& request_bids : rb_map) {
+    auto& bid_map = request_bids.second;
+    for (auto& bid_cost : bid_map) {
+      bid_cost.second = std::pow(bid_cost.second, 2);
     }
-    arc_ctr_++;
   }
+  arc_ctr_++;
+}
 
   RequestPortfolio<Material>::Ptr port_;
   int i_;
