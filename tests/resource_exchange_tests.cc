@@ -309,21 +309,21 @@ TEST_F(ResourceExchangeTests, ArcCostValues) {
   double p_arc_cost = pbid->unit_cost() - preq->pref_mod();
   double c_arc_cost = cbid->unit_cost() - creq->pref_mod();
 
-  RequestBidMap<Material>::type pobs;
-  pobs[preq].insert(std::make_pair(pbid, p_arc_cost));
-  RequestBidMap<Material>::type cobs;
-  cobs[creq].insert(std::make_pair(cbid, c_arc_cost));
+  RequestBidMap<Material>::type pexp;
+  pexp[preq].insert(std::make_pair(pbid, p_arc_cost));
+  RequestBidMap<Material>::type cexp;
+  cexp[creq].insert(std::make_pair(cbid, c_arc_cost));
 
   ExchangeContext<Material>& context = exchng->ex_ctx();
-  EXPECT_EQ(context.trader_arc_costs[parent], pobs);
-  EXPECT_EQ(context.trader_arc_costs[child], cobs);
+  EXPECT_EQ(context.trader_arc_costs[parent], pexp);
+  EXPECT_EQ(context.trader_arc_costs[child], cexp);
 
   EXPECT_NO_THROW(exchng->AdjustAll());
 
-  pobs[preq].begin()->second = std::pow(p_arc_cost, 2);
-  cobs[creq].begin()->second = std::pow(std::pow(c_arc_cost, 2), 2);
-  EXPECT_EQ(context.trader_arc_costs[parent], pobs);
-  EXPECT_EQ(context.trader_arc_costs[child], cobs);
+  pexp[preq].begin()->second = std::pow(p_arc_cost, 2);
+  cexp[creq].begin()->second = std::pow(std::pow(c_arc_cost, 2), 2);
+  EXPECT_EQ(context.trader_arc_costs[parent], pexp);
+  EXPECT_EQ(context.trader_arc_costs[child], cexp);
 
   child->Decommission();
   parent->Decommission();
