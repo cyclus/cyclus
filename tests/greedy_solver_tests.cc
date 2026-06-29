@@ -23,8 +23,8 @@ TEST(GreedySolverTests, AvgCost) {
   Arc a1(u1, v);
   Arc a2(u2, v);
   
-  a1.ArcCost(1.0);  
-  a2.ArcCost(2.0); 
+  a1.arc_cost(1.0);  
+  a2.arc_cost(2.0); 
 
   ExchangeGraph g;
   RequestGroup::Ptr rg(new RequestGroup());
@@ -54,8 +54,8 @@ TEST(GreedySolverTests, General) {
   Arc a1(u1, v);
   Arc a2(u2, v);
 
-  a1.ArcCost(1.0);
-  a2.ArcCost(2.0);
+  a1.arc_cost(1.0);
+  a2.arc_cost(2.0);
   
   u1->unit_capacities[a1].push_back(1);
   u2->unit_capacities[a2].push_back(1);

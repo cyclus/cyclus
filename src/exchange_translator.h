@@ -95,7 +95,7 @@ template <class T> class ExchangeTranslator {
         ex_ctx_->trader_arc_costs.at(req->requester()).at(req).at(bid);
 
     Arc a = TranslateArc(xlation_ctx_, bid, unit_cost, unit_value);
-    a.ArcCost(arc_cost);
+    a.arc_cost(arc_cost);
     CLOG(LEV_DEBUG5) << "Adding arc with Unit Cost =" << unit_cost
                      << ", Unit Value =" << unit_value
                      << ", Arc Cost =" << arc_cost;

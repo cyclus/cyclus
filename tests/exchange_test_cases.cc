@@ -188,8 +188,8 @@ void Case3::Construct(ExchangeGraph* g, bool exclusive_orders) {
   v->unit_capacities[a1].push_back(1);
   u->unit_capacities[a2].push_back(1);
   w->unit_capacities[a2].push_back(1);
-  a1.ArcCost(p1);
-  a2.ArcCost(p2);
+  a1.arc_cost(p1);
+  a2.arc_cost(p2);
 
   RequestGroup::Ptr request(new RequestGroup(q));
   request->AddCapacity(q);

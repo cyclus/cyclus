@@ -12,7 +12,7 @@ namespace cyclus {
 
 double ExchangeSolver::Cost(const Arc& a, bool exclusive_orders) {
   // Use stored arc cost which is set during translation.
-  double arc_cost = a.ArcCost();
+  double arc_cost = a.arc_cost();
   
   if (exclusive_orders && a.exclusive()) {
     // For exclusive arcs, scale by excl_val if needed
@@ -26,7 +26,7 @@ double ExchangeSolver::PseudoCost() {
 }
 
 double ExchangeSolver::PseudoCost(double cost_factor) {
-  return PseudoCostByArcCost(cost_factor);
+  return PseudoCostByarc_cost(cost_factor);
 }
 
 double ExchangeSolver::PseudoCostByCap(double cost_factor) {
@@ -78,7 +78,7 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
       std::vector<Arc>& node_arcs = graph_->node_arc_map()[*n_it];
       for (std::vector<Arc>::iterator arc_it = node_arcs.begin(); 
            arc_it != node_arcs.end(); ++arc_it) {
-        coeff = ArcCost(*arc_it);
+        coeff = arc_cost(*arc_it);
         if (coeff > max_coeff) max_coeff = coeff;
       }
     }
@@ -87,7 +87,7 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
   return max_coeff / min_unit_cap * (1 + cost_factor);
 }
 
-double ExchangeSolver::PseudoCostByArcCost(double cost_factor) {
+double ExchangeSolver::PseudoCostByarc_cost(double cost_factor) {
   double max_cost = 0;
   std::vector<Arc>& arcs = graph_->arcs();
   for (int i = 0; i != arcs.size(); i++) {
@@ -98,7 +98,7 @@ double ExchangeSolver::PseudoCostByArcCost(double cost_factor) {
     // request/bid quantities don't match).
     double factor =
         (a.exclusive() && a.excl_val() > 0 && a.excl_val() < 1) ? 1 / a.excl_val() : 1.0;
-    max_cost = std::max(max_cost, ArcCost(a) * factor);
+    max_cost = std::max(max_cost, arc_cost(a) * factor);
   }
   return max_cost * (1 + cost_factor);
 }

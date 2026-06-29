@@ -83,7 +83,7 @@ class Arc {
     excl_val_ = other.excl_val();
     unit_cost_ = other.unit_cost();
     unit_value_ = other.unit_value();
-    arc_cost_ = other.ArcCost();
+    arc_cost_ = other.arc_cost();
     return *this;
   }
 
@@ -110,9 +110,9 @@ class Arc {
   inline void set_unit_value(double unit_value) { unit_value_ = unit_value; }
   
   /// @brief returns the arc cost
-  inline double ArcCost() const { return arc_cost_; }
+  inline double arc_cost() const { return arc_cost_; }
   /// @brief sets the arc cost arbitrarily
-  inline void ArcCost(double arc_cost) { arc_cost_ = arc_cost; }
+  inline void arc_cost(double arc_cost) { arc_cost_ = arc_cost; }
 
  private:
   boost::weak_ptr<ExchangeNode> unode_;

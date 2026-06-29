@@ -32,8 +32,8 @@ struct ReqCostComp {
     int ru = r.unode()->agent_id;
     int rv = r.vnode()->agent_id;
     // Use stored arc cost
-    double l_cost = l.ArcCost();
-    double r_cost = r.ArcCost();
+    double l_cost = l.arc_cost();
+    double r_cost = r.arc_cost();
     return (l_cost != r_cost) ? (l_cost < r_cost)
                                 : (lu > ru || (lu == ru && lv > rv));
   }

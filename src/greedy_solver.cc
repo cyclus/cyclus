@@ -187,7 +187,7 @@ void GreedySolver::GreedilySatisfySet(RequestGroup::Ptr prs) {
           graph_->AddMatch(a, tomatch);
 
           match += tomatch;
-          UpdateObj(tomatch, a.ArcCost());
+          UpdateObj(tomatch, a.arc_cost());
         }
         ++arc_it;
       }  // while( (match =< target) && (arc_it != arcs.end()) )

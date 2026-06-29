@@ -56,11 +56,11 @@ class ExchangeSolver {
   double PseudoCost();
   double PseudoCost(double cost_factor);
   double PseudoCostByCap(double cost_factor);
-  double PseudoCostByArcCost(double cost_factor);
+  double PseudoCostByarc_cost(double cost_factor);
   /// @}
 
   /// return the cost of an arc (instance method that uses the solver's graph)
-  inline double ArcCost(const Arc& a) {
+  inline double arc_cost(const Arc& a) {
     return Cost(a, exclusive_orders_);
   }
 

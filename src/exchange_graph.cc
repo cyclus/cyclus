@@ -76,7 +76,7 @@ Arc::Arc(const Arc& other)
       excl_val_(other.excl_val()),
       unit_cost_(other.unit_cost()),
       unit_value_(other.unit_value()),
-      arc_cost_(other.ArcCost()) {}
+      arc_cost_(other.arc_cost()) {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExchangeNodeGroup::AddExchangeNode(ExchangeNode::Ptr node) {

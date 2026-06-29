@@ -27,7 +27,7 @@ double AvgCost(ExchangeNode::Ptr n, ExchangeGraph* graph) {
   
   double sum = 0.0;
   for (std::vector<Arc>::const_iterator arc_it = arcs.begin(); arc_it != arcs.end(); ++arc_it) {
-    sum += arc_it->ArcCost();
+    sum += arc_it->arc_cost();
   }
   
   return sum / arcs.size();

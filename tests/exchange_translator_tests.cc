@@ -210,7 +210,7 @@ TEST(ExXlateTests, AdjustedArcCost) {
 
   ASSERT_EQ(1, graph->arcs().size());
   const Arc& a = graph->arcs()[0];
-  EXPECT_DOUBLE_EQ(override_cost, a.ArcCost());
+  EXPECT_DOUBLE_EQ(override_cost, a.arc_cost());
   // unit_cost / unit_value remain what the bid and request themselves report
   EXPECT_DOUBLE_EQ(unit_value, a.unit_value());
 
@@ -218,7 +218,7 @@ TEST(ExXlateTests, AdjustedArcCost) {
   const std::vector<Arc>& node_arcs =
       graph->node_arc_map().at(a.unode());
   ASSERT_EQ(1, node_arcs.size());
-  EXPECT_DOUBLE_EQ(override_cost, node_arcs[0].ArcCost());
+  EXPECT_DOUBLE_EQ(override_cost, node_arcs[0].arc_cost());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -544,13 +544,13 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(1, graph->arcs().size());
   EXPECT_EQ(0, graph->matches().size());
   const Arc& a = *graph->arcs().begin();
-  // After Translate(), arc.ArcCost() contains unit_cost - unit_value
+  // After Translate(), arc.arc_cost() contains unit_cost - unit_value
   EXPECT_EQ(unit_value, a.unit_value());
   // Bid has no explicit unit_cost, defaults to 0
   EXPECT_EQ(0.0, a.unit_cost());
 
   double expected_arc_cost = a.unit_cost() - a.unit_value();
-  EXPECT_DOUBLE_EQ(expected_arc_cost, a.ArcCost());
+  EXPECT_DOUBLE_EQ(expected_arc_cost, a.arc_cost());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

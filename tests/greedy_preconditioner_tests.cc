@@ -21,13 +21,13 @@ TEST(ConditionerTests, AvgCost) {
 
   // u1 has two arcs with average arc cost of (1.0 + 3.0) / 2 = 2.0
   Arc a1(u1, v1);
-  a1.ArcCost(1.0);
+  a1.arc_cost(1.0);
   Arc a2(u1, v2);
-  a2.ArcCost(3.0);
+  a2.arc_cost(3.0);
   
   // u2 has one arc with arc cost 1.5
   Arc a3(u2, v1);
-  a3.ArcCost(1.5);
+  a3.arc_cost(1.5);
 
   ExchangeGraph g;
   RequestGroup::Ptr rg(new RequestGroup());
@@ -102,11 +102,11 @@ TEST(ConditionerTests, Conditioning) {
   Arc n22s(n22, spam);
 
   // Set arc costs - this is what AvgCost reads
-  n11e.ArcCost(n1ecost);
-  n12s.ArcCost(n1scost);
-  n13s.ArcCost(n1scost);
-  n21e.ArcCost(n2ecost);
-  n22s.ArcCost(n2scost);
+  n11e.arc_cost(n1ecost);
+  n12s.arc_cost(n1scost);
+  n13s.arc_cost(n1scost);
+  n21e.arc_cost(n2ecost);
+  n22s.arc_cost(n2scost);
 
   g.AddArc(n11e);
   g.AddArc(n12s);
