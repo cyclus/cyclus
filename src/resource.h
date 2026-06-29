@@ -37,10 +37,10 @@ class Resource {
   const int obj_id() const { return obj_id_; }
 
   /// Returns the unit value of this resource.
-  double unitA_value() const { return unitA_value_; }
+  double unit_value() const { return unitA_value_; }
 
   /// Sets the unit value of this resource.
-  void unitA_value(double unitA_value) { unitA_value_ = unitA_value; }
+  void unit_value(double unitA_value) { unitA_value_ = unitA_value; }
 
   /// Returns the unique id corresponding to this resource and its current
   /// state.  All resource id's are unique - even across different resource

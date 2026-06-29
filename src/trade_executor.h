@@ -134,9 +134,8 @@ template <class T> class TradeExecutor {
             }
           }
           
-          // Set the resource's unit value (different from req.pref_mod()) to 
-          // the successful trade's unit cost
-          rsrc->unitA_value(adjusted_unit_cost);
+          // Set the resource's unit value to the successful trade's unit cost
+          rsrc->unit_value(adjusted_unit_cost);
           
           // Record adjusted unit cost/value and the solver arc cost.
           ctx->NewDatum("Transactions")

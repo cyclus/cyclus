@@ -234,7 +234,7 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       // Peek at resbuf to get current composition
       m = buf_->Peek();
 
-      double bid_cost = cost_per_unit_ + m->unitA_value();
+      double bid_cost = cost_per_unit_ + m->unit_value();
 
       std::vector<double>::iterator bit;
       for (bit = bids.begin(); bit != bids.end(); ++bit) {
