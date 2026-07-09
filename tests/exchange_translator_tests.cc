@@ -192,7 +192,7 @@ TEST(ExXlateTests, FullRequestArcRemoval) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Mutating the arc_cost value in trader_arc_costs (as AdjustMatlParams does)
 // should propagate through to Arc::ArcCost on the translated graph,
-// independently of unit_cost - unit_cost_mod.
+// independently of unit_cost + unit_cost_mod.
 TEST(ExXlateTests, AdjustedArcCost) {
   TestContext tc;
   TestFacility* trader = tc.trader();
@@ -208,7 +208,7 @@ TEST(ExXlateTests, AdjustedArcCost) {
   ctx.AddBidPortfolio(bp);
 
   // simulate adjustment overriding the arc cost with a value unrelated to
-  // unit_cost - unit_cost_mod
+  // unit_cost + unit_cost_mod
   double override_cost = 99.5;
   ctx.trader_arc_costs[trader][req][bid] = override_cost;
 
@@ -411,7 +411,7 @@ TEST(ExXlateTests, XlateArc) {
   ExchangeNodeGroup::Ptr bset =
       TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
-  double unit_cost = std::isnan(bid->unit_cost()) ? 0.0 : bid->unit_cost();
+  double unit_cost = std::isnan(bid->unit_cost()) ? 1.0 : bid->unit_cost();
   double unit_cost_mod = req->unit_cost_mod();
   Arc a = TranslateArc(xlator.translation_ctx(), bid, unit_cost, unit_cost_mod);
 
@@ -466,7 +466,7 @@ TEST(ExXlateTests, XlateArcExclusive) {
 
   // Helper to get unit_cost and unit_cost_mod for TranslateArc
   auto get_cost_value = [](Bid<Material>* b) -> std::pair<double, double> {
-    double unit_cost = std::isnan(b->unit_cost()) ? 0.0 : b->unit_cost();
+    double unit_cost = std::isnan(b->unit_cost()) ? 1.0 : b->unit_cost();
     double unit_cost_mod = b->request()->unit_cost_mod();
     return std::make_pair(unit_cost, unit_cost_mod);
   };
@@ -551,12 +551,12 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(1, graph->arcs().size());
   EXPECT_EQ(0, graph->matches().size());
   const Arc& a = *graph->arcs().begin();
-  // After Translate(), arc.arc_cost() contains unit_cost - unit_cost_mod
+  // After Translate(), arc.arc_cost() contains unit_cost + unit_cost_mod
   EXPECT_EQ(unit_cost_mod, a.unit_cost_mod());
-  // Bid has no explicit unit_cost, defaults to 0
-  EXPECT_EQ(0.0, a.unit_cost());
+  // Bid has no explicit unit_cost, defaults to 1
+  EXPECT_EQ(1.0, a.unit_cost());
 
-  double expected_arc_cost = a.unit_cost() - a.unit_cost_mod();
+  double expected_arc_cost = a.unit_cost() + a.unit_cost_mod();
   EXPECT_DOUBLE_EQ(expected_arc_cost, a.arc_cost());
 }
 

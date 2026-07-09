@@ -34,8 +34,8 @@ TEST(RequestTests, Defaults) {
 
   EXPECT_EQ("", r->commodity());
   EXPECT_FALSE(r->exclusive());
-  EXPECT_EQ(1., r->unit_cost_mod());
-  EXPECT_EQ(1., cyclus::kDefaultUnitCostMod);
+  EXPECT_EQ(0.0, r->unit_cost_mod());
+  EXPECT_EQ(0.0, cyclus::kDefaultUnitCostMod);
 
   delete r;
 }

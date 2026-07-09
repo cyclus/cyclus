@@ -285,11 +285,11 @@ TEST_F(TradeExecutorDatabaseTests, WrapperFunctionAndBasicRecording) {
   
   if (qr.rows.size() > 0) {
     double recorded_cost = qr.GetVal<double>("UnitCost", 0);
-    double recorded_value = qr.GetVal<double>("UnitCostMod", 0);
+    double recorded_mod = qr.GetVal<double>("UnitCostMod", 0);
     
-    // UnitCost should equal val from bid, UnitCostMod should equal value from request (default = 1.0)
+    // UnitCost should equal val from bid, UnitCostMod should equal value from request (default = 0.0)
     EXPECT_DOUBLE_EQ(recorded_cost, orig_unit_cost);
-    EXPECT_DOUBLE_EQ(recorded_value, 1.0);
+    EXPECT_DOUBLE_EQ(recorded_mod, 0.0);
   }
   
   // Cleanup

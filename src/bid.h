@@ -9,8 +9,8 @@
 
 namespace cyclus {
 
-/// Default unit_cost values are zero
-static const double kDefaultUnitCost = 0.0;
+/// Default unit_cost values are one
+static const double kDefaultUnitCost = 1.0;
 
 class Trader;
 template <class T> class BidPortfolio;

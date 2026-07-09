@@ -162,7 +162,7 @@ TEST_F(ExchangeContextTests, AddBid1) {
   EXPECT_EQ(bidders, context.bidders);
 
   RequestBidMap<Resource>::type exp_cost;
-  exp_cost[req1].insert(std::make_pair(bid, unit_cost - unit_cost_mod));
+  exp_cost[req1].insert(std::make_pair(bid, unit_cost + unit_cost_mod));
   EXPECT_EQ(context.trader_arc_costs[req1->requester()], exp_cost);
 
 }

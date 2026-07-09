@@ -288,7 +288,7 @@ TEST_F(ResourceExchangeTests, ArcCostValues) {
 
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
 
-  // Bids without a unit_cost default to unit_cost = 0
+  // Bids without a unit_cost default to unit_cost = 1
   Bid<Material>* pbid = bp->AddBid(preq, mat, bidr, false);
   Bid<Material>* cbid = bp->AddBid(creq, mat, bidr, false);
 
@@ -303,8 +303,8 @@ TEST_F(ResourceExchangeTests, ArcCostValues) {
   EXPECT_NO_THROW(exchng->AddAllRequests());
   EXPECT_NO_THROW(exchng->AddAllBids());
 
-  double p_arc_cost = pbid->unit_cost() - preq->unit_cost_mod();
-  double c_arc_cost = cbid->unit_cost() - creq->unit_cost_mod();
+  double p_arc_cost = pbid->unit_cost() + preq->unit_cost_mod();
+  double c_arc_cost = cbid->unit_cost() + creq->unit_cost_mod();
 
   RequestBidMap<Material>::type pexp;
   pexp[preq].insert(std::make_pair(pbid, p_arc_cost));

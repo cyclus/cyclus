@@ -38,10 +38,10 @@ TEST(ProgTranslatorTests, translation) {
   double unit_cost_vals[] = {5.0, 2.0, 1.0, 0.5, 1.5};  
   double unit_cost_mod_vals[] = {0.0, 0.5, 0.0, 0.0, 0.2}; 
   
-  // Calculate arc_cost = unit_cost - unit_cost_mod for each arc
+  // Calculate arc_cost = unit_cost + unit_cost_mod for each arc
   double arc_costs[narcs];
   for (int i = 0; i != narcs; i++) {
-    arc_costs[i] = unit_cost_vals[i] - unit_cost_mod_vals[i];
+    arc_costs[i] = unit_cost_vals[i] + unit_cost_mod_vals[i];
   }
 
   double ucaps_a_0[] = {0.5, 0.4};

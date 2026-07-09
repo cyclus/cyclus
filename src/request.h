@@ -12,10 +12,9 @@ namespace cyclus {
 
 class Material;
 
-/// Default unit_cost_mod values are unity. This has been updated from values of
-/// zero (which was the case prior to release 1.4). Unit cost modifiers can be 
+/// Default unit_cost_mod values are zero. Unit cost modifiers can be 
 /// lower or higher than the default value.
-static const double kDefaultUnitCostMod = 1;
+static const double kDefaultUnitCostMod = 0.0;
 
 class Trader;
 template <class T> class RequestPortfolio;

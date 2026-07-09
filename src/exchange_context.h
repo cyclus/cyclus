@@ -90,8 +90,8 @@ template <class T> struct ExchangeContext {
     // unit cost modifier comes from request
     double unit_cost_mod = pb->request()->unit_cost_mod();
 
-    // define arc_cost as unit_cost - unit_cost_mod
-    double arc_cost = unit_cost - unit_cost_mod;
+    // define arc_cost as unit_cost + unit_cost_mod
+    double arc_cost = unit_cost + unit_cost_mod;
     
     trader_arc_costs[pb->request()->requester()][pb->request()].insert(
         std::make_pair(pb, arc_cost));

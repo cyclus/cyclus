@@ -118,7 +118,7 @@ template <class T> class TradeExecutor {
           double adjusted_unit_cost_mod = trade.request->unit_cost_mod();
 
           // Normally the arc_cost is going to be this, however...
-          double adjusted_arc_cost = adjusted_unit_cost - adjusted_unit_cost_mod;
+          double adjusted_arc_cost = adjusted_unit_cost + adjusted_unit_cost_mod;
       
           // It's possible to change the arc_cost directly during Adjustment
           if (ex_ctx) {

@@ -1821,7 +1821,7 @@ cpdef dict normalize_request_portfolio(object inp):
     # canonize commods
     if not isinstance(commods, Iterable):
         commods = list(commods)
-    cdef dict default_req = {'target': None, 'unit_cost_mod': 1.0,
+    cdef dict default_req = {'target': None, 'unit_cost_mod': 0.0,
                              'exclusive': False, 'cost': None}
     for index, commodity in enumerate(commods):
         for key, val in commodity.items():
@@ -1881,7 +1881,7 @@ cpdef dict normalize_bid_portfolio(object inp):
     if not isinstance(bids, Sequence):
         bids = [bids]
     cdef dict default_bid = {'request': None, 'offer': None,
-                             'unit_cost': 0.0, 'exclusive': False}
+                             'unit_cost': 1.0, 'exclusive': False}
     cdef int i, n
     cdef list normbids = []
     n = len(bids)
