@@ -14,7 +14,7 @@ int Product::next_qualid_ = 1;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Product::Ptr Product::Create(Agent* creator, double quantity,
                              std::string quality, std::string package_name,
-                             double unitA_value) {
+                             double unit_value) {
   if (qualids_.count(quality) == 0) {
     qualids_[quality] = next_qualid_++;
     creator->context()
@@ -26,7 +26,7 @@ Product::Ptr Product::Create(Agent* creator, double quantity,
 
   // the next lines must come after qual id setting
   Product::Ptr r(new Product(creator->context(), quantity, quality,
-                             package_name, unitA_value));
+                             package_name, unit_value));
   r->tracker_.Create(creator);
   return r;
 }
@@ -53,10 +53,10 @@ void Product::Absorb(Product::Ptr other) {
     throw ValueError("incompatible resource types.");
   }
   double tot_qty = quantity_ + other->quantity();
-  double avg_unitA_value =
+  double avg_unit_value =
       (quantity_ * unit_value() + other->quantity() * other->unit_value()) /
       tot_qty;
-  unit_value(avg_unitA_value);
+  unit_value(avg_unit_value);
   quantity_ = tot_qty;
   other->quantity_ = 0;
 
@@ -129,13 +129,13 @@ void Product::ChangePackage(std::string new_package_name) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Product::Product(Context* ctx, double quantity, std::string quality,
-                 std::string package_name, double unitA_value)
+                 std::string package_name, double unit_value)
     : quality_(quality),
       quantity_(quantity),
       tracker_(ctx, this),
       ctx_(ctx),
       package_name_(package_name) {
-        this->unit_value(unitA_value);
+        this->unit_value(unit_value);
 }
 
 }  // namespace cyclus

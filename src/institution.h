@@ -23,8 +23,8 @@ typedef std::set<std::string>::iterator PrototypeIterator;
 /// @section introduction Introduction The Institution type assists in defining
 /// the region-institution-facility hierarchy in Cyclus. A Institution
 /// institution is an actor associated with a set of facilities for which it is
-/// responsible. An Institution may be used to adjust unit costs/values in the
-/// ResourceExchange to make material routing decisions based on interfacility
+/// responsible. An Institution may be used to adjust unit costs/cost mods in 
+/// the ResourceExchange to make material routing decisions based on interfacility
 /// relationships. Deployment is a primary differentiator between different
 /// Institution implementations.
 class Institution : public Agent, public TimeListener {

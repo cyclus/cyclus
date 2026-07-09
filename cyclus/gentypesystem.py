@@ -2081,7 +2081,7 @@ cdef class _{{rclsname}}Request:
         self._target = None
         self._requester = None
         self._commodity = None
-        self._unit_value = None
+        self._unit_cost_mod = None
         self._exclusive = None
         self._cost_function = None
 
@@ -2115,12 +2115,12 @@ cdef class _{{rclsname}}Request:
         return self._commodity
 
     @property
-    def pref_mod(self):
-        """This request's unit_value"""
-        if self._unit_value is not None:
-            return self._unit_value
-        self._unit_value = self.ptx.pref_mod()
-        return self._unit_value
+    def unit_cost_mod(self):
+        """This request's unit_cost_mod"""
+        if self._unit_cost_mod is not None:
+            return self._unit_cost_mod
+        self._unit_cost_mod = self.ptx.unit_cost_mod()
+        return self._unit_cost_mod
 
     @property
     def exclusive(self):
@@ -2186,7 +2186,7 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
                 if req['cost'] is not None:
                     raise ValueError('setting cost functions from Python is not yet '
                                     'supported.')
-                single_request = port.get().AddRequest(targ_ptr, requester, commod, req['unit_value'],
+                single_request = port.get().AddRequest(targ_ptr, requester, commod, req['unit_cost_mod'],
                                 req['exclusive'])
                 mreqs.push_back(single_request)
     port.get().AddMutualReqs(mreqs)
@@ -2580,7 +2580,7 @@ cdef class _{{rclsname}}Request:
     cdef object _target
     cdef object _requester
     cdef object _commodity
-    cdef object _unit_value
+    cdef object _unit_cost_mod
     cdef object _exclusive
     cdef object _cost_function
 

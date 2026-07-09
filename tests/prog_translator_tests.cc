@@ -34,14 +34,14 @@ TEST(ProgTranslatorTests, translation) {
   int nrows = 8;
   int nexcl = 3;
 
-  // unit value (from bid) and unit value (from request) for each arc
+  // unit cost (from bid) and unit cost modifier (from request) for each arc
   double unit_cost_vals[] = {5.0, 2.0, 1.0, 0.5, 1.5};  
-  double unit_value_vals[] = {0.0, 0.5, 0.0, 0.0, 0.2}; 
+  double unit_cost_mod_vals[] = {0.0, 0.5, 0.0, 0.0, 0.2}; 
   
-  // Calculate arc_cost = unit_cost - unit_value for each arc
+  // Calculate arc_cost = unit_cost - unit_cost_mod for each arc
   double arc_costs[narcs];
   for (int i = 0; i != narcs; i++) {
-    arc_costs[i] = unit_cost_vals[i] - unit_value_vals[i];
+    arc_costs[i] = unit_cost_vals[i] - unit_cost_mod_vals[i];
   }
 
   double ucaps_a_0[] = {0.5, 0.4};
@@ -100,23 +100,23 @@ TEST(ProgTranslatorTests, translation) {
 
   Arc x0(a0, c0);
   x0.unit_cost(unit_cost_vals[0]);
-  x0.set_pref_mod(unit_value_vals[0]);
+  x0.set_unit_cost_mod(unit_cost_mod_vals[0]);
   x0.arc_cost(arc_costs[0]);
   Arc x1(b0, c1);
   x1.unit_cost(unit_cost_vals[1]);
-  x1.set_pref_mod(unit_value_vals[1]);
+  x1.set_unit_cost_mod(unit_cost_mod_vals[1]);
   x1.arc_cost(arc_costs[1]);
   Arc x2(b1, c2);
   x2.unit_cost(unit_cost_vals[2]);
-  x2.set_pref_mod(unit_value_vals[2]);
+  x2.set_unit_cost_mod(unit_cost_mod_vals[2]);
   x2.arc_cost(arc_costs[2]);
   Arc x3(a1, d0);
   x3.unit_cost(unit_cost_vals[3]);
-  x3.set_pref_mod(unit_value_vals[3]);
+  x3.set_unit_cost_mod(unit_cost_mod_vals[3]);
   x3.arc_cost(arc_costs[3]);
   Arc x4(b1, d1);
   x4.unit_cost(unit_cost_vals[4]);
-  x4.set_pref_mod(unit_value_vals[4]);
+  x4.set_unit_cost_mod(unit_cost_mod_vals[4]);
   x4.arc_cost(arc_costs[4]);
 
   a0->unit_capacities[x0] = std::vector<double>(

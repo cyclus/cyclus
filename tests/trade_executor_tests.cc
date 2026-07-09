@@ -279,15 +279,15 @@ TEST_F(TradeExecutorDatabaseTests, WrapperFunctionAndBasicRecording) {
   // Verify bid object retains original cost
   EXPECT_DOUBLE_EQ(bid->unit_cost(), orig_unit_cost);
   
-  // Query database and verify UnitCost and UnitValue are recorded (no ExchangeContext means no adjustments)
+  // Query database and verify UnitCost and UnitCostMod are recorded (no ExchangeContext means no adjustments)
   cyclus::QueryResult qr = backend_->Query("Transactions", NULL);
   EXPECT_EQ(1, qr.rows.size()) << "Expected 1 transaction, got " << qr.rows.size();
   
   if (qr.rows.size() > 0) {
     double recorded_cost = qr.GetVal<double>("UnitCost", 0);
-    double recorded_value = qr.GetVal<double>("UnitValue", 0);
+    double recorded_value = qr.GetVal<double>("UnitCostMod", 0);
     
-    // UnitCost should equal val from bid, UnitValue should equal value from request (default = 1.0)
+    // UnitCost should equal val from bid, UnitCostMod should equal value from request (default = 1.0)
     EXPECT_DOUBLE_EQ(recorded_cost, orig_unit_cost);
     EXPECT_DOUBLE_EQ(recorded_value, 1.0);
   }
@@ -310,15 +310,15 @@ TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedArcCost) {
   std::vector<Trade<Material>> trades;
   trades.push_back(Trade<Material>(req, bid, trade_amt));
   
-  // Create ExchangeContext with adjusted unit cost and unit value
+  // Create ExchangeContext with adjusted unit cost and unit cost modifier
   ExchangeContext<Material> ex_ctx;
   ex_ctx.AddRequest(req);
   ex_ctx.AddBid(bid);
   
-  // Set different adjusted unit cost and unit value
+  // Set different adjusted unit cost and unit cost modifier
   double adj_arc_cost = 4.2;
   
-  // Set adjusted unit cost and unit value in ExchangeContext
+  // Set adjusted unit cost and unit cost modifier in ExchangeContext
   ex_ctx.trader_arc_costs[r1_][req][bid] = adj_arc_cost;
   
   TradeExecutor<Material> exec(trades);
@@ -330,19 +330,19 @@ TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedArcCost) {
   // Verify original bid unit cost is preserved
   EXPECT_DOUBLE_EQ(bid->unit_cost(), orig_unit_cost);
   
-  // Query database and verify adjusted unit cost and unit value are recorded
+  // Query database and verify adjusted unit cost and unit cost modifier are recorded
   cyclus::QueryResult qr = backend_->Query("Transactions", NULL);
   EXPECT_EQ(1, qr.rows.size()) << "Expected 1 transaction, got " << qr.rows.size();
   
   if (qr.rows.size() > 0) {
     double recorded_cost = qr.GetVal<double>("UnitCost", 0);
-    double recorded_value = qr.GetVal<double>("UnitValue", 0);
+    double recorded_value = qr.GetVal<double>("UnitCostMod", 0);
     double recorded_arc_cost = qr.GetVal<double>("ArcCost", 0);
 
     // We changed the arc_cost directly here, so the original unit cost/value
     // should persist, with a new adjusted_arc_cost
     EXPECT_DOUBLE_EQ(recorded_cost, orig_unit_cost);
-    EXPECT_DOUBLE_EQ(recorded_value, cyclus::kDefaultUnitValue);
+    EXPECT_DOUBLE_EQ(recorded_value, cyclus::kDefaultUnitCostMod);
     EXPECT_DOUBLE_EQ(recorded_arc_cost, adj_arc_cost);
   }
   

@@ -113,12 +113,12 @@ template <class T> class TradeExecutor {
 
         typename T::Ptr rsrc = v_it->second;
         if (rsrc->quantity() > cyclus::eps_rsrc()) {
-          // Get adjusted unit_cost and unit_value
+          // Get adjusted unit_cost and unit_cost_mod
           double adjusted_unit_cost = trade.bid->unit_cost();
-          double adjusted_unit_value = trade.request->pref_mod();
+          double adjusted_unit_cost_mod = trade.request->unit_cost_mod();
 
           // Normally the arc_cost is going to be this, however...
-          double adjusted_arc_cost = adjusted_unit_cost - adjusted_unit_value;
+          double adjusted_arc_cost = adjusted_unit_cost - adjusted_unit_cost_mod;
       
           // It's possible to change the arc_cost directly during Adjustment
           if (ex_ctx) {
@@ -132,7 +132,7 @@ template <class T> class TradeExecutor {
           // Set the resource's unit value to the successful trade's unit cost
           rsrc->unit_value(adjusted_unit_cost);
           
-          // Record adjusted unit cost/value and the solver arc cost.
+          // Record adjusted unit cost/modifier and the solver arc cost.
           ctx->NewDatum("Transactions")
               ->AddVal("TransactionId", ctx->NextTransactionID())
               ->AddVal("SenderId", supplier->id())
@@ -141,7 +141,7 @@ template <class T> class TradeExecutor {
               ->AddVal("Commodity", trade.request->commodity())
               ->AddVal("Time", ctx->time())
               ->AddVal("UnitCost", adjusted_unit_cost)
-              ->AddVal("UnitValue", adjusted_unit_value)
+              ->AddVal("UnitCostMod", adjusted_unit_cost_mod)
               ->AddVal("ArcCost", adjusted_arc_cost)
               ->Record();
         }

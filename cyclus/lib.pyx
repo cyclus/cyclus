@@ -1803,7 +1803,7 @@ cpdef dict normalize_request_portfolio(object inp):
         commods = []
         for commodity in inp['commodities']:
             for name, reqs in commodity.items():
-                if name == 'unit_value' or name == 'exclusive':
+                if name == 'unit_cost_mod' or name == 'exclusive':
                     continue
 
                 commods.append({name:reqs})
@@ -1811,7 +1811,7 @@ cpdef dict normalize_request_portfolio(object inp):
     else:
         commods = []
         for name, reqs in inp.items():
-            if name == 'unit_value' or name == 'exclusive':
+            if name == 'unit_cost_mod' or name == 'exclusive':
                 continue
             commods.append({name:reqs})
         constrs = []
@@ -1821,7 +1821,7 @@ cpdef dict normalize_request_portfolio(object inp):
     # canonize commods
     if not isinstance(commods, Iterable):
         commods = list(commods)
-    cdef dict default_req = {'target': None, 'unit_value': 1.0,
+    cdef dict default_req = {'target': None, 'unit_cost_mod': 1.0,
                              'exclusive': False, 'cost': None}
     for index, commodity in enumerate(commods):
         for key, val in commodity.items():
@@ -1829,8 +1829,8 @@ cpdef dict normalize_request_portfolio(object inp):
                 req = default_req.copy()
                 req['target'] = val
                 if 'commodities' in inp:
-                    if 'unit_value' in inp['commodities'][index]:
-                        req['unit_value'] = inp['commodities'][index]['unit_value']
+                    if 'unit_cost_mod' in inp['commodities'][index]:
+                        req['unit_cost_mod'] = inp['commodities'][index]['unit_cost_mod']
                     if 'exclusive' in inp['commodities'][index]:
                         req['exclusive'] = inp['commodities'][index]['exclusive']
                 commods[index][key] = [req]

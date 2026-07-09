@@ -81,10 +81,10 @@ struct MatConverter2 : public Converter<Material> {
 TEST(ExXlateTests, NegArcCost) {
   TestContext tc;
   TestFacility* trader = tc.trader();
-  double unit_value = -1;
+  double unit_cost_mod = -1;
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>* req =
-      rp->AddRequest(get_mat(u235, qty), trader, "", unit_value);
+      rp->AddRequest(get_mat(u235, qty), trader, "", unit_cost_mod);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
 
@@ -109,10 +109,10 @@ TEST(ExXlateTests, NegArcCost) {
 TEST(ExXlateTests, ZeroArcCost) {
   TestContext tc;
   TestFacility* trader = tc.trader();
-  double unit_value = 0;
+  double unit_cost_mod = 0;
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>* req =
-      rp->AddRequest(get_mat(u235, qty), trader, "", unit_value);
+      rp->AddRequest(get_mat(u235, qty), trader, "", unit_cost_mod);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
 
@@ -192,14 +192,14 @@ TEST(ExXlateTests, FullRequestArcRemoval) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Mutating the arc_cost value in trader_arc_costs (as AdjustMatlParams does)
 // should propagate through to Arc::ArcCost on the translated graph,
-// independently of unit_cost - unit_value.
+// independently of unit_cost - unit_cost_mod.
 TEST(ExXlateTests, AdjustedArcCost) {
   TestContext tc;
   TestFacility* trader = tc.trader();
-  double unit_value = 4.5;
+  double unit_cost_mod = 4.5;
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>* req =
-      rp->AddRequest(get_mat(u235, qty), trader, "", unit_value);
+      rp->AddRequest(get_mat(u235, qty), trader, "", unit_cost_mod);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
 
@@ -208,7 +208,7 @@ TEST(ExXlateTests, AdjustedArcCost) {
   ctx.AddBidPortfolio(bp);
 
   // simulate adjustment overriding the arc cost with a value unrelated to
-  // unit_cost - unit_value
+  // unit_cost - unit_cost_mod
   double override_cost = 99.5;
   ctx.trader_arc_costs[trader][req][bid] = override_cost;
 
@@ -218,8 +218,8 @@ TEST(ExXlateTests, AdjustedArcCost) {
   ASSERT_EQ(1, graph->arcs().size());
   const Arc& a = graph->arcs()[0];
   EXPECT_DOUBLE_EQ(override_cost, a.arc_cost());
-  // unit_cost / unit_value remain what the bid and request themselves report
-  EXPECT_DOUBLE_EQ(unit_value, a.pref_mod());
+  // unit_cost / unit_cost_mod remain what the bid and request themselves report
+  EXPECT_DOUBLE_EQ(unit_cost_mod, a.unit_cost_mod());
 
   // the per-node arc list (used by solvers) must agree with arcs_
   const std::vector<Arc>& node_arcs =
@@ -412,8 +412,8 @@ TEST(ExXlateTests, XlateArc) {
       TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
   double unit_cost = std::isnan(bid->unit_cost()) ? 0.0 : bid->unit_cost();
-  double unit_value = req->pref_mod();
-  Arc a = TranslateArc(xlator.translation_ctx(), bid, unit_cost, unit_value);
+  double unit_cost_mod = req->unit_cost_mod();
+  Arc a = TranslateArc(xlator.translation_ctx(), bid, unit_cost, unit_cost_mod);
 
   EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid], a.vnode());
   EXPECT_EQ(xlator.translation_ctx().request_to_node[req], a.unode());
@@ -464,11 +464,11 @@ TEST(ExXlateTests, XlateArcExclusive) {
   TranslateRequestPortfolio(xlator.translation_ctx(), rport);
   TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
-  // Helper to get unit_cost and unit_value for TranslateArc
+  // Helper to get unit_cost and unit_cost_mod for TranslateArc
   auto get_cost_value = [](Bid<Material>* b) -> std::pair<double, double> {
     double unit_cost = std::isnan(b->unit_cost()) ? 0.0 : b->unit_cost();
-    double unit_value = b->request()->pref_mod();
-    return std::make_pair(unit_cost, unit_value);
+    double unit_cost_mod = b->request()->unit_cost_mod();
+    return std::make_pair(unit_cost, unit_cost_mod);
   };
   
   // bid > request && req exclusive && bid !exclusive,
@@ -529,10 +529,10 @@ TEST(ExXlateTests, SimpleXlate) {
   TestFacility* trader = tc.trader();
 
   std::string commod = "c";
-  double unit_value = 4.5;
+  double unit_cost_mod = 4.5;
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
   Request<Material>* req =
-      rport->AddRequest(get_mat(u235, qty), trader, commod, unit_value);
+      rport->AddRequest(get_mat(u235, qty), trader, commod, unit_cost_mod);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
   bport->AddBid(req, get_mat(u235, qty), trader);
@@ -551,12 +551,12 @@ TEST(ExXlateTests, SimpleXlate) {
   EXPECT_EQ(1, graph->arcs().size());
   EXPECT_EQ(0, graph->matches().size());
   const Arc& a = *graph->arcs().begin();
-  // After Translate(), arc.arc_cost() contains unit_cost - unit_value
-  EXPECT_EQ(unit_value, a.pref_mod());
+  // After Translate(), arc.arc_cost() contains unit_cost - unit_cost_mod
+  EXPECT_EQ(unit_cost_mod, a.unit_cost_mod());
   // Bid has no explicit unit_cost, defaults to 0
   EXPECT_EQ(0.0, a.unit_cost());
 
-  double expected_arc_cost = a.unit_cost() - a.pref_mod();
+  double expected_arc_cost = a.unit_cost() - a.unit_cost_mod();
   EXPECT_DOUBLE_EQ(expected_arc_cost, a.arc_cost());
 }
 

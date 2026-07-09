@@ -115,14 +115,14 @@ class ResourceExchangeTests: public ::testing::Test {
   Bidder* bidr;
   ResourceExchange<Material>* exchng;
   string commod;
-  double unit_value;
+  double unit_cost_mod;
   Material::Ptr mat;
   Request<Material>* req;
   Bid<Material>* bid;
 
   virtual void SetUp() {
     commod = "name";
-    unit_value = 2.4;
+    unit_cost_mod = 2.4;
     cyclus::CompMap cm;
     cm[92235] = 1.0;
     Composition::Ptr comp = Composition::CreateFromMass(cm);
@@ -141,7 +141,7 @@ class ResourceExchangeTests: public ::testing::Test {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ResourceExchangeTests, Requests) {
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
-  req = rp->AddRequest(mat, reqr, commod, unit_value);
+  req = rp->AddRequest(mat, reqr, commod, unit_cost_mod);
   reqr->port_ = rp;
 
   Facility* clone = dynamic_cast<Facility*>(reqr->Clone());
@@ -172,8 +172,8 @@ TEST_F(ResourceExchangeTests, Bids) {
   ExchangeContext<Material>& ctx = exchng->ex_ctx();
 
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
-  req = rp->AddRequest(mat, reqr, commod, unit_value);
-  Request<Material>* req1 = rp->AddRequest(mat, reqr, commod, unit_value);
+  req = rp->AddRequest(mat, reqr, commod, unit_cost_mod);
+  Request<Material>* req1 = rp->AddRequest(mat, reqr, commod, unit_cost_mod);
   ctx.AddRequestPortfolio(rp);
   const std::vector<Request<Material>*>& reqs = ctx.commod_requests[commod];
   EXPECT_EQ(2, reqs.size());
@@ -240,10 +240,10 @@ TEST_F(ResourceExchangeTests, ArcCostCalls) {
 
   // doin a little magic to simulate each requester making their own request
   RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
-  Request<Material>* preq = rp1->AddRequest(mat, pcast, commod, unit_value);
+  Request<Material>* preq = rp1->AddRequest(mat, pcast, commod, unit_cost_mod);
   pcast->port_ = rp1;
   RequestPortfolio<Material>::Ptr rp2(new RequestPortfolio<Material>());
-  Request<Material>* creq = rp2->AddRequest(mat, ccast, commod, unit_value);
+  Request<Material>* creq = rp2->AddRequest(mat, ccast, commod, unit_cost_mod);
   ccast->port_ = rp2;
 
   EXPECT_EQ(0, pcast->req_ctr_);
@@ -278,10 +278,10 @@ TEST_F(ResourceExchangeTests, ArcCostValues) {
 
   // doin a little magic to simulate each requester making their own request
   RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
-  Request<Material>* preq = rp1->AddRequest(mat, pcast, commod, unit_value);
+  Request<Material>* preq = rp1->AddRequest(mat, pcast, commod, unit_cost_mod);
   pcast->port_ = rp1;
   RequestPortfolio<Material>::Ptr rp2(new RequestPortfolio<Material>());
-  Request<Material>* creq = rp2->AddRequest(mat, ccast, commod, unit_value);
+  Request<Material>* creq = rp2->AddRequest(mat, ccast, commod, unit_cost_mod);
   ccast->port_ = rp2;
 
   Bidder* bidr = new Bidder(tc.get(), commod);
@@ -303,8 +303,8 @@ TEST_F(ResourceExchangeTests, ArcCostValues) {
   EXPECT_NO_THROW(exchng->AddAllRequests());
   EXPECT_NO_THROW(exchng->AddAllBids());
 
-  double p_arc_cost = pbid->unit_cost() - preq->pref_mod();
-  double c_arc_cost = cbid->unit_cost() - creq->pref_mod();
+  double p_arc_cost = pbid->unit_cost() - preq->unit_cost_mod();
+  double c_arc_cost = cbid->unit_cost() - creq->unit_cost_mod();
 
   RequestBidMap<Material>::type pexp;
   pexp[preq].insert(std::make_pair(pbid, p_arc_cost));

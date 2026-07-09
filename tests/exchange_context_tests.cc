@@ -40,19 +40,19 @@ class ExchangeContextTests: public ::testing::Test {
   Request<Resource>* req2;
   RequestPortfolio<Resource>::Ptr rp1, rp2;
   string commod1, commod2;
-  double unit_value;
+  double unit_cost_mod;
 
   virtual void SetUp() {
     fac1 = new TestFacility(tc.get());
     fac2 = new TestFacility(tc.get());
 
-    unit_value = 0.5;
+    unit_cost_mod = 0.5;
     commod1 = "commod1";
 
     rp1 = RequestPortfolio<Resource>::Ptr(new RequestPortfolio<Resource>());
-    req1 = rp1->AddRequest(get_mat(), fac1, commod1, unit_value);
+    req1 = rp1->AddRequest(get_mat(), fac1, commod1, unit_cost_mod);
     rp2 = RequestPortfolio<Resource>::Ptr(new RequestPortfolio<Resource>());
-    req2 = rp2->AddRequest(get_mat(), fac2, commod1, unit_value);
+    req2 = rp2->AddRequest(get_mat(), fac2, commod1, unit_cost_mod);
   }
 
   virtual void TearDown() {
@@ -162,7 +162,7 @@ TEST_F(ExchangeContextTests, AddBid1) {
   EXPECT_EQ(bidders, context.bidders);
 
   RequestBidMap<Resource>::type exp_cost;
-  exp_cost[req1].insert(std::make_pair(bid, unit_cost - unit_value));
+  exp_cost[req1].insert(std::make_pair(bid, unit_cost - unit_cost_mod));
   EXPECT_EQ(context.trader_arc_costs[req1->requester()], exp_cost);
 
 }

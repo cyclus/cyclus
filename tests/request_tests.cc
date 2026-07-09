@@ -34,8 +34,8 @@ TEST(RequestTests, Defaults) {
 
   EXPECT_EQ("", r->commodity());
   EXPECT_FALSE(r->exclusive());
-  EXPECT_EQ(1., r->pref_mod());
-  EXPECT_EQ(1., cyclus::kDefaultUnitValue);
+  EXPECT_EQ(1., r->unit_cost_mod());
+  EXPECT_EQ(1., cyclus::kDefaultUnitCostMod);
 
   delete r;
 }
@@ -45,19 +45,19 @@ TEST(RequestTests, MaterialGetSet) {
   TestFacility* fac = tc.trader();
 
   string commod = "name";
-  double unit_value = 2.4;
+  double unit_cost_mod = 2.4;
   cyclus::CompMap cm;
   cm[92235] = 1.0;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
   double qty = 1.0;
   Material::Ptr mat = Material::CreateUntracked(qty, comp);
 
-  Request<Material>* r = Request<Material>::Create(mat, fac, commod, unit_value);
+  Request<Material>* r = Request<Material>::Create(mat, fac, commod, unit_cost_mod);
 
   EXPECT_EQ(commod, r->commodity());
   EXPECT_EQ(fac, r->requester());
   EXPECT_EQ(mat, r->target());
-  EXPECT_EQ(unit_value, r->pref_mod());
+  EXPECT_EQ(unit_cost_mod, r->unit_cost_mod());
 
   delete r;
 }
@@ -66,7 +66,7 @@ TEST(RequestTests, ProductGetSet) {
   TestContext tc;
   TestFacility* fac = tc.trader();
   string commod = "name";
-  double unit_value = 2.4;
+  double unit_cost_mod = 2.4;
   double qty = 1.0;
   string quality = "qual";
 
@@ -74,12 +74,12 @@ TEST(RequestTests, ProductGetSet) {
       Product::CreateUntracked(qty, quality);
 
   Request<Product>* r =
-      Request<Product>::Create(rsrc, fac, commod, unit_value);
+      Request<Product>::Create(rsrc, fac, commod, unit_cost_mod);
 
   EXPECT_EQ(commod, r->commodity());
   EXPECT_EQ(fac, r->requester());
   EXPECT_EQ(rsrc, r->target());
-  EXPECT_EQ(unit_value, r->pref_mod());
+  EXPECT_EQ(unit_cost_mod, r->unit_cost_mod());
 
   delete r;
 }
@@ -95,11 +95,11 @@ TEST(RequestTests, FunctionPointer) {
   double qty = 1.0;
   Material::Ptr mat = Material::CreateUntracked(qty, comp);
   string commod = "name";
-  double unit_value = 2.4;
+  double unit_cost_mod = 2.4;
   string quality = "qual";
 
   Request<Material>* r = Request<Material>::Create(
-    mat, fac, commod, unit_value, false,
+    mat, fac, commod, unit_cost_mod, false,
     [](Material::Ptr m)->double { return 1.0; });
 
   EXPECT_EQ(1.0, r->cost_function()(mat));

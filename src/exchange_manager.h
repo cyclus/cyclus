@@ -79,7 +79,7 @@ template <class T> class ExchangeManager {
             ->AddVal("ReqId", ss.str())
             ->AddVal("RequesterID", r->requester()->manager()->id())
             ->AddVal("Commodity", r->commodity())
-            ->AddVal("UnitValue", r->pref_mod())
+            ->AddVal("UnitCostMod", r->unit_cost_mod())
             ->AddVal("Exclusive", r->exclusive())
             ->AddVal("ResType", r->target()->type())
             ->AddVal("Quantity", r->target()->quantity())

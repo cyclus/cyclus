@@ -76,7 +76,7 @@ template <class T> struct ExchangeContext {
   }
 
   /// @brief adds a bid to the appropriate containers, default unit cost
-  /// and unit value are set
+  /// and unit cost modifier are set
   /// @param pb the bid
   void AddBid(Bid<T>* pb) {
     assert(pb->bidder() != NULL);
@@ -87,11 +87,11 @@ template <class T> struct ExchangeContext {
     // unit cost comes from bid
     double unit_cost = pb->unit_cost();
   
-    // unit value comes from request
-    double unit_value = pb->request()->pref_mod();
+    // unit cost modifier comes from request
+    double unit_cost_mod = pb->request()->unit_cost_mod();
 
-    // define arc_cost as unit_cost - unit_value
-    double arc_cost = unit_cost - unit_value;
+    // define arc_cost as unit_cost - unit_cost_mod
+    double arc_cost = unit_cost - unit_cost_mod;
     
     trader_arc_costs[pb->request()->requester()][pb->request()].insert(
         std::make_pair(pb, arc_cost));

@@ -37,7 +37,7 @@ struct ExchangeNode {
   /// @brief the parent ExchangeNodeGroup to which this ExchangeNode belongs
   ExchangeNodeGroup* group;
 
-  /// @brief unit values associated with this ExchangeNode corresponding to
+  /// @brief Values associated with this ExchangeNode corresponding to
   /// capacties of its parent ExchangeNodeGroup. This information corresponds to
   /// the resource object from which this ExchangeNode was translated.
   std::map<Arc, std::vector<double>> unit_capacities;
@@ -82,7 +82,7 @@ class Arc {
     exclusive_ = other.exclusive();
     excl_val_ = other.excl_val();
     unit_cost_ = other.unit_cost();
-    unit_value_ = other.pref_mod();
+    unit_cost_mod_ = other.unit_cost_mod();
     arc_cost_ = other.arc_cost();
     return *this;
   }
@@ -105,9 +105,9 @@ class Arc {
   inline double unit_cost() const { return unit_cost_; }
   inline void unit_cost(double unit_cost) { unit_cost_ = unit_cost; }
   
-  /// @brief unit value (from request node)
-  inline double pref_mod() const { return unit_value_; }
-  inline void set_pref_mod(double unit_value) { unit_value_ = unit_value; }
+  /// @brief unit cost modifier (from request node)
+  inline double unit_cost_mod() const { return unit_cost_mod_; }
+  inline void set_unit_cost_mod(double unit_cost_mod) { unit_cost_mod_ = unit_cost_mod; }
   
   /// @brief returns the arc cost
   inline double arc_cost() const { return arc_cost_; }
@@ -120,7 +120,7 @@ class Arc {
   bool exclusive_;
   double excl_val_;
   double unit_cost_;  
-  double unit_value_; 
+  double unit_cost_mod_; 
   double arc_cost_;
 };
 

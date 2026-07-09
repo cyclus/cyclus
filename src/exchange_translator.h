@@ -81,16 +81,16 @@ template <class T> class ExchangeTranslator {
   }
 
   /// @brief adds a bid-request arc to a graph, using the bid's unit cost,
-  /// the request's unit value, and the possibly adjustment-modified arc cost.
+  /// the request's unit cost modifier, and the possibly adjustment-modified arc cost.
   void AddArc(Request<T>* req, Bid<T>* bid, double arc_cost,
               ExchangeGraph::Ptr graph) {
     double unit_cost = bid->unit_cost();
-    double unit_value = req->pref_mod();
+    double unit_cost_mod = req->unit_cost_mod();
 
-    Arc a = TranslateArc(xlation_ctx_, bid, unit_cost, unit_value);
+    Arc a = TranslateArc(xlation_ctx_, bid, unit_cost, unit_cost_mod);
     a.arc_cost(arc_cost);
     CLOG(LEV_DEBUG5) << "Adding arc with Unit Cost =" << unit_cost
-                     << ", Unit Value =" << unit_value
+                     << ", Unit Cost Modifier =" << unit_cost_mod
                      << ", Arc Cost =" << arc_cost;
     graph->AddArc(a);
   }
@@ -212,13 +212,13 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
 /// updates the unit capacities for the associated nodes on the arc
 template <class T>
 Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
-                 Bid<T>* bid, double unit_cost, double unit_value) {
+                 Bid<T>* bid, double unit_cost, double unit_cost_mod) {
   Request<T>* req = bid->request();
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
   Arc arc(unode, vnode);
   arc.unit_cost(unit_cost);
-  arc.set_pref_mod(unit_value);
+  arc.set_unit_cost_mod(unit_cost_mod);
 
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();
