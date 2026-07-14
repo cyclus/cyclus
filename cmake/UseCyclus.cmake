@@ -159,8 +159,7 @@ MACRO(USE_CYCLUS lib_root src_root)
             DEPENDS ${CCIN}
             DEPENDS ${CYCPP}
             DEPENDS ${CYCLUS_CUSTOM_HEADERS}
-            COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}"
-            COMMENT "Executing ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}"
+            COMMENT "Executing ${CYCPP} ${HIN} ${PREPROCESSOR} ${HFLAG} ${ORIG} ${INCL_ARGS}\nExecuting ${CYCPP} ${CCIN} ${PREPROCESSOR} ${CCFLAG} ${ORIG} ${INCL_ARGS}"
             )
         SET(DEP_LIST ${DEP_LIST} ${CCOUT} ${HOUT})
     ELSE(EXISTS "${HIN}")
@@ -206,8 +205,7 @@ MACRO(USE_CYCLUS lib_root src_root)
                 DEPENDS ${HTIN}
                 DEPENDS ${CCTIN}
                 DEPENDS ${CYCLUS_CUSTOM_HEADERS}
-                COMMENT "Copying ${HTIN} to ${HTOUT}."
-                COMMENT "Copying ${CCTIN} to ${CCTOUT}."
+                COMMENT "Copying ${HTIN} to ${HTOUT}.\nCopying ${CCTIN} to ${CCTOUT}."
                 )
             SET(DEP_LIST ${DEP_LIST} ${HTOUT} ${CCTOUT})
         ELSE(EXISTS "${HTIN}")

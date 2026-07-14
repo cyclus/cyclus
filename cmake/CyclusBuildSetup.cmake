@@ -3,7 +3,7 @@
 # provide convenience for build maintenance.
 
 MACRO(cyclus_minimum_cmake_version VERSION_NUMBER)
-    SET(${VERSION_NUMBER} "3.16")
+    SET(${VERSION_NUMBER} "3.22...4.2")
 ENDMACRO()
 
 MACRO(cyclus_require_out_of_source_build)
