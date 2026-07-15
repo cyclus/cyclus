@@ -310,7 +310,7 @@ TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedArcCost) {
   std::vector<Trade<Material>> trades;
   trades.push_back(Trade<Material>(req, bid, trade_amt));
   
-  // Create ExchangeContext with adjusted unit cost and unit cost modifier
+  // Create ExchangeContext with adjusted arc cost
   ExchangeContext<Material> ex_ctx;
   ex_ctx.AddRequest(req);
   ex_ctx.AddBid(bid);

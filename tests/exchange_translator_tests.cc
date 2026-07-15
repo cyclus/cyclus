@@ -170,12 +170,12 @@ TEST(ExXlateTests, FullRequestArcRemoval) {
     Request<Material>* req_2 =
       rp->AddRequest(get_mat(u235, qty), trader, "", 1.0);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  bp->AddBid(req, get_mat(u235, qty), trader);
-  bp->AddBid(req, get_mat(u235, qty), trader);
-  bp->AddBid(req, get_mat(u235, qty), trader);
+  bp->AddBid(req, get_mat(u235, qty), trader_2);
+  bp->AddBid(req, get_mat(u235, qty), trader_2);
+  bp->AddBid(req, get_mat(u235, qty), trader_2);
 
   // This bid should remain, since it's a response to req_2
-  bp->AddBid(req_2, get_mat(u235, qty), trader);
+  bp->AddBid(req_2, get_mat(u235, qty), trader_2);
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rp);
