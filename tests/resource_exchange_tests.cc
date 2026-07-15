@@ -316,8 +316,8 @@ TEST_F(ResourceExchangeTests, ArcCostValues) {
 
   EXPECT_NO_THROW(exchng->AdjustAll());
 
-  pexp[preq].begin()->second = std::pow(p_arc_cost, 2);
-  cexp[creq].begin()->second = std::pow(std::pow(c_arc_cost, 2), 2);
+  pexp[preq].begin()->second = p_arc_cost * p_arc_cost;
+  cexp[creq].begin()->second = std::pow(c_arc_cost, 4);
   EXPECT_EQ(context.trader_arc_costs[parent], pexp);
   EXPECT_EQ(context.trader_arc_costs[child], cexp);
 

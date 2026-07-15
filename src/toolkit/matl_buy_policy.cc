@@ -232,7 +232,7 @@ MatlBuyPolicy& MatlBuyPolicy::Init(
 MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod) {
   CompMap c;
   c[10010000] = 1e-100;
-  return Set(commod, Composition::CreateFromMass(c), 0.0);
+  return Set(commod, Composition::CreateFromMass(c));
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod, Composition::Ptr c,

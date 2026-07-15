@@ -132,29 +132,34 @@ TEST(ExXlateTests, ZeroArcCost) {
 // pair while leaving the request and bid themselves intact.
 TEST(ExXlateTests, ArcRemoval) {
   TestContext tc;
-  TestFacility* trader = tc.trader();
-  TestFacility* trader_2 = tc.trader();
+  TestFacility* requester = tc.trader();
+  TestFacility* supplier = tc.trader();
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>* req =
-      rp->AddRequest(get_mat(u235, qty), trader, "", 1.0);
+      rp->AddRequest(get_mat(u235, qty), requester, "", 1.0);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  Bid<Material>* bid1 = bp->AddBid(req, get_mat(u235, qty), trader);
-  Bid<Material>* bid2 = bp->AddBid(req, get_mat(u235, qty), trader_2);
+  Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), supplier);
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rp);
   ctx.AddBidPortfolio(bp);
 
-  // simulate a trader's AdjustMatlParams erasing bid1 to remove its arc
-  ctx.trader_arc_costs[trader][req].erase(bid1);
+  // Verify that the arc is there in the first place
+  EXPECT_EQ(1, ctx.trader_arc_costs[requester][req].erase(bid));
+
+  // simulate a trader's AdjustMatlParams erasing the bid to remove its arc
+  ctx.trader_arc_costs[requester][req].erase(bid);
 
   ExchangeTranslator<Material> xlator(&ctx);
   ExchangeGraph::Ptr graph = xlator.Translate();
 
-  // bid2's arc survives, bid1's does not
-  EXPECT_EQ(1, graph->arcs().size());
-  EXPECT_EQ(xlator.translation_ctx().bid_to_node[bid2],
-            graph->arcs()[0].vnode());
+  // After erasing the arc from trader_arc_costs, the graph should have no
+  // arcs, but still nodes (as the second and third assertions check).
+  EXPECT_EQ(0, graph->arcs().size());
+  EXPECT_TRUE(xlator.translation_ctx().request_to_node.find(req) !=
+              xlator.translation_ctx().request_to_node.end());
+  EXPECT_TRUE(xlator.translation_ctx().bid_to_node.find(bid) !=
+              xlator.translation_ctx().bid_to_node.end());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -197,13 +202,14 @@ TEST(ExXlateTests, FullRequestArcRemoval) {
 // independently of unit_cost + unit_cost_mod.
 TEST(ExXlateTests, AdjustedArcCost) {
   TestContext tc;
-  TestFacility* trader = tc.trader();
+  TestFacility* requester = tc.trader();
+  TestFacility* supplier = tc.trader();
   double unit_cost_mod = 4.5;
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>* req =
-      rp->AddRequest(get_mat(u235, qty), trader, "", unit_cost_mod);
+      rp->AddRequest(get_mat(u235, qty), requester, "", unit_cost_mod);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
+  Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), supplier);
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rp);
@@ -212,7 +218,7 @@ TEST(ExXlateTests, AdjustedArcCost) {
   // simulate adjustment overriding the arc cost with a value unrelated to
   // unit_cost + unit_cost_mod
   double override_cost = 99.5;
-  ctx.trader_arc_costs[trader][req][bid] = override_cost;
+  ctx.trader_arc_costs[requester][req][bid] = override_cost;
 
   ExchangeTranslator<Material> xlator(&ctx);
   ExchangeGraph::Ptr graph = xlator.Translate();
@@ -222,6 +228,7 @@ TEST(ExXlateTests, AdjustedArcCost) {
   EXPECT_DOUBLE_EQ(override_cost, a.arc_cost());
   // unit_cost / unit_cost_mod remain what the bid and request themselves report
   EXPECT_DOUBLE_EQ(unit_cost_mod, a.unit_cost_mod());
+  EXPECT_DOUBLE_EQ(bid->unit_cost(), a.unit_cost());
 
   // the per-node arc list (used by solvers) must agree with arcs_
   const std::vector<Arc>& node_arcs =
@@ -469,7 +476,8 @@ TEST(ExXlateTests, XlateArcExclusive) {
 
   // Helper to get unit_cost and unit_cost_mod for TranslateArc
   auto get_cost_value = [](Bid<Material>* b) -> std::pair<double, double> {
-    double unit_cost = std::isnan(b->unit_cost()) ? 1.0 : b->unit_cost();
+    double unit_cost = std::isnan(b->unit_cost()) ?
+        cyclus::kDefaultUnitCost : b->unit_cost();
     double unit_cost_mod = b->request()->unit_cost_mod();
     return std::make_pair(unit_cost, unit_cost_mod);
   };

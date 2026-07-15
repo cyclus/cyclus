@@ -132,16 +132,16 @@ template <class T> class ResourceExchange {
   }
 
   void Adjust_(Trader* t) {
-  typename RequestBidMap<T>::type& map = ex_ctx_.trader_arc_costs[t];
+    typename RequestBidMap<T>::type& map = ex_ctx_.trader_arc_costs[t];
 
-  Adjust(t, map);
+    Adjust(t, map);
 
-  Agent* m = t->manager()->parent();
-  while (m != NULL) {
-    Adjust(m, map);
-    m = m->parent();
+    Agent* m = t->manager()->parent();
+    while (m != NULL) {
+      Adjust(m, map);
+      m = m->parent();
+    }
   }
-}
 
   struct trader_compare {
     bool operator()(Trader* lhs, Trader* rhs) const {
