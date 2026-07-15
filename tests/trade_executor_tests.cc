@@ -301,7 +301,6 @@ TEST_F(TradeExecutorDatabaseTests, WrapperFunctionAndBasicRecording) {
 TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedArcCost) {
   // Create one trade to test ExchangeContext functionality
   double orig_unit_cost = 2.5;
-  double orig_unit_val = 4.5;
   double trade_amt = 2.0;
   
   Request<Material>* req = Request<Material>::Create(fac_.mat, r1_);
@@ -315,10 +314,10 @@ TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedArcCost) {
   ex_ctx.AddRequest(req);
   ex_ctx.AddBid(bid);
   
-  // Set different adjusted unit cost and unit cost modifier
+  // Set different adjusted arc cost
   double adj_arc_cost = 4.2;
   
-  // Set adjusted unit cost and unit cost modifier in ExchangeContext
+  // Set adjusted arc cost in ExchangeContext
   ex_ctx.trader_arc_costs[r1_][req][bid] = adj_arc_cost;
   
   TradeExecutor<Material> exec(trades);
@@ -339,7 +338,7 @@ TEST_F(TradeExecutorDatabaseTests, ExchangeContextWithAdjustedArcCost) {
     double recorded_value = qr.GetVal<double>("UnitCostMod", 0);
     double recorded_arc_cost = qr.GetVal<double>("ArcCost", 0);
 
-    // We changed the arc_cost directly here, so the original unit cost/value
+    // We changed the arc_cost directly here, so the original unit cost/mod
     // should persist, with a new adjusted_arc_cost
     EXPECT_DOUBLE_EQ(recorded_cost, orig_unit_cost);
     EXPECT_DOUBLE_EQ(recorded_value, cyclus::kDefaultUnitCostMod);
@@ -360,7 +359,7 @@ TEST_F(TradeExecutorDatabaseTests, MixedCostScenarios) {
   
   // One bid with explicit unit cost, one with default value
   Bid<Material>* bid_explicit = Bid<Material>::Create(req, fac_.mat, s1_, false, explicit_cost);
-  Bid<Material>* bid_default = Bid<Material>::Create(req, fac_.mat, s2_);  // Default Cost
+  Bid<Material>* bid_default = Bid<Material>::Create(req, fac_.mat, s2_);  // Default cost
   
   std::vector<Trade<Material>> trades;
   trades.push_back(Trade<Material>(req, bid_explicit, trade_amt));
@@ -378,8 +377,27 @@ TEST_F(TradeExecutorDatabaseTests, MixedCostScenarios) {
   
   // Query database
   cyclus::QueryResult qr = backend_->Query("Transactions", NULL);
-  EXPECT_EQ(2, qr.rows.size()) << "Expected 2 transactions, got " 
-            << qr.rows.size();
+  ASSERT_EQ(2, qr.rows.size()) << "Expected 2 transactions, got "
+                                << qr.rows.size();
+
+  std::map<double, int> seen_unit_costs;
+
+  // Check to make sure that the costs we expect are actually recorded
+  // using a for loop because we can't be certain which order they're
+  // recorded in.
+  for (int i = 0; i < qr.rows.size(); ++i) {
+    double unit_cost = qr.GetVal<double>("UnitCost", i);
+    double unit_cost_mod = qr.GetVal<double>("UnitCostMod", i);
+    double arc_cost = qr.GetVal<double>("ArcCost", i);
+
+    seen_unit_costs[unit_cost]++;
+
+    EXPECT_DOUBLE_EQ(cyclus::kDefaultUnitCostMod, unit_cost_mod);
+    EXPECT_DOUBLE_EQ(unit_cost + unit_cost_mod, arc_cost);
+  }
+
+  EXPECT_EQ(1, seen_unit_costs[explicit_cost]);
+  EXPECT_EQ(1, seen_unit_costs[cyclus::kDefaultUnitCost]);
   
   // Cleanup
   delete bid_default;

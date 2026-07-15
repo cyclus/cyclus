@@ -24,7 +24,7 @@ TEST(ConditionerTests, AvgCost) {
   a1.arc_cost(1.0);
   Arc a2(u1, v2);
   a2.arc_cost(3.0);
-  
+
   // u2 has one arc with arc cost 1.5
   Arc a3(u2, v1);
   a3.arc_cost(1.5);
@@ -42,7 +42,7 @@ TEST(ConditionerTests, AvgCost) {
   g.AddArc(a1);
   g.AddArc(a2);
   g.AddArc(a3);
-  
+
   // Test average calculation: u1 should have average of (1.0 + 3.0) / 2 = 2.0
   EXPECT_DOUBLE_EQ(AvgCost(u1, &g), 2.0);
   

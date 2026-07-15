@@ -237,7 +237,7 @@ TEST_F(ResourceExchangeTests, ArcCostCalls) {
   ASSERT_TRUE(pcast->manager() == dynamic_cast<Agent*>(pcast));
   ASSERT_TRUE(ccast->manager() == dynamic_cast<Agent*>(ccast));
 
-  // doin a little magic to simulate each requester making their own request
+  // simulate each requester making their own request
   RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
   Request<Material>* preq = rp1->AddRequest(mat, pcast, commod, unit_cost_mod);
   pcast->port_ = rp1;
@@ -275,7 +275,7 @@ TEST_F(ResourceExchangeTests, ArcCostValues) {
   Requester* pcast = dynamic_cast<Requester*>(parent);
   Requester* ccast = dynamic_cast<Requester*>(child);
 
-  // doin a little magic to simulate each requester making their own request
+  // simulate each requester making their own request
   RequestPortfolio<Material>::Ptr rp1(new RequestPortfolio<Material>());
   Request<Material>* preq = rp1->AddRequest(mat, pcast, commod, unit_cost_mod);
   pcast->port_ = rp1;

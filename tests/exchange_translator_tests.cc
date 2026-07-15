@@ -80,13 +80,14 @@ struct MatConverter2 : public Converter<Material> {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, NegArcCost) {
   TestContext tc;
-  TestFacility* trader = tc.trader();
-  double unit_cost_mod = -1;
+  TestFacility* requester = tc.trader();
+  TestFacility* supplier = tc.trader();
+  double unit_cost_mod = -1000; // Arbitrary big negative number
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>* req =
-      rp->AddRequest(get_mat(u235, qty), trader, "", unit_cost_mod);
+      rp->AddRequest(get_mat(u235, qty), requester, "", unit_cost_mod);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
+  Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), supplier);
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rp);
@@ -96,33 +97,34 @@ TEST(ExXlateTests, NegArcCost) {
   ExchangeGraph::Ptr graph = xlator.Translate();
 
   // We no longer reject negative cost arcs, so the one we added should be there
-  EXPECT_EQ(graph->arcs().size(), 1);
+  ASSERT_EQ(1, graph->arcs().size());
+  EXPECT_LT(graph->arcs()[0].arc_cost(), 0);
 }
 
 /// this test checks the condition of an arc with a zero-valued arc_cost value
-/// being added to an exchange graph. The throw check is neccesary because of
-/// transition from simulation backwards incompatability from releases 1.3 to
-/// 1.5.
-///
-/// TODO: check that arcs().size() is zero instead of throwing before release
-/// 1.5
+/// being added to an exchange graph.
 TEST(ExXlateTests, ZeroArcCost) {
   TestContext tc;
-  TestFacility* trader = tc.trader();
-  double unit_cost_mod = 0;
+  TestFacility* requester = tc.trader();
+  TestFacility* supplier = tc.trader();
+  double unit_cost_mod = -1;
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>* req =
-      rp->AddRequest(get_mat(u235, qty), trader, "", unit_cost_mod);
+      rp->AddRequest(get_mat(u235, qty), requester, "", unit_cost_mod);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), trader);
+
+  // Make a bid with the default unit_cost of 1, such that arc_cost = 0
+  Bid<Material>* bid = bp->AddBid(req, get_mat(u235, qty), supplier);
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rp);
   ctx.AddBidPortfolio(bp);
   ExchangeTranslator<Material> xlator(&ctx);
-
   
-  EXPECT_NO_THROW(ExchangeGraph::Ptr graph = xlator.Translate());
+  ExchangeGraph::Ptr graph;
+  EXPECT_NO_THROW(graph = xlator.Translate());
+  ASSERT_EQ(1, graph->arcs().size());
+  EXPECT_DOUBLE_EQ(0.0, graph->arcs()[0].arc_cost());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -145,7 +147,7 @@ TEST(ExXlateTests, ArcRemoval) {
   ctx.AddBidPortfolio(bp);
 
   // Verify that the arc is there in the first place
-  EXPECT_EQ(1, ctx.trader_arc_costs[requester][req].erase(bid));
+  EXPECT_EQ(1, ctx.trader_arc_costs[requester][req].count(bid));
 
   // simulate a trader's AdjustMatlParams erasing the bid to remove its arc
   ctx.trader_arc_costs[requester][req].erase(bid);
@@ -174,7 +176,7 @@ TEST(ExXlateTests, FullRequestArcRemoval) {
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>* req =
       rp->AddRequest(get_mat(u235, qty), trader, "", 1.0);
-    Request<Material>* req_2 =
+  Request<Material>* req_2 =
       rp->AddRequest(get_mat(u235, qty), trader, "", 1.0);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   bp->AddBid(req, get_mat(u235, qty), trader_2);
@@ -387,7 +389,8 @@ TEST(ExXlateTests, XlateBid) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateArc) {
   TestContext tc;
-  TestFacility* trader = tc.trader();
+  TestFacility* requester = tc.trader();
+  TestFacility* supplier = tc.trader();
 
   Material::Ptr mat = get_mat(u235, qty);
 
@@ -403,11 +406,11 @@ TEST(ExXlateTests, XlateArc) {
   std::vector<double> cexp(carr, carr + sizeof(carr) / sizeof(carr[0]));
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
-  Request<Material>* req = rport->AddRequest(get_mat(u235, qty), trader);
+  Request<Material>* req = rport->AddRequest(get_mat(u235, qty), requester);
   rport->AddConstraint(cc1);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
-  Bid<Material>* bid = bport->AddBid(req, get_mat(u235, qty), trader);
+  Bid<Material>* bid = bport->AddBid(req, get_mat(u235, qty), supplier);
   bport->AddConstraint(cc1);
   bport->AddConstraint(cc2);
 
@@ -420,8 +423,8 @@ TEST(ExXlateTests, XlateArc) {
   ExchangeNodeGroup::Ptr bset =
       TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
-  double unit_cost = std::isnan(bid->unit_cost()) ? 
-                      cyclus::kDefaultUnitCost : bid->unit_cost();
+  double unit_cost = std::isnan(bid->unit_cost()) ?
+      cyclus::kDefaultUnitCost : bid->unit_cost();
   double unit_cost_mod = req->unit_cost_mod();
   Arc a = TranslateArc(xlator.translation_ctx(), bid, unit_cost, unit_cost_mod);
 
@@ -441,32 +444,33 @@ TEST(ExXlateTests, XlateArc) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, XlateArcExclusive) {
   TestContext tc;
-  TestFacility* trader = tc.trader();
+  TestFacility* requester = tc.trader();
+  TestFacility* supplier = tc.trader();
 
   bool exclusive = true;
 
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
-  Request<Material>* req = rport->AddRequest(get_mat(u235, qty), trader,
+  Request<Material>* req = rport->AddRequest(get_mat(u235, qty), requester,
                                                  "", 0, exclusive);
-  Request<Material>* req2 = rport->AddRequest(get_mat(u235, qty), trader,
+  Request<Material>* req2 = rport->AddRequest(get_mat(u235, qty), requester,
                                                   "", 0, !exclusive);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
-  Bid<Material>* bid1 = bport->AddBid(req, get_mat(u235, qty  + 1), trader,
+  Bid<Material>* bid1 = bport->AddBid(req, get_mat(u235, qty  + 1), supplier,
                                           !exclusive);
-  Bid<Material>* bid2 = bport->AddBid(req, get_mat(u235, qty), trader,
+  Bid<Material>* bid2 = bport->AddBid(req, get_mat(u235, qty), supplier,
                                           !exclusive);
-  Bid<Material>* bid3 = bport->AddBid(req, get_mat(u235, qty - 1), trader,
+  Bid<Material>* bid3 = bport->AddBid(req, get_mat(u235, qty - 1), supplier,
                                           !exclusive);
-  Bid<Material>* bid4 = bport->AddBid(req, get_mat(u235, qty + 1), trader,
+  Bid<Material>* bid4 = bport->AddBid(req, get_mat(u235, qty + 1), supplier,
                                           exclusive);
-  Bid<Material>* bid5 = bport->AddBid(req, get_mat(u235, qty), trader,
+  Bid<Material>* bid5 = bport->AddBid(req, get_mat(u235, qty), supplier,
                                           exclusive);
-  Bid<Material>* bid6 = bport->AddBid(req2, get_mat(u235, qty - 1), trader,
+  Bid<Material>* bid6 = bport->AddBid(req2, get_mat(u235, qty - 1), supplier,
                                           exclusive);
-  Bid<Material>* bid7 = bport->AddBid(req2, get_mat(u235, qty), trader,
+  Bid<Material>* bid7 = bport->AddBid(req2, get_mat(u235, qty), supplier,
                                           exclusive);
-  Bid<Material>* bid8 = bport->AddBid(req2, get_mat(u235, qty + 1), trader,
+  Bid<Material>* bid8 = bport->AddBid(req2, get_mat(u235, qty + 1), supplier,
                                           exclusive);
 
   ExchangeContext<Material> ctx;
@@ -481,7 +485,7 @@ TEST(ExXlateTests, XlateArcExclusive) {
     double unit_cost_mod = b->request()->unit_cost_mod();
     return std::make_pair(unit_cost, unit_cost_mod);
   };
-  
+
   // bid > request && req exclusive && bid !exclusive,
   // so excl_val set to request qty
   auto cost_value1 = get_cost_value(bid1);
@@ -537,16 +541,17 @@ TEST(ExXlateTests, XlateArcExclusive) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST(ExXlateTests, SimpleXlate) {
   TestContext tc;
-  TestFacility* trader = tc.trader();
+  TestFacility* requester = tc.trader();
+  TestFacility* supplier = tc.trader();
 
   std::string commod = "c";
   double unit_cost_mod = 4.5;
   RequestPortfolio<Material>::Ptr rport(new RequestPortfolio<Material>());
   Request<Material>* req =
-      rport->AddRequest(get_mat(u235, qty), trader, commod, unit_cost_mod);
+      rport->AddRequest(get_mat(u235, qty), requester, commod, unit_cost_mod);
 
   BidPortfolio<Material>::Ptr bport(new BidPortfolio<Material>());
-  bport->AddBid(req, get_mat(u235, qty), trader);
+  bport->AddBid(req, get_mat(u235, qty), supplier);
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rport);

@@ -134,7 +134,7 @@ TEST_F(ExchangeContextTests, AddRequest3) {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ExchangeContextTests, AddBid1) {
-  // bid bid for a request
+  // bid for a request
   ExchangeContext<Resource> context;
   context.AddRequestPortfolio(rp1);
 

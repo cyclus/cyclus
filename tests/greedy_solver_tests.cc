@@ -22,8 +22,8 @@ TEST(GreedySolverTests, AvgCost) {
 
   Arc a1(u1, v);
   Arc a2(u2, v);
-  
-  a1.arc_cost(1.0);  
+
+  a1.arc_cost(1.0);
   a2.arc_cost(2.0); 
 
   ExchangeGraph g;
