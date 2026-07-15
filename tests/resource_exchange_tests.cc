@@ -29,7 +29,6 @@ using cyclus::Facility;
 using cyclus::Material;
 using cyclus::Agent;
 using cyclus::RequestBidMap;
-using cyclus::RequestBidMap;
 using cyclus::Request;
 using cyclus::RequestPortfolio;
 using cyclus::ResourceExchange;
@@ -62,16 +61,16 @@ class Requester: public TestFacility {
     return rps;
   }
 
-// increments counter and squares all arc_costs directly
-virtual void AdjustMatlParams(RequestBidMap<Material>::type& rb_map) {
-  for (auto& request_bids : rb_map) {
-    auto& bid_map = request_bids.second;
-    for (auto& bid_cost : bid_map) {
-      bid_cost.second = bid_cost.second * bid_cost.second;
+  // increments counter and squares all arc_costs directly
+  virtual void AdjustMatlParams(RequestBidMap<Material>::type& rb_map) {
+    for (auto& request_bids : rb_map) {
+      auto& bid_map = request_bids.second;
+      for (auto& bid_cost : bid_map) {
+        bid_cost.second *= bid_cost.second;
+      }
     }
+    arc_ctr_++;
   }
-  arc_ctr_++;
-}
 
   RequestPortfolio<Material>::Ptr port_;
   int i_;

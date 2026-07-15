@@ -157,8 +157,8 @@ class MatlBuyPolicy : public Trader {
   /// @param unit_cost_mod the unit cost modifier for the commodity
   /// @{
   MatlBuyPolicy& Set(std::string commod);
-  MatlBuyPolicy& Set(std::string commod, Composition::Ptr c);
-  MatlBuyPolicy& Set(std::string commod, Composition::Ptr c, double unit_cost_mod);
+  MatlBuyPolicy& Set(std::string commod, Composition::Ptr c,
+                     double unit_cost_mod = kDefaultUnitCostMod);
   /// @}
 
   /// Instructs the policy to stop requesting a speific commodity

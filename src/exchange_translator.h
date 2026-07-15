@@ -218,7 +218,7 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
   Arc arc(unode, vnode);
   arc.unit_cost(unit_cost);
-  arc.set_unit_cost_mod(unit_cost_mod);
+  arc.unit_cost_mod(unit_cost_mod);
 
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();

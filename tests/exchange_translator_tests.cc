@@ -133,12 +133,13 @@ TEST(ExXlateTests, ZeroArcCost) {
 TEST(ExXlateTests, ArcRemoval) {
   TestContext tc;
   TestFacility* trader = tc.trader();
+  TestFacility* trader_2 = tc.trader();
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>* req =
       rp->AddRequest(get_mat(u235, qty), trader, "", 1.0);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
   Bid<Material>* bid1 = bp->AddBid(req, get_mat(u235, qty), trader);
-  Bid<Material>* bid2 = bp->AddBid(req, get_mat(u235, qty), trader);
+  Bid<Material>* bid2 = bp->AddBid(req, get_mat(u235, qty), trader_2);
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rp);
@@ -159,7 +160,8 @@ TEST(ExXlateTests, ArcRemoval) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Erasing an entire request entry from trader_arc_costs should remove every
 // arc on that request from the graph in one shot. Doing this should not remove
-// identical, but separate arcs from the graph.
+// identical (same arc_cost, material, trader, and quantity), but separate arcs
+// from the graph.
 TEST(ExXlateTests, FullRequestArcRemoval) {
   TestContext tc;
   TestFacility* trader = tc.trader();
@@ -411,7 +413,8 @@ TEST(ExXlateTests, XlateArc) {
   ExchangeNodeGroup::Ptr bset =
       TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
-  double unit_cost = std::isnan(bid->unit_cost()) ? 1.0 : bid->unit_cost();
+  double unit_cost = std::isnan(bid->unit_cost()) ? 
+                      cyclus::kDefaultUnitCost : bid->unit_cost();
   double unit_cost_mod = req->unit_cost_mod();
   Arc a = TranslateArc(xlator.translation_ctx(), bid, unit_cost, unit_cost_mod);
 

@@ -235,10 +235,6 @@ MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod) {
   return Set(commod, Composition::CreateFromMass(c), 0.0);
 }
 
-MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod, Composition::Ptr c) {
-  return Set(commod, c, 0.0);
-}
-
 MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod, Composition::Ptr c,
                                   double unit_cost_mod) {
   CommodDetail d;

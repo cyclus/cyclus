@@ -289,7 +289,7 @@ TEST_F(TradeExecutorDatabaseTests, WrapperFunctionAndBasicRecording) {
     
     // UnitCost should equal val from bid, UnitCostMod should equal value from request (default = 0.0)
     EXPECT_DOUBLE_EQ(recorded_cost, orig_unit_cost);
-    EXPECT_DOUBLE_EQ(recorded_mod, 0.0);
+    EXPECT_DOUBLE_EQ(recorded_mod, cyclus::kDefaultUnitCostMod);
   }
   
   // Cleanup

@@ -107,7 +107,7 @@ class Arc {
   
   /// @brief unit cost modifier (from request node)
   inline double unit_cost_mod() const { return unit_cost_mod_; }
-  inline void set_unit_cost_mod(double unit_cost_mod) { unit_cost_mod_ = unit_cost_mod; }
+  inline void unit_cost_mod(double unit_cost_mod) { unit_cost_mod_ = unit_cost_mod; }
   
   /// @brief returns the arc cost
   inline double arc_cost() const { return arc_cost_; }
