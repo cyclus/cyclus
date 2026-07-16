@@ -171,26 +171,26 @@ TEST(ExXlateTests, ArcRemoval) {
 // from the graph.
 TEST(ExXlateTests, FullRequestArcRemoval) {
   TestContext tc;
-  TestFacility* trader = tc.trader();
-  TestFacility* trader_2 = tc.trader();
+  TestFacility* requester = tc.trader();
+  TestFacility* supplier = tc.trader();
   RequestPortfolio<Material>::Ptr rp(new RequestPortfolio<Material>());
   Request<Material>* req =
-      rp->AddRequest(get_mat(u235, qty), trader, "", 1.0);
+      rp->AddRequest(get_mat(u235, qty), requester, "", 1.0);
   Request<Material>* req_2 =
-      rp->AddRequest(get_mat(u235, qty), trader, "", 1.0);
+      rp->AddRequest(get_mat(u235, qty), requester, "", 1.0);
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
-  bp->AddBid(req, get_mat(u235, qty), trader_2);
-  bp->AddBid(req, get_mat(u235, qty), trader_2);
-  bp->AddBid(req, get_mat(u235, qty), trader_2);
+  bp->AddBid(req, get_mat(u235, qty), supplier);
+  bp->AddBid(req, get_mat(u235, qty), supplier);
+  bp->AddBid(req, get_mat(u235, qty), supplier);
 
   // This bid should remain, since it's a response to req_2
-  bp->AddBid(req_2, get_mat(u235, qty), trader_2);
+  bp->AddBid(req_2, get_mat(u235, qty), supplier);
 
   ExchangeContext<Material> ctx;
   ctx.AddRequestPortfolio(rp);
   ctx.AddBidPortfolio(bp);
 
-  ctx.trader_arc_costs[trader].erase(req);
+  ctx.trader_arc_costs[requester].erase(req);
 
   ExchangeTranslator<Material> xlator(&ctx);
   ExchangeGraph::Ptr graph = xlator.Translate();
