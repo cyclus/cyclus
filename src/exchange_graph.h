@@ -42,9 +42,6 @@ struct ExchangeNode {
   /// the resource object from which this ExchangeNode was translated.
   std::map<Arc, std::vector<double>> unit_capacities;
 
-  /// @brief arc cost values for arcs
-  std::map<Arc, double> arc_costs;
-
   /// @brief whether this node represents an exclusive request or offer
   bool exclusive;
 
