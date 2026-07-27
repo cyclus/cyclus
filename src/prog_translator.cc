@@ -177,7 +177,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       CoinPackedVector excl_row;
       std::vector<ExchangeNode::Ptr>& nodes = exngs[i];
       for (int j = 0; j != nodes.size(); j++) {
-        std::vector<Arc>& arcs = g_->node_arc_map()[nodes[j]];
+        const std::vector<Arc>& arcs = g_->GetArcsFromNode(nodes[j]);
         for (int k = 0; k != arcs.size(); k++) {
           excl_row.insert(g_->arc_ids()[arcs[k]], 1.0);
         }
