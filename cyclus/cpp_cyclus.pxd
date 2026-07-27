@@ -476,7 +476,6 @@ cdef extern from "exchange_graph.h" namespace "cyclus":
         ExchangeNode(double, cpp_bool, std_string, int)
         ExchangeNodeGroup* group
         map[Arc, vector[double]] unit_capacities
-        map[Arc, double] prefs
         cpp_bool exclusives
         std_string commod
         int agent_id
@@ -493,8 +492,9 @@ cdef extern from "exchange_graph.h" namespace "cyclus":
         ExchangeNode.Ptr vnode()
         cpp_bool exclusive()
         double excl_val()
-        double pref()
-        void pref(double)
+        double unit_cost()
+        double unit_cost_mod()
+        double arc_cost()
 
     cpp_bool operator==(const ExchangeNode&, const ExchangeNode&)
 
