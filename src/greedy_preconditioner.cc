@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <assert.h>
-#include <numeric>
 #include <string>
 #include <cmath>
 
