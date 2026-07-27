@@ -22,7 +22,7 @@ void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
 
 /// @brief A comparison functor for sorting a container of Arcs by arc cost,
 /// in ascending order (i.e., lowest cost Arc first). In the case of a tie, a
-/// lexicalgraphic ordering of node ids is used.
+/// lexicographic ordering of node ids is used.
 /// Note: Lower arc cost is better, so we sort ascending.
 struct ReqCostComp {
   ReqCostComp() {}
@@ -41,7 +41,7 @@ struct ReqCostComp {
 
 /// @brief A comparison function for sorting a container of Nodes by average arc cost
 /// in ascending order (i.e., lowest cost Node first). In the case of a tie, a
-/// lexicalgraphic ordering of node ids is used.
+/// lexicographic ordering of node ids is used.
 /// Note: This requires the graph to be available, so it's not a simple inline function
 struct AvgArcCostComp {
   ExchangeGraph* graph_;

@@ -34,7 +34,7 @@ template <class T> class ExchangeTranslator {
  public:
   /// @brief default constructor
   ///
-  /// @param ex_ctx the exchance context
+  /// @param ex_ctx the exchange context
   ExchangeTranslator(ExchangeContext<T>* ex_ctx) { ex_ctx_ = ex_ctx; }
 
   /// @brief translate the ExchangeContext into an ExchangeGraph
@@ -99,7 +99,7 @@ template <class T> class ExchangeTranslator {
   void BackTranslateSolution(const std::vector<Match>& matches,
                              std::vector<Trade<T>>& ret) {
     std::vector<Match>::const_iterator m_it;
-    CLOG(LEV_DEBUG1) << "Back traslating " << matches.size()
+    CLOG(LEV_DEBUG1) << "Back translating " << matches.size()
                      << " trade matches.";
     for (m_it = matches.begin(); m_it != matches.end(); ++m_it) {
       ret.push_back(BackTranslateMatch(xlation_ctx_, *m_it));
@@ -134,7 +134,7 @@ inline void AddBid(ExchangeTranslationContext<T>& translation_ctx, Bid<T>* b,
 }
 
 /// @brief translates a request portfolio by adding request nodes and
-/// accounting for capacities. Request unit capcities must be added when arcs
+/// accounting for capacities. Request unit capacities must be added when arcs
 /// are known
 template <class T>
 RequestGroup::Ptr TranslateRequestPortfolio(
@@ -167,7 +167,7 @@ RequestGroup::Ptr TranslateRequestPortfolio(
 }
 
 /// @brief translates a bid portfolio by adding bid nodes and accounting
-/// for capacities. Bid unit capcities must be added when arcs are known
+/// for capacities. Bid unit capacities must be added when arcs are known
 template <class T>
 ExchangeNodeGroup::Ptr TranslateBidPortfolio(
     ExchangeTranslationContext<T>& translation_ctx,

@@ -162,7 +162,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
     }
 
     // 1e15 is the largest value that doesn't make the solver fall over
-    // (by emperical testing)
+    // (by empirical testing)
     double rlb = std::min(caps[i], 1e15);
     ctx_.row_lbs.push_back(request ? rlb : 0);
     ctx_.row_ubs.push_back(request ? inf : caps[i]);

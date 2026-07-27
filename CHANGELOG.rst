@@ -53,7 +53,7 @@ Since last release
 * Modified cycpp.py to fix a few whitespace-related bugs, and allow cyclus vars to be initialized (#1954)
 * Changed the epsilon (eps) in Material::Decay to 1e-4 allowing 1 day decay of tritium (#1946)
 * Changed the schema for recipes to require oneOrMore instead of zeroOrMore (#1940)
-* Renamed DRE variables to remove reference to preference and clarify intent (#TBD)
+* Renamed DRE variables to remove reference to preference and clarify intent (#1937)
 * Made the Unit Tests far less verbose by suppressing log output during RunSim (#1927)
 * Reworked the facility/instituion/region_cost.cycpp.h files to work with MC (#1931)
 * Changed Dockerfile to use boost and boost-cpp instead of libboost-devel (#1906)

@@ -38,7 +38,7 @@ struct ExchangeNode {
   ExchangeNodeGroup* group;
 
   /// @brief Values associated with this ExchangeNode corresponding to
-  /// capacties of its parent ExchangeNodeGroup. This information corresponds to
+  /// capacities of its parent ExchangeNodeGroup. This information corresponds to
   /// the resource object from which this ExchangeNode was translated.
   std::map<Arc, std::vector<double>> unit_capacities;
 

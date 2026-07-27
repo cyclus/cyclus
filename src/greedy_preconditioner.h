@@ -20,7 +20,7 @@ double GroupWeight(RequestGroup::Ptr g,
 
 /// @returns the average arc cost across arcs for a node
 /// @param n the node
-/// @param graph the exchange graph (needed to access arcs and compute shift)
+/// @param graph the exchange graph (needed to access arcs)
 double AvgCost(ExchangeNode::Ptr n, ExchangeGraph* graph);
 
 /// @class GreedyPreconditioner
@@ -50,8 +50,8 @@ double AvgCost(ExchangeNode::Ptr n, ExchangeGraph* graph);
 /// Now consider two RequestGroups with the following commodities:
 ///   #. g1 = {"eggs", "spam", "eggs"}
 ///   #. g2 = {"eggs", "spam"}
-/// And the following arc_cost-commodity  mapping:
-/// {g1: {"spam": 3/4, "eggs": 1/4}, g2: {"spam": 1, "eggs": 1}.
+/// And the following arc_cost --> commodity mapping:
+/// {g1: {"spam": 3/4, "eggs": 1/4}, g2: {"spam": 1, "eggs": 1}}.
 ///
 /// First, the groups will be ordered by conditioning weights:
 ///   #. g1 = {"eggs", "eggs", "spam"}
