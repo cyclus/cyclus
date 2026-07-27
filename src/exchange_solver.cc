@@ -27,7 +27,7 @@ double ExchangeSolver::PseudoCost() {
 }
 
 double ExchangeSolver::PseudoCost(double cost_factor) {
-  return PseudoCostByarc_cost(cost_factor);
+  return PseudoCostByArcCost(cost_factor);
 }
 
 double ExchangeSolver::PseudoCostByCap(double cost_factor) {
@@ -88,7 +88,7 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
   return max_coeff / min_unit_cap * (1 + cost_factor);
 }
 
-double ExchangeSolver::PseudoCostByarc_cost(double cost_factor) {
+double ExchangeSolver::PseudoCostByArcCost(double cost_factor) {
   double max_cost = -std::numeric_limits<double>::infinity();
   bool found_arc = false;
 

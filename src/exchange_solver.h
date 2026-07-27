@@ -64,11 +64,9 @@ class ExchangeSolver {
   /// @brief Calculates a faux-arc penalty for unmet demand.
   ///
   /// @param cost_factor The positive relative margin applied to the largest
-  ///                    effective arc cost.
+  ///                    effective arc cost. Should be finite and positive.
   /// @return A penalty greater than every finite effective real-arc cost, or
   ///         0.0 when the graph has no arcs.
-  /// @throws ValueError if an effective arc cost is not finite or cost_factor is
-  ///                    not finite and positive.
   double PseudoCost(double cost_factor);
 
   /// @brief Calculates a capacity-derived faux-arc penalty for unmet demand.
@@ -93,7 +91,7 @@ class ExchangeSolver {
   ///                    effective arc cost.
   /// @return The faux-arc penalty, or 0.0 when the graph has no arcs.
   /// @throws ValueError if an effective arc cost is not finite.
-  double PseudoCostByarc_cost(double cost_factor);
+  double PseudoCostByArcCost(double cost_factor);
   /// @}
 
   /// return the cost of an arc (instance method that uses the solver's graph)

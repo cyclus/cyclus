@@ -54,11 +54,11 @@ double AvgCost(ExchangeNode::Ptr n, ExchangeGraph* graph);
 /// {g1: {"spam": 3/4, "eggs": 1/4}, g2: {"spam": 1, "eggs": 1}.
 ///
 /// First, the groups will be ordered by conditioning weights:
-///   #. g1 = {"spam", "eggs", "eggs"}
-///   #. g2 = {"spam", "eggs"}
+///   #. g1 = {"eggs", "eggs", "spam"}
+///   #. g2 = {"eggs", "spam"}
 ///
 /// Finally, the groups themselves will be ordered by average weight:
-///   #. {g2, g1}
+///   #. {g1, g2}
 class GreedyPreconditioner {
  public:
   /// @brief the order of commodity weights
