@@ -96,3 +96,45 @@ TEST(GreedySolverTests, General) {
   EXPECT_EQ(g.request_groups()[0], gu1);
   EXPECT_EQ(g.request_groups()[1], gu2);
 }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(GreedySolverTests, PrioritizesCheapestNegativeCostRequest) {
+  ExchangeNode::Ptr expensive_request(new ExchangeNode(1.0));
+  ExchangeNode::Ptr cheap_request(new ExchangeNode(1.0));
+  ExchangeNode::Ptr supplier(new ExchangeNode(1.0));
+
+  Arc expensive_arc(expensive_request, supplier);
+  expensive_arc.arc_cost(-0.5);
+  Arc cheap_arc(cheap_request, supplier);
+  cheap_arc.arc_cost(-2.0);
+
+  expensive_request->unit_capacities[expensive_arc].push_back(1.0);
+  cheap_request->unit_capacities[cheap_arc].push_back(1.0);
+  supplier->unit_capacities[expensive_arc].push_back(1.0);
+  supplier->unit_capacities[cheap_arc].push_back(1.0);
+
+  RequestGroup::Ptr expensive_group(new RequestGroup(1.0));
+  expensive_group->AddExchangeNode(expensive_request);
+  expensive_group->AddCapacity(1.0);
+  RequestGroup::Ptr cheap_group(new RequestGroup(1.0));
+  cheap_group->AddExchangeNode(cheap_request);
+  cheap_group->AddCapacity(1.0);
+  ExchangeNodeGroup::Ptr supply_group(new ExchangeNodeGroup());
+  supply_group->AddExchangeNode(supplier);
+  supply_group->AddCapacity(1.0);
+
+  ExchangeGraph g;
+  g.AddRequestGroup(expensive_group);
+  g.AddRequestGroup(cheap_group);
+  g.AddSupplyGroup(supply_group);
+  g.AddArc(expensive_arc);
+  g.AddArc(cheap_arc);
+
+  GreedySolver solver(false);
+  solver.Solve(&g);
+
+  ASSERT_EQ(1, g.matches().size());
+  EXPECT_EQ(cheap_request, g.matches()[0].first.unode());
+  EXPECT_DOUBLE_EQ(-2.0, g.matches()[0].first.arc_cost());
+  EXPECT_DOUBLE_EQ(1.0, g.matches()[0].second);
+}

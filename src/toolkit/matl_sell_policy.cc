@@ -2,6 +2,7 @@
 
 #include "error.h"
 #include "comp_math.h"
+#include <cmath>
 
 #define LG(X) LOG(LEV_##X, "selpol")
 #define LGH(X)                                                    \
@@ -19,7 +20,8 @@ MatlSellPolicy::MatlSellPolicy()
       throughput_(std::numeric_limits<double>::max()),
       ignore_comp_(false),
       package_(Package::unpackaged()),
-      transport_unit_(TransportUnit::unrestricted()) {
+      transport_unit_(TransportUnit::unrestricted()),
+      unit_cost_(0.0) {
   Warn<EXPERIMENTAL_WARNING>(
       "MatlSellPolicy is experimental and its API may be subject to change");
 }
@@ -40,11 +42,6 @@ void MatlSellPolicy::set_throughput(double x) {
 
 void MatlSellPolicy::set_ignore_comp(bool x) {
   ignore_comp_ = x;
-}
-
-void MatlSellPolicy::set_cost_per_unit(double x) {
-  assert(x >= 0);
-  cost_per_unit_ = x;
 }
 
 void MatlSellPolicy::set_package(std::string x) {
@@ -95,31 +92,31 @@ void MatlSellPolicy::set_transport_unit(std::string x) {
 }
 
 MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                     std::string name, double cost_per_unit) {
+                                     std::string name) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
-  cost_per_unit_ = cost_per_unit;
+  unit_cost_ = 0.0;
   return *this;
 }
 
 MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                     std::string name, double throughput, double cost_per_unit) {
+                                     std::string name, double throughput) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
   set_throughput(throughput);
-  cost_per_unit_ = cost_per_unit;
+  unit_cost_ = 0.0;
   return *this;
 }
 
 MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
-                                     std::string name, bool ignore_comp, double cost_per_unit) {
+                                     std::string name, bool ignore_comp) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
   set_ignore_comp(ignore_comp);
-  cost_per_unit_ = cost_per_unit;
+  unit_cost_ = 0.0;
   return *this;
 }
 
@@ -131,6 +128,7 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   name_ = name;
   set_throughput(throughput);
   set_ignore_comp(ignore_comp);
+  unit_cost_ = 0.0;
   return *this;
 }
 
@@ -138,7 +136,7 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
                                      std::string name, double throughput,
                                      bool ignore_comp, double quantize,
                                      std::string package_name,
-                                     std::string transport_unit_name, double cost_per_unit) {
+                                     std::string transport_unit_name) {
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
@@ -147,12 +145,20 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   set_ignore_comp(ignore_comp);
   set_package(package_name);
   set_transport_unit(transport_unit_name);
-  cost_per_unit_ = cost_per_unit;
+  unit_cost_ = 0.0;
   return *this;
 }
 
 MatlSellPolicy& MatlSellPolicy::Set(std::string commod) {
   commods_.insert(commod);
+  return *this;
+}
+
+MatlSellPolicy& MatlSellPolicy::SetUnitCost(double unit_cost) {
+  if (!std::isfinite(unit_cost) || unit_cost < 0.0) {
+    throw ValueError("MatlSellPolicy cost per unit must be finite and non-negative.");
+  }
+  unit_cost_ = unit_cost;
   return *this;
 }
 
@@ -234,7 +240,18 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       // Peek at resbuf to get current composition
       m = buf_->Peek();
 
-      double bid_cost = cost_per_unit_ + m->unit_value();
+      // Grab and make sure the unit_value is set appropriately
+      double unit_value = m->unit_value();
+      if (!std::isfinite(unit_value)) {
+        throw ValueError(
+          "MatlSellPolicy cannot bid material with non-finite unit_value"
+        );
+      }
+
+      double bid_cost = unit_cost_ + unit_value;
+      if (!std::isfinite(bid_cost)) {
+        throw ValueError("MatlSellPolicy computed a non-finite bid_cost");
+      }
 
       std::vector<double>::iterator bit;
       for (bit = bids.begin(); bit != bids.end(); ++bit) {

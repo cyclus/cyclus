@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <cmath>
+
 #include "exchange_graph.h"
 #include "greedy_preconditioner.h"
 
@@ -9,6 +11,7 @@ using cyclus::ExchangeNode;
 using cyclus::ExchangeNodeGroup;
 using cyclus::ExchangeGraph;
 using cyclus::GreedyPreconditioner;
+using cyclus::NodeWeight;
 using cyclus::RequestGroup;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -55,6 +58,57 @@ TEST(ConditionerTests, AvgCost) {
   // Test ordering: u1 (2.0) > u2 (1.5) > u3 (0.0)
   EXPECT_TRUE(AvgCost(u1, &g) > AvgCost(u2, &g));
   EXPECT_TRUE(AvgCost(u2, &g) > AvgCost(u3, &g));
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST(ConditionerTests, NegativeCostsAreFiniteAndMonotonic) {
+  ExchangeNode::Ptr zero_cost(new ExchangeNode());
+  ExchangeNode::Ptr negative_one_cost(new ExchangeNode());
+  ExchangeNode::Ptr negative_two_cost(new ExchangeNode());
+  ExchangeNode::Ptr supplier(new ExchangeNode());
+
+  Arc zero_arc(zero_cost, supplier);
+  zero_arc.arc_cost(0.0);
+  Arc negative_one_arc(negative_one_cost, supplier);
+  negative_one_arc.arc_cost(-1.0);
+  Arc negative_two_arc(negative_two_cost, supplier);
+  negative_two_arc.arc_cost(-2.0);
+
+  RequestGroup::Ptr requests(new RequestGroup());
+  requests->AddExchangeNode(zero_cost);
+  requests->AddExchangeNode(negative_one_cost);
+  requests->AddExchangeNode(negative_two_cost);
+  ExchangeNodeGroup::Ptr supplies(new ExchangeNodeGroup());
+  supplies->AddExchangeNode(supplier);
+
+  ExchangeGraph g;
+  g.AddRequestGroup(requests);
+  g.AddSupplyGroup(supplies);
+  g.AddArc(zero_arc);
+  g.AddArc(negative_one_arc);
+  g.AddArc(negative_two_arc);
+
+  std::map<std::string, double> weights;
+  double zero_weight = NodeWeight(zero_cost, &weights, AvgCost(zero_cost, &g));
+  double negative_one_weight =
+      NodeWeight(negative_one_cost, &weights, AvgCost(negative_one_cost, &g));
+  double negative_two_weight =
+      NodeWeight(negative_two_cost, &weights, AvgCost(negative_two_cost, &g));
+
+  EXPECT_DOUBLE_EQ(0.0, AvgCost(zero_cost, &g));
+  EXPECT_DOUBLE_EQ(-1.0, AvgCost(negative_one_cost, &g));
+  EXPECT_DOUBLE_EQ(-2.0, AvgCost(negative_two_cost, &g));
+  EXPECT_TRUE(std::isfinite(zero_weight));
+  EXPECT_TRUE(std::isfinite(negative_one_weight));
+  EXPECT_TRUE(std::isfinite(negative_two_weight));
+  EXPECT_LT(negative_two_weight, negative_one_weight);
+  EXPECT_LT(negative_one_weight, zero_weight);
+
+  GreedyPreconditioner conditioner;
+  conditioner.Condition(&g);
+  EXPECT_EQ(negative_two_cost, requests->nodes().at(0));
+  EXPECT_EQ(negative_one_cost, requests->nodes().at(1));
+  EXPECT_EQ(zero_cost, requests->nodes().at(2));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

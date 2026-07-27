@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <numeric>
 #include <string>
+#include <cmath>
 
 #include <boost/lambda/bind.hpp>
 
@@ -134,7 +135,8 @@ double NodeWeight(ExchangeNode::Ptr n,
                   std::map<std::string, double>* weights,
                   double avg_arc_cost) {
   double commod_weight = (weights->size() != 0) ? (*weights)[n->commod] : 1;
-  double node_weight = commod_weight * (1 + avg_arc_cost / (1 + avg_arc_cost));
+  double node_weight = commod_weight *
+    (1 + avg_arc_cost / (1 + std::abs(avg_arc_cost)));
 
   CLOG(LEV_DEBUG5) << "Determining node weight: ";
   CLOG(LEV_DEBUG5) << "       commodity weight: " << commod_weight;

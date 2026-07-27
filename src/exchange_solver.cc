@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <limits>
+#include <cmath>
 
 #include "context.h"
 #include "exchange_graph.h"
@@ -88,19 +89,27 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
 }
 
 double ExchangeSolver::PseudoCostByarc_cost(double cost_factor) {
-  double max_cost = 0;
-  std::vector<Arc>& arcs = graph_->arcs();
-  for (int i = 0; i != arcs.size(); i++) {
-    const Arc& a = arcs[i];
-    // remove exclusive value factor from costs for arc costs that are less
-    // than unity. otherwise they can artificially raise the maximum cost.
-    // Guard excl_val > 0 to avoid division by zero (excl_val can be 0 when
-    // request/bid quantities don't match).
-    double factor =
-        (a.exclusive() && a.excl_val() > 0 && a.excl_val() < 1) ? 1 / a.excl_val() : 1.0;
-    max_cost = std::max(max_cost, arc_cost(a) * factor);
+  double max_cost = -std::numeric_limits<double>::infinity();
+  bool found_arc = false;
+
+  for (const Arc& a : graph_->arcs()) {
+    double cost = arc_cost(a);
+    if (!std::isfinite(cost)) {
+      throw ValueError("Arc cost must be finite.");
+    }
+    if (!found_arc || cost > max_cost) {
+      max_cost = cost;
+      found_arc = true;
+    }
   }
-  return max_cost * (1 + cost_factor);
+
+  if (!found_arc) {
+    return 0.0;
+  }
+
+  double margin = cost_factor * std::max(1.0, std::abs(max_cost));
+  return max_cost + margin;
+
 }
 
 }  // namespace cyclus

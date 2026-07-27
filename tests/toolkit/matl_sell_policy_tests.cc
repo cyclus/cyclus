@@ -1,6 +1,8 @@
 
 #include <gtest/gtest.h>
 
+#include <limits>
+
 #include "toolkit/matl_sell_policy.h"
 
 #include "composition.h"
@@ -39,10 +41,10 @@ class MatlSellPolicyTests: public ::testing::Test {
     CompMap v;
     v[pyne::nucname::id("H1")] = 1;
     comp = Composition::CreateFromAtom(v);
-    mat = Material::CreateUntracked(qty, comp);
+    mat = Material::CreateUntracked(qty, comp, 0.0);
     buff.Push(mat);
     comp1 = Composition::CreateFromAtom(v);
-    mat1 = Material::CreateUntracked(qty, comp1);
+    mat1 = Material::CreateUntracked(qty, comp1, 0.0);
   }
 
   virtual void TearDown() {
@@ -121,6 +123,68 @@ TEST_F(MatlSellPolicyTests, Bids) {
   obs = p.GetMatlBids(reqs);
   ASSERT_EQ(obs.size(), 0);
   delete req;
+
+}
+
+TEST_F(MatlSellPolicyTests, BidCost) {
+  MatlSellPolicy p;
+  std::string commod("commod");
+  CommodMap<Material>::type reqs;
+  Request<Material>* req = Request<Material>::Create(mat1, fac1, commod);
+  reqs[commod].push_back(req);
+
+  mat->unit_value(1.5);
+  p.Init(NULL, &buff, "", false).SetUnitCost(2.0).Set(commod);
+  std::set<BidPortfolio<Material>::Ptr> obs = p.GetMatlBids(reqs);
+  ASSERT_EQ(1, obs.size());
+  ASSERT_EQ(1, (*obs.begin())->bids().size());
+  EXPECT_DOUBLE_EQ(3.5, (*(*obs.begin())->bids().begin())->unit_cost());
+
+  p.Init(NULL, &buff, "").Set(commod);
+  obs = p.GetMatlBids(reqs);
+  ASSERT_EQ(1, obs.size());
+  ASSERT_EQ(1, (*obs.begin())->bids().size());
+  EXPECT_DOUBLE_EQ(1.5, (*(*obs.begin())->bids().begin())->unit_cost());
+
+  delete req;
+}
+
+TEST_F(MatlSellPolicyTests, RejectsUnsetMaterialUnitValue) {
+  ResBuf<Material> unset_buf;
+  unset_buf.capacity(cap);
+  unset_buf.Push(Material::CreateUntracked(qty, comp));
+
+  MatlSellPolicy p;
+  std::string commod("commod");
+  CommodMap<Material>::type reqs;
+  Request<Material>* req = Request<Material>::Create(mat1, fac1, commod);
+  reqs[commod].push_back(req);
+
+  p.Init(NULL, &unset_buf, "").Set(commod);
+  EXPECT_THROW(p.GetMatlBids(reqs), ValueError);
+
+  delete req;
+}
+
+TEST_F(MatlSellPolicyTests, RejectsNonFiniteBidCost) {
+  MatlSellPolicy p;
+  std::string commod("commod");
+  CommodMap<Material>::type reqs;
+  Request<Material>* req = Request<Material>::Create(mat1, fac1, commod);
+  reqs[commod].push_back(req);
+
+  p.Init(NULL, &buff, "").Set(commod);
+  EXPECT_THROW(
+      p.SetUnitCost(std::numeric_limits<double>::infinity()),
+      ValueError);
+
+  // Test that two big numbers that go over max catches too
+  mat->unit_value(std::numeric_limits<double>::max());
+  p.Init(NULL, &buff, "")
+    .SetUnitCost(std::numeric_limits<double>::max())
+    .Set(commod);
+  EXPECT_THROW(p.GetMatlBids(reqs), ValueError);
+  delete req;
 }
 
 TEST_F(MatlSellPolicyTests, Trades) {
@@ -172,7 +236,7 @@ TEST_F(MatlSellPolicyTests, Package) {
   cm[922350000] = 0.05;
   cm[922380000] = 0.95;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
-  mat = Material::Create(a, qty, comp, Package::unpackaged_name());
+  mat = Material::Create(a, qty, comp, Package::unpackaged_name(), 0.0);
 
   buf.Push(mat);
 
@@ -236,7 +300,7 @@ TEST_F(MatlSellPolicyTests, TransportUnit) {
   cm[922350000] = 0.05;
   cm[922380000] = 0.95;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
-  mat = Material::Create(a, qty, comp, Package::unpackaged_name());
+  mat = Material::Create(a, qty, comp, Package::unpackaged_name(), 0.0);
 
   buf.Push(mat);
 
@@ -330,7 +394,7 @@ TEST_F(MatlSellPolicyTests, PackageFailedTrade) {
   CompMap cm;
   cm[922380000] = 1;
   Composition::Ptr comp = Composition::CreateFromMass(cm);
-  mat = Material::Create(a, qty, comp, Package::unpackaged_name());
+  mat = Material::Create(a, qty, comp, Package::unpackaged_name(), 0.0);
 
   buf.Push(mat);
 

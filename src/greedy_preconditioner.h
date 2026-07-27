@@ -35,7 +35,7 @@ double AvgCost(ExchangeNode::Ptr n, ExchangeGraph* graph);
 /// larger weight implies a higher level of importance for solving.
 ///
 /// The conditioning weight for a node is calculated as $w_cond_i = w_commod_i *
-/// (1 + \frac{\overline{p_i}}{1 + \overline{p_i}})$, where $w_cond_i$ is the
+/// (1 + \frac{\overline{p_i}}{1 + |\overline{p_i}|})$, where $w_cond_i$ is the
 /// calculated conditioning weight, $w_commod_i$ is node $i$'s commodity's
 /// weight, and $\overline{p_i}$ is the average arc cost of all bid arcs
 /// associated with node $i$.
