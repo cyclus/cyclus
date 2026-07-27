@@ -279,7 +279,7 @@ class ExchangeGraph {
   inline std::map<int, Arc>& arc_by_id() { return arc_by_id_; }
 
   /// @brief returns all arcs on the graph connected to a specified node
-  std::vector<Arc>& GetArcsFromNode(ExchangeNode::Ptr node);
+  const std::vector<Arc>& GetArcsFromNode(ExchangeNode::Ptr node) const;
 
  private:
   std::vector<RequestGroup::Ptr> request_groups_;

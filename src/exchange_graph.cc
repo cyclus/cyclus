@@ -131,13 +131,15 @@ void ExchangeGraph::AddMatch(const Arc& a, double qty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::vector<Arc>& ExchangeGraph::GetArcsFromNode(ExchangeNode::Ptr node){
-  std::map<ExchangeNode::Ptr, std::vector<Arc>>& node_arc_map = this->node_arc_map();
+const std::vector<Arc>& ExchangeGraph::GetArcsFromNode(
+    ExchangeNode::Ptr node) const {
+  const std::map<ExchangeNode::Ptr, std::vector<Arc>>& arcs_by_node =
+      this->node_arc_map();
 
-  auto it = node_arc_map.find(node);
-  
-  static std::vector<Arc> empty;
-  if (it == node_arc_map.end() || it->second.size() == 0){
+  auto it = arcs_by_node.find(node);
+
+  static const std::vector<Arc> empty;
+  if (it == arcs_by_node.end() || it->second.empty()) {
     return empty;
   }
   return it->second;
