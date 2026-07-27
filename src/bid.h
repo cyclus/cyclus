@@ -28,7 +28,7 @@ template <class T> class Bid {
   /// @param bidder the bidder
   /// @param portfolio the portfolio of which this bid is a part
   /// @param exclusive flag for whether the bid is exclusive
-  /// @param unit_cost the unit_cost associated with providing the resource 
+  /// @param unit_cost the unit_cost associated with providing the resource
   ///                  from the request. 
   inline static Bid<T>* Create(Request<T>* request,
                                boost::shared_ptr<T> offer,
@@ -45,7 +45,7 @@ template <class T> class Bid {
   /// @param request the request being responded to by this bid
   /// @param offer the resource being offered in response to the request
   /// @param bidder the bidder
-  /// @param portfolio the porftolio of which this bid is a part
+  /// @param portfolio the portfolio of which this bid is a part
   /// @param exclusive flag for whether the bid is exclusive
   inline static Bid<T>* Create(Request<T>* request,
                                boost::shared_ptr<T> offer,

@@ -171,7 +171,7 @@ void GroupTradesBySupplier(TradeExecutionContext<T>& trade_ctx,
   }
 }
 
-/// @brief queries each supplier for the responses to thier matched trade and
+/// @brief queries each supplier for the responses to their matched trade and
 /// populates trades_by_requester_ and all_trades_ with the results
 template <class T>
 static void GetTradeResponses(TradeExecutionContext<T>& trade_ctx) {

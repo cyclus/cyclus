@@ -46,7 +46,7 @@ inline static void Adjust(Trader* t, RequestBidMap<Product>::type& rb_map) {
 ///     those requests
 /// -# Adjustment
 ///     Costs and Values for each request-bid pair are set, informing\n
-///     the evenutal soluation mechanism
+///     the eventual solution mechanism
 ///
 /// For example, assuming a simulation Context, ctx, and resource type,
 /// ResourceType:

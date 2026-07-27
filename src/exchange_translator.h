@@ -257,7 +257,7 @@ void TranslateCapacities(typename T::Ptr offer,
   typename std::set<CapacityConstraint<T>>::const_iterator it;
   for (it = constr.begin(); it != constr.end(); ++it) {
     CLOG(cyclus::LEV_DEBUG1)
-        << "Additing unit capacity: "
+        << "Adding unit capacity: "
         << it->convert(offer, &a, &ctx) / offer->quantity();
     n->unit_capacities[a].push_back(it->convert(offer, &a, &ctx) /
                                     offer->quantity());

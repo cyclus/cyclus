@@ -50,7 +50,7 @@ double AvgCost(ExchangeNode::Ptr n, ExchangeGraph* graph);
 /// Now consider two RequestGroups with the following commodities:
 ///   #. g1 = {"eggs", "spam", "eggs"}
 ///   #. g2 = {"eggs", "spam"}
-/// And the following arc_cost --> commodity mapping:
+/// And the following arc-cost-to-commodity mapping:
 /// {g1: {"spam": 3/4, "eggs": 1/4}, g2: {"spam": 1, "eggs": 1}}.
 ///
 /// First, the groups will be ordered by conditioning weights:
@@ -84,14 +84,14 @@ class GreedyPreconditioner {
   /// mapping
   void Condition(ExchangeGraph* graph);
 
-  /// @brief a comparitor for ordering containers of ExchangeNode::Ptrs in
+  /// @brief a comparator for ordering containers of ExchangeNode::Ptrs in
   /// ascending order based on their commodity's weight
   inline bool NodeComp(const ExchangeNode::Ptr l, const ExchangeNode::Ptr r) {
     return NodeWeight(l, &commod_weights_, avg_arc_costs_[l]) <
            NodeWeight(r, &commod_weights_, avg_arc_costs_[r]);
   }
 
-  /// @brief a comparitor for ordering containers of Request::Ptrs in
+  /// @brief a comparator for ordering containers of Request::Ptrs in
   /// ascending order based on their average commodity weight (lower arc cost = better)
   inline bool GroupComp(const RequestGroup::Ptr l, const RequestGroup::Ptr r) {
     return group_weights_[l] < group_weights_[r];

@@ -18,7 +18,7 @@ namespace toolkit {
 ///
 /// For simple behavior, policies virtually eliminate the need to write any code
 /// for resource exchange. Just assign a few policies to work with a few buffers
-/// and focus on writing the physics and other behvavior of your agent.  Typical
+/// and focus on writing the physics and other behavior of your agent. Typical
 /// usage goes something like this:
 ///
 /// @code

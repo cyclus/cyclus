@@ -97,7 +97,7 @@ class Arc {
   inline boost::shared_ptr<ExchangeNode> vnode() const { return vnode_.lock(); }
   inline bool exclusive() const { return exclusive_; }
   inline double excl_val() const { return excl_val_; }
-  
+
   /// @brief unit cost (from bid node)
   inline double unit_cost() const { return unit_cost_; }
   inline void unit_cost(double unit_cost) { unit_cost_ = unit_cost; }
