@@ -54,6 +54,7 @@ TEST(ConditionerTests, AvgCost) {
 
   // Test node with no arcs returns 0.0
   EXPECT_DOUBLE_EQ(AvgCost(u3, &g), 0.0);
+  EXPECT_EQ(0u, g.node_arc_map().count(u3));
 
   // Test ordering: u1 (2.0) > u2 (1.5) > u3 (0.0)
   EXPECT_TRUE(AvgCost(u1, &g) > AvgCost(u2, &g));
