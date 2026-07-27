@@ -12,8 +12,10 @@
 #include "equality_helpers.h"
 #include "exchange_graph.h"
 #include "logger.h"
+#include "prog_solver.h"
 #include "prog_translator.h"
 #include "solver_factory.h"
+#include "test_context.h"
 #include "env.h"
 #include "cyc_limits.h"
 
@@ -302,5 +304,38 @@ TEST(ProgTranslatorTests, translation) {
   delete iface;
 }
 
+// A zero-cost real arc must beat the positive faux unmet-demand arc.
+TEST(ProgSolverTests, ZeroCostArcProducesRealMatch) {
+  TestContext tc;
+
+  ExchangeNode::Ptr request(new ExchangeNode(1.0));
+  ExchangeNode::Ptr supply(new ExchangeNode(1.0));
+  Arc real_arc(request, supply);
+  real_arc.arc_cost(0.0);
+  request->unit_capacities[real_arc].push_back(1.0);
+  supply->unit_capacities[real_arc].push_back(1.0);
+
+  RequestGroup::Ptr requests(new RequestGroup(1.0));
+  requests->AddExchangeNode(request);
+  requests->AddCapacity(1.0);
+  ExchangeNodeGroup::Ptr supplies(new ExchangeNodeGroup());
+  supplies->AddExchangeNode(supply);
+  supplies->AddCapacity(1.0);
+
+  ExchangeGraph graph;
+  graph.AddRequestGroup(requests);
+  graph.AddSupplyGroup(supplies);
+  graph.AddArc(real_arc);
+
+  ProgSolver solver("clp");
+  solver.sim_ctx(tc.get());
+  ASSERT_NO_THROW(solver.Solve(&graph));
+
+  ASSERT_EQ(1, graph.matches().size());
+  EXPECT_EQ(request, graph.matches()[0].first.unode());
+  EXPECT_EQ(supply, graph.matches()[0].first.vnode());
+  EXPECT_DOUBLE_EQ(0.0, graph.matches()[0].first.arc_cost());
+  EXPECT_DOUBLE_EQ(1.0, graph.matches()[0].second);
+}
 
 }  // namespace cyclus
