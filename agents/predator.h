@@ -39,7 +39,7 @@ class Predator : public cyclus::Facility  {
   virtual std::set<cyclus::RequestPortfolio<cyclus::Product>::Ptr>
       GetProductRequests();
 
-  virtual void AdjustProductPrefs(cyclus::RequestBidMap<cyclus::Product>::type& prefs);
+  virtual void AdjustProductParams(cyclus::RequestBidMap<cyclus::Product>::type& rb_map);
 
   /// @brief Predator place accepted trade Materials in their Inventory
   virtual void AcceptProductTrades(

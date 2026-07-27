@@ -35,14 +35,14 @@ Predator::GetProductRequests() {
   return ports;
 }
 
-void Predator::AdjustProductPrefs(
-    cyclus::RequestBidMap<cyclus::Product>::type& prefs) {
-  if (prefs.size() == 0)
+void Predator::AdjustProductParams(
+    cyclus::RequestBidMap<cyclus::Product>::type& rb_map) {
+  if (rb_map.size() == 0)
     return;
-  Request<Product>* req = prefs.begin()->first;
+  Request<Product>* req = rb_map.begin()->first;
   std::map<Bid<Product>*, double>::iterator it;
   std::vector<Bid<Product>*> bids;
-  for (it = prefs[req].begin(); it != prefs[req].end(); ++it) {
+  for (it = rb_map[req].begin(); it != rb_map[req].end(); ++it) {
     bids.push_back(it->first);
   }
 
@@ -50,12 +50,12 @@ void Predator::AdjustProductPrefs(
   int nprey = context()->n_prototypes(prey);
   int npred = context()->n_prototypes(prototype());
   double factor = (hunt_factor && nprey < npred) ? double(nprey) / npred : 1;
-  int n_drop = std::floor(prefs[req].size() * (1 - success * factor));
+  int n_drop = std::floor(rb_map[req].size() * (1 - success * factor));
   LOG(cyclus::LEV_INFO3, "Predator") << name()
                                      << " removing " << n_drop << " bids "
-                                     << " out of " << prefs[req].size();
+                                     << " out of " << rb_map[req].size();
   for (int i = 0; i != n_drop; i++) {
-    prefs[req].erase(bids[i]);
+    rb_map[req].erase(bids[i]);
   }
 }
 
