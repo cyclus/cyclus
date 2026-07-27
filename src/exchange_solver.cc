@@ -32,8 +32,6 @@ double ExchangeSolver::PseudoCost(double cost_factor) {
 
 double ExchangeSolver::PseudoCostByCap(double cost_factor) {
   std::vector<ExchangeNode::Ptr>::iterator n_it;
-  std::map<Arc, std::vector<double>>::iterator c_it;
-  std::map<Arc, double>::iterator p_it;
   std::vector<RequestGroup::Ptr>::iterator rg_it;
   std::vector<ExchangeNodeGroup::Ptr>::iterator sg_it;
   double min_cap, coeff;
