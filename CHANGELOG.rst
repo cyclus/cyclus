@@ -46,6 +46,7 @@ Since last release
 * Introduced a definition of "stocked" for a resource buffer, which is a threshold quantity that can be set by the user (#)
 
 **Changed:**
+
 * Raised the minimum versions of Python to 3.10.0, SQLite to 3.36.0, Jinja2 to 2.10.3, NumPy to 1.21.4, and pandas to 1.3.4, and lowered that of Coin-Clp to 1.17.3, which are the versions tested in the ``minimum`` environment of the Pixi workspace
 * Removed the ``python<3.13`` and ``cython<3.1.0`` pins from the conda Docker builds, which now install ``libpython`` in place of the Python bindings of Boost (#1985)
 * Updated the Pixi workspace to Boost 1.92, Python 3.15, and Cython 3.3, and added ``libpython`` to it, as the conda-forge ``python`` package no longer installs the Python shared library as of Python 3.15 (#1985)
@@ -54,6 +55,7 @@ Since last release
 * Changed the epsilon (eps) in Material::Decay to 1e-4 allowing 1 day decay of tritium (#1946)
 * Changed the schema for recipes to require oneOrMore instead of zeroOrMore (#1940)
 * Renamed DRE variables to remove reference to preference and clarify intent (#1937)
+* Reworked the Dynamic Resource Exchange to minimize direct arc costs rather than inverted preferences. Updated sell policy accordingly (#1937)
 * Made the Unit Tests far less verbose by suppressing log output during RunSim (#1927)
 * Reworked the facility/instituion/region_cost.cycpp.h files to work with MC (#1931)
 * Changed Dockerfile to use boost and boost-cpp instead of libboost-devel (#1906)
@@ -81,7 +83,6 @@ Since last release
 * Removed ``exclusive_orders_only`` from schema (#1816)
 
 **Fixed:**
-
 * Fixed the generated random seed (``seed`` of 0) becoming negative on Linux hosts with more than about 25 days of uptime, which made the seed recorded in the Info table invalid as an input file seed. The seed is now generated from the system clock instead of the time since the host booted (#1989)
 * Fixed building with Boost 1.89 and newer, which no longer has a compiled Boost.System library (#1985)
 * Fixed a segmentation fault when a Cyclus Python module fails to import, which is now reported as an error with the Python traceback (#1985)
