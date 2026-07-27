@@ -120,7 +120,7 @@ TEST(ExXlateTests, ZeroArcCost) {
   ctx.AddRequestPortfolio(rp);
   ctx.AddBidPortfolio(bp);
   ExchangeTranslator<Material> xlator(&ctx);
-  
+
   ExchangeGraph::Ptr graph;
   EXPECT_NO_THROW(graph = xlator.Translate());
   ASSERT_EQ(1, graph->arcs().size());

@@ -101,11 +101,11 @@ class Arc {
   /// @brief unit cost (from bid node)
   inline double unit_cost() const { return unit_cost_; }
   inline void unit_cost(double unit_cost) { unit_cost_ = unit_cost; }
-  
+
   /// @brief unit cost modifier (from request node)
   inline double unit_cost_mod() const { return unit_cost_mod_; }
   inline void unit_cost_mod(double unit_cost_mod) { unit_cost_mod_ = unit_cost_mod; }
-  
+
   /// @brief returns the arc cost
   inline double arc_cost() const { return arc_cost_; }
   /// @brief sets the arc cost arbitrarily
@@ -116,8 +116,8 @@ class Arc {
   boost::weak_ptr<ExchangeNode> vnode_;
   bool exclusive_;
   double excl_val_;
-  double unit_cost_;  
-  double unit_cost_mod_; 
+  double unit_cost_;
+  double unit_cost_mod_;
   double arc_cost_;
 };
 

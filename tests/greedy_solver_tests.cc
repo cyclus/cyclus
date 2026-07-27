@@ -24,7 +24,7 @@ TEST(GreedySolverTests, AvgCost) {
   Arc a2(u2, v);
 
   a1.arc_cost(1.0);
-  a2.arc_cost(2.0); 
+  a2.arc_cost(2.0);
 
   ExchangeGraph g;
   RequestGroup::Ptr rg(new RequestGroup());
@@ -35,8 +35,8 @@ TEST(GreedySolverTests, AvgCost) {
   g.AddArc(a2);
 
   std::vector<ExchangeNode::Ptr> nodes;
-  nodes.push_back(u2);  
-  nodes.push_back(u1);  
+  nodes.push_back(u2);
+  nodes.push_back(u1);
 
   EXPECT_EQ(nodes[0], u2);
   EXPECT_EQ(nodes[1], u1);
@@ -56,7 +56,7 @@ TEST(GreedySolverTests, General) {
 
   a1.arc_cost(1.0);
   a2.arc_cost(2.0);
-  
+
   u1->unit_capacities[a1].push_back(1);
   u2->unit_capacities[a2].push_back(1);
   v->unit_capacities[a1].push_back(1);

@@ -19,7 +19,7 @@ namespace cyclus {
 /// The Region type assists in defining the region-institution-facility
 /// hierarchy in Cyclus. A Region region is an actor associated with a set
 /// of institutions or facilities for which it is responsible. A Region may
-/// be used to adjust unit costs/cost mods in the ResourceExchange to make 
+/// be used to adjust unit costs/cost mods in the ResourceExchange to make
 /// material routing decisions based on interfacility relationships. Deployment
 /// is a primary differentiator between different Region implementations.
 ///

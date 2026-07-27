@@ -29,7 +29,7 @@ template <class T> class Bid {
   /// @param portfolio the portfolio of which this bid is a part
   /// @param exclusive flag for whether the bid is exclusive
   /// @param unit_cost the unit_cost associated with providing the resource
-  ///                  from the request. 
+  ///                  from the request.
   inline static Bid<T>* Create(Request<T>* request,
                                boost::shared_ptr<T> offer,
                                Trader* bidder,
@@ -37,7 +37,7 @@ template <class T> class Bid {
                                bool exclusive,
                                double unit_cost,
                                Package::Ptr package = Package::unpackaged()) {
-    return new Bid<T>(request, offer, bidder, portfolio, exclusive, 
+    return new Bid<T>(request, offer, bidder, portfolio, exclusive,
                       unit_cost, package);
   }
 
@@ -92,7 +92,7 @@ template <class T> class Bid {
   inline double unit_cost() const { return unit_cost_; }
 
   /// @brief Set the unit_cost of this bid
-  /// @param unit_cost 
+  /// @param unit_cost
   inline void unit_cost(double unit_cost) {unit_cost_ = unit_cost;}
 
  private:

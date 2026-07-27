@@ -39,7 +39,7 @@ TEST(ProgTranslatorTests, translation) {
   // unit cost (from bid) and unit cost modifier (from request) for each arc
   double unit_cost_vals[] = {5.0, 2.0, 1.0, 0.5, 1.5};
   double unit_cost_mod_vals[] = {0.0, 0.5, 0.0, 0.0, 0.2};
-  
+
   // Calculate arc_cost = unit_cost + unit_cost_mod for each arc
   double arc_costs[narcs];
   for (int i = 0; i != narcs; i++) {

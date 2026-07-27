@@ -48,13 +48,13 @@ TEST(ConditionerTests, AvgCost) {
 
   // Test average calculation: u1 should have average of (1.0 + 3.0) / 2 = 2.0
   EXPECT_DOUBLE_EQ(AvgCost(u1, &g), 2.0);
-  
+
   // Test single arc: u2 should have average of 1.5
   EXPECT_DOUBLE_EQ(AvgCost(u2, &g), 1.5);
-  
+
   // Test node with no arcs returns 0.0
   EXPECT_DOUBLE_EQ(AvgCost(u3, &g), 0.0);
-  
+
   // Test ordering: u1 (2.0) > u2 (1.5) > u3 (0.0)
   EXPECT_TRUE(AvgCost(u1, &g) > AvgCost(u2, &g));
   EXPECT_TRUE(AvgCost(u2, &g) > AvgCost(u3, &g));

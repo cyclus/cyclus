@@ -12,7 +12,7 @@ namespace cyclus {
 
 class Material;
 
-/// Default unit_cost_mod values are zero. Unit cost modifiers can be 
+/// Default unit_cost_mod values are zero. Unit cost modifiers can be
 /// lower or higher than the default value.
 static const double kDefaultUnitCostMod = 0.0;
 
@@ -102,7 +102,7 @@ template <class T> class Request {
   inline double unit_cost_mod() const { return unit_cost_mod_; }
 
   /// @brief Sets the unit_cost_mod of this request
-  /// @param unit_cost_mod 
+  /// @param unit_cost_mod
   inline void unit_cost_mod(double unit_cost_mod) {unit_cost_mod_ = unit_cost_mod;}
 
   /// @return the portfolio of which this request is a part

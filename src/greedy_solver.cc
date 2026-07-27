@@ -57,7 +57,7 @@ double GreedySolver::SolveGraph() {
   n_qty_.clear();
 
   Init();
-  
+
   std::for_each(graph_->request_groups().begin(),
                 graph_->request_groups().end(),
                 std::bind(&GreedySolver::GreedilySatisfySet, this,

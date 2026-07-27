@@ -119,7 +119,7 @@ template <class T> class TradeExecutor {
 
           // Normally the arc_cost is going to be this, however...
           double adjusted_arc_cost = adjusted_unit_cost + adjusted_unit_cost_mod;
-      
+
           // It's possible to change the arc_cost directly during Adjustment
           if (ex_ctx) {
             const double* arc_cost =
@@ -128,10 +128,10 @@ template <class T> class TradeExecutor {
               adjusted_arc_cost = *arc_cost;
             }
           }
-          
+
           // Set the resource's unit value to the successful trade's unit cost
           rsrc->unit_value(adjusted_unit_cost);
-          
+
           // Record adjusted unit cost/modifier and the solver arc cost.
           ctx->NewDatum("Transactions")
               ->AddVal("TransactionId", ctx->NextTransactionID())
