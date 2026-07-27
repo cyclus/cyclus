@@ -52,7 +52,7 @@ template <class T> class Request {
   /// @brief a factory method for a request
   /// @param target the target resource associated with this request
   /// @param requester the requester
-  /// @param portfolio the porftolio of which this request is a part
+  /// @param portfolio the portfolio of which this request is a part
   /// @param commodity the commodity associated with this request
   /// @param unit_cost_mod the unit_cost_mod associated with this request
   /// @param exclusive a flag denoting that this request must be met
