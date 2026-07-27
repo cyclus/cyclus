@@ -74,9 +74,9 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
       }
 
       // update max_coeff by checking all arcs connected to this node
-      std::vector<Arc>& node_arcs = graph_->node_arc_map()[*n_it];
-      for (std::vector<Arc>::iterator arc_it = node_arcs.begin(); 
-           arc_it != node_arcs.end(); ++arc_it) {
+      const std::vector<Arc>& node_arcs = graph_->GetArcsFromNode(*n_it);
+      for (std::vector<Arc>::const_iterator arc_it = node_arcs.begin();
+          arc_it != node_arcs.end(); ++arc_it) {
         coeff = arc_cost(*arc_it);
         if (coeff > max_coeff) max_coeff = coeff;
       }
