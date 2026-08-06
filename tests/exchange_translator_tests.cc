@@ -477,61 +477,46 @@ TEST(ExXlateTests, XlateArcExclusive) {
   TranslateRequestPortfolio(xlator.translation_ctx(), rport);
   TranslateBidPortfolio(xlator.translation_ctx(), bport);
 
-  // Helper to get unit_cost and unit_cost_mod for TranslateArc
-  auto get_cost_value = [](Bid<Material>* b) -> std::pair<double, double> {
-    double unit_cost = b->unit_cost();
-    double unit_cost_mod = b->request()->unit_cost_mod();
-    return std::make_pair(unit_cost, unit_cost_mod);
-  };
-
   // bid > request && req exclusive && bid !exclusive,
   // so excl_val set to request qty
-  auto cost_value1 = get_cost_value(bid1);
-  Arc a1 = TranslateArc(xlator.translation_ctx(), bid1, cost_value1.first, cost_value1.second);
+  Arc a1 = TranslateArc(xlator.translation_ctx(), bid1);
   EXPECT_TRUE(a1.exclusive());
   EXPECT_DOUBLE_EQ(a1.excl_val(), qty);
   // bid == request && req exclusive && bid !exclusive,
   // so excl_val set to request qty
-  auto cost_value2 = get_cost_value(bid2);
-  Arc a2 = TranslateArc(xlator.translation_ctx(), bid2, cost_value2.first, cost_value2.second);
+  Arc a2 = TranslateArc(xlator.translation_ctx(), bid2);
   EXPECT_TRUE(a2.exclusive());
   EXPECT_DOUBLE_EQ(a2.excl_val(), qty);
   // request < bid && req exclusive && bid !exclusive,
   // so arc excl_val is set to 0
-  auto cost_value3 = get_cost_value(bid3);
-  Arc a3 = TranslateArc(xlator.translation_ctx(), bid3, cost_value3.first, cost_value3.second);
+  Arc a3 = TranslateArc(xlator.translation_ctx(), bid3);
   EXPECT_TRUE(a3.exclusive());
   EXPECT_DOUBLE_EQ(a3.excl_val(), 0.0);
 
   // bid != request && req exclusive && bid exclusive,
   // so excl_val set to 0
-  auto cost_value4 = get_cost_value(bid4);
-  Arc a4 = TranslateArc(xlator.translation_ctx(), bid4, cost_value4.first, cost_value4.second);
+  Arc a4 = TranslateArc(xlator.translation_ctx(), bid4);
   EXPECT_TRUE(a4.exclusive());
   EXPECT_DOUBLE_EQ(a4.excl_val(), 0);
   // bid == request && req exclusive && bid exclusive,
   // so excl_val set to request qty
-  auto cost_value5 = get_cost_value(bid5);
-  Arc a5 = TranslateArc(xlator.translation_ctx(), bid5, cost_value5.first, cost_value5.second);
+  Arc a5 = TranslateArc(xlator.translation_ctx(), bid5);
   EXPECT_TRUE(a5.exclusive());
   EXPECT_DOUBLE_EQ(a5.excl_val(), qty);
 
   // bid < request && bid exclusive && req !exclusive,
   // so excl_val set to bid qty
-  auto cost_value6 = get_cost_value(bid6);
-  Arc a6 = TranslateArc(xlator.translation_ctx(), bid6, cost_value6.first, cost_value6.second);
+  Arc a6 = TranslateArc(xlator.translation_ctx(), bid6);
   EXPECT_TRUE(a6.exclusive());
   EXPECT_DOUBLE_EQ(a6.excl_val(), qty - 1);
   // bid == request && bid exclusive && req !exclusive,
   // so excl_val set to bid qty
-  auto cost_value7 = get_cost_value(bid7);
-  Arc a7 = TranslateArc(xlator.translation_ctx(), bid7, cost_value7.first, cost_value7.second);
+  Arc a7 = TranslateArc(xlator.translation_ctx(), bid7);
   EXPECT_TRUE(a7.exclusive());
   EXPECT_DOUBLE_EQ(a7.excl_val(), qty);
   // bid > request && bid exclusive && req !exclusive,
   // so excl_val set to 0
-  auto cost_value8 = get_cost_value(bid8);
-  Arc a8 = TranslateArc(xlator.translation_ctx(), bid8, cost_value8.first, cost_value8.second);
+  Arc a8 = TranslateArc(xlator.translation_ctx(), bid8);
   EXPECT_TRUE(a8.exclusive());
   EXPECT_DOUBLE_EQ(a8.excl_val(), 0);
 }

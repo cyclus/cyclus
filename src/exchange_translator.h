@@ -239,7 +239,7 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
                  Bid<T>* bid) {
   
   return TranslateArc(translation_ctx, bid, 
-                      kDefaultUnitCost, kDefaultUnitCostMod);
+                      bid->unit_cost(), bid->request()->unit_cost_mod());
 }
 
 /// @brief simple translation from a Match to a Trade, given internal state
