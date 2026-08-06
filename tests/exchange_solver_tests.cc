@@ -90,8 +90,9 @@ TEST_F(PseudoCostTests, UsesEffectiveExclusiveCostOnce) {
   ASSERT_DOUBLE_EQ(0.5, arc.excl_val());
   graph_.AddArc(arc);
 
-  // The effective cost is 5.0 / 0.5 = 10.0, so the pseudo cost is 11.0.
-  EXPECT_DOUBLE_EQ(11.0, solver_.PseudoCostByArcCost(0.1));
+  // The effective cost is 5.0 * 0.5 = 2.5, so the pseudo cost is 
+  // cost_factor * abs(max_cost) * max_cost = 0.1 * 2.5 + 2.5 = 2.75
+  EXPECT_DOUBLE_EQ(2.75, solver_.PseudoCostByArcCost(0.1));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

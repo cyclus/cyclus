@@ -17,7 +17,7 @@ double ExchangeSolver::Cost(const Arc& a, bool exclusive_orders) {
 
   if (exclusive_orders && a.exclusive()) {
     // For exclusive arcs, scale by excl_val if needed
-    return arc_cost * (a.excl_val() > 0 ? 1.0 / a.excl_val() : 1.0);
+    return arc_cost * a.excl_val();
   }
   return arc_cost;
 }

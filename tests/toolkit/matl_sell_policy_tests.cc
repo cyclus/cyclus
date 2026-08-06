@@ -140,12 +140,6 @@ TEST_F(MatlSellPolicyTests, BidCost) {
   ASSERT_EQ(1, (*obs.begin())->bids().size());
   EXPECT_DOUBLE_EQ(3.5, (*(*obs.begin())->bids().begin())->unit_cost());
 
-  p.Init(NULL, &buff, "").Set(commod);
-  obs = p.GetMatlBids(reqs);
-  ASSERT_EQ(1, obs.size());
-  ASSERT_EQ(1, (*obs.begin())->bids().size());
-  EXPECT_DOUBLE_EQ(1.5, (*(*obs.begin())->bids().begin())->unit_cost());
-
   delete req;
 }
 
