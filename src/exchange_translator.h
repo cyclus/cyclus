@@ -232,6 +232,16 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
   return arc;
 }
 
+/// @brief translates an arc given a bid and subsequent data using the
+/// default values for unit_cost and unit_cost_mod.
+template <class T>
+Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
+                 Bid<T>* bid) {
+  
+  return TranslateArc(translation_ctx, bid, 
+                      kDefaultUnitCost, kDefaultUnitCostMod);
+}
+
 /// @brief simple translation from a Match to a Trade, given internal state
 template <class T>
 Trade<T> BackTranslateMatch(
