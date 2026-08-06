@@ -13,7 +13,6 @@ namespace cyclus {
 
 class ExchangeGraph;
 class ExchangeNodeGroup;
-class Arc;
 
 /// @brief struct to hold all problem instance state
 struct ProgTranslatorContext {

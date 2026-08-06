@@ -35,10 +35,9 @@ template <class T> class Bid {
                                Trader* bidder,
                                typename BidPortfolio<T>::Ptr portfolio,
                                bool exclusive,
-                               double unit_cost,
-                               Package::Ptr package = Package::unpackaged()) {
+                               double unit_cost) {
     return new Bid<T>(request, offer, bidder, portfolio, exclusive,
-                      unit_cost, package);
+                      unit_cost);
   }
 
   /// @brief a factory method for a bid

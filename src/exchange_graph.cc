@@ -133,13 +133,11 @@ void ExchangeGraph::AddMatch(const Arc& a, double qty) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 const std::vector<Arc>& ExchangeGraph::GetArcsFromNode(
     ExchangeNode::Ptr node) const {
-  const std::map<ExchangeNode::Ptr, std::vector<Arc>>& arcs_by_node =
-      this->node_arc_map();
 
-  auto it = arcs_by_node.find(node);
+  auto it = node_arc_map_.find(node);
 
   static const std::vector<Arc> empty;
-  if (it == arcs_by_node.end() || it->second.empty()) {
+  if (it == node_arc_map_.end()) {
     return empty;
   }
   return it->second;
