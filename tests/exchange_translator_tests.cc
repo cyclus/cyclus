@@ -553,7 +553,7 @@ TEST(ExXlateTests, SimpleXlate) {
   // After Translate(), arc.arc_cost() contains unit_cost + unit_cost_mod
   EXPECT_EQ(unit_cost_mod, a.unit_cost_mod());
   // Bid has no explicit unit_cost, defaults to 1
-  EXPECT_EQ(1.0, a.unit_cost());
+  EXPECT_EQ(cyclus::kDefaultUnitCost, a.unit_cost());
 
   double expected_arc_cost = a.unit_cost() + a.unit_cost_mod();
   EXPECT_DOUBLE_EQ(expected_arc_cost, a.arc_cost());
