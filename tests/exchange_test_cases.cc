@@ -98,8 +98,8 @@ void Case2b::Construct(ExchangeGraph* g, bool exclusive_orders) {
   qty = 10;
   unit_cap_req = 1;
   capacity = 10;
-  unit_cap_sup = 2;
-  flow = capacity / unit_cap_sup;
+  unit_cap_sup = 1;
+  flow = capacity;
 
   Case2::Construct(g, exclusive_orders);
 }

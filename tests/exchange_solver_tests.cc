@@ -15,8 +15,7 @@ using cyclus::ValueError;
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class MockSolver : public ExchangeSolver {
  public:
-  explicit MockSolver(bool exclusive_orders = kDefaultExclusive)
-      : ExchangeSolver(exclusive_orders), i(0) {}
+  explicit MockSolver() : i(0) {}
 
   virtual double SolveGraph() {
     ++i;

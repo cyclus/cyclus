@@ -157,6 +157,7 @@ class Case3: public ExchangeCase {
 
 /// Case3a:
 /// q = c1
+/// p1 < p2
 /// f1 = c1, f2 DNE
 class Case3a: public Case3 {
  public:
@@ -166,6 +167,7 @@ class Case3a: public Case3 {
 
 /// Case3b:
 /// q - c1 < c2
+/// p1 < p2
 /// f1 = c1, f2 = q - c1
 class Case3b: public Case3 {
  public:
@@ -175,6 +177,7 @@ class Case3b: public Case3 {
 
 /// Case3c:
 /// q - c1 = c2
+/// p1 < p2
 /// f1 = c1, f2 = c2
 class Case3c: public Case3 {
  public:
@@ -184,6 +187,7 @@ class Case3c: public Case3 {
 
 /// Case3d:
 /// q - c1 > c2
+/// p1 < p2
 /// f1 = c1, f2 = c2
 class Case3d: public Case3 {
  public:
@@ -193,7 +197,7 @@ class Case3d: public Case3 {
 
 /// Case3e:
 /// q = c2
-/// p2 > p1
+/// supplier 2 has a lower arc cost: p2 < p1
 /// f1 DNE, f2 = c2
 class Case3e: public Case3 {
  public:
