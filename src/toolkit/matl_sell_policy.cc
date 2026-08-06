@@ -96,7 +96,6 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   Trader::manager_ = manager;
   buf_ = buf;
   name_ = name;
-  unit_cost_ = 0.0;
   return *this;
 }
 
@@ -106,7 +105,6 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   buf_ = buf;
   name_ = name;
   set_throughput(throughput);
-  unit_cost_ = 0.0;
   return *this;
 }
 
@@ -116,7 +114,6 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   buf_ = buf;
   name_ = name;
   set_ignore_comp(ignore_comp);
-  unit_cost_ = 0.0;
   return *this;
 }
 
@@ -128,7 +125,6 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   name_ = name;
   set_throughput(throughput);
   set_ignore_comp(ignore_comp);
-  unit_cost_ = 0.0;
   return *this;
 }
 
@@ -145,7 +141,6 @@ MatlSellPolicy& MatlSellPolicy::Init(Agent* manager, ResBuf<Material>* buf,
   set_ignore_comp(ignore_comp);
   set_package(package_name);
   set_transport_unit(transport_unit_name);
-  unit_cost_ = 0.0;
   return *this;
 }
 
