@@ -67,16 +67,15 @@ TEST(ProgTranslatorTests, translation) {
   int excl_arcs[] = {1, 2, 4};
   double excl_flow[] = {0, 2, 2, 0, 2, 0, 0};
 
-  // Calculate expected objective coefficients using ExchangeSolver::Cost logic
-  // For non-exclusive arcs: obj_coeff = arc_cost
-  // For exclusive arcs obj_coeff = arc_cost * excl_val
+  // Calculate expected objective coefficients.
+  // excl_flow[i] represents the corresponding arc's excl_val():
+  //   non-exclusive arc: arc_cost
+  //   exclusive arc: arc_cost * excl_val
   std::vector<double> obj_coeffs;
-  double excl_val = 2.0;  // excl_val for exclusive arcs (set by excl_flow[1])
-  for (int i = 0; i != narcs; i++) {
+  for (int i = 0; i != narcs; ++i) {
     double coeff = arc_costs[i];
     if (excl_flow[i] != 0) {
-      // Exclusive arcs: ExchangeSolver::Cost returns arc_cost * excl_val
-      coeff = arc_costs[i] * excl_val;
+      coeff *= excl_flow[i];
     }
     obj_coeffs.push_back(coeff);
   }
