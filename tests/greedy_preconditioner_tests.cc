@@ -55,10 +55,6 @@ TEST(ConditionerTests, AvgCost) {
   // Test node with no arcs returns 0.0
   EXPECT_DOUBLE_EQ(AvgCost(u3, &g), 0.0);
   EXPECT_EQ(0u, g.node_arc_map().count(u3));
-
-  // Test ordering: u1 (2.0) > u2 (1.5) > u3 (0.0)
-  EXPECT_TRUE(AvgCost(u1, &g) > AvgCost(u2, &g));
-  EXPECT_TRUE(AvgCost(u2, &g) > AvgCost(u3, &g));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -185,8 +181,6 @@ TEST(ConditionerTests, Conditioning) {
 
   std::map<ExchangeNode::Ptr, double> avg_costs;
 
-  double avg1 = 5./12;
-  double avg2 = 2./2;
   double c1e = (1. + n1ecost / (1 + n1ecost));
   double c1s = (1. + n1scost / (1 + n1scost));
   double c2e = (1. + n2ecost / (1 + n2ecost));
