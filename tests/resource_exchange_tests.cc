@@ -288,8 +288,8 @@ TEST_F(ResourceExchangeTests, ArcCostValues) {
   BidPortfolio<Material>::Ptr bp(new BidPortfolio<Material>());
 
   // Bids without a unit_cost default to unit_cost = 1
-  Bid<Material>* pbid = bp->AddBid(preq, mat, bidr, false);
-  Bid<Material>* cbid = bp->AddBid(creq, mat, bidr, false);
+  Bid<Material>* pbid = bp->AddBid(preq, mat, bidr);
+  Bid<Material>* cbid = bp->AddBid(creq, mat, bidr);
 
   std::vector<Bid<Material>*> bids;
   bids.push_back(pbid);
