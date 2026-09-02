@@ -53,8 +53,10 @@ TEST_F(PseudoCostTests, UsesLargestPositiveCost) {
   AddArc(2.0);
   AddArc(5.0);
 
-  EXPECT_DOUBLE_EQ(5.5, solver_.PseudoCostByArcCost(0.1));
-  EXPECT_DOUBLE_EQ(5.5, solver_.PseudoCost());
+  // The max cost is 5.0, so the pseudo cost is: 
+  // max_cost + max(1, cost_factor * max_cost) = 5 + 1 = 6
+  EXPECT_DOUBLE_EQ(6, solver_.PseudoCostByArcCost(0.1));
+  EXPECT_DOUBLE_EQ(6, solver_.PseudoCost());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -62,7 +64,7 @@ TEST_F(PseudoCostTests, IsStrictlyGreaterThanZeroCost) {
   AddArc(0.0);
 
   double pseudo_cost = solver_.PseudoCostByArcCost(0.1);
-  EXPECT_DOUBLE_EQ(0.1, pseudo_cost);
+  EXPECT_DOUBLE_EQ(1, pseudo_cost);
   EXPECT_GT(pseudo_cost, 0.0);
 }
 
@@ -71,8 +73,10 @@ TEST_F(PseudoCostTests, HandlesNegativeCosts) {
   AddArc(-10.0);
   AddArc(-2.0);
 
+  // The max cost is -2.0, so the pseudo cost is: 
+  // max_cost + max(1, cost_factor * max_cost) = -2.0 + 1 = -1
   double pseudo_cost = solver_.PseudoCostByArcCost(0.1);
-  EXPECT_DOUBLE_EQ(-1.8, pseudo_cost);
+  EXPECT_DOUBLE_EQ(-1, pseudo_cost);
   EXPECT_GT(pseudo_cost, -10.0);
   EXPECT_GT(pseudo_cost, -2.0);
 }
@@ -90,8 +94,8 @@ TEST_F(PseudoCostTests, UsesEffectiveExclusiveCostOnce) {
   graph_.AddArc(arc);
 
   // The effective cost is 5.0 * 0.5 = 2.5, so the pseudo cost is 
-  // cost_factor * abs(max_cost) * max_cost = 0.1 * 2.5 + 2.5 = 2.75
-  EXPECT_DOUBLE_EQ(2.75, solver_.PseudoCostByArcCost(0.1));
+  // max_cost + max(1, cost_factor * max_cost) = 2.5 + 1 = 3.5
+  EXPECT_DOUBLE_EQ(3.5, solver_.PseudoCostByArcCost(0.1));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

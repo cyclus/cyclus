@@ -105,7 +105,7 @@ double ExchangeSolver::PseudoCostByArcCost(double cost_factor) {
     return 0.0;
   }
 
-  double margin = cost_factor * std::max(1.0, std::abs(max_cost));
+  double margin = std::max(1.0, cost_factor * max_cost);
   return max_cost + margin;
 
 }
