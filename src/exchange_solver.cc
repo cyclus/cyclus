@@ -88,26 +88,21 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
 
 double ExchangeSolver::PseudoCostByArcCost(double cost_factor) {
   double max_cost = -std::numeric_limits<double>::infinity();
-  bool found_arc = false;
 
   for (const Arc& a : graph_->arcs()) {
     double cost = arc_cost(a);
     if (!std::isfinite(cost)) {
       throw ValueError("Arc cost must be finite.");
     }
-    if (!found_arc || cost > max_cost) {
-      max_cost = cost;
-      found_arc = true;
-    }
+    max_cost = std::max(max_cost, cost);
   }
 
-  if (!found_arc) {
+  if (!std::isfinite(max_cost)) {
     return 0.0;
   }
 
   double margin = std::max(1.0, cost_factor * max_cost);
   return max_cost + margin;
-
 }
 
 }  // namespace cyclus
