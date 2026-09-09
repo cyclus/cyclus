@@ -35,6 +35,7 @@ class ProductBufTest : public ::testing::Test {
   ResBuf<Product> filled_store_;
 
   double neg_cap, zero_cap, cap, low_cap;
+  double neg_full, zero_full, full, hi_full;
   double exact_qty;  // mass in filled_store_
   double exact_qty_under;  // mass in filled_store - 0.9*eps_rsrc()
   double exact_qty_over;  // mass in filled_store + 0.9*eps_rsrc()
@@ -57,6 +58,11 @@ class ProductBufTest : public ::testing::Test {
             1;  // should be higher than mat1+mat2 masses
       low_cap = mat1_->quantity() + mat2_->quantity() -
                 1;  // should be lower than mat1_mat2 masses
+
+      neg_full = -1;
+      zero_full = 0;
+      full = cap * 0.5;
+      hi_full = cap * 1.1;
 
       undereps = 0.9 * eps_rsrc();
       overeps = 1.1 * eps_rsrc();
