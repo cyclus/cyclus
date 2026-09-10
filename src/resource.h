@@ -90,7 +90,7 @@ class Resource {
   /// To enable the Decay method to be called on any child resource, define
   /// a null op Decay method here.
   /// @param curr_time the current time for the decay oepration
-  virtual void Decay(int curr_time) {
+  virtual void Decay(int curr_time, bool force = false) {
     throw Error("cannot decay resource type " + this->type());
   };
 

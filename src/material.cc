@@ -118,18 +118,17 @@ void Material::Absorb(Material::Ptr mat) {
     }
 
     // Synchronize the incoming material with this material.
-    mat->Decay(prev_decay_time_);
+    mat->Decay(prev_decay_time_, true);
   } else if (ctx_->sim_info().decay == "lazy") {
     // NOTE: Absorb will only Decay materials like this if the decay mode is
     // set to lazy. If more decay modes are introduced in the future which 
     // want Absorb to decay, this will need to be changed
     int common_decay_time = ctx_->time();
 
-    mat->Decay(common_decay_time);
-    Decay(common_decay_time);
-
-    // Decay may return early when the change is below its threshold.
-    prev_decay_time_ = common_decay_time;
+    // Decay the material with "force" set to true so that even small
+    // fractional changes on short time steps are decayed before they combine.
+    mat->Decay(common_decay_time, true);
+    Decay(common_decay_time, true);
   }
 
   // these calls force lazy evaluation if in lazy decay mode
@@ -216,7 +215,7 @@ void Material::ChangePackage(std::string new_package_name) {
   tracker_.Package();
 }
 
-void Material::Decay(int curr_time) {
+void Material::Decay(int curr_time, bool force) {
   if (ctx_ != NULL && ctx_->sim_info().decay == "never") {
     return;
   } else if (curr_time < 0 && ctx_ == NULL) {
@@ -229,6 +228,11 @@ void Material::Decay(int curr_time) {
 
 
   int dt = curr_time - prev_decay_time_;
+
+  // If we're already up-to-date we can skip all the expensive stuff.
+  if (dt == 0) {
+    return;
+  }
   
   // Block decay backwards and past sim time for materials in a context
   if (ctx_ && (dt < 0 || curr_time > ctx_->time())) {
@@ -243,7 +247,8 @@ void Material::Decay(int curr_time) {
 
   // If composition has too many nuclides (i.e. > 100), it is cheaper to
   // just do the decay rather than check all the decay constants.
-  bool decay = c.size() > 100;
+  // Alternatively, if we want to force the decay we indicate that here.
+  bool decay = force || c.size() > 100;
 
   uint64_t secs_per_timestep = kDefaultTimeStepDur;
   if (ctx_ != NULL) {

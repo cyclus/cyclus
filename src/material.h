@@ -144,7 +144,8 @@ class Material : public Resource {
   /// constants are significant with respect to the time delta.
   /// @param curr_time current time to use for the decay calculation
   ///        (default: -1 forces the decay to the context's current time)
-  virtual void Decay(int curr_time = -1);
+  /// @param force whether to ignore the eps_decay threshold and decay anyway
+  virtual void Decay(int curr_time = -1, bool force = false) override;
 
   /// Returns the last time step on which a decay calculation was performed
   /// for the material.  This is not necessarily synonymous with the last time
