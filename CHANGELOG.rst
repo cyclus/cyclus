@@ -8,6 +8,7 @@ Since last release
 **Added:**
 * Added concurrency groups to the build, MacOS build, and code coverage workflows so that a new push cancels superseded in-progress runs (#1984)
 * Added a Pixi workspace (``pixi.toml``, ``pixi.lock``) for development on Linux and MacOS (#1984)
+* Added forced decay mode for use inside Material::Absorb() to correctly handle lazy mode with small timesteps and half-lives (#1974)
 * Added a boolean-specific Query function to infile_tree.h to support archetype bools using true and false (#1970)
 * Added a copy constructor to Timer to allow MockSim to copy it without upsetting the progress bar (#1961)
 * Added progress bar to the simulation loop (#1912)
