@@ -14,6 +14,11 @@ namespace cyclus {
 
 int Composition::next_id_ = 1;
 
+// Double precision ~2.2e-16 (https://en.wikipedia.org/wiki/Machine_epsilon)
+// but we do a few operations so this gives us some headroom while still being
+// conservative.
+const double Composition::kEquivalenceTolerance = 1e-14;
+
 Composition::Ptr Composition::CreateFromAtom(CompMap v) {
   if (!compmath::ValidNucs(v)) throw ValueError("invalid nuclide in CompMap");
 
@@ -109,6 +114,29 @@ void Composition::Record(Context* ctx) {
         ->AddVal("MassFrac", it->second)
         ->Record();
   }
+}
+
+bool Composition::IsEquivalent(Composition::Ptr a, Composition::Ptr b,
+                               double threshold) {
+  // Quick to check this, so we do it first
+  if (a == b) {
+    return true;
+  }
+
+  // This should never be true, but it's here to guard an edge case and
+  // is cheap to check. Written out as '== NULL' for readability/clarity.
+  if (a == NULL || b == NULL) {
+    return false;
+  }
+
+  // The main use case for this is in Absorb, which mixes mass, so equivalence
+  // must be judged using mass fractions.
+  CompMap a_mass(a->mass());
+  CompMap b_mass(b->mass());
+  compmath::Normalize(&a_mass);
+  compmath::Normalize(&b_mass);
+
+  return compmath::AlmostEq(a_mass, b_mass, threshold);
 }
 
 Composition::Composition() : prev_decay_(0), recorded_(false) {

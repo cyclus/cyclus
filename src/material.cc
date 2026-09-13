@@ -135,11 +135,13 @@ void Material::Absorb(Material::Ptr mat) {
   Composition::Ptr c0 = comp();
   Composition::Ptr c1 = mat->comp();
 
-  if (c0 != c1) {
+  if (!Composition::IsEquivalent(c0, c1)) {
     CompMap v(c0->mass());
     compmath::Normalize(&v, qty_);
+
     CompMap otherv(c1->mass());
     compmath::Normalize(&otherv, mat->qty_);
+
     comp_ = Composition::CreateFromMass(compmath::Add(v, otherv));
   }
   
