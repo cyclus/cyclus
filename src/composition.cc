@@ -80,9 +80,13 @@ const CompMap& Composition::mass() {
 
 Composition::Ptr Composition::Decay(int delta, uint64_t secs_per_timestep) {
   int tot_decay = prev_decay_ + delta;
-  if (decay_line_->count(tot_decay) == 1) {
-    // decay_line_ has cached, pre-computed result of this decay
-    return (*decay_line_)[tot_decay];
+  Chain::iterator cached = decay_line_->find(tot_decay);
+  if (cached != decay_line_->end()) {
+    Composition::Ptr result = cached->second.lock();
+    if (result != NULL) {
+      // decay_line_ has a cached, pre-computed result of this decay.
+      return result;
+    }
   }
 
   // Calculate a new decayed composition and insert it into the decay chain.

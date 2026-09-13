@@ -4,6 +4,7 @@
 #include <map>
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 
 class SimInitTest;
 
@@ -19,8 +20,9 @@ typedef std::map<Nuc, double> CompMap;
 /// An immutable object responsible for holding a nuclide composition. It tracks
 /// decay lineages to prevent duplicate calculations and output recording and is
 /// able to record its composition data to output when told.  Each composition
-/// keeps a pointer to references to every other composition that is a result of
-/// decaying this or a previously decayed-from composition.
+/// shares a cache of decayed compositions with every composition in its decay
+/// lineage. The cache uses weak references so it does not extend the lifetime
+/// of decayed compositions.
 ///
 /// Compositions are immutable and thus their state must be created/defined
 /// entirely at their creation. Compositions are created by passing in a
@@ -100,7 +102,7 @@ class Composition {
   /// a chain containing compositions that are a result of decay from a common
   /// ancestor composition. The key is the total amount of time a composition
   /// has been decayed from its root parent.
-  typedef std::map<int, Composition::Ptr> Chain;
+  typedef std::map<int, boost::weak_ptr<Composition> > Chain;
 
   typedef boost::shared_ptr<Chain> ChainPtr;
 
