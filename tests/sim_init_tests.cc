@@ -228,6 +228,7 @@ TEST_P(SimInitTest, InitSimInfo) {
   EXPECT_EQ(si_orig.y0, si_init.y0);
   EXPECT_EQ(si_orig.m0, si_init.m0);
   EXPECT_EQ(si_orig.handle, si_init.handle);
+  EXPECT_EQ(si_orig.decay_nuc, si_init.decay_nuc);
   EXPECT_EQ(si_orig.parent_sim, si_init.parent_sim);
   EXPECT_EQ(si_orig.parent_type, si_init.parent_type);
   EXPECT_EQ(si_orig.branch_time, si_init.branch_time);

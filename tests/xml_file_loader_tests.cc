@@ -78,6 +78,7 @@ std::string XMLFileLoaderTests::ControlSequenceWithDecay() {
           "  <startyear>2000</startyear>"
           "  <simstart>0</simstart>"
           "  <decay>never</decay>"
+          "  <decay_nuclide>Pu239</decay_nuclide>"
           " </control>"
           "</simulation>";
 }

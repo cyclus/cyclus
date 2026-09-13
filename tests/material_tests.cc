@@ -383,6 +383,27 @@ TEST_F(MaterialTest, DecayShortcut) {
   EXPECT_EQ(c, m->comp());
 }
 
+TEST_F(MaterialTest, DecayBelowThresholdAdvancesTime) {
+  SimInfo si(10, 2015, 1, "", "manual");
+  FakeContext* fake_ctx = new FakeContext(&ti, &rec);
+  fake_ctx->InitSim(si);
+  TestFacility* fake_fac = new TestFacility(fake_ctx);
+
+  CompMap v;
+  v[u235_] = 1;
+  Composition::Ptr c = Composition::CreateFromAtom(v);
+  Material::Ptr m = Material::Create(fake_fac, 1.0, c);
+
+  fake_ctx->time(1);
+  m->Decay();
+
+  EXPECT_EQ(1, m->prev_decay_time());
+  EXPECT_EQ(c, m->comp());
+
+  delete fake_fac;
+  delete fake_ctx;
+}
+
 // this test checks that we handle potentially non-default custom time step
 // durations correctly w.r.t. decay.
 TEST_F(MaterialTest, DecayCustomTimeStep) {

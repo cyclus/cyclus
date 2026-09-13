@@ -36,6 +36,11 @@
           <a:documentation>Mode for when radioactive decay occurs. Choose from "never", "manual", "lazy".</a:documentation>
           <text/> </element>
         </optional>
+        <optional>
+          <element name="decay_nuclide">
+          <a:documentation>Nuclide whose one-timestep fractional decay sets the minimum change Cyclus tracks. Smaller changes are treated as zero. Default: Am241.</a:documentation>
+          <text/> </element>
+        </optional>
         <optional> 
           <element name="dt">
             <a:documentation>Length of a time step in seconds. Default: 1 month = 1 year/12 (i.e. 2,629,846 seconds).</a:documentation>

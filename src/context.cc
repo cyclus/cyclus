@@ -28,6 +28,7 @@ SimInfo::SimInfo()
       m0(0),
       dt(kDefaultTimeStepDur),
       decay("manual"),
+      decay_nuc(kDefaultDecayNuc),
       branch_time(-1),
       explicit_inventory(false),
       explicit_inventory_compact(false),
@@ -42,6 +43,7 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
       m0(m0),
       dt(kDefaultTimeStepDur),
       decay("manual"),
+      decay_nuc(kDefaultDecayNuc),
       branch_time(-1),
       handle(handle),
       explicit_inventory(false),
@@ -57,6 +59,7 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d)
       m0(m0),
       dt(kDefaultTimeStepDur),
       decay(d),
+      decay_nuc(kDefaultDecayNuc),
       branch_time(-1),
       handle(handle),
       explicit_inventory(false),
@@ -73,6 +76,7 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim, int branch_time,
       m0(-1),
       dt(kDefaultTimeStepDur),
       decay("manual"),
+      decay_nuc(kDefaultDecayNuc),
       parent_sim(parent_sim),
       parent_type(parent_type),
       branch_time(branch_time),
@@ -286,6 +290,8 @@ void Context::InitSim(SimInfo si) {
       ->Record();
 
   NewDatum("DecayMode")->AddVal("Decay", si.decay)->Record();
+
+  NewDatum("DecayThreshold")->AddVal("NucId", si.decay_nuc)->Record();
 
   NewDatum("InfoExplicitInv")
       ->AddVal("RecordInventory", si.explicit_inventory)

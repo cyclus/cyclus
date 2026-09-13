@@ -1,6 +1,6 @@
 #include "material.h"
 
-#include <math.h>
+#include <cmath>
 
 #include "comp_math.h"
 #include "context.h"
@@ -118,17 +118,15 @@ void Material::Absorb(Material::Ptr mat) {
     }
 
     // Synchronize the incoming material with this material.
-    mat->Decay(prev_decay_time_, true);
+    mat->Decay(prev_decay_time_);
   } else if (ctx_->sim_info().decay == "lazy") {
     // NOTE: Absorb will only Decay materials like this if the decay mode is
     // set to lazy. If more decay modes are introduced in the future which 
     // want Absorb to decay, this will need to be changed
     int common_decay_time = ctx_->time();
 
-    // Decay the material with "force" set to true so that even small
-    // fractional changes on short time steps are decayed before they combine.
-    mat->Decay(common_decay_time, true);
-    Decay(common_decay_time, true);
+    mat->Decay(common_decay_time);
+    Decay(common_decay_time);
   }
 
   // these calls force lazy evaluation if in lazy decay mode
@@ -217,7 +215,7 @@ void Material::ChangePackage(std::string new_package_name) {
   tracker_.Package();
 }
 
-void Material::Decay(int curr_time, bool force) {
+void Material::Decay(int curr_time) {
   if (ctx_ != NULL && ctx_->sim_info().decay == "never") {
     return;
   } else if (curr_time < 0 && ctx_ == NULL) {
@@ -243,18 +241,22 @@ void Material::Decay(int curr_time, bool force) {
     throw cyclus::Error(msg);
   }
 
-  // eps_decay defined such that tritium (12.32 yr half life) decays over 1 day
-  double eps_decay = 1e-4;
   const CompMap c = comp_->atom();
 
   // If composition has too many nuclides (i.e. > 100), it is cheaper to
   // just do the decay rather than check all the decay constants.
-  // Alternatively, if we want to force the decay we indicate that here.
-  bool decay = force || c.size() > 100;
+  bool decay = c.size() > 100;
 
   uint64_t secs_per_timestep = kDefaultTimeStepDur;
   if (ctx_ != NULL) {
     secs_per_timestep = ctx_->sim_info().dt;
+  }
+  Nuc decay_nuc = (ctx_ == NULL) ? kDefaultDecayNuc :
+                                  ctx_->sim_info().decay_nuc;
+  double eps_decay = -std::expm1(
+      -pyne::decay_const(decay_nuc) * static_cast<double>(secs_per_timestep));
+  if (!(eps_decay > 0.0 && eps_decay < 1.0)) {
+    throw ValueError("decay_nuclide must be radioactive");
   }
 
   if (!decay) {
@@ -266,14 +268,16 @@ void Material::Decay(int curr_time, bool force) {
       int nuc = it->first;
       double lambda_timesteps =
           pyne::decay_const(nuc) * static_cast<double>(secs_per_timestep);
-      double change =
-          1.0 - std::exp(-lambda_timesteps * static_cast<double>(dt));
+      double change = -std::expm1(
+          -lambda_timesteps * static_cast<double>(dt));
       if (change >= eps_decay) {
         decay = true;
         break;
       }
     }
     if (!decay) {
+      // Decay below the configured threshold is intentionally discarded.
+      prev_decay_time_ = curr_time;
       return;
     }
   }
