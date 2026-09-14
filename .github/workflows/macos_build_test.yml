@@ -51,11 +51,17 @@ jobs:
         with:
           xcode-version: latest
 
+      - name: Check native clang
+        shell: bash -el {0}
+        run: |
+          clang --version
+          which clang
+
       - name: Checkout Cyclus
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v3
+        uses: conda-incubator/setup-miniconda@v4
         with:
           python-version: "3.12"
           miniforge-version: "latest"
@@ -63,6 +69,13 @@ jobs:
           auto-update-conda: true
           channels: conda-forge
 
+
+      - name: Check conda clang
+        shell: bash -el {0}
+        run: |
+          clang --version
+          which clang
+          
       - name: Build and Test Cyclus
         id: build-cyclus
         shell: bash -el {0}
@@ -91,11 +104,8 @@ jobs:
             websockets \
             pprintpp \
             pip
-          export CC=$CONDA_PREFIX/bin/clang
-          export CXX=$CONDA_PREFIX/bin/clang++
-          export CPP=$CONDA_PREFIX/bin/clang-cpp
           mkdir -p $(python3 -m site --user-site)
-          python3 install.py -j 3 ${{ matrix.parallel_flag }} ${{ matrix.coin_flag }}
+          python3 install.py -j 1 ${{ matrix.parallel_flag }} ${{ matrix.coin_flag }}
           export PATH=$HOME/.local/bin:$PATH
           cyclus_unit_tests
           cd tests && python3 -m pytest

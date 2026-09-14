@@ -88,6 +88,7 @@ Since last release
 * Update contributing guide to match current practice (#1882)
 * Improved documentation in schema (#1958, #1959)
 * Updated Changelog test (#1962)
+* Updated MacOS CI workflow to use latest XCode and Miniforge actions (#1976)
 
 v1.6.0
 ====================
