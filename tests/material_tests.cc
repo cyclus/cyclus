@@ -374,7 +374,10 @@ TEST_F(MaterialTest, DecayShortcut) {
 
   double sec_per_month = 2629152;
   double u235_lambda = pyne::decay_const(u235) * sec_per_month;  // per month
-  double eps = 1e-4;
+  Nuc decay_nuc = kDefaultDecayNuc;
+  double eps = -std::expm1(
+      -pyne::decay_const(decay_nuc) *
+      static_cast<double>(kDefaultTimeStepDur));
   double threshold = -1 * std::log(1-eps) / u235_lambda;
 
   // If delta t is small w.r.t. composition's decay constants, no decay is
@@ -534,7 +537,8 @@ TEST_F(MaterialTest, DecayHeatTest) {
 }
 
 TEST_F(MaterialTest, DecaySmallAmount) {
-  // eps_decay is defined such that tritium can decay on a 1 day time step
+  // eps_decay is defined by the user picking a nuclide in control. We imagine
+  // here that the chosen nuclide is Tritium, and that dt is 1 day.
   const int tritium_id = 10030000;
   const double qty = 1; //kg, NOTE: fractional amounts all that matter 
 
@@ -547,6 +551,7 @@ TEST_F(MaterialTest, DecaySmallAmount) {
   cyclus::Timer ti_day_timestep;
   si_day_timestep = SimInfo(100, 2015, 1, "", "manual");
   si_day_timestep.dt = one_day;
+  si_day_timestep.decay_nuc = 10030000; // Tritium
   FakeContext* ctx_day_timestep = new FakeContext(&ti_day_timestep, &rec);
   ctx_day_timestep->InitSim(si_day_timestep);
   TestFacility* fac_day_timestep = new TestFacility(ctx_day_timestep);

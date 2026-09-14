@@ -155,13 +155,13 @@ void SimInit::LoadInfo() {
   std::string d = dq.GetVal<std::string>("Decay");
   si_ = SimInfo(dur, y0, m0, h, d);
 
-  qr = b_->Query("DecayThreshold", NULL);
-  si_.decay_nuc = qr.GetVal<int>("NucId");
-
   si_.seed = qr.GetVal<int>("Seed");
   si_.stride = qr.GetVal<int>("Stride");
 
   si_.parent_sim = qr.GetVal<boost::uuids::uuid>("ParentSimId");
+
+  qr = b_->Query("DecayThreshold", NULL);
+  si_.decay_nuc = qr.GetVal<int>("NucId");
 
   qr = b_->Query("TimeStepDur", NULL);
   // TODO: when the backends support uint64_t, the int template here
