@@ -374,10 +374,7 @@ TEST_F(MaterialTest, DecayShortcut) {
 
   double sec_per_month = 2629152;
   double u235_lambda = pyne::decay_const(u235) * sec_per_month;  // per month
-  Nuc decay_nuc = kDefaultDecayNuc;
-  double eps = -std::expm1(
-      -pyne::decay_const(decay_nuc) *
-      static_cast<double>(kDefaultTimeStepDur));
+  double eps = kDefaultDecayEps;
   double threshold = -1 * std::log(1-eps) / u235_lambda;
 
   // If delta t is small w.r.t. composition's decay constants, no decay is
@@ -405,6 +402,46 @@ TEST_F(MaterialTest, DecayBelowThresholdAdvancesTime) {
 
   delete fake_fac;
   delete fake_ctx;
+}
+
+// A one-step change is below epsilon, even though two steps exceed it.
+// Repeated calls discard that change rather than accumulating decay time.
+TEST_F(MaterialTest, DecayEpsDiscardsSmallChanges) {
+  SimInfo si(10, 2015, 1, "", "manual");
+  const int nuc = id("H3");
+  const double step = pyne::decay_const(nuc) * si.dt;
+  si.decay_eps = -std::expm1(-1.5 * step);
+  FakeContext ctx(&ti, &rec);
+  ctx.InitSim(si);
+  TestFacility fac(&ctx);
+  CompMap v;
+  v[nuc] = 1;
+  Composition::Ptr c = Composition::CreateFromAtom(v);
+  Material::Ptr frequent = Material::Create(&fac, 1.0, c);
+  Material::Ptr delayed = Material::Create(&fac, 1.0, c);
+  ctx.time(1);
+  frequent->Decay();
+  ctx.time(2);
+  frequent->Decay();
+  delayed->Decay();
+  EXPECT_EQ(c, frequent->comp());
+  EXPECT_EQ(2, frequent->prev_decay_time());
+  EXPECT_NE(c, delayed->comp());
+}
+
+TEST_F(MaterialTest, DecayEpsZero) {
+  SimInfo si(10, 2015, 1, "", "manual");
+  si.decay_eps = 0.0;
+  FakeContext ctx(&ti, &rec);
+  ctx.InitSim(si);
+  TestFacility fac(&ctx);
+  CompMap v;
+  v[u235_] = 1;
+  Composition::Ptr c = Composition::CreateFromAtom(v);
+  Material::Ptr m = Material::Create(&fac, 1.0, c);
+  ctx.time(1);
+  m->Decay();
+  EXPECT_NE(c, m->comp());
 }
 
 // this test checks that we handle potentially non-default custom time step
@@ -537,8 +574,7 @@ TEST_F(MaterialTest, DecayHeatTest) {
 }
 
 TEST_F(MaterialTest, DecaySmallAmount) {
-  // eps_decay is defined by the user picking a nuclide in control. We imagine
-  // here that the chosen nuclide is Tritium, and that dt is 1 day.
+  // The default decay threshold allows tritium to decay on a one-day step.
   const int tritium_id = 10030000;
   const double qty = 1; //kg, NOTE: fractional amounts all that matter 
 
@@ -551,7 +587,6 @@ TEST_F(MaterialTest, DecaySmallAmount) {
   cyclus::Timer ti_day_timestep;
   si_day_timestep = SimInfo(100, 2015, 1, "", "manual");
   si_day_timestep.dt = one_day;
-  si_day_timestep.decay_nuc = 10030000; // Tritium
   FakeContext* ctx_day_timestep = new FakeContext(&ti_day_timestep, &rec);
   ctx_day_timestep->InitSim(si_day_timestep);
   TestFacility* fac_day_timestep = new TestFacility(ctx_day_timestep);

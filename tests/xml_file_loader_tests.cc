@@ -78,7 +78,7 @@ std::string XMLFileLoaderTests::ControlSequenceWithDecay() {
           "  <startyear>2000</startyear>"
           "  <simstart>0</simstart>"
           "  <decay>never</decay>"
-          "  <decay_nuclide>Pu239</decay_nuclide>"
+          "  <decay_eps>1e-8</decay_eps>"
           " </control>"
           "</simulation>";
 }
@@ -284,6 +284,35 @@ TEST_F(XMLFileLoaderTests, EpsFile) {
 
   EXPECT_DOUBLE_EQ(0.5e-5, cyclus::eps());
   EXPECT_DOUBLE_EQ(3e-4, cyclus::eps_rsrc());
+}
+
+TEST_F(XMLFileLoaderTests, DecayEpsDefault) {
+  XMLFileLoader file(&rec_, b_, schema_path, eps_file);
+  file.LoadSim();
+  rec_.Flush();
+  EXPECT_DOUBLE_EQ(1e-4,
+      b_->Query("DecayThreshold", NULL).GetVal<double>("Epsilon"));
+}
+
+TEST_F(XMLFileLoaderTests, DecayEpsCustom) {
+  std::string input = ControlSequenceWithEps();
+  input.insert(input.find("</control>"), "<decay_eps>1e-8</decay_eps>");
+  XMLFileLoader file(&rec_, b_, schema_path, input, "xml");
+  file.LoadSim();
+  rec_.Flush();
+  EXPECT_DOUBLE_EQ(1e-8,
+      b_->Query("DecayThreshold", NULL).GetVal<double>("Epsilon"));
+}
+
+TEST_F(XMLFileLoaderTests, DecayEpsInvalid) {
+  const char* values[] = {"-0.1", "1", "2", "NaN", "INF", "-INF"};
+  for (const char* value : values) {
+    std::string input = ControlSequenceWithEps();
+    input.insert(input.find("</control>"),
+                 std::string("<decay_eps>") + value + "</decay_eps>");
+    XMLFileLoader file(&rec_, b_, schema_path, input, "xml");
+    EXPECT_THROW(file.LoadSim(), cyclus::Error) << value;
+  }
 }
 
 TEST_F(XMLFileLoaderTests, ExplicitFormat) {

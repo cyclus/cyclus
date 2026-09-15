@@ -37,9 +37,13 @@
           <text/> </element>
         </optional>
         <optional>
-          <element name="decay_nuclide">
-          <a:documentation>Nuclide whose one-timestep fractional decay sets the minimum change Cyclus tracks. Smaller changes are treated as zero. Default: Am241.</a:documentation>
-          <text/> </element>
+          <element name="decay_eps">
+          <a:documentation>Fractional decay threshold. Default: 1e-4. Must satisfy 0 &lt;= decay_eps &lt; 1. Use at your own risk: below-threshold decay is not accumulated or guaranteed; changing this value can affect accuracy and performance.</a:documentation>
+          <data type="double">
+              <param name="minInclusive">0</param>
+              <param name="maxExclusive">1</param>
+            </data>
+          </element>
         </optional>
         <optional> 
           <element name="dt">

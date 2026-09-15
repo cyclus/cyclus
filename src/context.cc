@@ -28,7 +28,7 @@ SimInfo::SimInfo()
       m0(0),
       dt(kDefaultTimeStepDur),
       decay("manual"),
-      decay_nuc(kDefaultDecayNuc),
+      decay_eps(kDefaultDecayEps),
       branch_time(-1),
       explicit_inventory(false),
       explicit_inventory_compact(false),
@@ -43,7 +43,7 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
       m0(m0),
       dt(kDefaultTimeStepDur),
       decay("manual"),
-      decay_nuc(kDefaultDecayNuc),
+      decay_eps(kDefaultDecayEps),
       branch_time(-1),
       handle(handle),
       explicit_inventory(false),
@@ -59,7 +59,7 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d)
       m0(m0),
       dt(kDefaultTimeStepDur),
       decay(d),
-      decay_nuc(kDefaultDecayNuc),
+      decay_eps(kDefaultDecayEps),
       branch_time(-1),
       handle(handle),
       explicit_inventory(false),
@@ -76,7 +76,7 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim, int branch_time,
       m0(-1),
       dt(kDefaultTimeStepDur),
       decay("manual"),
-      decay_nuc(kDefaultDecayNuc),
+      decay_eps(kDefaultDecayEps),
       parent_sim(parent_sim),
       parent_type(parent_type),
       branch_time(branch_time),
@@ -270,6 +270,10 @@ TransportUnit::Ptr Context::GetTransportUnit(std::string name) {
 }
 
 void Context::InitSim(SimInfo si) {
+  if (!(si.decay_eps >= 0.0 && si.decay_eps < 1.0)) {
+    throw ValueError("decay_eps must be finite and satisfy 0 <= decay_eps < 1");
+  }
+
   NewDatum("Info")
       ->AddVal("Handle", si.handle)
       ->AddVal("InitialYear", si.y0)
@@ -291,7 +295,7 @@ void Context::InitSim(SimInfo si) {
 
   NewDatum("DecayMode")->AddVal("Decay", si.decay)->Record();
 
-  NewDatum("DecayThreshold")->AddVal("NucId", si.decay_nuc)->Record();
+  NewDatum("DecayThreshold")->AddVal("Epsilon", si.decay_eps)->Record();
 
   NewDatum("InfoExplicitInv")
       ->AddVal("RecordInventory", si.explicit_inventory)

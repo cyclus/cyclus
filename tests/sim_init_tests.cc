@@ -110,7 +110,9 @@ class SimInitTest : public ::testing::TestWithParam<int> {
         ->AddVal("Solver", std::string("greedy")) // str constructor for macs
         ->AddVal("ExclusiveOrders", true)
         ->Record();
-    ctx->InitSim(cy::SimInfo(5));
+    cy::SimInfo info(5);
+    info.decay_eps = 1e-8;
+    ctx->InitSim(info);
 
     cy::CompMap v;
     v[922350000] = 1;
@@ -215,6 +217,13 @@ TEST_P(SimInitTest, InitNextIds) {
   EXPECT_EQ(prod_qual_id, prodid());
 }
 
+TEST_P(SimInitTest, LegacyDecayEpsDefault) {
+  b->db().Execute("DROP TABLE DecayThreshold");
+  cy::SimInit si;
+  si.Init(&rec, b);
+  EXPECT_DOUBLE_EQ(1e-4, si.context()->sim_info().decay_eps);
+}
+
 TEST_P(SimInitTest, InitSimInfo) {
   cy::SimInit si;
   si.Init(&rec, b);
@@ -228,7 +237,7 @@ TEST_P(SimInitTest, InitSimInfo) {
   EXPECT_EQ(si_orig.y0, si_init.y0);
   EXPECT_EQ(si_orig.m0, si_init.m0);
   EXPECT_EQ(si_orig.handle, si_init.handle);
-  EXPECT_EQ(si_orig.decay_nuc, si_init.decay_nuc);
+  EXPECT_EQ(si_orig.decay_eps, si_init.decay_eps);
   EXPECT_EQ(si_orig.parent_sim, si_init.parent_sim);
   EXPECT_EQ(si_orig.parent_type, si_init.parent_type);
   EXPECT_EQ(si_orig.branch_time, si_init.branch_time);
@@ -445,6 +454,7 @@ TEST_P(SimInitTest, RestartSimInfo) {
   EXPECT_NE(rec.sim_id(), si.recorder()->sim_id());
   EXPECT_EQ(2, si.context()->time());
   EXPECT_EQ(5, info.duration);
+  EXPECT_DOUBLE_EQ(1e-8, info.decay_eps);
   EXPECT_EQ(2010, info.y0);
   EXPECT_EQ(1, info.m0);
   EXPECT_EQ("", info.handle);

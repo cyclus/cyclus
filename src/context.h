@@ -30,7 +30,7 @@ const uint64_t cyclusMonth = cyclusYear / kMonthsPerYear;
 
 const uint64_t kDefaultTimeStepDur = cyclusMonth;
 
-const cyclus::Nuc kDefaultDecayNuc = 952410000;  // Am-241
+const double kDefaultDecayEps = 1e-4;
 
 const uint64_t kDefaultSeed = 20160212;
 
@@ -91,8 +91,8 @@ class SimInfo {
   /// "manual" if use of the decay function is allowed, "never" otherwise
   std::string decay;
 
-  /// Nuclide whose one-timestep fractional decay sets the decay threshold.
-  Nuc decay_nuc;
+  /// Fractional decay threshold in [0, 1). Smaller changes may be discarded.
+  double decay_eps;
 
   /// length of the simulation in timesteps (months)
   int duration;

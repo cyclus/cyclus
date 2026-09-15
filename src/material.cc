@@ -251,13 +251,8 @@ void Material::Decay(int curr_time) {
   if (ctx_ != NULL) {
     secs_per_timestep = ctx_->sim_info().dt;
   }
-  Nuc decay_nuc = (ctx_ == NULL) ? kDefaultDecayNuc :
-                                  ctx_->sim_info().decay_nuc;
-  double eps_decay = -std::expm1(
-      -pyne::decay_const(decay_nuc) * static_cast<double>(secs_per_timestep));
-  if (!(eps_decay > 0.0 && eps_decay < 1.0)) {
-    throw ValueError("decay_nuclide must be radioactive");
-  }
+  const double eps_decay = (ctx_ == NULL) ? kDefaultDecayEps :
+                                           ctx_->sim_info().decay_eps;
 
   if (!decay) {
     // Only do the decay calc if one of the nuclides would change in number

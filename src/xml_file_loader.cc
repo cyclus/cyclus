@@ -21,7 +21,6 @@
 #include "greedy_solver.h"
 #include "infile_tree.h"
 #include "logger.h"
-#include "pyne.h"
 #include "sim_init.h"
 #include "toolkit/infile_converters.h"
 
@@ -494,14 +493,8 @@ void XMLFileLoader::LoadControlParams() {
   int y0 = strtol(y0_str.c_str(), NULL, 10);
   // get decay mode
   std::string d = OptionalQuery<std::string>(qe, "decay", "manual");
-  std::string decay_nuc =
-      OptionalQuery<std::string>(qe, "decay_nuclide", "Am241");
-
   SimInfo si(dur, y0, m0, handle, d);
-  if (!pyne::nucname::isnuclide(decay_nuc)) {
-    throw ValueError("decay_nuclide must be a valid nuclide");
-  }
-  si.decay_nuc = pyne::nucname::id(decay_nuc);
+  si.decay_eps = OptionalQuery<double>(qe, "decay_eps", kDefaultDecayEps);
 
   si.explicit_inventory = OptionalQuery<bool>(qe, "explicit_inventory", false);
   si.explicit_inventory_compact =
