@@ -123,6 +123,7 @@ jobs:
 
           # Print the actual compile and link commands, including failing ones.
           export VERBOSE=1
+          export LDFLAGS="${LDFLAGS:+$LDFLAGS }-L${CONDA_PREFIX}/lib"
           mkdir -p $(python3 -m site --user-site)
           python3 install.py -j 3 ${{ matrix.parallel_flag }} ${{ matrix.coin_flag }}
           export PATH=$HOME/.local/bin:$PATH
