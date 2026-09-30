@@ -100,6 +100,29 @@ jobs:
           export CC=$CONDA_PREFIX/bin/clang
           export CXX=$CONDA_PREFIX/bin/clang++
           export CPP=$CONDA_PREFIX/bin/clang-cpp
+
+          # Temporary diagnostics for the non-parallel libquadmath link failure.
+          echo "::group::Fortran runtime libraries and dependency paths"
+          find "$CONDA_PREFIX" \( -name 'libgfortran*.dylib' -o -name 'libquadmath*.dylib' \) -print
+          for library in "$CONDA_PREFIX"/lib/libgfortran*.dylib "$CONDA_PREFIX"/lib/libquadmath*.dylib; do
+            if [[ -e "$library" ]]; then
+              echo "Library: $library"
+              otool -L "$library" || echo "Could not inspect dependencies: $library"
+              otool -l "$library" | sed -n '/cmd LC_RPATH/,+2p' || echo "Could not inspect RPATH: $library"
+            fi
+          done
+          echo "::endgroup::"
+
+          echo "::group::Clang linker commands with and without OpenMP (dry run)"
+          printf 'int main() { return 0; }\n' > "$RUNNER_TEMP/link-probe.cc"
+          echo "Without OpenMP:"
+          "$CXX" -### "$RUNNER_TEMP/link-probe.cc" -o "$RUNNER_TEMP/link-probe"
+          echo "With OpenMP:"
+          "$CXX" -### -fopenmp=libomp "$RUNNER_TEMP/link-probe.cc" -o "$RUNNER_TEMP/link-probe"
+          echo "::endgroup::"
+
+          # Print the actual compile and link commands, including failing ones.
+          export VERBOSE=1
           mkdir -p $(python3 -m site --user-site)
           python3 install.py -j 3 ${{ matrix.parallel_flag }} ${{ matrix.coin_flag }}
           export PATH=$HOME/.local/bin:$PATH
