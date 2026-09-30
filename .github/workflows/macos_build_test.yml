@@ -67,8 +67,14 @@ jobs:
         id: build-cyclus
         shell: bash -el {0}
         run: |
+          # Keep the compiler versions from the successful July CI runs while
+          # investigating Clang 21 incompatibilities with the Xcode linker.
           mamba install -y \
-            compilers \
+            "compilers=1.11.0" \
+            "c-compiler=1.11.0" \
+            "cxx-compiler=1.11.0" \
+            "clang=19.1.7" \
+            "clangxx=19.1.7" \
             cmake \
             make \
             git \
