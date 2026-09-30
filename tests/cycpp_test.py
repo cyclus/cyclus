@@ -168,10 +168,13 @@ def test_synerror():
     m = MockMachine()
     f = PragmaCyclusErrorFilter(m)
     assert not f.isvalid("#pragma cyclus var {}")
+    assert not f.isvalid("#pragma cyclus var{}")
     assert not f.isvalid("#pragma cyclus")
+    assert not f.isvalid("#pragma cyclus clone")
+    assert not f.isvalid("#pragma cyclus annotations")
+    assert not f.isvalid("#pragma cyclus snapshotinv")
 
-    assert  f.isvalid('#pragma cyclus nooooo')
-    statement, sep = "#pragma cyclus var{}", "\n"
+    statement, sep = "#pragma cyclus nooooo", "\n"
     assert  f.isvalid(statement)
     with pytest.raises(SyntaxError):
         f.transform(statement, sep)
@@ -190,19 +193,62 @@ def test_vdecorfilter():
     f.transform(statement, sep)
     assert m.var_annotations == {'name': 'James Bond'}
 
+    statement, sep = "#pragma cyclus var{'name': 'Moneypenny'} ", "\n"
+    assert  f.isvalid(statement)
+    f.transform(statement, sep)
+    assert m.var_annotations == {'name': 'Moneypenny'}
+
 def test_vdeclarfilter():
     """Test VarDeclarationFilter"""
     m = MockMachine()
     f = VarDeclarationFilter(m)
     assert not f.isvalid("one ")
+    assert not f.isvalid("one two")
 
     statement, sep = "one two", "\n"
+    m.var_annotations = {}
     assert  f.isvalid(statement)
+
+
+def test_vdeclarfilter_consumes_pending_annotation():
+    """Test VarDeclarationFilter consumes a pending state var annotation"""
+    m = StateAccumulator()
     m.classes = [(0, "trader")]
-    m.access = {"trader": "public"}
-    # m.var_annotations = {'name': 'James Bond'}
+    m.superclasses["trader"] = set()
+    m.access = {tuple(m.classes): "public"}
+    m.var_annotations = {'doc': 'some state variable'}
+    f = VarDeclarationFilter(m)
+
+    statement, sep = "double foo", "\n"
+    assert f.isvalid(statement)
     f.transform(statement, sep)
-    assert m.var_annotations == None
+    assert m.var_annotations is None
+    assert m.context["trader"]["vars"]["foo"]["type"] == "double"
+    assert m.context["trader"]["vars"]["foo"]["doc"] == "some state variable"
+
+def test_vdeclarfilter_initialized_member():
+    """Test VarDeclarationFilter with a C++ default member initializer"""
+    m = MockMachine()
+    m.var_annotations = {}
+    f = VarDeclarationFilter(m)
+
+    statement = "double latitude = 0.0"
+    assert f.isvalid(statement)
+    assert f.match.groups() == ("double", "latitude")
+
+    statement = "int foo = 7"
+    assert f.isvalid(statement)
+    assert f.match.groups() == ("int", "foo")
+
+def test_vdeclarfilter_skips_pragmas_and_comments():
+    """Test VarDeclarationFilter leaves non-declarations for later filters"""
+    m = MockMachine()
+    m.var_annotations = {}
+    f = VarDeclarationFilter(m)
+
+    assert not f.isvalid("#pragma cyclus")
+    assert not f.isvalid("// a comment")
+    assert not f.isvalid("/* a comment */")
 
 def test_vdeclarfilter_canonize_alias():
     m = MockMachine()
@@ -1189,4 +1235,3 @@ def test_integration():
         cmd = 'cycpp.py {} -o {} --cpp-path `which g++`'.format(inf, outf.name)
     p = Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
     assert '' ==  p.stdout.read().decode()
-

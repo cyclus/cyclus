@@ -1,6 +1,6 @@
 *.sw*
 *.orig
-build
+build/
 .DS_Store
 debug
 core
@@ -61,6 +61,7 @@ tests/attr-toaster-comapny.json
 tests/attr-toaster-region.h5
 tests/attr-toaster-region.json
 rs.cred
+Testing/
 
 # Docker stuff
 build-local/
@@ -87,3 +88,7 @@ cyclus/cycpp.py
 # Rever
 rever/
 .vscode
+
+# Coverage
+tests/html/*
+*coverage.info

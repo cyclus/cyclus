@@ -103,6 +103,35 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
 }
 
 void Material::Absorb(Material::Ptr mat) {
+  
+  bool tracked = HasContext();
+  bool mat_tracked = mat->HasContext();
+
+  if (tracked != mat_tracked) {
+    throw cyclus::Error("Cannot combine a tracked and untracked material!");
+  }
+
+  if (!tracked) {
+    if (mat->prev_decay_time_ > prev_decay_time_) {
+      throw ValueError(
+          "Cannot absorb a material that is more decayed than this one");
+    }
+
+    // Synchronize the incoming material with this material.
+    mat->Decay(prev_decay_time_);
+  } else if (ctx_->sim_info().decay == "lazy") {
+    // NOTE: Absorb will only Decay materials like this if the decay mode is
+    // set to lazy. If more decay modes are introduced in the future which 
+    // want Absorb to decay, this will need to be changed
+    int common_decay_time = ctx_->time();
+
+    mat->Decay(common_decay_time);
+    Decay(common_decay_time);
+
+    // Decay may return early when the change is below its threshold.
+    prev_decay_time_ = common_decay_time;
+  }
+
   // these calls force lazy evaluation if in lazy decay mode
   Composition::Ptr c0 = comp();
   Composition::Ptr c1 = mat->comp();
@@ -114,19 +143,13 @@ void Material::Absorb(Material::Ptr mat) {
     compmath::Normalize(&otherv, mat->qty_);
     comp_ = Composition::CreateFromMass(compmath::Add(v, otherv));
   }
-
-  // Set the decay time to the value of the material that had the larger
-  // quantity.  This helps avoid inheriting erroneous prev decay times if, for
-  // example, you absorb a material into a zero-quantity material that had a
-  // prev decay time prior to the current simulation time step.
-  if (qty_ < mat->qty_) {
-    prev_decay_time_ = mat->prev_decay_time_;
-  }
+  
   double tot_mass = qty_ + mat->quantity();
   double avg_unit_value =
       (qty_ * UnitValue() + mat->quantity() * mat->UnitValue()) / tot_mass;
   SetUnitValue(avg_unit_value);
   qty_ = tot_mass;
+
   mat->qty_ = 0;
   tracker_.Absorb(&mat->tracker_);
 }
@@ -202,12 +225,18 @@ void Material::Decay(int curr_time) {
     curr_time = ctx_->time();
   }
 
+
   int dt = curr_time - prev_decay_time_;
-  if (dt == 0) {
-    return;
+  
+  // Block decay backwards and past sim time for materials in a context
+  if (ctx_ && (dt < 0 || curr_time > ctx_->time())) {
+    std::string msg = "Materials in a context cannot decay backwards or "
+                      "past the current simulation time!";
+    throw cyclus::Error(msg);
   }
 
-  double eps = 1e-3;
+  // eps_decay defined such that tritium (12.32 yr half life) decays over 1 day
+  double eps_decay = 1e-4;
   const CompMap c = comp_->atom();
 
   // If composition has too many nuclides (i.e. > 100), it is cheaper to
@@ -221,8 +250,8 @@ void Material::Decay(int curr_time) {
 
   if (!decay) {
     // Only do the decay calc if one of the nuclides would change in number
-    // density more than fraction eps.
-    // i.e. decay if   (1 - eps) > exp(-lambda*dt)
+    // density more than fraction eps_decay.
+    // i.e. decay if   (1 - eps_decay) > exp(-lambda*dt)
     CompMap::const_reverse_iterator it;
     for (it = c.rbegin(); it != c.rend(); ++it) {
       int nuc = it->first;
@@ -230,7 +259,7 @@ void Material::Decay(int curr_time) {
           pyne::decay_const(nuc) * static_cast<double>(secs_per_timestep);
       double change =
           1.0 - std::exp(-lambda_timesteps * static_cast<double>(dt));
-      if (change >= eps) {
+      if (change >= eps_decay) {
         decay = true;
         break;
       }
@@ -240,7 +269,9 @@ void Material::Decay(int curr_time) {
     }
   }
 
-  prev_decay_time_ = curr_time;  // this must go before Transmute call
+  // Need to set prev_decay_time before Transmute.
+  prev_decay_time_ = curr_time; 
+  
   Composition::Ptr decayed = comp_->Decay(dt, secs_per_timestep);
   Transmute(decayed);
 }

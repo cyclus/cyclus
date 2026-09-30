@@ -50,6 +50,16 @@ TEST(CompositionTests, create_mass) {
                    2 / pyne::atomic_mass(922350000) * pyne::atomic_mass(922330000));
 }
 
+
+TEST(CompositionTests, create_nuclide) {
+  cyclus::Env::SetNucDataPath();
+  EXPECT_THROW(Composition::CreateFromNuclide(920010000);,cyclus::ValueError);
+
+  Composition::Ptr c2 = Composition::CreateFromNuclide(922350000);
+  CompMap v = c2->atom();
+  EXPECT_DOUBLE_EQ(v[922350000],1.0);
+}
+
 TEST(CompositionTests, lineage) {
   cyclus::Env::SetNucDataPath();
 

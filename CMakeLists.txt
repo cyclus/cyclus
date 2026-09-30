@@ -343,6 +343,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     # NOTE: for some reason, adding quotes around
     # ${Glibmm_INCLUDE_DIRS} breaks Ubuntu 12.04
     set(inc_dirs
+        "${PROJECT_SOURCE_DIR}/include"
         "${Python3_INCLUDE_DIRS}"
         "${LIBXML2_INCLUDE_DIR}"
         "${LIBXMLXX_INCLUDE_DIRS}"

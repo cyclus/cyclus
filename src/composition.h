@@ -52,6 +52,9 @@ class Composition {
   /// value.
   static Ptr CreateFromMass(CompMap v);
 
+  //creates a composition from one specificed nuclide 
+  static Ptr CreateFromNuclide(Nuc nuc);
+
   /// Returns a unique id associated with this composition.  Note that multiple
   /// material objects can share the same composition. Also Note that the id is
   /// not the same for two compositions that were separately created from the

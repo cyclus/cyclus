@@ -2,6 +2,7 @@
 #include <set>
 #include <utility>
 #include <vector>
+#include <sstream>
 
 #include <gtest/gtest.h>
 
@@ -19,6 +20,7 @@
 #include "trade_executor.h"
 #include "trader.h"
 
+using namespace cyclus;
 using cyclus::Bid;
 using cyclus::Context;
 using cyclus::ExchangeContext;
@@ -215,9 +217,48 @@ TEST_F(TradeExecutorTests, NoThrowWriting) {
   TradeExecutor<Material> exec(trades);
   exec.ExecuteTrades();
   EXPECT_NO_THROW(exec.RecordTrades(tc.get()));
+  
+  // Test that trades between different agents don't trigger warnings
+  warn_as_error = true;
+  TradeExecutor<Material> warning_exec(trades);
+  EXPECT_NO_THROW(warning_exec.ExecuteTrades(tc.get()));
+  warn_as_error = false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(TradeExecutorTests, SelfTradingWarningIssued) {
+  Request<Material>* req = Request<Material>::Create(fac.mat, s1, fac.commod);
+  Bid<Material>* bid = Bid<Material>::Create(req, fac.mat, s1);
+
+  std::vector< Trade<Material> > self_trades;
+  self_trades.push_back(Trade<Material>(req, bid, amt));
+
+  TradeExecutor<Material> executor(self_trades);
+
+  warn_as_error = true;
+  bool self_trade_warned = false;
+  std::string warning_msg;
+  try {
+    executor.ExecuteTrades(tc.get());
+  }
+  catch (const cyclus::StateError& e) {
+    self_trade_warned = true;
+    warning_msg = e.what();
+  }
+  catch (...) {
+    warn_as_error = false;
+    throw;
+  }
+  warn_as_error = false;
+
+  std::string expected_id = std::to_string(s1->id());
+  EXPECT_TRUE(self_trade_warned);
+  EXPECT_TRUE(warning_msg.find(expected_id) != std::string::npos);
+
+  delete bid;
+  delete req;
+}
+
 TEST_F(TradeExecutorDatabaseTests, WrapperFunctionAndBasicRecording) {
   
   double orig_pref = 3.14;
@@ -344,23 +385,3 @@ TEST_F(TradeExecutorDatabaseTests, MixedPreferenceScenarios) {
   delete bid_explicit;
   delete req;
 }
-
-// This test was a part of a previous iteration of Trade testing, but its not
-// clear if this throwing behavior is what we want. I'm leaving it here for now
-// in case it needs to be picked up again. MJG - 11/26/13
-// // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-// TEST(TradeTests, OfferThrow) {
-//   TestContext tc;
-
-//   Material::Ptr mat = get_mat();
-//   Receiver* r = new Receiver(tc.get(), mat);
-//   Request<Material>* req = Request<Material>::Create(mat, r);
-
-//   Sender* s = new Sender(tc.get(), true);
-//   Bid<Material>* bid = Bid<Material>::Create(req, mat, s);
-
-//   Trade<Material> trade(req, bid, mat->quantity());
-//   EXPECT_THROW(cyclus::ExecuteTrade(trade), cyclus::ValueError);
-//   delete s;
-//   delete r;
-// }
