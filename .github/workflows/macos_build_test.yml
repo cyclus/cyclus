@@ -46,6 +46,16 @@ jobs:
     runs-on: ["${{ matrix.macos_versions }}"]
 
     steps:
+      - name: Check temporary workaround deadline
+        run: |
+          # Revisit the compiler pins before November 1, 2026 (UTC).
+          test "$(date -u +%Y%m%d)" -lt 20261101 || {
+            echo "::error::Compiler workaround expired; review the pins and" \
+              "delete L49-57 of macos_build_test.yml when a more stable fix" \
+              "has been added."
+            exit 1
+          }
+
       - name: Setup XCode
         uses: maxim-lobanov/setup-xcode@v1
         with:
