@@ -7,6 +7,7 @@
 #include "sqlite_back.h"
 #include "timer.h"
 #include "random_number_generator.h"
+#include <thread>
 
 // special name to tell sqlite to use in-mem db
 static const char* dbpath = ":memory:";
@@ -90,4 +91,15 @@ TEST_F(RandomTest, TestRandomNormalFactory) {
   EXPECT_GE(r, 0);
   EXPECT_LE(r, 10);
   EXPECT_NEAR(r, 6.408382, 0.00001);
+}
+
+TEST_F(RandomTest, GetDateTimeSeed) {
+  int seed1 = ctx->date_time_int();
+  std::this_thread::sleep_for(std::chrono::milliseconds(5));
+  int seed2 = ctx->date_time_int();
+  std::this_thread::sleep_for(std::chrono::milliseconds(5));
+  int seed3 = ctx->date_time_int();
+  std::set<int> seeds = {seed1,seed2,seed3};
+  EXPECT_EQ(seeds.size(), 3);
+  EXPECT_GT(*seeds.begin(),0); //bc sets are ordered the first value should be the smallest comparably
 }

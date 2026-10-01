@@ -2,8 +2,11 @@
 // Implements the Timer class
 #include "timer.h"
 
+#include <algorithm>
 #include <iostream>
 #include <string>
+#include <cstdlib>
+#include <cmath>
 #if CYCLUS_IS_PARALLEL
 #include <omp.h>
 #endif  // CYCLUS_IS_PARALLEL
@@ -15,6 +18,31 @@
 #include "sim_init.h"
 
 namespace cyclus {
+
+Timer::Timer(const Timer& other) {
+  *this = other;
+}
+
+Timer& Timer::operator=(const Timer& other) {
+  if (this != &other) {
+    ctx_ = other.ctx_;
+    time_ = other.time_;
+    si_ = other.si_;
+    want_snapshot_ = other.want_snapshot_;
+    want_kill_ = other.want_kill_;
+    tickers_ = other.tickers_;
+    cpp_tickers_ = other.cpp_tickers_;
+    py_tickers_ = other.py_tickers_;
+    build_queue_ = other.build_queue_;
+    decom_queue_ = other.decom_queue_;
+    progress_bar_.reset();
+    progress_update_frequency_ = other.progress_update_frequency_;
+    progress_origin_ = other.progress_origin_;
+    progress_span_ = other.progress_span_;
+    quiet_ = other.quiet_;
+  }
+  return *this;
+}
 
 void Timer::RunSim() {
   LogLevel saved_level = Logger::ReportLevel();
@@ -29,6 +57,11 @@ void Timer::RunSim() {
 
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
+
+  if (!progress_bar_ && ProgressBarEnabled()) {
+    SetupProgressBar();
+  }
+
   while (time_ < si_.duration) {
     CLOG(LEV_INFO1) << "Current time: " << time_;
 
@@ -54,6 +87,8 @@ void Timer::RunSim() {
 #endif
 
     time_++;
+    RedrawProgressBar();
+
 
     if (want_kill_) {
       break;
@@ -270,6 +305,8 @@ void Timer::Reset() {
   build_queue_.clear();
   decom_queue_.clear();
   si_ = SimInfo(0);
+
+  progress_bar_.reset();
 }
 
 void Timer::Initialize(Context* ctx, SimInfo si) {
@@ -287,10 +324,78 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   }
 }
 
+bool Timer::ProgressBarEnabled() {
+  const char* env_var = std::getenv("CYCLUS_PROGRESS_BAR");
+  if (env_var) {
+    std::string val(env_var);
+    return !(val == "0" || val == "false" || val == "no" || val == "off");
+  }
+
+  // Disable with verbose logging to avoid interfering with debug output.
+  return cyclus::Logger::ReportLevel() <= cyclus::LEV_WARN;
+}
+
+void Timer::SetupProgressBar() {
+  progress_origin_ = time_;
+  progress_span_ = std::max(si_.duration - progress_origin_, 1);
+
+  progress_bar_.reset();
+  progress_update_frequency_ = ProgressUpdateFrequency(si_.duration);
+  progress_bar_.reset(new indicators::ProgressBar{
+      indicators::option::BarWidth{50},
+      indicators::option::MaxProgress{ProgressValue(progress_span_)},
+      indicators::option::ShowPercentage{true},
+  });
+}
+
+void Timer::RedrawProgressBar() {
+  int completed_steps = time_ - progress_origin_;
+
+  if (progress_bar_ &&
+      (completed_steps % progress_update_frequency_ == 0 ||
+      completed_steps == progress_span_)) {
+
+    const size_t progress = ProgressValue(completed_steps);
+    // Postfix must be set before set_progress: set_option does not redraw,
+    // but set_progress calls print_progress() which reads postfix_text.
+    progress_bar_->set_option(
+        indicators::option::PostfixText{
+            " (" + std::to_string(progress) + "/" +
+            std::to_string(progress_span_) + ")"});
+    progress_bar_->set_progress(progress);
+  }
+}
+
+int Timer::ProgressUpdateFrequency(int duration) {
+  return std::max(1, duration / 100);
+}
+
+size_t Timer::ProgressValue(int completed_steps) {
+  return static_cast<size_t>(
+      std::min(std::max(completed_steps, 0), progress_span_));
+}
+
 int Timer::dur() {
   return si_.duration;
 }
 
-Timer::Timer() : time_(0), si_(0), want_snapshot_(false), want_kill_(false) {}
+int Timer::CalcTimeDiff(int year, int month) {
+
+  int start_time = si_.y0 * cyclusYear + si_.m0 * cyclusMonth;
+  int time = std::max(year,0) * cyclusYear + std::max(month,0) * cyclusMonth;
+
+  // if time is 0, then invalid combination of year and month were given
+  if (time == 0 ) {
+    CLOG(LEV_WARN) << "Invalid year and month combination given to Timer::CalcTimeDiff. Returning 0. "
+                   "Year: " << year << " Month: " << month;
+
+    return 0;
+  } 
+
+  // Casting because ctx_->dt() is uint64_t and so negatives don't play nice
+  return (time - start_time) / static_cast<int>(ctx_->dt());
+
+}
+
 
 }  // namespace cyclus

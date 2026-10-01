@@ -147,10 +147,9 @@ TEST(CompMathTests, ApplyThresholdMedium) {
   v[3] = 3.0;
 
   // if the threshold is in a reasonable range, it should zero small vals
-  CompMap::iterator it;
-  for (it = v.begin(); it != v.end(); ++it) {
-    EXPECT_NO_THROW(cm::ApplyThreshold(&v, it->second));
-    EXPECT_FLOAT_EQ(0, v[it->first]);
+  for (int key = 1; key <= 3; key++) {
+      EXPECT_NO_THROW(cm::ApplyThreshold(&v, v[key]));
+      EXPECT_FLOAT_EQ(0, v[key]);
   }
 }
 

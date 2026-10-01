@@ -1,6 +1,6 @@
 *.sw*
 *.orig
-build
+build/
 .DS_Store
 debug
 core
@@ -50,6 +50,7 @@ cyclus/system.py
 tests/libcyclus-orig.h5
 tests/libcyclus-orig.sqlite
 tests/libcyclus-test.h5
+tests/gen_db.h5
 tests/libcyclus-test.sqlite
 tests/dummy.json
 tests/dummy.h5
@@ -61,6 +62,7 @@ tests/attr-toaster-region.h5
 tests/attr-toaster-region.json
 rs.cred
 *.h5
+Testing/
 
 # Docker stuff
 build-local/
@@ -87,3 +89,7 @@ cyclus/cycpp.py
 # Rever
 rever/
 .vscode
+
+# Coverage
+tests/html/*
+*coverage.info

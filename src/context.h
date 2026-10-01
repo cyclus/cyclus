@@ -24,7 +24,11 @@
 // a round number)
 const uint64_t cyclusYear = 31558200;
 
-const uint64_t kDefaultTimeStepDur = cyclusYear / 12;
+const uint64_t kMonthsPerYear = 12;
+
+const uint64_t cyclusMonth = cyclusYear / kMonthsPerYear;
+
+const uint64_t kDefaultTimeStepDur = cyclusMonth;
 
 const uint64_t kDefaultSeed = 20160212;
 
@@ -250,6 +254,9 @@ class Context {
   /// Returns the current simulation timestep.
   virtual int time();
 
+  /// Returns a time shift between the simulation start time and another time stamp
+  int CalcTimeDiff(int year, int month);
+
   /// Adds a package type to a simulation-wide accessible list.
   /// Agents should NOT add their own packages.
   void AddPackage(std::string name, double fill_min = 0,
@@ -283,6 +290,9 @@ class Context {
 
   /// Returns a random number from a uniform integer distribution.
   int random_uniform_int(int low, int high);
+
+  //returns an integer representation of the date-time to seed the simulation
+  int date_time_int();
 
   /// Returns a random number from a uniform real distribution.
   double random_uniform_real(double low, double high);

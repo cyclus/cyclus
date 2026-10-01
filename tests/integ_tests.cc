@@ -133,6 +133,18 @@ TEST_P(IntegTestsFixture, CustomSeed) {
     EXPECT_EQ(1234, qr.GetVal<int>("Stride"));
 }
 
+TEST_P(IntegTestsFixture, RecipeCheck) {
+  {
+    SqliteBack back(":memory:");
+    // no_recipe.xml is identical to predator.xml minus the recipe block
+    try {
+      RunSim("no_recipe.xml", &back);
+    } catch (std::exception& ex) {
+      EXPECT_STREQ("Document failed schema validation", ex.what());
+    }
+  }
+}
+
 #if CYCLUS_IS_PARALLEL
 INSTANTIATE_TEST_CASE_P(IntegTestsParallel, IntegTestsFixture, ::testing::Values(1, 2, 3, 4));
 #else

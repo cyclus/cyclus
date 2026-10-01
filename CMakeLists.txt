@@ -93,7 +93,8 @@ IF(NOT CYCLUS_DOC_ONLY)
         set(suffix ".dll")
         set(dynamicloadlib "windows_helper_functions.h")
     ELSEIF(APPLE)
-        set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup -flat_namespace")
+        set(CMAKE_SHARED_LINKER_FLAGS
+            "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup -flat_namespace")
         set(suffix ".dylib")
         set(dynamicloadlib "unix_helper_functions.h")
     ELSE()
@@ -343,6 +344,7 @@ IF(NOT CYCLUS_DOC_ONLY)
     # NOTE: for some reason, adding quotes around
     # ${Glibmm_INCLUDE_DIRS} breaks Ubuntu 12.04
     set(inc_dirs
+        "${PROJECT_SOURCE_DIR}/include"
         "${Python3_INCLUDE_DIRS}"
         "${LIBXML2_INCLUDE_DIR}"
         "${LIBXMLXX_INCLUDE_DIRS}"

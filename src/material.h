@@ -108,6 +108,9 @@ class Material : public Resource {
   /// Returns the mass of this material in kg.
   virtual double quantity() const;
 
+  /// Returns true if the material has a context, false otherwise.
+  virtual bool HasContext() const {return ctx_ != NULL;}
+
   virtual Resource::Ptr ExtractRes(double qty);
 
   /// Same as ExtractComp with c = this->comp().
