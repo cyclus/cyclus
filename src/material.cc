@@ -156,7 +156,6 @@ void Material::Absorb(Material::Ptr mat) {
 
 void Material::Transmute(Composition::Ptr c) {
   comp_ = c;
-  tracker_.Modify();
 
   // Presumably the user has chosen the new composition to be accurate for
   // the current simulation time.  The next call to decay should not include
@@ -168,6 +167,9 @@ void Material::Transmute(Composition::Ptr c) {
   if (ctx_ != NULL && ctx_->time() > prev_decay_time_) {
     prev_decay_time_ = ctx_->time();
   }
+
+  // Record the composition and updated decay timestamp together.
+  tracker_.Modify();
 }
 
 Resource::Ptr Material::PackageExtract(double qty,

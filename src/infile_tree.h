@@ -90,6 +90,18 @@ inline std::string Query(InfileTree* tree, std::string query, int index) {
   return tree->GetString(query, index);
 }
 
+template <> inline bool Query(InfileTree* tree, std::string query, int index) {
+  std::string s = tree->GetString(query, index);
+  boost::trim(s);
+  if (s == "true") {
+    return true;
+  }
+  if (s == "false") {
+    return false;
+  }
+  return boost::lexical_cast<bool>(s.c_str());
+}
+
 template <> inline int Query(InfileTree* tree, std::string query, int index) {
   std::string s = tree->GetString(query, index);
   boost::trim(s);

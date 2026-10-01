@@ -6,6 +6,7 @@ Since last release
 ====================
 
 **Added:**
+* Added a boolean-specific Query function to infile_tree.h to support archetype bools using true and false (#1970)
 * Added a copy constructor to Timer to allow MockSim to copy it without upsetting the progress bar (#1961)
 * Added progress bar to the simulation loop (#1912)
 * Added a warning for when a facility trades with itself (#1895)
