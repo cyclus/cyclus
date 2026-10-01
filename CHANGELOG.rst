@@ -39,6 +39,7 @@ Since last release
 * New composition specification based on single nuclide (#1949) 
 * Added ability to calcuate a time shift between the start time and some other time stamp (#1907)
 * Users can specify for random seed to be created for random number generation (#1950)
+* Introduced a definition of "full" for a resource buffer, which is a threshold quantity that can be set by the user (#)
 
 **Changed:**
 * Clarify behavior of `Material::Absorb()` with respect to decay (#1966)

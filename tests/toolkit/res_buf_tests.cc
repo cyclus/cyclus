@@ -49,6 +49,45 @@ TEST_F(ProductBufTest, Getset_capacityEmpty) {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+TEST_F(ProductBufTest, set_full_threshold_ExceptionsEmpty) {
+  EXPECT_THROW(store_.full_threshold(neg_full), ValueError);
+  EXPECT_NO_THROW(store_.full_threshold(zero_full));
+  EXPECT_NO_THROW(store_.full_threshold(full));
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ProductBufTest, set_full_threshold_ExceptionsFilled) {
+  EXPECT_THROW(filled_store_.full_threshold(hi_full), ValueError);
+  EXPECT_NO_THROW(filled_store_.full_threshold(full));
+}
+
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ProductBufTest, GetFullThreshold_ExceptionsEmpty) {
+  ASSERT_NO_THROW(store_.full_threshold());
+  store_.full_threshold(zero_full);
+  ASSERT_NO_THROW(store_.full_threshold());
+  store_.full_threshold(zero_full);
+  ASSERT_NO_THROW(store_.full_threshold());
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ProductBufTest, GetFullThreshold_InitialEmpty) {
+  EXPECT_DOUBLE_EQ(store_.full_threshold(), 0.0);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(ProductBufTest, Getset_full_thresholdEmpty) {
+  store_.full_threshold(zero_full);
+  EXPECT_DOUBLE_EQ(store_.full_threshold(), zero_full);
+
+  store_.full_threshold(full);
+  EXPECT_DOUBLE_EQ(store_.full_threshold(), full);
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 TEST_F(ProductBufTest, GetSpace_Empty) {
   ASSERT_NO_THROW(store_.space());
   EXPECT_DOUBLE_EQ(store_.space(), INFINITY);
