@@ -1,6 +1,6 @@
 #include "material.h"
 
-#include <math.h>
+#include <cmath>
 
 #include "comp_math.h"
 #include "context.h"
@@ -127,20 +127,19 @@ void Material::Absorb(Material::Ptr mat) {
 
     mat->Decay(common_decay_time);
     Decay(common_decay_time);
-
-    // Decay may return early when the change is below its threshold.
-    prev_decay_time_ = common_decay_time;
   }
 
   // these calls force lazy evaluation if in lazy decay mode
   Composition::Ptr c0 = comp();
   Composition::Ptr c1 = mat->comp();
 
-  if (c0 != c1) {
+  if (!Composition::IsEquivalent(c0, c1)) {
     CompMap v(c0->mass());
     compmath::Normalize(&v, qty_);
+
     CompMap otherv(c1->mass());
     compmath::Normalize(&otherv, mat->qty_);
+
     comp_ = Composition::CreateFromMass(compmath::Add(v, otherv));
   }
   
@@ -229,6 +228,11 @@ void Material::Decay(int curr_time) {
 
 
   int dt = curr_time - prev_decay_time_;
+
+  // If we're already up-to-date we can skip all the expensive stuff.
+  if (dt == 0) {
+    return;
+  }
   
   // Block decay backwards and past sim time for materials in a context
   if (ctx_ && (dt < 0 || curr_time > ctx_->time())) {
@@ -237,8 +241,6 @@ void Material::Decay(int curr_time) {
     throw cyclus::Error(msg);
   }
 
-  // eps_decay defined such that tritium (12.32 yr half life) decays over 1 day
-  double eps_decay = 1e-4;
   const CompMap c = comp_->atom();
 
   // If composition has too many nuclides (i.e. > 100), it is cheaper to
@@ -249,6 +251,8 @@ void Material::Decay(int curr_time) {
   if (ctx_ != NULL) {
     secs_per_timestep = ctx_->sim_info().dt;
   }
+  const double eps_decay = (ctx_ == NULL) ? kDefaultDecayEps :
+                                           ctx_->sim_info().decay_eps;
 
   if (!decay) {
     // Only do the decay calc if one of the nuclides would change in number
@@ -259,14 +263,16 @@ void Material::Decay(int curr_time) {
       int nuc = it->first;
       double lambda_timesteps =
           pyne::decay_const(nuc) * static_cast<double>(secs_per_timestep);
-      double change =
-          1.0 - std::exp(-lambda_timesteps * static_cast<double>(dt));
+      double change = -std::expm1(
+          -lambda_timesteps * static_cast<double>(dt));
       if (change >= eps_decay) {
         decay = true;
         break;
       }
     }
     if (!decay) {
+      // Decay below the configured threshold is intentionally discarded.
+      prev_decay_time_ = curr_time;
       return;
     }
   }

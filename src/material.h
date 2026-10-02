@@ -142,6 +142,8 @@ class Material : public Resource {
   /// not result in an updated material composition.  Does nothing if the
   /// simulation decay mode is set to "never" or none of the nuclides' decay
   /// constants are significant with respect to the time delta.
+  /// The optional control decay_eps sets the fractional threshold (default
+  /// 1e-4). Below-threshold decay is not accumulated or guaranteed.
   /// @param curr_time current time to use for the decay calculation
   ///        (default: -1 forces the decay to the context's current time)
   virtual void Decay(int curr_time = -1);

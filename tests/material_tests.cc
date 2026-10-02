@@ -374,13 +374,74 @@ TEST_F(MaterialTest, DecayShortcut) {
 
   double sec_per_month = 2629152;
   double u235_lambda = pyne::decay_const(u235) * sec_per_month;  // per month
-  double eps = 1e-4;
+  double eps = kDefaultDecayEps;
   double threshold = -1 * std::log(1-eps) / u235_lambda;
 
   // If delta t is small w.r.t. composition's decay constants, no decay is
   // performed and the composition should remain the same.
   m->Decay(threshold * 0.9);
   EXPECT_EQ(c, m->comp());
+}
+
+TEST_F(MaterialTest, DecayBelowThresholdAdvancesTime) {
+  SimInfo si(10, 2015, 1, "", "manual");
+  FakeContext* fake_ctx = new FakeContext(&ti, &rec);
+  fake_ctx->InitSim(si);
+  TestFacility* fake_fac = new TestFacility(fake_ctx);
+
+  CompMap v;
+  v[u235_] = 1;
+  Composition::Ptr c = Composition::CreateFromAtom(v);
+  Material::Ptr m = Material::Create(fake_fac, 1.0, c);
+
+  fake_ctx->time(1);
+  m->Decay();
+
+  EXPECT_EQ(1, m->prev_decay_time());
+  EXPECT_EQ(c, m->comp());
+
+  delete fake_fac;
+  delete fake_ctx;
+}
+
+// A one-step change is below epsilon, even though two steps exceed it.
+// Repeated calls discard that change rather than accumulating decay time.
+TEST_F(MaterialTest, DecayEpsDiscardsSmallChanges) {
+  SimInfo si(10, 2015, 1, "", "manual");
+  const int nuc = id("H3");
+  const double step = pyne::decay_const(nuc) * si.dt;
+  si.decay_eps = -std::expm1(-1.5 * step);
+  FakeContext ctx(&ti, &rec);
+  ctx.InitSim(si);
+  TestFacility fac(&ctx);
+  CompMap v;
+  v[nuc] = 1;
+  Composition::Ptr c = Composition::CreateFromAtom(v);
+  Material::Ptr frequent = Material::Create(&fac, 1.0, c);
+  Material::Ptr delayed = Material::Create(&fac, 1.0, c);
+  ctx.time(1);
+  frequent->Decay();
+  ctx.time(2);
+  frequent->Decay();
+  delayed->Decay();
+  EXPECT_EQ(c, frequent->comp());
+  EXPECT_EQ(2, frequent->prev_decay_time());
+  EXPECT_NE(c, delayed->comp());
+}
+
+TEST_F(MaterialTest, DecayEpsZero) {
+  SimInfo si(10, 2015, 1, "", "manual");
+  si.decay_eps = 0.0;
+  FakeContext ctx(&ti, &rec);
+  ctx.InitSim(si);
+  TestFacility fac(&ctx);
+  CompMap v;
+  v[u235_] = 1;
+  Composition::Ptr c = Composition::CreateFromAtom(v);
+  Material::Ptr m = Material::Create(&fac, 1.0, c);
+  ctx.time(1);
+  m->Decay();
+  EXPECT_NE(c, m->comp());
 }
 
 // this test checks that we handle potentially non-default custom time step
@@ -513,7 +574,7 @@ TEST_F(MaterialTest, DecayHeatTest) {
 }
 
 TEST_F(MaterialTest, DecaySmallAmount) {
-  // eps_decay is defined such that tritium can decay on a 1 day time step
+  // The default decay threshold allows tritium to decay on a one-day step.
   const int tritium_id = 10030000;
   const double qty = 1; //kg, NOTE: fractional amounts all that matter 
 

@@ -1,5 +1,6 @@
 #include <map>
 
+#include <boost/weak_ptr.hpp>
 #include <gtest/gtest.h>
 
 #include "context.h"
@@ -72,14 +73,37 @@ TEST(CompositionTests, lineage) {
   Composition::Ptr dec4 = dec1->Decay(2 * dt);
   Composition::Ptr dec5 = dec2->Decay(dt);
 
-  std::map<int, Composition::Ptr> chain = c.DecayLine();
+  // Chain is an std::map<int, boost::weak_ptr<Composition>> here. Using auto
+  // simplifies a few things, but hides that.
+  auto chain = c.DecayLine();
 
   EXPECT_EQ(chain.size(), 3);
-  EXPECT_EQ(chain[dt], dec1);
-  EXPECT_EQ(chain[2 * dt], dec2);
+  EXPECT_EQ(chain.at(dt).lock(), dec1);
+  EXPECT_EQ(chain.at(2 * dt).lock(), dec2);
   EXPECT_EQ(dec2, dec3);
-  EXPECT_EQ(chain[3 * dt], dec4);
+  EXPECT_EQ(chain.at(3 * dt).lock(), dec4);
   EXPECT_EQ(dec4, dec5);
+}
+
+TEST(CompositionTests, expired_lineage_entry_is_recomputed) {
+  cyclus::Env::SetNucDataPath();
+
+  TestComp c;
+  int dt = 5;
+  Composition::Ptr decayed = c.Decay(dt);
+  boost::weak_ptr<Composition> weak_decayed(decayed);
+  int decayed_id = decayed->id();
+
+  decayed.reset();
+
+  EXPECT_TRUE(weak_decayed.expired());
+  EXPECT_TRUE(c.DecayLine().at(dt).expired());
+
+  Composition::Ptr recomputed = c.Decay(dt);
+
+  ASSERT_TRUE(recomputed != NULL);
+  EXPECT_NE(recomputed->id(), decayed_id);
+  EXPECT_EQ(c.DecayLine().at(dt).lock(), recomputed);
 }
 
 TEST(CompositionTests, decay) {
@@ -103,4 +127,3 @@ TEST(CompositionTests, decay) {
   EXPECT_NEAR(v[id("Cs137")] / 2, newv[id("Cs137")], 1e-4);
   EXPECT_NEAR(v[id("U238")], newv[id("U238")], 1e-4);
 }
-
