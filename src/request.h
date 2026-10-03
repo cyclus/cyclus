@@ -12,10 +12,9 @@ namespace cyclus {
 
 class Material;
 
-/// Default preference values are unity. This has been updated from values of
-/// zero (which was the case prior to release 1.4). Preferences can be lower or
-/// higher than the default value, but must be positive.
-static const double kDefaultPref = 1;
+/// Default unit_cost_mod values are zero. Unit cost modifiers can be
+/// lower or higher than the default value.
+static const double kDefaultUnitCostMod = 0.0;
 
 class Trader;
 template <class T> class RequestPortfolio;
@@ -33,32 +32,29 @@ template <class T> class Request {
   /// @brief a factory method for a request
   /// @param target the target resource associated with this request
   /// @param requester the requester
-  /// @param portfolio the porftolio of which this request is a part
+  /// @param portfolio the portfolio of which this request is a part
   /// @param commodity the commodity associated with this request
-  /// @param preference the preference associated with this request (relative to
-  /// others in the portfolio)
+  /// @param unit_cost_mod the unit_cost_mod associated with this request
   /// @param exclusive a flag denoting that this request must be met
-  /// exclusively,
-  /// i.e., in its entirety by a single offer
+  /// exclusively, i.e., in its entirety by a single offer
   /// @param cost_function a standard function object that returns the cost of a
   /// potential resource when called.
   inline static Request<T>* Create(boost::shared_ptr<T> target,
                                    Trader* requester,
                                    typename RequestPortfolio<T>::Ptr portfolio,
                                    std::string commodity,
-                                   double preference,
+                                   double unit_cost_mod,
                                    bool exclusive,
                                    cost_function_t cost_function) {
-    return new Request<T>(target, requester, portfolio, commodity, preference,
+    return new Request<T>(target, requester, portfolio, commodity, unit_cost_mod,
                           exclusive, cost_function);
   }
   /// @brief a factory method for a request
   /// @param target the target resource associated with this request
   /// @param requester the requester
-  /// @param portfolio the porftolio of which this request is a part
+  /// @param portfolio the portfolio of which this request is a part
   /// @param commodity the commodity associated with this request
-  /// @param preference the preference associated with this request (relative to
-  /// others in the portfolio)
+  /// @param unit_cost_mod the unit_cost_mod associated with this request
   /// @param exclusive a flag denoting that this request must be met
   /// exclusively,
   /// i.e., in its entirety by a single offer
@@ -66,9 +62,9 @@ template <class T> class Request {
                                    Trader* requester,
                                    typename RequestPortfolio<T>::Ptr portfolio,
                                    std::string commodity = "",
-                                   double preference = kDefaultPref,
+                                   double unit_cost_mod = kDefaultUnitCostMod,
                                    bool exclusive = false) {
-    return Create(target, requester, portfolio, commodity, preference,
+    return Create(target, requester, portfolio, commodity, unit_cost_mod,
                   exclusive, NULL);
   }
 
@@ -77,10 +73,10 @@ template <class T> class Request {
   inline static Request<T>* Create(boost::shared_ptr<T> target,
                                    Trader* requester,
                                    std::string commodity,
-                                   double preference,
+                                   double unit_cost_mod,
                                    bool exclusive,
                                    cost_function_t cost_function) {
-    return new Request<T>(target, requester, commodity, preference, exclusive,
+    return new Request<T>(target, requester, commodity, unit_cost_mod, exclusive,
                           cost_function);
   }
   /// @brief a factory method for a bid for a bid without a portfolio
@@ -88,9 +84,9 @@ template <class T> class Request {
   inline static Request<T>* Create(boost::shared_ptr<T> target,
                                    Trader* requester,
                                    std::string commodity = "",
-                                   double preference = kDefaultPref,
+                                   double unit_cost_mod = kDefaultUnitCostMod,
                                    bool exclusive = false) {
-    return Create(target, requester, commodity, preference, exclusive, NULL);
+    return Create(target, requester, commodity, unit_cost_mod, exclusive, NULL);
   }
 
   /// @return this request's target
@@ -102,8 +98,12 @@ template <class T> class Request {
   /// @return the commodity associated with this request
   inline std::string commodity() const { return commodity_; }
 
-  /// @return the preference value for this request
-  inline double preference() const { return preference_; }
+  /// @return the unit cost modifier for this request
+  inline double unit_cost_mod() const { return unit_cost_mod_; }
+
+  /// @brief Sets the unit_cost_mod of this request
+  /// @param unit_cost_mod
+  inline void unit_cost_mod(double unit_cost_mod) {unit_cost_mod_ = unit_cost_mod;}
 
   /// @return the portfolio of which this request is a part
   inline typename RequestPortfolio<T>::Ptr portfolio() const {
@@ -119,51 +119,51 @@ template <class T> class Request {
  private:
   /// @brief constructors are private to require use of factory methods
   Request(boost::shared_ptr<T> target, Trader* requester, std::string commodity,
-          double preference, bool exclusive, cost_function_t cost_function)
+          double unit_cost_mod, bool exclusive, cost_function_t cost_function)
       : target_(target),
         requester_(requester),
         commodity_(commodity),
-        preference_(preference),
+        unit_cost_mod_(unit_cost_mod),
         exclusive_(exclusive),
         cost_function_(cost_function) {}
 
   /// @brief constructors are private to require use of factory methods
   Request(boost::shared_ptr<T> target, Trader* requester,
-          std::string commodity = "", double preference = kDefaultPref,
+          std::string commodity = "", double unit_cost_mod = kDefaultUnitCostMod,
           bool exclusive = false)
       : target_(target),
         requester_(requester),
         commodity_(commodity),
-        preference_(preference),
+        unit_cost_mod_(unit_cost_mod),
         exclusive_(exclusive),
         cost_function_(NULL) {}
 
   Request(boost::shared_ptr<T> target, Trader* requester,
           typename RequestPortfolio<T>::Ptr portfolio, std::string commodity,
-          double preference, bool exclusive, cost_function_t cost_function)
+          double unit_cost_mod, bool exclusive, cost_function_t cost_function)
       : target_(target),
         requester_(requester),
         commodity_(commodity),
-        preference_(preference),
+        unit_cost_mod_(unit_cost_mod),
         portfolio_(portfolio),
         exclusive_(exclusive),
         cost_function_(cost_function) {}
 
   Request(boost::shared_ptr<T> target, Trader* requester,
           typename RequestPortfolio<T>::Ptr portfolio,
-          std::string commodity = "", double preference = kDefaultPref,
+          std::string commodity = "", double unit_cost_mod = kDefaultUnitCostMod,
           bool exclusive = false)
       : target_(target),
         requester_(requester),
         commodity_(commodity),
-        preference_(preference),
+        unit_cost_mod_(unit_cost_mod),
         portfolio_(portfolio),
         exclusive_(exclusive),
         cost_function_(NULL) {}
 
   boost::shared_ptr<T> target_;
   Trader* requester_;
-  double preference_;
+  double unit_cost_mod_;
   std::string commodity_;
   boost::weak_ptr<RequestPortfolio<T>> portfolio_;
   bool exclusive_;

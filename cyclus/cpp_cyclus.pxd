@@ -456,7 +456,7 @@ cdef extern from "request.h" namespace "cyclus":
         shared_ptr[T] target()
         Trader* requester()
         std_string commodity()
-        double preference()
+        double unit_cost_mod()
         shared_ptr[RequestPortfolio[T]] portfolio()
         cpp_bool exclusive()
         cost_function_t cost_function()
@@ -476,7 +476,6 @@ cdef extern from "exchange_graph.h" namespace "cyclus":
         ExchangeNode(double, cpp_bool, std_string, int)
         ExchangeNodeGroup* group
         map[Arc, vector[double]] unit_capacities
-        map[Arc, double] prefs
         cpp_bool exclusives
         std_string commod
         int agent_id
@@ -493,8 +492,9 @@ cdef extern from "exchange_graph.h" namespace "cyclus":
         ExchangeNode.Ptr vnode()
         cpp_bool exclusive()
         double excl_val()
-        double pref()
-        void pref(double)
+        double unit_cost()
+        double unit_cost_mod()
+        double arc_cost()
 
     cpp_bool operator==(const ExchangeNode&, const ExchangeNode&)
 
@@ -588,7 +588,7 @@ cdef extern from "bid.h" namespace "cyclus":
         Trader* bidder()
         shared_ptr[BidPortfolio[T]] portfolio()
         cpp_bool exclusive()
-        double preference()
+        double unit_cost()
 
 
 cdef extern from "bid_portfolio.h" namespace "cyclus":
@@ -610,7 +610,7 @@ cdef extern from "bid_portfolio.h" namespace "cyclus":
 
 cdef extern from "exchange_context.h" namespace "cyclus":
 
-    cdef cppclass PrefMap[T]:
+    cdef cppclass RequestBidMap[T]:
         ctypedef Request[T]* request_ptr
         ctypedef Bid[T]* bid_ptr
         ctypedef map[request_ptr, map[bid_ptr, double]] type
@@ -649,8 +649,8 @@ cdef extern from "agent.h" namespace "cyclus":
         void BuildNotify(Agent*)
         void DecomNotify(Agent*)
         void Decommission() except +
-        void AdjustMatlPrefs(PrefMap[Material].type&)
-        void AdjustProductPrefs(PrefMap[Product].type&)
+        void AdjustMatlParams(RequestBidMap[Material].type&)
+        void AdjustProductParams(RequestBidMap[Product].type&)
         std_string schema()
         cpp_jsoncpp.Value annotations() except +
         const std_string get_prototype "prototype" ()
@@ -700,8 +700,8 @@ cdef extern from "trader.h" namespace "cyclus":
         set[RequestPortfolio[Product].Ptr] GetProductRequests()
         set[BidPortfolio[Material].Ptr] GetMatlBids(CommodMap[Material].type&)
         set[BidPortfolio[Product].Ptr] GetProductBids(CommodMap[Product].type&)
-        void AdjustMatlPrefs(PrefMap[Material].type&)
-        void AdjustProductPrefs(PrefMap[Product].type&)
+        void AdjustMatlParams(RequestBidMap[Material].type&)
+        void AdjustProductParams(RequestBidMap[Product].type&)
         void GetMatlTrades(const vector[Trade[Material]]&,
                            vector[pair[Trade[Material], Material.Ptr]]&)
         void GetProductTrades(const vector[Trade[Product]]&,
@@ -754,8 +754,8 @@ cdef extern from "facility.h" namespace "cyclus":
         set[RequestPortfolio[Product].Ptr] GetProductRequests()
         set[BidPortfolio[Material].Ptr] GetMatlBids(CommodMap[Material].type&)
         set[BidPortfolio[Product].Ptr] GetProductBids(CommodMap[Product].type&)
-        void AdjustMatlPrefs(PrefMap[Material].type&)
-        void AdjustProductPrefs(PrefMap[Product].type&)
+        void AdjustMatlParams(RequestBidMap[Material].type&)
+        void AdjustProductParams(RequestBidMap[Product].type&)
         void GetMatlTrades(const vector[Trade[Material]]&,
                            vector[pair[Trade[Material], Material.Ptr]]&)
         void GetProductTrades(const vector[Trade[Product]]&,

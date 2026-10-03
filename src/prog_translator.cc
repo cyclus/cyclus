@@ -51,19 +51,6 @@ void ProgTranslator::Init() {
   ctx_.m = CoinPackedMatrix(false, 0, 0);
 }
 
-void ProgTranslator::CheckPref(double pref) {
-  if (pref <= 0) {
-    std::stringstream ss;
-    ss << "Preference value found to be nonpositive (" << pref
-       << "). Preferences must be positive when using an optimization solver."
-       << " If using Cyclus in simulation mode (e.g., from the command line),"
-       << " this error is likely a bug in Cyclus. Please report it to the "
-          "developer's "
-       << "list (https://groups.google.com/forum/#!forum/cyclus-dev).";
-    throw ValueError(ss.str());
-  }
-}
-
 void ProgTranslator::Translate() {
   // number of variables = number of arcs + 1 faux arc per request group with
   // arcs
@@ -155,7 +142,6 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       }
 
       if (request) {
-        CheckPref(a.pref());
         ctx_.obj_coeffs[arc_id] = ExchangeSolver::Cost(a, excl_);
         ctx_.col_lbs[arc_id] = 0;
         ctx_.col_ubs[arc_id] =
@@ -176,7 +162,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
     }
 
     // 1e15 is the largest value that doesn't make the solver fall over
-    // (by emperical testing)
+    // (by empirical testing)
     double rlb = std::min(caps[i], 1e15);
     ctx_.row_lbs.push_back(request ? rlb : 0);
     ctx_.row_ubs.push_back(request ? inf : caps[i]);
@@ -191,7 +177,7 @@ void ProgTranslator::XlateGrp_(ExchangeNodeGroup* grp, bool request) {
       CoinPackedVector excl_row;
       std::vector<ExchangeNode::Ptr>& nodes = exngs[i];
       for (int j = 0; j != nodes.size(); j++) {
-        std::vector<Arc>& arcs = g_->node_arc_map()[nodes[j]];
+        const std::vector<Arc>& arcs = g_->GetArcsFromNode(nodes[j]);
         for (int k = 0; k != arcs.size(); k++) {
           excl_row.insert(g_->arc_ids()[arcs[k]], 1.0);
         }

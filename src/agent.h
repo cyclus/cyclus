@@ -322,11 +322,14 @@ class Agent : public StateWrangler, virtual public Ider, public EconomicEntity {
   /// END of their Decommission function.
   virtual void Decommission();
 
-  /// default implementation for material preferences.
-  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
+  /// default implementation for adjusting material trade parameters.
+  /// @param rb_map map for adjusting unit costs (from bids)
+  virtual void AdjustMatlParams(RequestBidMap<Material>::type& rb_map) {}
 
-  /// default implementation for material preferences.
-  virtual void AdjustProductPrefs(PrefMap<Product>::type& prefs) {}
+  /// default implementation for adjusting Product trade parameters.
+  /// @param rb_map map for adjusting unit costs (from bids)
+  virtual void AdjustProductParams(RequestBidMap<Product>::type& rb_map) {}
+
 
   /// Returns an agent's xml rng schema for initializing from input files. All
   /// concrete agents should override this function. This must validate the same

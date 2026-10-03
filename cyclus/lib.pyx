@@ -1802,7 +1802,7 @@ cpdef dict normalize_request_portfolio(object inp):
         commods = []
         for commodity in inp['commodities']:
             for name, reqs in commodity.items():
-                if name == 'preference' or name == 'exclusive':
+                if name == 'unit_cost_mod' or name == 'exclusive':
                     continue
 
                 commods.append({name:reqs})
@@ -1810,7 +1810,7 @@ cpdef dict normalize_request_portfolio(object inp):
     else:
         commods = []
         for name, reqs in inp.items():
-            if name == 'preference' or name == 'exclusive':
+            if name == 'unit_cost_mod' or name == 'exclusive':
                 continue
             commods.append({name:reqs})
         constrs = []
@@ -1820,7 +1820,7 @@ cpdef dict normalize_request_portfolio(object inp):
     # canonize commods
     if not isinstance(commods, Iterable):
         commods = list(commods)
-    cdef dict default_req = {'target': None, 'preference': 1.0,
+    cdef dict default_req = {'target': None, 'unit_cost_mod': 0.0,
                              'exclusive': False, 'cost': None}
     for index, commodity in enumerate(commods):
         for key, val in commodity.items():
@@ -1828,8 +1828,8 @@ cpdef dict normalize_request_portfolio(object inp):
                 req = default_req.copy()
                 req['target'] = val
                 if 'commodities' in inp:
-                    if 'preference' in inp['commodities'][index]:
-                        req['preference'] = inp['commodities'][index]['preference']
+                    if 'unit_cost_mod' in inp['commodities'][index]:
+                        req['unit_cost_mod'] = inp['commodities'][index]['unit_cost_mod']
                     if 'exclusive' in inp['commodities'][index]:
                         req['exclusive'] = inp['commodities'][index]['exclusive']
                 commods[index][key] = [req]
@@ -1880,7 +1880,7 @@ cpdef dict normalize_bid_portfolio(object inp):
     if not isinstance(bids, Sequence):
         bids = [bids]
     cdef dict default_bid = {'request': None, 'offer': None,
-                             'preference': 1.0, 'exclusive': False}
+                             'unit_cost': 1.0, 'exclusive': False}
     cdef int i, n
     cdef list normbids = []
     n = len(bids)

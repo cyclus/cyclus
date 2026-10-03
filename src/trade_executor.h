@@ -64,8 +64,7 @@ template <class T> class TradeExecutor {
   /// responses to requesters
   void ExecuteTrades(Context* ctx) { ExecuteTrades(ctx, NULL); }
 
-  /// @brief execute all trades with access to exchange context for adjusted
-  /// preferences
+  /// @brief execute all trades with access to exchange context for adjusted vals
   void ExecuteTrades(Context* ctx, ExchangeContext<T>* ex_ctx) {
     GroupTradesBySupplier(trade_ctx_, trades_);
     GetTradeResponses(trade_ctx_);
@@ -81,12 +80,11 @@ template <class T> class TradeExecutor {
   /// occur
   void RecordTrades(Context* ctx) { RecordTrades(ctx, NULL); }
 
-  /// @brief Record all trades with the appropriate backends, using adjusted
-  /// preferences
+  /// @brief Record all trades with appropriate backends, using adjusted vals
   ///
   /// @param ctx the Context through which communication with backends will
   /// occur
-  /// @param ex_ctx the ExchangeContext containing the adjusted preferences used
+  /// @param ex_ctx the ExchangeContext containing the adjusted values used
   /// by the solver
   void RecordTrades(Context* ctx, ExchangeContext<T>* ex_ctx) {
     // record all trades
@@ -115,34 +113,26 @@ template <class T> class TradeExecutor {
 
         typename T::Ptr rsrc = v_it->second;
         if (rsrc->quantity() > cyclus::eps_rsrc()) {
-          // Get the original bid preference
-          double original_preference = trade.bid->preference();
+          // Get adjusted unit_cost and unit_cost_mod
+          double adjusted_unit_cost = trade.bid->unit_cost();
+          double adjusted_unit_cost_mod = trade.request->unit_cost_mod();
 
-          // If the bid has NaN preference, use the request preference
-          if (std::isnan(original_preference)) {
-            original_preference = trade.request->preference();
-          }
+          // Normally the arc_cost is going to be this, however...
+          double adjusted_arc_cost = adjusted_unit_cost + adjusted_unit_cost_mod;
 
-          // Start with the original preference as the adjusted preference
-          double adjusted_preference = original_preference;
-
-          // If we have access to the exchange context, use the adjusted
-          // preference that was actually used by the solver
+          // It's possible to change the arc_cost directly during Adjustment
           if (ex_ctx) {
-            auto trader_it = ex_ctx->trader_prefs.find(trade.request->requester());
-            if (trader_it != ex_ctx->trader_prefs.end()) {
-              auto request_it = trader_it->second.find(trade.request);
-              if (request_it != trader_it->second.end()) {
-                auto bid_it = request_it->second.find(trade.bid);
-                if (bid_it != request_it->second.end()) {
-                  adjusted_preference = bid_it->second;
-                }
-              }
+            const double* arc_cost =
+                ex_ctx->GetArcCost(trade.request, trade.bid);
+            if (arc_cost != nullptr) {
+              adjusted_arc_cost = *arc_cost;
             }
-            // If any of the keys are not found, adjusted_preference remains
-            // the original preference
           }
 
+          // Set the resource's unit value to the successful trade's unit cost
+          rsrc->unit_value(adjusted_unit_cost);
+
+          // Record adjusted unit cost/modifier and the solver arc cost.
           ctx->NewDatum("Transactions")
               ->AddVal("TransactionId", ctx->NextTransactionID())
               ->AddVal("SenderId", supplier->id())
@@ -150,8 +140,9 @@ template <class T> class TradeExecutor {
               ->AddVal("ResourceId", rsrc->state_id())
               ->AddVal("Commodity", trade.request->commodity())
               ->AddVal("Time", ctx->time())
-              ->AddVal("BidCost", 1 / original_preference)
-              ->AddVal("AdjustedCost", 1 / adjusted_preference)
+              ->AddVal("UnitCost", adjusted_unit_cost)
+              ->AddVal("UnitCostMod", adjusted_unit_cost_mod)
+              ->AddVal("ArcCost", adjusted_arc_cost)
               ->Record();
         }
       }
@@ -180,7 +171,7 @@ void GroupTradesBySupplier(TradeExecutionContext<T>& trade_ctx,
   }
 }
 
-/// @brief queries each supplier for the responses to thier matched trade and
+/// @brief queries each supplier for the responses to their matched trade and
 /// populates trades_by_requester_ and all_trades_ with the results
 template <class T>
 static void GetTradeResponses(TradeExecutionContext<T>& trade_ctx) {

@@ -18,7 +18,7 @@ namespace toolkit {
 ///
 /// For simple behavior, policies virtually eliminate the need to write any code
 /// for resource exchange. Just assign a few policies to work with a few buffers
-/// and focus on writing the physics and other behvavior of your agent.  Typical
+/// and focus on writing the physics and other behavior of your agent. Typical
 /// usage goes something like this:
 ///
 /// @code
@@ -95,6 +95,12 @@ class MatlSellPolicy : public Trader {
   /// calling Set multiple times.
   MatlSellPolicy& Set(std::string commod);
 
+  /// @brief Sets the policy's added cost per unit of material.
+  ///
+  /// @param unit_cost The non-negative added cost per unit.
+  /// @return This policy, for method chaining.
+  MatlSellPolicy& SetUnitCost(double unit_cost);
+
   /// Registers this policy as a trader in the current simulation.  This
   /// function must be called for the policy to begin participating in resource
   /// exchange. Init MUST be called prior to calling this function.  Start is
@@ -138,6 +144,7 @@ class MatlSellPolicy : public Trader {
   bool ignore_comp_;
   Package::Ptr package_;
   TransportUnit::Ptr transport_unit_;
+  double unit_cost_;
 };
 
 }  // namespace toolkit

@@ -1,6 +1,7 @@
 #ifndef CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_
 #define CYCLUS_SRC_EXCHANGE_TRANSLATOR_H_
 
+#include <algorithm>
 #include <sstream>
 
 #include "bid.h"
@@ -33,7 +34,7 @@ template <class T> class ExchangeTranslator {
  public:
   /// @brief default constructor
   ///
-  /// @param ex_ctx the exchance context
+  /// @param ex_ctx the exchange context
   ExchangeTranslator(ExchangeContext<T>* ex_ctx) { ex_ctx_ = ex_ctx; }
 
   /// @brief translate the ExchangeContext into an ExchangeGraph
@@ -60,45 +61,37 @@ template <class T> class ExchangeTranslator {
       ExchangeNodeGroup::Ptr ns = TranslateBidPortfolio(xlation_ctx_, *bp_it);
       graph->AddSupplyGroup(ns);
 
-      // add each request-bid arc
+      // add each request-bid arc, skipping any (request, bid) pair whose
+      // entry has been erased from trader_arc_costs during the adjustment
+      // phase. A missing entry is the trader-facing convention for "remove
+      // this arc from the graph": the bid and request still exist, but no
+      // arc connects them. See AdjustMatlParams / AdjustProductParams.
       const std::set<Bid<T>*>& bids = (*bp_it)->bids();
       typename std::set<Bid<T>*>::const_iterator b_it;
       for (b_it = bids.begin(); b_it != bids.end(); ++b_it) {
         Bid<T>* bid = *b_it;
         Request<T>* req = bid->request();
-        AddArc(req, bid, graph);
+        const double* arc_cost = ex_ctx_->GetArcCost(req, bid);
+        if (arc_cost == nullptr) continue;
+        AddArc(req, bid, *arc_cost, graph);
       }
     }
 
     return graph;
   }
 
-  /// @brief adds a bid-request arc to a graph, if the preference for the arc is
-  /// non-negative
-  void AddArc(Request<T>* req, Bid<T>* bid, ExchangeGraph::Ptr graph) {
-    double pref = ex_ctx_->trader_prefs.at(req->requester())[req][bid];
-    // TODO: make the following check `pref <=0` and remove the `else if` block
-    // before release 1.5
-    if (pref < 0) {
-      CLOG(LEV_DEBUG1) << "Removing arc because of negative preference.";
-      return;
-    } else if (pref == 0) {
-      std::stringstream ss;
-      ss << "0-valued preferences have been deprecated. "
-         << "Please make preference value positive."
-         << "This message will go away in before the next release (1.5).";
-      throw ValueError(ss.str());
-    }
-    // get translated arc
-    Arc a = TranslateArc(xlation_ctx_, bid, pref);
-    a.unode()->prefs[a] = pref;  // request node is a.unode()
-    int n_prefs = a.unode()->prefs.size();
+  /// @brief adds a bid-request arc to a graph, using the bid's unit cost,
+  /// the request's unit cost modifier, and the possibly adjustment-modified arc cost.
+  void AddArc(Request<T>* req, Bid<T>* bid, double arc_cost,
+              ExchangeGraph::Ptr graph) {
+    double unit_cost = bid->unit_cost();
+    double unit_cost_mod = req->unit_cost_mod();
 
-    CLOG(LEV_DEBUG5) << "Updating preference for one of "
-                     << req->requester()->manager()->prototype()
-                     << "'s trade nodes:";
-    CLOG(LEV_DEBUG5) << "   preference: " << a.unode()->prefs[a];
-
+    Arc a = TranslateArc(xlation_ctx_, bid, unit_cost, unit_cost_mod);
+    a.arc_cost(arc_cost);
+    CLOG(LEV_DEBUG5) << "Adding arc with Unit Cost =" << unit_cost
+                     << ", Unit Cost Modifier =" << unit_cost_mod
+                     << ", Arc Cost =" << arc_cost;
     graph->AddArc(a);
   }
 
@@ -106,7 +99,7 @@ template <class T> class ExchangeTranslator {
   void BackTranslateSolution(const std::vector<Match>& matches,
                              std::vector<Trade<T>>& ret) {
     std::vector<Match>::const_iterator m_it;
-    CLOG(LEV_DEBUG1) << "Back traslating " << matches.size()
+    CLOG(LEV_DEBUG1) << "Back translating " << matches.size()
                      << " trade matches.";
     for (m_it = matches.begin(); m_it != matches.end(); ++m_it) {
       ret.push_back(BackTranslateMatch(xlation_ctx_, *m_it));
@@ -141,7 +134,7 @@ inline void AddBid(ExchangeTranslationContext<T>& translation_ctx, Bid<T>* b,
 }
 
 /// @brief translates a request portfolio by adding request nodes and
-/// accounting for capacities. Request unit capcities must be added when arcs
+/// accounting for capacities. Request unit capacities must be added when arcs
 /// are known
 template <class T>
 RequestGroup::Ptr TranslateRequestPortfolio(
@@ -174,7 +167,7 @@ RequestGroup::Ptr TranslateRequestPortfolio(
 }
 
 /// @brief translates a bid portfolio by adding bid nodes and accounting
-/// for capacities. Bid unit capcities must be added when arcs are known
+/// for capacities. Bid unit capacities must be added when arcs are known
 template <class T>
 ExchangeNodeGroup::Ptr TranslateBidPortfolio(
     ExchangeTranslationContext<T>& translation_ctx,
@@ -219,18 +212,13 @@ ExchangeNodeGroup::Ptr TranslateBidPortfolio(
 /// updates the unit capacities for the associated nodes on the arc
 template <class T>
 Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
-                 Bid<T>* bid) {
-  return TranslateArc<T>(translation_ctx, bid, 1);
-}
-
-template <class T>
-Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
-                 Bid<T>* bid, double pref) {
+                 Bid<T>* bid, double unit_cost, double unit_cost_mod) {
   Request<T>* req = bid->request();
   ExchangeNode::Ptr unode = translation_ctx.request_to_node.at(req);
   ExchangeNode::Ptr vnode = translation_ctx.bid_to_node.at(bid);
   Arc arc(unode, vnode);
-  arc.pref(pref);
+  arc.unit_cost(unit_cost);
+  arc.unit_cost_mod(unit_cost_mod);
 
   typename T::Ptr offer = bid->offer();
   typename BidPortfolio<T>::Ptr bp = bid->portfolio();
@@ -242,6 +230,16 @@ Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
   TranslateCapacities(offer, rp->constraints(), unode, arc, translation_ctx);
 
   return arc;
+}
+
+/// @brief translates an arc given a bid and subsequent data using the
+/// default values for unit_cost and unit_cost_mod.
+template <class T>
+Arc TranslateArc(const ExchangeTranslationContext<T>& translation_ctx,
+                 Bid<T>* bid) {
+  
+  return TranslateArc(translation_ctx, bid, 
+                      bid->unit_cost(), bid->request()->unit_cost_mod());
 }
 
 /// @brief simple translation from a Match to a Trade, given internal state
@@ -269,7 +267,7 @@ void TranslateCapacities(typename T::Ptr offer,
   typename std::set<CapacityConstraint<T>>::const_iterator it;
   for (it = constr.begin(); it != constr.end(); ++it) {
     CLOG(cyclus::LEV_DEBUG1)
-        << "Additing unit capacity: "
+        << "Adding unit capacity: "
         << it->convert(offer, &a, &ctx) / offer->quantity();
     n->unit_capacities[a].push_back(it->convert(offer, &a, &ctx) /
                                     offer->quantity());

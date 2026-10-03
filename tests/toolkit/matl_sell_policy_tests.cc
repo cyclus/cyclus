@@ -1,6 +1,8 @@
 
 #include <gtest/gtest.h>
 
+#include <limits>
+
 #include "toolkit/matl_sell_policy.h"
 
 #include "composition.h"
@@ -120,6 +122,45 @@ TEST_F(MatlSellPolicyTests, Bids) {
   p.Init(NULL, &buff, "", qty, true, qty * 2).Set(commod);
   obs = p.GetMatlBids(reqs);
   ASSERT_EQ(obs.size(), 0);
+  delete req;
+
+}
+
+TEST_F(MatlSellPolicyTests, BidCost) {
+  MatlSellPolicy p;
+  std::string commod("commod");
+  CommodMap<Material>::type reqs;
+  Request<Material>* req = Request<Material>::Create(mat1, fac1, commod);
+  reqs[commod].push_back(req);
+
+  mat->unit_value(1.5);
+  p.Init(NULL, &buff, "", false).SetUnitCost(2.0).Set(commod);
+  std::set<BidPortfolio<Material>::Ptr> obs = p.GetMatlBids(reqs);
+  ASSERT_EQ(1, obs.size());
+  ASSERT_EQ(1, (*obs.begin())->bids().size());
+  EXPECT_DOUBLE_EQ(3.5, (*(*obs.begin())->bids().begin())->unit_cost());
+
+  delete req;
+}
+
+TEST_F(MatlSellPolicyTests, RejectsNonFiniteBidCost) {
+  MatlSellPolicy p;
+  std::string commod("commod");
+  CommodMap<Material>::type reqs;
+  Request<Material>* req = Request<Material>::Create(mat1, fac1, commod);
+  reqs[commod].push_back(req);
+
+  p.Init(NULL, &buff, "").Set(commod);
+  EXPECT_THROW(
+      p.SetUnitCost(std::numeric_limits<double>::infinity()),
+      ValueError);
+
+  // Test that two big numbers that go over max catches too
+  mat->unit_value(std::numeric_limits<double>::max());
+  p.Init(NULL, &buff, "")
+    .SetUnitCost(std::numeric_limits<double>::max())
+    .Set(commod);
+  EXPECT_THROW(p.GetMatlBids(reqs), ValueError);
   delete req;
 }
 

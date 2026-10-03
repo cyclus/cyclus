@@ -2,6 +2,7 @@
 
 #include "error.h"
 #include "comp_math.h"
+#include <cmath>
 
 #define LG(X) LOG(LEV_##X, "selpol")
 #define LGH(X)                                                    \
@@ -19,7 +20,8 @@ MatlSellPolicy::MatlSellPolicy()
       throughput_(std::numeric_limits<double>::max()),
       ignore_comp_(false),
       package_(Package::unpackaged()),
-      transport_unit_(TransportUnit::unrestricted()) {
+      transport_unit_(TransportUnit::unrestricted()),
+      unit_cost_(0.0) {
   Warn<EXPERIMENTAL_WARNING>(
       "MatlSellPolicy is experimental and its API may be subject to change");
 }
@@ -147,6 +149,14 @@ MatlSellPolicy& MatlSellPolicy::Set(std::string commod) {
   return *this;
 }
 
+MatlSellPolicy& MatlSellPolicy::SetUnitCost(double unit_cost) {
+  if (!std::isfinite(unit_cost) || unit_cost < 0.0) {
+    throw ValueError("MatlSellPolicy cost per unit must be finite and non-negative.");
+  }
+  unit_cost_ = unit_cost;
+  return *this;
+}
+
 void MatlSellPolicy::Start() {
   if (manager() == NULL) {
     std::stringstream ss;
@@ -225,12 +235,25 @@ std::set<BidPortfolio<Material>::Ptr> MatlSellPolicy::GetMatlBids(
       // Peek at resbuf to get current composition
       m = buf_->Peek();
 
+      // Grab and make sure the unit_value is set appropriately
+      double unit_value = m->unit_value();
+      if (!std::isfinite(unit_value)) {
+        throw ValueError(
+          "MatlSellPolicy cannot bid material with non-finite unit_value"
+        );
+      }
+
+      double bid_cost = unit_cost_ + unit_value;
+      if (!std::isfinite(bid_cost)) {
+        throw ValueError("MatlSellPolicy computed a non-finite bid_cost");
+      }
+
       std::vector<double>::iterator bit;
       for (bit = bids.begin(); bit != bids.end(); ++bit) {
         offer = ignore_comp_
                     ? Material::CreateUntracked(*bit, req->target()->comp())
                     : Material::CreateUntracked(*bit, m->comp());
-        port->AddBid(req, offer, this, excl);
+        port->AddBid(req, offer, this, excl, bid_cost);
         LG(INFO3) << "  - bid " << *bit << " kg on a request for " << commod;
       }
     }

@@ -41,6 +41,8 @@ Since last release
 * Users can specify for random seed to be created for random number generation (#1950)
 
 **Changed:**
+* Reworked the Dynamic Resource Exchange to minimize direct arc costs rather
+  than inverted preferences. Renamed variables as needed/appropriate (#1937)
 * Clarify behavior of `Material::Absorb()` with respect to decay (#1966)
 * Modified cycpp.py to fix a few whitespace-related bugs, and allow cyclus vars to be initialized (#1954)
 * Changed the epsilon (eps) in Material::Decay to 1e-4 allowing 1 day decay of tritium (#1946)
@@ -72,7 +74,6 @@ Since last release
 * Removed ``exclusive_orders_only`` from schema (#1816)
 
 **Fixed:**
-
 * Removed retired macos-13 runner for CI tests and added macos-15-intel and macos-latest (#1938)
 * Removed unnecessary records being added to the Resource database by packaging process (#1761)
 * Removed GTest source code from code coverage reports (#1759)

@@ -77,7 +77,7 @@ class Material : public Resource {
 
   virtual ~Material();
 
-  /// Creates a new material resource that is "live" and tracked. creator is a
+  /// Creates a new material resource that is "live" and tracked. Creator is a
   /// pointer to the agent creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
