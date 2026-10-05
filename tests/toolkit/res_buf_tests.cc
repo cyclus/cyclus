@@ -51,40 +51,40 @@ TEST_F(ProductBufTest, Getset_capacityEmpty) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-TEST_F(ProductBufTest, set_full_threshold_ExceptionsEmpty) {
-  EXPECT_THROW(store_.full_threshold(neg_full), ValueError);
-  EXPECT_NO_THROW(store_.full_threshold(zero_full));
-  EXPECT_NO_THROW(store_.full_threshold(full));
+TEST_F(ProductBufTest, set_stocked_threshold_ExceptionsEmpty) {
+  EXPECT_THROW(store_.stocked_threshold(neg_stocked), ValueError);
+  EXPECT_NO_THROW(store_.stocked_threshold(zero_stocked));
+  EXPECT_NO_THROW(store_.stocked_threshold(stocked));
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ProductBufTest, set_full_threshold_ExceptionsFilled) {
-  EXPECT_THROW(filled_store_.full_threshold(hi_full), ValueError);
-  EXPECT_NO_THROW(filled_store_.full_threshold(full));
+TEST_F(ProductBufTest, set_stocked_threshold_ExceptionsFilled) {
+  EXPECT_THROW(filled_store_.stocked_threshold(hi_stocked), ValueError);
+  EXPECT_NO_THROW(filled_store_.stocked_threshold(stocked));
 }
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ProductBufTest, GetFullThreshold_ExceptionsEmpty) {
-  ASSERT_NO_THROW(store_.full_threshold());
-  store_.full_threshold(zero_full);
-  ASSERT_NO_THROW(store_.full_threshold());
-  store_.full_threshold(zero_full);
-  ASSERT_NO_THROW(store_.full_threshold());
+TEST_F(ProductBufTest, GetStockedThreshold_ExceptionsEmpty) {
+  ASSERT_NO_THROW(store_.stocked_threshold());
+  store_.stocked_threshold(zero_stocked);
+  ASSERT_NO_THROW(store_.stocked_threshold());
+  store_.stocked_threshold(zero_stocked);
+  ASSERT_NO_THROW(store_.stocked_threshold());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ProductBufTest, GetFullThreshold_InitialEmpty) {
-  EXPECT_DOUBLE_EQ(store_.full_threshold(), 0.0);
+TEST_F(ProductBufTest, GetStockedThreshold_InitialEmpty) {
+  EXPECT_DOUBLE_EQ(store_.stocked_threshold(), 0.0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(ProductBufTest, Getset_full_thresholdEmpty) {
-  store_.full_threshold(zero_full);
-  EXPECT_DOUBLE_EQ(store_.full_threshold(), zero_full);
+TEST_F(ProductBufTest, Getset_stocked_thresholdEmpty) {
+  store_.stocked_threshold(zero_stocked);
+  EXPECT_DOUBLE_EQ(store_.stocked_threshold(), zero_stocked);
 
-  store_.full_threshold(full);
-  EXPECT_DOUBLE_EQ(store_.full_threshold(), full);
+  store_.stocked_threshold(stocked);
+  EXPECT_DOUBLE_EQ(store_.stocked_threshold(), stocked);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
