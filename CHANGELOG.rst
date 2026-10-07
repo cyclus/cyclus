@@ -73,6 +73,7 @@ Since last release
 
 **Fixed:**
 
+* Removed the macos-14 runner and the Xcode selection step from the MacOS CI, which now uses the default Xcode of the runner for the MacOS SDK (#1984)
 * Fixed the MacOS CI by building in a locked Pixi environment instead of pinning old compilers (#1984)
 * Fixed the conda Docker builds by installing ``libxml2-devel``, which has the headers of the conda-forge ``libxml2`` as of version 2.14 (#1984)
 * Removed retired macos-13 runner for CI tests and added macos-15-intel and macos-latest (#1938)
