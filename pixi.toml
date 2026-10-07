@@ -42,3 +42,15 @@ websockets = ">=17.2,<18"
 [target.osx.dependencies]
 # Clang does not ship an OpenMP runtime, which is needed for --parallel builds
 llvm-openmp = ">=23.1.2,<24"
+
+[target.osx.activation.env]
+# The conda-forge clang packages do not provide cc, c++, or cpp, so without
+# these CMake and cycpp.py would use the Xcode toolchain instead.
+CC = "clang"
+CXX = "clang++"
+CPP = "clang-cpp"
+# The shared libraries are linked with -flat_namespace, which makes the linker
+# load the dependencies of the libraries being linked against. Some of those
+# are referenced through @rpath (e.g. libquadmath from libgfortran) and are
+# only found if the environment's library directory is searched.
+LDFLAGS = "-L$CONDA_PREFIX/lib"
