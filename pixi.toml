@@ -54,3 +54,80 @@ CPP = "clang-cpp"
 # are referenced through @rpath (e.g. libquadmath from libgfortran) and are
 # only found if the environment's library directory is searched.
 LDFLAGS = "-L$CONDA_PREFIX/lib"
+
+[activation.env]
+# Cyclus is installed into the workspace's install/ directory, not into the
+# Pixi environment, so that the environment only ever contains what is in
+# pixi.lock. This does not make the build any more reproducible (pixi.lock
+# already pins every dependency), but it keeps what Pixi manages separate from
+# what the build produces:
+# * No file collisions. Cyclus builds its own copy of GoogleTest (downloaded
+#   with CMake's FetchContent in tests/CMakeLists.txt) and installs libgtest
+#   and libgmock into <prefix>/lib, where they would overwrite, or be
+#   overwritten by, the files of a gtest package if one were added to the
+#   environment.
+# * Clean uninstalls. Everything Cyclus installs is under install/, so
+#   removing it ('pixi run uninstall') leaves nothing behind. In the Pixi
+#   environment, files from an earlier build that a newer build no longer
+#   installs would remain until the environment is recreated.
+CYCLUS_INSTALL_PREFIX = "$PIXI_PROJECT_ROOT/install"
+# The build directory is per Pixi environment, as CMake records the absolute
+# paths of the compilers and of cmake itself in it at configure time, and so a
+# build directory can only be reused from the environment that configured it.
+# It has to be directly under the top level of the repository, as the build
+# refers to the sources relative to it (e.g. ../cyclus/system.py in
+# cli/sidecar.py).
+CYCLUS_BUILD_DIR = "$PIXI_PROJECT_ROOT/build-$PIXI_ENVIRONMENT_NAME"
+PATH = "$CYCLUS_INSTALL_PREFIX/bin:$PATH"
+# Relocate the Python user site, which is where CMakeLists.txt installs the
+# Cyclus Python package by default, from ~/.local to the install prefix.
+PYTHONUSERBASE = "$CYCLUS_INSTALL_PREFIX"
+
+[tasks.build]
+# Extra arguments are forwarded to install.py, e.g.
+#   pixi run build -j 4 --parallel --allow-milps
+# install.py builds with a single job unless given -j, so default to using 80%
+# of the CPUs of the machine. A -j given on the command line comes later in
+# the arguments and so takes precedence.
+# The user site has to exist before the install, as the install step that
+# symlinks the Cython modules into it does not create it and its failure is
+# not treated as an error.
+cmd = """
+mkdir -p "$(python -m site --user-site)" && \
+python install.py --build-dir "$CYCLUS_BUILD_DIR" --prefix "$CYCLUS_INSTALL_PREFIX" \
+-j "$(python -c "import os; print(max(1, int(os.cpu_count() * 0.8)))")"
+"""
+description = "Build Cyclus and install it into the workspace's install/ directory"
+
+[tasks.uninstall]
+# The build directory is kept, so 'pixi run build' only has to install again.
+cmd = 'rm -rf "$CYCLUS_INSTALL_PREFIX"'
+description = "Uninstall Cyclus by removing the workspace's install/ directory"
+
+[feature.test.dependencies]
+pytables = ">=3.11.1,<4"
+pytest = ">=9.1.1,<10"
+
+[feature.test.tasks.test-unit]
+cmd = "cyclus_unit_tests"
+description = "Run the C++ unit tests (requires 'pixi run build')"
+
+[feature.test.tasks.test-python]
+cmd = "pytest"
+cwd = "tests"
+description = "Run the Python tests (requires 'pixi run build')"
+
+[feature.test.tasks.test]
+depends-on = ["test-unit", "test-python"]
+description = "Run all tests (requires 'pixi run build')"
+
+[feature.test.tasks.start]
+depends-on = ["uninstall", "build", "test"]
+description = "Build and test Cyclus from a clean install"
+
+[environments]
+# Both environments are in the same solve group so that they use the same
+# versions of the dependencies they share. The default environment has to be
+# listed for this, as it is not part of any solve group otherwise.
+default = { solve-group = "default" }
+test = { features = ["test"], solve-group = "default" }
