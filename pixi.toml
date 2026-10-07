@@ -1,0 +1,44 @@
+[workspace]
+name = "cyclus"
+description = "Development environment for building and testing Cyclus"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+
+[dependencies]
+# Build tools
+c-compiler = ">=2.0.0,<3"
+cxx-compiler = ">=2.0.0,<3"
+cmake = ">=4.4.3,<5"
+make = ">=4.4.1,<5"
+pkg-config = ">=0.29.2,<0.30"
+git = ">=2.55.0,<3"
+# C++ library dependencies
+# Boost 1.89 removed the compiled Boost.System stub library that
+# CMakeLists.txt still requests as a required component.
+libboost-devel = ">=1.88.0,<1.89"
+coincbc = ">=2.10.13,<3"
+glib = ">=2.90.0,<3"
+hdf5 = ">=2.2.0,<3"
+liblapack = ">=3.11.0,<4"
+# The headers and pkg-config file of libxml2 are in libxml2-devel as of
+# libxml2 2.14 on conda-forge, and are needed both by Cyclus itself and by
+# libxml++-4.0.pc.
+libxml2-devel = ">=2.15.4,<3"
+"libxmlpp-4.0" = ">=4.0.2,<5"
+pcre = ">=8.45,<9"
+sqlite = ">=3.53.4,<4"
+# Python dependencies
+python = "3.12.*"
+# Cython 3.1 removed support for parts of the Python 2 era API that the
+# Cyclus Cython sources still use.
+cython = ">=3.0.0,<3.1.0"
+jinja2 = ">=3.1.6,<4"
+pandas = ">=3.0.6,<4"
+pip = ">=26.2.1,<27"
+pprintpp = ">=0.4.0,<0.5"
+setuptools = ">=84.0.0,<85"
+websockets = ">=17.2,<18"
+
+[target.osx.dependencies]
+# Clang does not ship an OpenMP runtime, which is needed for --parallel builds
+llvm-openmp = ">=23.1.2,<24"
