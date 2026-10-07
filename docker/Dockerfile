@@ -64,7 +64,7 @@ RUN mamba install -y "python<3.13" --no-pin && \
                make \
                git \
                glib \
-               libxml2 \
+               libxml2-devel \
                libxmlpp-4.0 \
                liblapack \
                pkg-config \
