@@ -56,7 +56,7 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
 ENV PATH=/opt/conda/bin:$PATH
 RUN mamba create -n cyclus
 SHELL ["mamba", "run", "-n", "cyclus", "/bin/bash", "-c"]
-RUN mamba install -y "python<3.13" --no-pin && \
+RUN mamba install -y python --no-pin && \
     mamba update -y --all && \
     mamba install -y \
                compilers \
@@ -69,7 +69,6 @@ RUN mamba install -y "python<3.13" --no-pin && \
                liblapack \
                pkg-config \
                coincbc \
-               boost \
                boost-cpp \
                hdf5 \
                sqlite \
@@ -79,7 +78,7 @@ RUN mamba install -y "python<3.13" --no-pin && \
                pytables \
                pandas \
                jinja2 \
-               "cython<3.1.0" \
+               cython \
                websockets \
                pprintpp \
                pip \

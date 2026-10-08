@@ -43,6 +43,8 @@ Since last release
 * Users can specify for random seed to be created for random number generation (#1950)
 
 **Changed:**
+* Removed the ``python<3.13`` and ``cython<3.1.0`` pins from the conda Docker builds (#1985)
+* Updated the Pixi workspace to Python 3.14 and Cython 3.3 (#1985)
 * Clarify behavior of `Material::Absorb()` with respect to decay (#1966)
 * Modified cycpp.py to fix a few whitespace-related bugs, and allow cyclus vars to be initialized (#1954)
 * Changed the epsilon (eps) in Material::Decay to 1e-4 allowing 1 day decay of tritium (#1946)
@@ -74,6 +76,7 @@ Since last release
 
 **Fixed:**
 
+* Fixed building with Boost 1.89 and newer, which no longer has a compiled Boost.System library, and updated the Pixi workspace to Boost 1.92 (#1985)
 * Fixed a segmentation fault when a Cyclus Python module fails to import, which is now reported as an error with the Python traceback (#1985)
 * Fixed the Python ``Sink`` agent raising a ``TypeError`` for every material it accepted, which caused a segmentation fault with Python 3.13 and newer (#1985)
 * Fixed a typo in the ``AttrToaster`` test agent that caused a segmentation fault in the Python tests with Python 3.13 and newer (#1985)
