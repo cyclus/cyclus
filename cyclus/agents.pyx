@@ -1123,7 +1123,9 @@ cdef class _Region(_Agent):
         """Agent annotations."""
         cdef jsoncpp.Value cpp_rtn = jsoncpp.Value()
         if self._annotations is None:
-            cpp_rtn._inst[0] = (<CyclusRegionShim*> (<_Agent> self).shim).annotations()
+            # Call the virtual annotations() through the Agent base class, as
+            # Cython 3.1+ rejects the call on the shim type as ambiguous.
+            cpp_rtn._inst[0] = (<cpp_cyclus.Agent*> (<CyclusRegionShim*> (<_Agent> self).shim)).annotations()
         self._annotations = cpp_rtn
         return self._annotations
 
@@ -1323,7 +1325,9 @@ cdef class _Institution(_Agent):
         """Agent annotations."""
         cdef jsoncpp.Value cpp_rtn = jsoncpp.Value()
         if self._annotations is None:
-            cpp_rtn._inst[0] = (<CyclusInstitutionShim*> (<_Agent> self).shim).annotations()
+            # Call the virtual annotations() through the Agent base class, as
+            # Cython 3.1+ rejects the call on the shim type as ambiguous.
+            cpp_rtn._inst[0] = (<cpp_cyclus.Agent*> (<CyclusInstitutionShim*> (<_Agent> self).shim)).annotations()
         self._annotations = cpp_rtn
         return self._annotations
 
@@ -1524,7 +1528,9 @@ cdef class _Facility(_Agent):
         """Agent annotations."""
         cdef jsoncpp.Value cpp_rtn = jsoncpp.Value()
         if self._annotations is None:
-            cpp_rtn._inst[0] = (<CyclusFacilityShim*> (<_Agent> self).shim).annotations()
+            # Call the virtual annotations() through the Agent base class, as
+            # Cython 3.1+ rejects the call on the shim type as ambiguous.
+            cpp_rtn._inst[0] = (<cpp_cyclus.Agent*> (<CyclusFacilityShim*> (<_Agent> self).shim)).annotations()
         self._annotations = cpp_rtn
         return self._annotations
 
