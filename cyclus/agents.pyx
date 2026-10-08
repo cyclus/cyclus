@@ -11,7 +11,7 @@ from cython.operator cimport dereference as deref
 cimport cython
 
 from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
-    PyDict_GetItemString, PyDict_SetItemString, PyString_FromString,
+    PyDict_GetItemString, PyDict_SetItemString,
     PyBytes_FromString, PyDict_GetItem, PyDict_SetItem, PyObject_GetAttrString)
 
 import json
