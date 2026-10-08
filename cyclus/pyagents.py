@@ -43,7 +43,6 @@ class Sink(Facility):
         tooltip="sink capacity",
         default=100.0,
         )
-    inventory = ts.ResBufProduct()
 
     def get_material_requests(self):
         if len(self.recipe) == 0:
@@ -61,13 +60,8 @@ class Sink(Facility):
                 "constraints": self.capacity}
         return port
 
-    def accept_material_trades(self, responses):
-        for mat in responses.values():
-            self.inventory.push(mat)
-
-    def accept_product_trades(self, responses):
-        for prod in responses.values():
-            self.inventory.push(prod)
+    # The resources that the sink accepts are not kept, so the methods for
+    # accepting trades of Facility, which do nothing, are not overridden.
 
 
 class Source(Facility):

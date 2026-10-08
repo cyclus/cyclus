@@ -74,6 +74,7 @@ Since last release
 
 **Fixed:**
 
+* Fixed the Python ``Sink`` agent raising a ``TypeError`` for every material it accepted, which caused a segmentation fault with Python 3.13 and newer (#1985)
 * Fixed a typo in the ``AttrToaster`` test agent that caused a segmentation fault in the Python tests with Python 3.13 and newer (#1985)
 * Fixed building the Python bindings with Cython 3.1 and newer (#1985)
 * Removed the macos-14 runner and the Xcode selection step from the MacOS CI, which now uses the default Xcode of the runner for the MacOS SDK (#1984)
