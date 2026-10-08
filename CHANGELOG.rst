@@ -6,6 +6,8 @@ Since last release
 ====================
 
 **Added:**
+* Added concurrency groups to the build, MacOS build, and code coverage workflows so that a new push cancels superseded in-progress runs (#1984)
+* Added a Pixi workspace (``pixi.toml``, ``pixi.lock``) for development on Linux and MacOS (#1984)
 * Added a boolean-specific Query function to infile_tree.h to support archetype bools using true and false (#1970)
 * Added a copy constructor to Timer to allow MockSim to copy it without upsetting the progress bar (#1961)
 * Added progress bar to the simulation loop (#1912)
@@ -72,6 +74,9 @@ Since last release
 
 **Fixed:**
 
+* Removed the macos-14 runner and the Xcode selection step from the MacOS CI, which now uses the default Xcode of the runner for the MacOS SDK (#1984)
+* Fixed the MacOS CI by building in a locked Pixi environment instead of pinning old compilers (#1984)
+* Fixed the conda Docker builds by installing ``libxml2-devel``, which has the headers of the conda-forge ``libxml2`` as of version 2.14 (#1984)
 * Removed retired macos-13 runner for CI tests and added macos-15-intel and macos-latest (#1938)
 * Removed unnecessary records being added to the Resource database by packaging process (#1761)
 * Removed GTest source code from code coverage reports (#1759)

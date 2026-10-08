@@ -1,0 +1,133 @@
+[workspace]
+name = "cyclus"
+description = "Development environment for building and testing Cyclus"
+channels = ["conda-forge"]
+platforms = ["linux-64", "osx-64", "osx-arm64"]
+
+[dependencies]
+# Build tools
+c-compiler = ">=2.0.0,<3"
+cxx-compiler = ">=2.0.0,<3"
+cmake = ">=4.4.3,<5"
+make = ">=4.4.1,<5"
+pkg-config = ">=0.29.2,<0.30"
+git = ">=2.55.0,<3"
+# C++ library dependencies
+# Boost 1.89 removed the compiled Boost.System stub library that
+# CMakeLists.txt still requests as a required component.
+libboost-devel = ">=1.88.0,<1.89"
+coincbc = ">=2.10.13,<3"
+glib = ">=2.90.0,<3"
+hdf5 = ">=2.2.0,<3"
+liblapack = ">=3.11.0,<4"
+# The headers and pkg-config file of libxml2 are in libxml2-devel as of
+# libxml2 2.14 on conda-forge, and are needed both by Cyclus itself and by
+# libxml++-4.0.pc.
+libxml2-devel = ">=2.15.4,<3"
+"libxmlpp-4.0" = ">=4.0.2,<5"
+pcre = ">=8.45,<9"
+sqlite = ">=3.53.4,<4"
+# Python dependencies
+python = "3.12.*"
+# Cython 3.1 removed support for parts of the Python 2 era API that the
+# Cyclus Cython sources still use.
+cython = ">=3.0.0,<3.1.0"
+jinja2 = ">=3.1.6,<4"
+pandas = ">=3.0.6,<4"
+pip = ">=26.2.1,<27"
+pprintpp = ">=0.4.0,<0.5"
+setuptools = ">=84.0.0,<85"
+websockets = ">=17.2,<18"
+
+[target.osx.dependencies]
+# Clang does not ship an OpenMP runtime, which is needed for --parallel builds
+llvm-openmp = ">=23.1.2,<24"
+
+[target.osx.activation.env]
+# The conda-forge clang packages do not provide cc, c++, or cpp, so without
+# these CMake and cycpp.py would use the Xcode toolchain instead.
+CC = "clang"
+CXX = "clang++"
+CPP = "clang-cpp"
+# The shared libraries are linked with -flat_namespace, which makes the linker
+# load the dependencies of the libraries being linked against. Some of those
+# are referenced through @rpath (e.g. libquadmath from libgfortran) and are
+# only found if the environment's library directory is searched.
+LDFLAGS = "-L$CONDA_PREFIX/lib"
+
+[activation.env]
+# Cyclus is installed into the workspace's install/ directory, not into the
+# Pixi environment, so that the environment only ever contains what is in
+# pixi.lock. This does not make the build any more reproducible (pixi.lock
+# already pins every dependency), but it keeps what Pixi manages separate from
+# what the build produces:
+# * No file collisions. Cyclus builds its own copy of GoogleTest (downloaded
+#   with CMake's FetchContent in tests/CMakeLists.txt) and installs libgtest
+#   and libgmock into <prefix>/lib, where they would overwrite, or be
+#   overwritten by, the files of a gtest package if one were added to the
+#   environment.
+# * Clean uninstalls. Everything Cyclus installs is under install/, so
+#   removing it ('pixi run uninstall') leaves nothing behind. In the Pixi
+#   environment, files from an earlier build that a newer build no longer
+#   installs would remain until the environment is recreated.
+CYCLUS_INSTALL_PREFIX = "$PIXI_PROJECT_ROOT/install"
+# The build directory is per Pixi environment, as CMake records the absolute
+# paths of the compilers and of cmake itself in it at configure time, and so a
+# build directory can only be reused from the environment that configured it.
+# It has to be directly under the top level of the repository, as the build
+# refers to the sources relative to it (e.g. ../cyclus/system.py in
+# cli/sidecar.py).
+CYCLUS_BUILD_DIR = "$PIXI_PROJECT_ROOT/build-$PIXI_ENVIRONMENT_NAME"
+PATH = "$CYCLUS_INSTALL_PREFIX/bin:$PATH"
+# Relocate the Python user site, which is where CMakeLists.txt installs the
+# Cyclus Python package by default, from ~/.local to the install prefix.
+PYTHONUSERBASE = "$CYCLUS_INSTALL_PREFIX"
+
+[tasks.build]
+# Extra arguments are forwarded to install.py, e.g.
+#   pixi run build -j 4 --parallel --allow-milps
+# install.py builds with a single job unless given -j, so default to using 80%
+# of the CPUs of the machine. A -j given on the command line comes later in
+# the arguments and so takes precedence.
+# The user site has to exist before the install, as the install step that
+# symlinks the Cython modules into it does not create it and its failure is
+# not treated as an error.
+cmd = """
+mkdir -p "$(python -m site --user-site)" && \
+python install.py --build-dir "$CYCLUS_BUILD_DIR" --prefix "$CYCLUS_INSTALL_PREFIX" \
+-j "$(python -c "import os; print(max(1, int(os.cpu_count() * 0.8)))")"
+"""
+description = "Build Cyclus and install it into the workspace's install/ directory"
+
+[tasks.uninstall]
+# The build directory is kept, so 'pixi run build' only has to install again.
+cmd = 'rm -rf "$CYCLUS_INSTALL_PREFIX"'
+description = "Uninstall Cyclus by removing the workspace's install/ directory"
+
+[feature.test.dependencies]
+pytables = ">=3.11.1,<4"
+pytest = ">=9.1.1,<10"
+
+[feature.test.tasks.test-unit]
+cmd = "cyclus_unit_tests"
+description = "Run the C++ unit tests (requires 'pixi run build')"
+
+[feature.test.tasks.test-python]
+cmd = "pytest"
+cwd = "tests"
+description = "Run the Python tests (requires 'pixi run build')"
+
+[feature.test.tasks.test]
+depends-on = ["test-unit", "test-python"]
+description = "Run all tests (requires 'pixi run build')"
+
+[feature.test.tasks.start]
+depends-on = ["uninstall", "build", "test"]
+description = "Build and test Cyclus from a clean install"
+
+[environments]
+# Both environments are in the same solve group so that they use the same
+# versions of the dependencies they share. The default environment has to be
+# listed for this, as it is not part of any solve group otherwise.
+default = { solve-group = "default" }
+test = { features = ["test"], solve-group = "default" }

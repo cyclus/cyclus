@@ -189,16 +189,36 @@ All variables can be set using ``-DMY_VARIABLE=MY_VARIABLES_VALUE``.
 
 .. website_custom_end
 
-Note on Building Cyclus with Conda
-----------------------------------
+Note on Building Cyclus with Pixi
+---------------------------------
 
-If your python libraries are installed using Conda, install cyclus
-dependencies through conda-forge.
+The repository is a `Pixi <https://pixi.sh>`_ workspace (``pixi.toml``) that
+provides all of the Cyclus dependencies from conda-forge for Linux (x86-64) and
+macOS (Apple Silicon and Intel), with the exact versions recorded in
+``pixi.lock``. With Pixi installed, build Cyclus and install it into the
+``install`` directory of the workspace (which keeps the Pixi environment itself
+unmodified) with:
 
 .. code-block:: console
 
-  conda config --add channels conda-forge
-  conda install cyclus --only-deps
+  pixi run build
+
+Any additional arguments are passed on to ``install.py``, e.g.
+``pixi run build -j 4 --parallel --allow-milps``.
+
+The dependencies that are only needed for the tests are in a separate ``test``
+environment, which Pixi selects automatically for the test tasks. After
+building, run the tests with:
+
+.. code-block:: console
+
+  pixi run test
+
+To uninstall, build, and test in one step run ``pixi run start``.
+
+Use ``pixi shell`` to get a shell with the environment activated, which also
+puts the installed ``cyclus`` on ``PATH``. To uninstall Cyclus, which removes
+the ``install`` directory, run ``pixi run uninstall``.
 
 
 *************
