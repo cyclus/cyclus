@@ -191,14 +191,21 @@ IF(NOT CYCLUS_DOC_ONLY)
       SET(BOOST_ROOT "${DEPS_ROOT_DIR}")
       SET(BOOST_INCLUDEDIR "${DEPS_INCLUDE_HINTS}")
     endif (DEPS_ROOT_DIR)
-    FIND_PACKAGE(Boost COMPONENTS program_options filesystem system serialization REQUIRED)
+    # Boost.System is header-only as of Boost 1.69. Boost 1.89 to 1.91 have no
+    # system component at all, as 1.89 removed the compiled stub library and
+    # the CMake package only returned, as a header-only target, in 1.92. So
+    # the component is optional and is only linked to when it is found.
+    FIND_PACKAGE(Boost COMPONENTS program_options filesystem serialization REQUIRED
+                 OPTIONAL_COMPONENTS system)
     MESSAGE("--    Boost Root: ${Boost_ROOT}")
     MESSAGE("--    Boost Include directory: ${Boost_INCLUDE_DIR}")
     MESSAGE("--    Boost Library directories: ${Boost_LIBRARY_DIRS}")
     SET(LIBS ${LIBS} ${Boost_PROGRAM_OPTIONS_LIBRARY})
     MESSAGE("--    Boost Program Options location: ${Boost_PROGRAM_OPTIONS_LIBRARY}")
-    SET(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
-    MESSAGE("--    Boost System location: ${Boost_SYSTEM_LIBRARY}")
+    IF(Boost_SYSTEM_FOUND)
+        SET(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
+        MESSAGE("--    Boost System location: ${Boost_SYSTEM_LIBRARY}")
+    ENDIF()
     SET(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
     MESSAGE("--    Boost Filesystem location: ${Boost_FILESYSTEM_LIBRARY}")
     SET(LIBS ${LIBS} ${Boost_SERIALIZATION_LIBRARY})
