@@ -17,7 +17,6 @@ import warnings
 import itertools
 import subprocess
 from glob import glob
-from distutils import core, dir_util
 from pprint import pprint, pformat
 from collections import defaultdict
 if sys.version_info[0] > 2:
