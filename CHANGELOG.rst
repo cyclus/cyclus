@@ -76,6 +76,7 @@ Since last release
 
 **Fixed:**
 
+* Fixed the snapshot of a Python agent failing when one of its resource buffer inventories is not empty (#1985)
 * Fixed the inventories of Python agents missing from every snapshot (#1985)
 * Fixed building with Boost 1.89 and newer, which no longer has a compiled Boost.System library, and updated the Pixi workspace to Boost 1.92 (#1985)
 * Fixed a segmentation fault when a Cyclus Python module fails to import, which is now reported as an error with the Python traceback (#1985)

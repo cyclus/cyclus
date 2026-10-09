@@ -849,7 +849,7 @@ cdef extern from "toolkit/res_buf.h" namespace "cyclus::toolkit":
         shared_ptr[T] Peek()
         shared_ptr[T] Pop()
         shared_ptr[T] PopBack()
-        void Push(shared_ptr[Resource])
+        void Push(shared_ptr[Resource]) except +
         # cannot overload template and non-template functions in Cython.
         # it is probably bad design on Cyclus's part anyway.
         #void Push[B](vector[B])
