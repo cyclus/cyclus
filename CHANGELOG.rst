@@ -74,6 +74,7 @@ Since last release
 
 **Fixed:**
 
+* Fixed the inventories of Python agents missing from every snapshot (#1985)
 * Removed the uses of ``distutils``, which was removed from the standard library in Python 3.12 (#1985)
 * Fixed a typo in the ``AttrToaster`` test agent that caused a segmentation fault in the Python tests with Python 3.13 and newer (#1985)
 * Fixed building the Python bindings with Cython 3.1 and newer (#1985)
