@@ -43,6 +43,9 @@ Since last release
 * Users can specify for random seed to be created for random number generation (#1950)
 
 **Changed:**
+* Updated the Pixi workspace to allow Python 3.15, and added ``libpython`` to it and to the conda Docker builds, as the conda-forge ``python`` package no longer installs the Python shared library as of Python 3.15 (#1985)
+* Removed the ``python<3.13`` and ``cython<3.1.0`` pins from the conda Docker builds (#1985)
+* Updated the Pixi workspace to Python 3.14 and Cython 3.3 (#1985)
 * Clarify behavior of `Material::Absorb()` with respect to decay (#1966)
 * Modified cycpp.py to fix a few whitespace-related bugs, and allow cyclus vars to be initialized (#1954)
 * Changed the epsilon (eps) in Material::Decay to 1e-4 allowing 1 day decay of tritium (#1946)
@@ -74,6 +77,14 @@ Since last release
 
 **Fixed:**
 
+* Fixed the inventory of the Python ``Sink`` agent, which now keeps the materials and products that it accepts (#1985)
+* Fixed the snapshot of a Python agent failing when one of its resource buffer inventories is not empty (#1985)
+* Fixed the inventories of Python agents missing from every snapshot (#1985)
+* Fixed building with Boost 1.89 and newer, which no longer has a compiled Boost.System library, and updated the Pixi workspace to Boost 1.92 (#1985)
+* Fixed a segmentation fault when a Cyclus Python module fails to import, which is now reported as an error with the Python traceback (#1985)
+* Fixed the Python ``Sink`` agent raising a ``TypeError`` for every material it accepted, which caused a segmentation fault with Python 3.13 and newer (#1985)
+* Fixed a typo in the ``AttrToaster`` test agent that caused a segmentation fault in the Python tests with Python 3.13 and newer (#1985)
+* Fixed building the Python bindings with Cython 3.1 and newer (#1985)
 * Removed the macos-14 runner and the Xcode selection step from the MacOS CI, which now uses the default Xcode of the runner for the MacOS SDK (#1984)
 * Fixed the MacOS CI by building in a locked Pixi environment instead of pinning old compilers (#1984)
 * Fixed the conda Docker builds by installing ``libxml2-devel``, which has the headers of the conda-forge ``libxml2`` as of version 2.14 (#1984)

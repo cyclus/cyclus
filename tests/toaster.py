@@ -51,7 +51,7 @@ class AttrTick(object):
         self.ancestor_of(p)
         self.decendent_of(p)
         if isinstance(self, Facility):
-            self.decomission()
+            self.decommission()
 
 
 class AttrToaster(AttrTick, Facility):

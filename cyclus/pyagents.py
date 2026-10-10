@@ -43,7 +43,10 @@ class Sink(Facility):
         tooltip="sink capacity",
         default=100.0,
         )
-    inventory = ts.ResBufProduct()
+    # A resource buffer holds a single type of resource, so the materials and
+    # the products that the sink accepts are kept in separate inventories.
+    inventory = ts.ResBufMaterialInv(capacity='max_inv_size')
+    product_inventory = ts.ResBufProductInv(capacity='max_inv_size')
 
     def get_material_requests(self):
         if len(self.recipe) == 0:
@@ -67,7 +70,7 @@ class Sink(Facility):
 
     def accept_product_trades(self, responses):
         for prod in responses.values():
-            self.inventory.push(prod)
+            self.product_inventory.push(prod)
 
 
 class Source(Facility):

@@ -2,8 +2,7 @@ from __future__ import print_function, unicode_literals
 import re
 import os
 import sys
-from distutils.core import setup
-import setuptools
+from setuptools import setup
 from pprint import pprint
 
 PROJECT = 'cyclus'
