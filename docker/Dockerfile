@@ -73,6 +73,7 @@ RUN mamba install -y python --no-pin && \
                hdf5 \
                sqlite \
                pcre \
+               libpython \
                setuptools \
                pytest \
                pytables \
