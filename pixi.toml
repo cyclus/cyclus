@@ -26,7 +26,11 @@ libxml2-devel = ">=2.15.4,<3"
 pcre = ">=8.45,<9"
 sqlite = ">=3.53.4,<4"
 # Python dependencies
-python = ">=3.12.0,<3.15"
+python = ">=3.12.0,<3.16"
+# Cyclus embeds the Python interpreter, so it links to the libpython shared
+# library. As of Python 3.15 on conda-forge the python package no longer
+# installs it, cf. https://conda-forge.org/blog/2026/09/03/python-315/
+libpython = ">=3.12.0,<3.16"
 cython = ">=3.1.0,<4"
 jinja2 = ">=3.1.6,<4"
 pandas = ">=3.0.6,<4"

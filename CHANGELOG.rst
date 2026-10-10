@@ -43,6 +43,7 @@ Since last release
 * Users can specify for random seed to be created for random number generation (#1950)
 
 **Changed:**
+* Updated the Pixi workspace to allow Python 3.15, and added ``libpython`` to it and to the conda Docker builds, as the conda-forge ``python`` package no longer installs the Python shared library as of Python 3.15 (#1985)
 * Removed the ``python<3.13`` and ``cython<3.1.0`` pins from the conda Docker builds (#1985)
 * Updated the Pixi workspace to Python 3.14 and Cython 3.3 (#1985)
 * Clarify behavior of `Material::Absorb()` with respect to decay (#1966)
