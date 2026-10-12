@@ -43,6 +43,8 @@ Since last release
 * Users can specify for random seed to be created for random number generation (#1950)
 
 **Changed:**
+* Removed the ``python<3.13`` and ``cython<3.1.0`` pins from the conda Docker builds, which now install ``libpython`` in place of the Python bindings of Boost (#1985)
+* Updated the Pixi workspace to Boost 1.92, Python 3.15, and Cython 3.3, and added ``libpython`` to it, as the conda-forge ``python`` package no longer installs the Python shared library as of Python 3.15 (#1985)
 * Clarify behavior of `Material::Absorb()` with respect to decay (#1966)
 * Modified cycpp.py to fix a few whitespace-related bugs, and allow cyclus vars to be initialized (#1954)
 * Changed the epsilon (eps) in Material::Decay to 1e-4 allowing 1 day decay of tritium (#1946)
