@@ -74,6 +74,7 @@ Since last release
 
 **Fixed:**
 
+* Fixed the inventory of the Python ``Sink`` agent, which raised a ``TypeError`` for every material it accepted, causing a segmentation fault with Python 3.13 and newer, and now keeps the materials and products that it accepts (#1985)
 * Fixed the snapshot of a Python agent failing when one of its resource buffer inventories is not empty (#1985)
 * Fixed the inventories of Python agents missing from every snapshot (#1985)
 * Removed the uses of ``distutils``, which was removed from the standard library in Python 3.12 (#1985)
