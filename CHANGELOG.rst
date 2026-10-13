@@ -41,7 +41,7 @@ Since last release
 * New composition specification based on single nuclide (#1949)
 * Added ability to calcuate a time shift between the start time and some other time stamp (#1907)
 * Users can specify for random seed to be created for random number generation (#1950)
-* Added a ``minimum`` environment to the Pixi workspace that has the minimum versions of the dependencies documented in ``DEPENDENCIES.rst``
+* Added a ``minimum`` environment to the Pixi workspace that has the minimum versions of the dependencies documented in ``DEPENDENCIES.rst``, and a CI workflow that builds and tests Cyclus in it on changes to the Pixi workspace and every week
 
 **Changed:**
 * Raised the minimum versions of Python to 3.10.0, SQLite to 3.36.0, Jinja2 to 2.10.3, NumPy to 1.21.4, and pandas to 1.3.4, and lowered that of Coin-Clp to 1.17.3, which are the versions tested in the ``minimum`` environment of the Pixi workspace
