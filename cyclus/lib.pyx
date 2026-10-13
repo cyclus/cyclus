@@ -1289,6 +1289,7 @@ cdef cpp_cyclus.Inventories inventories_to_cpp(object pyinvs):
         value = std_vector[shared_ptr[cpp_cyclus.Resource]]()
         for r in pyvalue:
             value.push_back((<ts._Resource> r).ptx)
+        invs[name] = value
     return invs
 
 

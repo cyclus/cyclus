@@ -4,11 +4,28 @@
 #ifdef CYCLUS_WITH_PYTHON
 #include <stdlib.h>
 
+#include "error.h"
 #include "eventhooks_api.h"
 #include "pyinfile_api.h"
 #include "pymodule_api.h"
 
 namespace cyclus {
+namespace {
+// The import_<module>() functions that Cython generates return -1 with a
+// Python exception set when the import fails, and leave the pointers to the
+// functions of the module null, so calling one of them would be a
+// segmentation fault. As of Python 3.13 the import also fails if a Python
+// exception was already set, which is the case after a Python agent raises an
+// exception, as nothing checks for one after calling into an agent.
+void CheckImport(int status, std::string module) {
+  if (status < 0) {
+    PyErr_Print();
+    throw Error("Failed to import the Cyclus Python module '" + module +
+                "', see the Python traceback above.");
+  }
+}
+}  // namespace
+
 int PY_INTERP_COUNT = 0;
 bool PY_INTERP_INIT = false;
 
@@ -31,49 +48,49 @@ void PyStop(void) {
 };
 
 void EventLoop(void) {
-  import_eventhooks();
+  CheckImport(import_eventhooks(), "eventhooks");
   eventloophook();
 };
 
 std::string PyFindModule(std::string lib) {
-  import_pymodule();
+  CheckImport(import_pymodule(), "pymodule");
   return py_find_module(lib);
 };
 
 Agent* MakePyAgent(std::string lib, std::string agent, void* ctx) {
-  import_pymodule();
+  CheckImport(import_pymodule(), "pymodule");
   return make_py_agent(lib, agent, ctx);
 };
 
 void InitFromPyAgent(Agent* src, Agent* dst, void* ctx) {
-  import_pymodule();
+  CheckImport(import_pymodule(), "pymodule");
   init_from_py_agent(src, dst, ctx);
 };
 
 void ClearPyAgentRefs(void) {
-  import_pymodule();
+  CheckImport(import_pymodule(), "pymodule");
   clear_pyagent_refs();
 };
 
 void PyDelAgent(int i) {
-  import_pymodule();
+  CheckImport(import_pymodule(), "pymodule");
   py_del_agent(i);
 };
 
 namespace toolkit {
 std::string PyToJson(std::string infile) {
-  import_pyinfile();
+  CheckImport(import_pyinfile(), "pyinfile");
   return py_to_json(infile);
 };
 
 std::string JsonToPy(std::string infile) {
-  import_pyinfile();
+  CheckImport(import_pyinfile(), "pyinfile");
   return json_to_py(infile);
 };
 
 void PyCallListeners(std::string tstype, Agent* agent, void* cpp_ctx, int time,
                      boost::spirit::hold_any value) {
-  import_pymodule();
+  CheckImport(import_pymodule(), "pymodule");
   py_call_listeners(tstype, agent, cpp_ctx, time, value);
 };
 

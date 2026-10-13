@@ -57,10 +57,16 @@ MESSAGE("--LD_LIBRARY_PATH: $ENV{LD_LIBRARY_PATH}")
 # Include the boost header files, system, and filesystem libraries
 SET(Boost_USE_STATIC_LIBS       OFF)
 SET(Boost_USE_STATIC_RUNTIME    OFF)
-FIND_PACKAGE(Boost COMPONENTS filesystem system REQUIRED)
+# Boost.System is header-only as of Boost 1.69. Boost 1.89 to 1.91 have no
+# system component at all, as 1.89 removed the compiled stub library and
+# the CMake package only returned, as a header-only target, in 1.92. So
+# the component is optional and is only linked to when it is found.
+FIND_PACKAGE(Boost COMPONENTS filesystem REQUIRED OPTIONAL_COMPONENTS system)
 SET(STUB_INCLUDE_DIRS ${STUB_INCLUDE_DIRS} ${Boost_INCLUDE_DIR})
 SET(LIBS ${LIBS} ${Boost_FILESYSTEM_LIBRARY})
-SET(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
+IF(Boost_SYSTEM_FOUND)
+    SET(LIBS ${LIBS} ${Boost_SYSTEM_LIBRARY})
+ENDIF()
 
 # Find HDF5
 FIND_PACKAGE(HDF5 REQUIRED)

@@ -13,9 +13,7 @@ make = ">=4.4.1,<5"
 pkg-config = ">=0.29.2,<0.30"
 git = ">=2.55.0,<3"
 # C++ library dependencies
-# Boost 1.89 removed the compiled Boost.System stub library that
-# CMakeLists.txt still requests as a required component.
-libboost-devel = ">=1.88.0,<1.89"
+libboost-devel = ">=1.92.0,<2"
 coincbc = ">=2.10.13,<3"
 glib = ">=2.90.0,<3"
 hdf5 = ">=2.2.0,<3"
@@ -28,10 +26,12 @@ libxml2-devel = ">=2.15.4,<3"
 pcre = ">=8.45,<9"
 sqlite = ">=3.53.4,<4"
 # Python dependencies
-python = "3.12.*"
-# Cython 3.1 removed support for parts of the Python 2 era API that the
-# Cyclus Cython sources still use.
-cython = ">=3.0.0,<3.1.0"
+python = ">=3.12.0,<3.16"
+# Cyclus embeds the Python interpreter, so it links to the libpython shared
+# library. As of Python 3.15 on conda-forge the python package no longer
+# installs it, cf. https://conda-forge.org/blog/2026/09/03/python-315/
+libpython = ">=3.12.0,<3.16"
+cython = ">=3.1.0,<4"
 jinja2 = ">=3.1.6,<4"
 pandas = ">=3.0.6,<4"
 pip = ">=26.2.1,<27"

@@ -17,7 +17,6 @@ import warnings
 import itertools
 import subprocess
 from glob import glob
-from distutils import core, dir_util
 from pprint import pprint, pformat
 from collections import defaultdict
 if sys.version_info[0] > 2:
@@ -1373,8 +1372,12 @@ cdef class _{{tclassname}}:
         rtn = r
         return rtn
 
-    def push(self, _{{rcname}} r):
-        """Pushes a single resource object to the buffer."""
+    def push(self, _Resource r):
+        """Pushes a single resource object to the buffer. The resource has to
+        be a {{rcname}}, which the buffer checks, as resources that come from
+        the buffer of another type, or from an inventory snapshot, are only
+        known to be a Resource.
+        """
         self.ptx.Push(r.ptx)
 
     def pop_all_res(self):

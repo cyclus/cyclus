@@ -8,7 +8,7 @@ from libcpp.string cimport string as std_string
 from libcpp cimport bool as cpp_bool
 
 from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
-    PyDict_GetItemString, PyDict_SetItemString, PyString_FromString,
+    PyDict_GetItemString, PyDict_SetItemString,
     PyBytes_FromString, PyDict_GetItem, PyDict_SetItem)
 
 from cyclus cimport cpp_cyclus
