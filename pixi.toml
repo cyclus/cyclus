@@ -125,9 +125,86 @@ description = "Run all tests (requires 'pixi run build')"
 depends-on = ["uninstall", "build", "test"]
 description = "Build and test Cyclus from a clean install"
 
+[feature.minimum]
+# The versions below have only been solved and tested for linux-64.
+platforms = ["linux-64"]
+
+# The minimum versions of the dependencies that DEPENDENCIES.rst documents
+[feature.minimum.dependencies]
+cmake = "3.16.3.*"
+pkg-config = "0.29.1.*"
+boost-cpp = "1.71.0.*"
+libxml2 = "2.9.10.*"
+libxmlpp = "2.40.1.*"
+python = "3.10.0.*"
+# Python 3.10 on conda-forge requires 3.36.0
+sqlite = "3.36.0.*"
+hdf5 = "1.10.4.*"
+# The liblapack package is the LAPACK 3.9.0 interface of a build of OpenBLAS,
+# and build 0 has the oldest OpenBLAS. The latest builds also install MKL,
+# which the FindLAPACK module of CMake 3.16 uses in place of liblapack.
+liblapack = { version = "3.9.0.*", build-number = "0" }
+git = "2.32.0.*"
+# Includes Coin-Clp 1.17.3
+coincbc = "2.10.3.*"
+# The oldest Cython on conda-forge for Python 3.10
+cython = "0.29.24.*"
+# Older versions cannot be imported with Python 3.10, as they use the
+# collections.Mapping alias that Python 3.10 removed.
+jinja2 = "2.10.3.*"
+# The oldest NumPy on conda-forge that pandas 1.3.4 can be installed with
+numpy = "1.21.4.*"
+# The oldest pandas on conda-forge for Python 3.10
+pandas = "1.3.4.*"
+pip = "20.0.2.*"
+# The same as in [dependencies]
+c-compiler = ">=2.0.0,<3"
+cxx-compiler = ">=2.0.0,<3"
+# No documented minimum
+make = "*"
+pcre = "*"
+pprintpp = "*"
+pytest = "*"
+setuptools = "*"
+websockets = "*"
+
+[feature.minimum.pypi-dependencies]
+# conda-forge has no pytables that is built with HDF5 1.10 for Python 3.10.
+# The wheels have their own copy of HDF5, which is only used to read the
+# output files in the Python tests. 3.7.0 is the first with wheels for Python
+# 3.10, and later versions need a newer NumPy.
+tables = "==3.7.0"
+
+[feature.minimum.activation.env]
+# CMake 3.16 does not search the Pixi environment unless it is told to, and so
+# finds the dependencies of the system instead.
+CMAKE_PREFIX_PATH = "$CONDA_PREFIX"
+# The same as in [activation.env], except for the install directory, so that
+# the build of this environment is not installed over that of the others.
+CYCLUS_INSTALL_PREFIX = "$PIXI_PROJECT_ROOT/install-minimum"
+CYCLUS_BUILD_DIR = "$PIXI_PROJECT_ROOT/build-$PIXI_ENVIRONMENT_NAME"
+PATH = "$CYCLUS_INSTALL_PREFIX/bin:$PATH"
+PYTHONUSERBASE = "$CYCLUS_INSTALL_PREFIX"
+
+[feature.minimum.tasks.build-minimum]
+# The same as the build task, with --allow-milps for the build to use Coin-Cbc
+# and Coin-Clp. Extra arguments are forwarded to install.py.
+cmd = """
+mkdir -p "$(python -m site --user-site)" && \
+python install.py --build-dir "$CYCLUS_BUILD_DIR" --prefix "$CYCLUS_INSTALL_PREFIX" --allow-milps \
+-j "$(python -c "import os; print(max(1, int(os.cpu_count() * 0.8)))")"
+"""
+description = "Build Cyclus with the minimum versions of its dependencies"
+
+[feature.minimum.tasks.test-minimum]
+cmd = "cyclus_unit_tests && pytest"
+cwd = "tests"
+description = "Run all tests (requires 'pixi run build-minimum')"
+
 [environments]
 # Both environments are in the same solve group so that they use the same
 # versions of the dependencies they share. The default environment has to be
 # listed for this, as it is not part of any solve group otherwise.
 default = { solve-group = "default" }
 test = { features = ["test"], solve-group = "default" }
+minimum = { features = ["minimum"], no-default-feature = true }
