@@ -1024,10 +1024,7 @@ cdef class _Resource:
         object.  Allows for things like ResBuf and Traders to split
         offers/requests of arbitrary resource implementation type.
         """
-        cdef _Resource res = Resource()
-        res.ptx = self.ptx.get().ExtractRes(quantity)
-        respy = res
-        return respy
+        return resource_ptr_to_py(self.ptx.get().ExtractRes(quantity))
 
 
 class Resource(_Resource):
@@ -1260,6 +1257,23 @@ class Product(_Product, Resource):
     """
 
 
+cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] r):
+    """Wraps a resource in the Python class of its C++ type, as ``ResCast()``
+    does in C++, so that a material that is only known to be a resource (e.g.
+    one from an inventory snapshot) is still a ``Material`` in Python. Any other
+    type of resource is wrapped as a ``Resource``.
+    """
+    cdef _Resource res
+    if dynamic_cast[material_ptr](r.get()) != NULL:
+        res = Material()
+    elif dynamic_cast[product_ptr](r.get()) != NULL:
+        res = Product()
+    else:
+        res = Resource()
+    res.ptx = r
+    return res
+
+
 #
 # Inventories block
 #
@@ -1344,15 +1358,11 @@ cdef class _{{tclassname}}:
 
     def pop_n_res(self, int n):
         """Pops the specified number of resources from the buffer."""
-        cdef _Resource x
         cdef list v = []
         cdef cpp_cyclus.ResVec rs = self.ptx.PopNRes(n)
         for r in rs:
-            x = Resource()
-            x.ptx = r
-            v.append(x)
-        rtn = v
-        return rtn
+            v.append(resource_ptr_to_py(r))
+        return v
 
     def peek(self):
         """Returns the next resource in line to be popped from the buffer
@@ -1372,12 +1382,8 @@ cdef class _{{tclassname}}:
         rtn = r
         return rtn
 
-    def push(self, _Resource r):
-        """Pushes a single resource object to the buffer. The resource has to
-        be a {{rcname}}, which the buffer checks, as resources that come from
-        the buffer of another type, or from an inventory snapshot, are only
-        known to be a Resource.
-        """
+    def push(self, _{{rcname}} r):
+        """Pushes a single {{rcname}} object to the buffer."""
         self.ptx.Push(r.ptx)
 
     def pop_all_res(self):
@@ -1460,15 +1466,11 @@ cdef class _{{tclassname}}:
         """Pops the resources from the buffer.
         For the version of this method which sets resources, see push_many().
         """
-        cdef _Resource x
         cdef list v = []
         cdef std_vector[shared_ptr[cpp_cyclus.Resource]] rs = self.ptx.ResValues()
         for r in rs:
-            x = Resource()
-            x.ptx = r
-            v.append(x)
-        rtn = v
-        return rtn
+            v.append(resource_ptr_to_py(r))
+        return v
 
     def pop(self, key):
         """Pops one {{rcname}} object from the store."""
@@ -2468,6 +2470,12 @@ cdef class _Material(_Resource):
 
 cdef class _Product(_Resource):
     pass
+
+# dynamic_cast[] cannot be given a pointer type that is written with a '*'
+ctypedef cpp_cyclus.Material* material_ptr
+ctypedef cpp_cyclus.Product* product_ptr
+
+cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] r)
 
 {% for t in ts.inventory_types %}
 {% set tclassname = ts.classname(t)%}
