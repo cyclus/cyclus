@@ -30,8 +30,8 @@ Package                   Minimum Version
 ``boost``                 1.71.0
 ``libxml2``               2.9.10
 ``libxml++``              2.40.1
-``python``                3.8.10
-``sqlite3``               3.31.1
+``python``                3.10.0
+``sqlite3``               3.36.0
 ``HDF5``                  1.10.4
 ``LAPACK``                3.9.0
 ====================      ==================
@@ -40,18 +40,18 @@ Package                   Minimum Version
 
 And a few optional dependencies:
 
-====================   ==================  =============================================  ==================        
+====================   ==================  =============================================  ==================
 Package                Minimum Version     Purpose                                        Notes
-====================   ==================  =============================================  ==================  
+====================   ==================  =============================================  ==================
 ``git``                2.32.0              Enables access to source code via Github       N/A
 ``Coin-Cbc``           2.10.3              Enables use of Branch-and-Cut solver           Cyclus must be built with ``--allow-milps`` flag
-``Coin-Clp``           1.17.5              Enables use of Linear Programming solver       Cyclus must be built with ``--allow-milps`` flag
+``Coin-Clp``           1.17.3              Enables use of Linear Programming solver       Cyclus must be built with ``--allow-milps`` flag
 ``doxygen``            1.7.6.1             Building documentation                         N/A
 ``TCMmalloc``          any                 Improves performance                           Only used if Cython is not present
 ``Cython``             0.29                Enables use of Python agents and input files   N/A
-``Jinja2``             2.10.1              Enables use of Python agents and input files   Only needed if Cython is installed
-``NumPy``              1.9                 Enables use of Python agents and input files   Only needed if Cython is installed
-``pandas``             0.25.3              Enables use of Python agents and input files   Only needed if Cython is installed
+``Jinja2``             2.10.3              Enables use of Python agents and input files   Only needed if Cython is installed
+``NumPy``              1.21.4              Enables use of Python agents and input files   Only needed if Cython is installed
+``pandas``             1.3.4               Enables use of Python agents and input files   Only needed if Cython is installed
 ``pip``                20.0.2              Enables use of Python agents and input files   Only needed if Cython is installed
 ====================   ==================  =============================================  ==================
 
@@ -141,7 +141,7 @@ To determine which version of Python is already installed on your computer, run:
    python -V
 
 
-Despite having installed python3, Ubuntu installations may still point at python2 by default. So Python -V can return a version of python that is not preferred. In that case the python version can be changed system-wide with the update-alternatives command. 
+Despite having installed python3, Ubuntu installations may still point at python2 by default. So Python -V can return a version of python that is not preferred. In that case the python version can be changed system-wide with the update-alternatives command.
 
 First, you can list alternatives with the following command:
 
@@ -178,9 +178,9 @@ Then make Ubuntu aware of your current python version. Run the following command
 
 Cython Note
 ^^^^^^^^^^^
-If you get an error related to an old Cython version, then this may be 
-because the Debian stable version of Cython is 0.23.4. However, 
-Cyclus requires 0.29.0+. To install the latest cython version, please 
+If you get an error related to an old Cython version, then this may be
+because the Debian stable version of Cython is 0.23.4. However,
+Cyclus requires 0.29.24+. To install the latest cython version, please
 visit the `Cython Documentation`_.
 
 Boost Note
