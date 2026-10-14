@@ -30,6 +30,8 @@ const uint64_t cyclusMonth = cyclusYear / kMonthsPerYear;
 
 const uint64_t kDefaultTimeStepDur = cyclusMonth;
 
+const double kDefaultDecayEps = 1e-4;
+
 const uint64_t kDefaultSeed = 20160212;
 
 const uint64_t kDefaultStride = 10000;
@@ -88,6 +90,9 @@ class SimInfo {
 
   /// "manual" if use of the decay function is allowed, "never" otherwise
   std::string decay;
+
+  /// Fractional decay threshold in [0, 1). Smaller changes may be discarded.
+  double decay_eps;
 
   /// length of the simulation in timesteps (months)
   int duration;

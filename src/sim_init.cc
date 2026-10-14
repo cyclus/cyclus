@@ -160,6 +160,12 @@ void SimInit::LoadInfo() {
 
   si_.parent_sim = qr.GetVal<boost::uuids::uuid>("ParentSimId");
 
+  // Simulations recorded before configurable decay thresholds use the default.
+  if (b_->Tables().count("DecayThreshold") != 0) {
+    qr = b_->Query("DecayThreshold", NULL);
+    si_.decay_eps = qr.GetVal<double>("Epsilon");
+  }
+
   qr = b_->Query("TimeStepDur", NULL);
   // TODO: when the backends support uint64_t, the int template here
   // should be updated to uint64_t.
