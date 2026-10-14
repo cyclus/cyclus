@@ -1,6 +1,5 @@
 #include <map>
 
-#include <boost/weak_ptr.hpp>
 #include <gtest/gtest.h>
 
 #include "context.h"
