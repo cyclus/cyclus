@@ -7,7 +7,9 @@
 #include "sqlite_back.h"
 #include "timer.h"
 #include "random_number_generator.h"
+#include <limits>
 #include <thread>
+#include <vector>
 
 // special name to tell sqlite to use in-mem db
 static const char* dbpath = ":memory:";
@@ -102,4 +104,30 @@ TEST_F(RandomTest, GetDateTimeSeed) {
   std::set<int> seeds = {seed1,seed2,seed3};
   EXPECT_EQ(seeds.size(), 3);
   EXPECT_GT(*seeds.begin(),0); //bc sets are ordered the first value should be the smallest comparably
+}
+
+// Narrowing milliseconds to int gave negative seeds from 2^31 ms (about 24.9
+// days) of host uptime.
+// cf. discussion in https://github.com/cyclus/cyclus/pull/1974
+TEST(MillisecondsToSeedTest, AlwaysValidInputSeed) {
+  const int64_t int_max = std::numeric_limits<int>::max();
+  const std::vector<int64_t> ms_values = {
+      0,
+      1,
+      int_max - 1,
+      int_max,
+      int_max + 1,         // 2^31 ms, where narrowing first wrapped negative
+      3127400264,          // uptime that gave the seed -1167567032
+      (int64_t{1} << 32),  // 2^32 ms, where narrowing gave 0
+      1791763200000,       // 2026-10-12 since the Unix epoch
+      std::numeric_limits<int64_t>::max(),
+      -1,  // system clock set before 1970
+  };
+  for (int64_t ms : ms_values) {
+    int seed = cyclus::MillisecondsToSeed(ms);
+    EXPECT_GE(seed, 1) << "ms = " << ms;
+  }
+  // Consecutive milliseconds give distinct seeds, also across the wrap point
+  EXPECT_NE(cyclus::MillisecondsToSeed(int_max - 1),
+            cyclus::MillisecondsToSeed(int_max));
 }
