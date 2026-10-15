@@ -16,6 +16,7 @@
 #include "random_number_generator.h"
 #include "version.h"
 #include <chrono>
+#include <limits>
 
 namespace cyclus {
 
@@ -342,10 +343,21 @@ int Context::random_uniform_int(int low, int high) {
   return rng_->random_uniform_int(low, high);
 }
 
+int MillisecondsToSeed(int64_t ms) {
+  // Milliseconds since the Unix epoch do not fit in an int, so fold them into
+  // [1, INT_MAX] instead of letting the narrowing conversion wrap negative.
+  // The seed must be positive because it is recorded in the Info table and a
+  // recorded seed has to be valid as the input file's seed (a
+  // nonNegativeInteger, where 0 means generate a seed) to reproduce the
+  // simulation.
+  uint64_t folded = static_cast<uint64_t>(ms) % std::numeric_limits<int>::max();
+  return static_cast<int>(folded) + 1;
+}
+
 int Context::date_time_int(){
-  auto time = std::chrono::steady_clock::now();
-  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(time.time_since_epoch());
-  return duration.count();
+  auto time = std::chrono::system_clock::now().time_since_epoch();
+  return MillisecondsToSeed(
+      std::chrono::duration_cast<std::chrono::milliseconds>(time).count());
 }
 
 double Context::random_uniform_real(double low, double high) {
