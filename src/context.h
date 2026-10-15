@@ -141,6 +141,10 @@ class SimInfo {
   uint64_t stride;
 };
 
+/// Folds a time in milliseconds into a seed in [1, INT_MAX], which is valid as
+/// the input file's seed.
+int MillisecondsToSeed(int64_t ms);
+
 /// A simulation context provides access to necessary simulation-global
 /// functions and state. All code that writes to the output database, needs to
 /// know simulation time, creates/builds facilities, and/or uses loaded
