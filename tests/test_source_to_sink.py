@@ -59,6 +59,7 @@ def test_source_to_sink(source_to_sink_case, thread_count):
             info = output.get_node("/Info")[:]
             resources = output.get_node("/Resources")[:]
             transactions = output.get_node("/Transactions")[:]
+            inventories = output.get_node("/AgentStateInventories")[:]
             output.close()
         else:
             conn = sqlite3.connect(outfile)
@@ -70,6 +71,7 @@ def test_source_to_sink(source_to_sink_case, thread_count):
             info = exc('SELECT * FROM Info').fetchall()
             resources = exc('SELECT * FROM Resources').fetchall()
             transactions = exc('SELECT * FROM Transactions').fetchall()
+            inventories = exc('SELECT * FROM AgentStateInventories').fetchall()
             conn.close()
 
         # Find agent ids of source and sink facilities
@@ -107,6 +109,15 @@ def test_source_to_sink(source_to_sink_case, thread_count):
         expected_quantities.fill(quantities[0])
 
         assert_array_equal, quantities, expected_quantities
+
+        # The snapshot at the end of the simulation has every resource that
+        # the sink received in the inventory of the sink
+        received_ids = to_ary(transactions, "ResourceId")
+        assert received_ids.size > 0
+        assert_array_equal(to_ary(inventories, "AgentId"),
+                           np.full(received_ids.size, sink_id[0]))
+        assert_array_equal(np.sort(to_ary(inventories, "ResourceId")),
+                           np.sort(received_ids))
 
         clean_outs()
 
