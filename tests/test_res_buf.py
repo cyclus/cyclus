@@ -12,20 +12,21 @@ def new_product(qty):
     return ts.Product.create_untracked(qty, "quality")
 
 
-@pytest.fixture(params=[
+# The type of buffer, the type of resource that it holds, and functions that
+# create a resource of that type and one of the other type
+RES_BUF_CASES = [
     (ts.ResBufMaterial, ts.Material, new_material, new_product),
     (ts.ResBufProduct, ts.Product, new_product, new_material),
-])
-def res_buf_case(request):
-    yield request.param
+]
 
 
-def test_pop_all_res_push_many(res_buf_case):
+@pytest.mark.parametrize("buf_type,res_type,new_res,new_other_res",
+                         RES_BUF_CASES)
+def test_pop_all_res_push_many(buf_type, res_type, new_res, new_other_res):
     """Tests that the resources of a buffer can be popped and pushed back, as
     is done to snapshot an inventory, and that they have the type of the
     buffer, as they do in C++.
     """
-    buf_type, res_type, new_res, _ = res_buf_case
     buf = buf_type(init=True)
     buf.capacity = 10.0
     buf.push(new_res(1.0))
@@ -43,9 +44,10 @@ def test_pop_all_res_push_many(res_buf_case):
     assert buf.quantity == pytest.approx(3.0)
 
 
-def test_push_wrong_type(res_buf_case):
+@pytest.mark.parametrize("buf_type,res_type,new_res,new_other_res",
+                         RES_BUF_CASES)
+def test_push_wrong_type(buf_type, res_type, new_res, new_other_res):
     """Tests that a buffer only accepts resources of its type."""
-    buf_type, _, _, new_other_res = res_buf_case
     buf = buf_type(init=True)
     buf.capacity = 10.0
 
@@ -59,7 +61,7 @@ def test_push_wrong_type(res_buf_case):
 
 @pytest.mark.parametrize("res_type,new_res", [(ts.Material, new_material),
                                               (ts.Product, new_product)])
-def test_resource_methods_keep_type(res_type, new_res):
+def test_extract_res_keeps_type(res_type, new_res):
     """Tests that extract_res() returns a resource of the type of the
     resource that it is called on.
     """
