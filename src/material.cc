@@ -91,7 +91,7 @@ Material::Ptr Material::ExtractComp(double qty, Composition::Ptr c,
 
   qty_ -= qty;
   Material::Ptr other(
-      new Material(ctx_, qty, c, Package::unpackaged_name(), UnitValue()));
+      new Material(ctx_, qty, c, Package::unpackaged_name(), unit_value()));
 
   // Decay called on the extracted material should have the same dt as for
   // this material regardless of composition.
@@ -146,8 +146,8 @@ void Material::Absorb(Material::Ptr mat) {
   
   double tot_mass = qty_ + mat->quantity();
   double avg_unit_value =
-      (qty_ * UnitValue() + mat->quantity() * mat->UnitValue()) / tot_mass;
-  SetUnitValue(avg_unit_value);
+      (qty_ * unit_value() + mat->quantity() * mat->unit_value()) / tot_mass;
+  unit_value(avg_unit_value);
   qty_ = tot_mass;
 
   mat->qty_ = 0;
@@ -180,7 +180,7 @@ Resource::Ptr Material::PackageExtract(double qty,
 
   qty_ -= qty;
   Material::Ptr other(
-      new Material(ctx_, qty, comp_, new_package_name, UnitValue()));
+      new Material(ctx_, qty, comp_, new_package_name, unit_value()));
 
   // Decay called on the extracted material should have the same dt as for
   // this material regardless of composition.
@@ -312,7 +312,7 @@ Material::Material(Context* ctx, double quantity, Composition::Ptr c,
       ctx_(ctx),
       prev_decay_time_(0),
       package_name_(package_name) {
-  SetUnitValue(unit_value);
+  this->unit_value(unit_value);
   if (ctx != NULL) {
     prev_decay_time_ = ctx->time();
   } else {

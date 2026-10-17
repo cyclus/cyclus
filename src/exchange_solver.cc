@@ -2,15 +2,24 @@
 
 #include <vector>
 #include <map>
+#include <limits>
+#include <cmath>
 
 #include "context.h"
 #include "exchange_graph.h"
+#include "error.h"
 
 namespace cyclus {
 
 double ExchangeSolver::Cost(const Arc& a, bool exclusive_orders) {
-  return (exclusive_orders && a.exclusive()) ? a.excl_val() / a.pref()
-                                             : 1.0 / a.pref();
+  // Use stored arc cost which is set during translation.
+  double arc_cost = a.arc_cost();
+
+  if (exclusive_orders && a.exclusive()) {
+    // For exclusive arcs, scale by excl_val if needed
+    return arc_cost * a.excl_val();
+  }
+  return arc_cost;
 }
 
 double ExchangeSolver::PseudoCost() {
@@ -18,16 +27,14 @@ double ExchangeSolver::PseudoCost() {
 }
 
 double ExchangeSolver::PseudoCost(double cost_factor) {
-  return PseudoCostByPref(cost_factor);
+  return PseudoCostByArcCost(cost_factor);
 }
 
 double ExchangeSolver::PseudoCostByCap(double cost_factor) {
   std::vector<ExchangeNode::Ptr>::iterator n_it;
-  std::map<Arc, std::vector<double>>::iterator c_it;
-  std::map<Arc, double>::iterator p_it;
   std::vector<RequestGroup::Ptr>::iterator rg_it;
   std::vector<ExchangeNodeGroup::Ptr>::iterator sg_it;
-  double min_cap, pref, coeff;
+  double min_cap, coeff;
 
   double max_coeff = std::numeric_limits<double>::min();
   double min_unit_cap = std::numeric_limits<double>::max();
@@ -66,12 +73,11 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
         }
       }
 
-      // update max_pref_
-      std::map<Arc, double>& prefs = (*n_it)->prefs;
-      for (p_it = prefs.begin(); p_it != prefs.end(); ++p_it) {
-        pref = p_it->second;
-        const Arc& a = p_it->first;
-        coeff = ArcCost(a);
+      // update max_coeff by checking all arcs connected to this node
+      const std::vector<Arc>& node_arcs = graph_->GetArcsFromNode(*n_it);
+      for (std::vector<Arc>::const_iterator arc_it = node_arcs.begin();
+          arc_it != node_arcs.end(); ++arc_it) {
+        coeff = arc_cost(*arc_it);
         if (coeff > max_coeff) max_coeff = coeff;
       }
     }
@@ -80,18 +86,23 @@ double ExchangeSolver::PseudoCostByCap(double cost_factor) {
   return max_coeff / min_unit_cap * (1 + cost_factor);
 }
 
-double ExchangeSolver::PseudoCostByPref(double cost_factor) {
-  double max_cost = 0;
-  std::vector<Arc>& arcs = graph_->arcs();
-  for (int i = 0; i != arcs.size(); i++) {
-    const Arc& a = arcs[i];
-    // remove exclusive value factor from costs for preferences that are less
-    // than unity. otherwise they can artificially raise the maximum cost.
-    double factor =
-        (a.exclusive() && a.excl_val() < 1) ? 1 / a.excl_val() : 1.0;
-    max_cost = std::max(max_cost, ArcCost(a) * factor);
+double ExchangeSolver::PseudoCostByArcCost(double cost_factor) {
+  double max_cost = -std::numeric_limits<double>::infinity();
+
+  for (const Arc& a : graph_->arcs()) {
+    double cost = arc_cost(a);
+    if (!std::isfinite(cost)) {
+      throw ValueError("Arc cost must be finite.");
+    }
+    max_cost = std::max(max_cost, cost);
   }
-  return max_cost * (1 + cost_factor);
+
+  if (!std::isfinite(max_cost)) {
+    return 0.0;
+  }
+
+  double margin = std::max(1.0, cost_factor * max_cost);
+  return max_cost + margin;
 }
 
 }  // namespace cyclus

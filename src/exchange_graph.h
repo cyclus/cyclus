@@ -37,13 +37,10 @@ struct ExchangeNode {
   /// @brief the parent ExchangeNodeGroup to which this ExchangeNode belongs
   ExchangeNodeGroup* group;
 
-  /// @brief unit values associated with this ExchangeNode corresponding to
-  /// capacties of its parent ExchangeNodeGroup. This information corresponds to
+  /// @brief Values associated with this ExchangeNode corresponding to
+  /// capacities of its parent ExchangeNodeGroup. This information corresponds to
   /// the resource object from which this ExchangeNode was translated.
   std::map<Arc, std::vector<double>> unit_capacities;
-
-  /// @brief preference values for arcs
-  std::map<Arc, double> prefs;
 
   /// @brief whether this node represents an exclusive request or offer
   bool exclusive;
@@ -81,6 +78,9 @@ class Arc {
     vnode_ = other.vnode();
     exclusive_ = other.exclusive();
     excl_val_ = other.excl_val();
+    unit_cost_ = other.unit_cost();
+    unit_cost_mod_ = other.unit_cost_mod();
+    arc_cost_ = other.arc_cost();
     return *this;
   }
 
@@ -97,14 +97,28 @@ class Arc {
   inline boost::shared_ptr<ExchangeNode> vnode() const { return vnode_.lock(); }
   inline bool exclusive() const { return exclusive_; }
   inline double excl_val() const { return excl_val_; }
-  inline double pref() const { return pref_; }
-  inline void pref(double pref) { pref_ = pref; }
+
+  /// @brief unit cost (from bid node)
+  inline double unit_cost() const { return unit_cost_; }
+  inline void unit_cost(double unit_cost) { unit_cost_ = unit_cost; }
+
+  /// @brief unit cost modifier (from request node)
+  inline double unit_cost_mod() const { return unit_cost_mod_; }
+  inline void unit_cost_mod(double unit_cost_mod) { unit_cost_mod_ = unit_cost_mod; }
+
+  /// @brief returns the arc cost
+  inline double arc_cost() const { return arc_cost_; }
+  /// @brief sets the arc cost arbitrarily
+  inline void arc_cost(double arc_cost) { arc_cost_ = arc_cost; }
 
  private:
   boost::weak_ptr<ExchangeNode> unode_;
   boost::weak_ptr<ExchangeNode> vnode_;
   bool exclusive_;
-  double excl_val_, pref_;
+  double excl_val_;
+  double unit_cost_;
+  double unit_cost_mod_;
+  double arc_cost_;
 };
 
 /// @brief ExchangeNode-ExchangeNode equality operator
@@ -149,12 +163,16 @@ class ExchangeNodeGroup {
     excl_node_groups_.push_back(nodes);
   }
 
-  /// @return true of any nodes have arcs associated with them
+  /// @return true if any nodes in this group have arcs associated with them
+  /// This is used by ProgTranslator to determine if a request group needs
+  /// variables/constraints in the LP formulation. We check unit_capacities
+  /// because they are only populated when arcs are created, making this a
+  /// reliable indicator of arc presence.
   bool HasArcs() {
     for (std::vector<ExchangeNode::Ptr>::iterator it = nodes_.begin();
          it != nodes_.end();
          ++it) {
-      if (it->get()->prefs.size() > 0) return true;
+      if (it->get()->unit_capacities.size() > 0) return true;
     }
     return false;
   }
@@ -259,6 +277,9 @@ class ExchangeGraph {
 
   inline const std::map<int, Arc>& arc_by_id() const { return arc_by_id_; }
   inline std::map<int, Arc>& arc_by_id() { return arc_by_id_; }
+
+  /// @brief returns all arcs on the graph connected to a specified node
+  const std::vector<Arc>& GetArcsFromNode(ExchangeNode::Ptr node) const;
 
  private:
   std::vector<RequestGroup::Ptr> request_groups_;

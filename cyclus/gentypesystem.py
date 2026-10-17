@@ -2078,7 +2078,7 @@ cdef class _{{rclsname}}Request:
         self._target = None
         self._requester = None
         self._commodity = None
-        self._preference = None
+        self._unit_cost_mod = None
         self._exclusive = None
         self._cost_function = None
 
@@ -2112,12 +2112,12 @@ cdef class _{{rclsname}}Request:
         return self._commodity
 
     @property
-    def preference(self):
-        """This request's preference"""
-        if self._preference is not None:
-            return self._preference
-        self._preference = self.ptx.preference()
-        return self._preference
+    def unit_cost_mod(self):
+        """This request's unit_cost_mod"""
+        if self._unit_cost_mod is not None:
+            return self._unit_cost_mod
+        self._unit_cost_mod = self.ptx.unit_cost_mod()
+        return self._unit_cost_mod
 
     @property
     def exclusive(self):
@@ -2183,7 +2183,7 @@ cdef shared_ptr[cpp_cyclus.RequestPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_reque
                 if req['cost'] is not None:
                     raise ValueError('setting cost functions from Python is not yet '
                                     'supported.')
-                single_request = port.get().AddRequest(targ_ptr, requester, commod, req['preference'],
+                single_request = port.get().AddRequest(targ_ptr, requester, commod, req['unit_cost_mod'],
                                 req['exclusive'])
                 mreqs.push_back(single_request)
     port.get().AddMutualReqs(mreqs)
@@ -2209,7 +2209,7 @@ cdef shared_ptr[cpp_cyclus.BidPortfolio[{{cyr}}]] {{ ts.funcname(r) }}_bid_portf
                                              cpp_cyclus.Resource](
                         (<_{{rclsname}}> bid['offer']).ptx)
         port.get().AddBid((<_{{rclsname}}Request> bid['request']).ptx,
-                          offer_ptr, bidder, bid['exclusive'], bid['preference'])
+                          offer_ptr, bidder, bid['exclusive'], bid['unit_cost'])
     # add constraints
     for constr in pyport['constraints']:
         port.get().AddConstraint(
@@ -2223,7 +2223,7 @@ cdef class _{{rclsname}}Bid:
         self._request = None
         self._offer = None
         self._bidder = None
-        self._preference = None
+        self._unit_cost = None
         self._exclusive = None
 
 
@@ -2268,12 +2268,12 @@ cdef class _{{rclsname}}Bid:
         return self.request._commodity
 
     @property
-    def preference(self):
-        """This bid's preference"""
-        if self._preference is not None:
-            return self._preference
-        self._preference = self.ptx.preference()
-        return self._preference
+    def unit_cost(self):
+        """This bid's unit cost"""
+        if self._unit_cost is not None:
+            return self._unit_cost
+        self._unit_cost = self.ptx.unit_cost()
+        return self._unit_cost
 
     @property
     def exclusive(self):
@@ -2292,8 +2292,8 @@ class {{rclsname}}Bid(_{{rclsname}}Bid):
     """An representation of a bid for a {{rfname}}"""
 
 
-cdef dict {{rfname}}_pref_map_to_py(cpp_cyclus.PrefMap[{{cyr}}].type& pm):
-    """Converts a {{rfname}} prefmap to a Python dict."""
+cdef dict {{rfname}}_arc_cost_map_to_py(cpp_cyclus.RequestBidMap[{{cyr}}].type& pm):
+    """Converts a {{rfname}} arc-cost map to a Python dict."""
     cdef dict rtn = {}
     for rbd in pm:
         r = {{rclsname}}Request()
@@ -2577,7 +2577,7 @@ cdef class _{{rclsname}}Request:
     cdef object _target
     cdef object _requester
     cdef object _commodity
-    cdef object _preference
+    cdef object _unit_cost_mod
     cdef object _exclusive
     cdef object _cost_function
 
@@ -2590,10 +2590,10 @@ cdef class _{{rclsname}}Bid:
     cdef object _request
     cdef object _offer
     cdef object _bidder
-    cdef object _preference
+    cdef object _unit_cost
     cdef object _exclusive
 
-cdef dict {{rfname}}_pref_map_to_py(cpp_cyclus.PrefMap[{{cyr}}].type& pm)
+cdef dict {{rfname}}_arc_cost_map_to_py(cpp_cyclus.RequestBidMap[{{cyr}}].type& pm)
 
 ctypedef cpp_cyclus.Trade[{{cyr}}]* {{rfname}}_trade_ptr
 
