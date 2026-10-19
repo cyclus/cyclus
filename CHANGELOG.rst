@@ -46,8 +46,6 @@ Since last release
 * Introduced a definition of "stocked" for a resource buffer, which is a threshold quantity that can be set by the user (#)
 
 **Changed:**
-<<<<<<< HEAD
-
 * Raised the minimum versions of Python to 3.10.0, SQLite to 3.36.0, Jinja2 to 2.10.3, NumPy to 1.21.4, and pandas to 1.3.4, and lowered that of Coin-Clp to 1.17.3, which are the versions tested in the ``minimum`` environment of the Pixi workspace
 * Removed the ``python<3.13`` and ``cython<3.1.0`` pins from the conda Docker builds, which now install ``libpython`` in place of the Python bindings of Boost (#1985)
 * Updated the Pixi workspace to Boost 1.92, Python 3.15, and Cython 3.3, and added ``libpython`` to it, as the conda-forge ``python`` package no longer installs the Python shared library as of Python 3.15 (#1985)

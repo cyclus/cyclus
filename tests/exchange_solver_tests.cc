@@ -65,7 +65,6 @@ TEST_F(PseudoCostTests, IsStrictlyGreaterThanZeroCost) {
 
   double pseudo_cost = solver_.PseudoCostByArcCost(0.1);
   EXPECT_DOUBLE_EQ(1, pseudo_cost);
-  EXPECT_GT(pseudo_cost, 0.0);
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
