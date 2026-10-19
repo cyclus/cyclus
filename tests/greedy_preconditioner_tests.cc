@@ -190,16 +190,16 @@ TEST(ConditionerTests, Conditioning) {
   Arc arc_2_eggs(n2, egg_supply);
   Arc arc_3_eggs(n3, egg_supply);
   Arc arc_4_eggs(n4, egg_supply);
-  Arc arc_5_eggs(n4, egg_supply);
+  Arc arc_5_eggs(n5, egg_supply);
   Arc arc_6_spam(n6, spam_supply);
   Arc arc_7_spam(n7, spam_supply);
   Arc arc_8_spam(n8, spam_supply);
   Arc arc_9_spam(n9, spam_supply);
 
   // These weights will determine the node_weight using the following formula:
-  //    node_weight = commod_weight * (1 + avg_arc_cost) / (1 + |avg_arc_cost|)
-  // which for all our arcs will just be:
-  //    node_weight = commod_weight
+  //    node_weight = commod_weight * (1 + avg_arc_cost / (1 + |avg_arc_cost|))
+  // note that this is not: 
+  //    node_weight = commod_weight * (1 + avg_arc_cost) / (1 + |avg_arc_cost|))
   // This is used to sort the groups by their average node_weight later.
   std::map<std::string, double> weights;
   weights["spam"] = 5.0;
@@ -245,8 +245,8 @@ TEST(ConditionerTests, Conditioning) {
   EXPECT_EQ(g.request_groups().at(1), g2);
   EXPECT_EQ(g.request_groups().at(1)->nodes().at(0), n2);
   EXPECT_EQ(g.request_groups().at(1)->nodes().at(1), n7);
-  EXPECT_EQ(g.request_groups().at(1)->nodes().at(0), n8);
-  EXPECT_EQ(g.request_groups().at(1)->nodes().at(1), n9);
+  EXPECT_EQ(g.request_groups().at(1)->nodes().at(2), n8);
+  EXPECT_EQ(g.request_groups().at(1)->nodes().at(3), n9);
 
   EXPECT_EQ(g.request_groups().at(2), g3);
   EXPECT_EQ(g.request_groups().at(2)->nodes().at(0), n4);
@@ -265,16 +265,27 @@ TEST(ConditionerTests, Conditioning) {
   avg_costs[n8] = AvgCost(n8, &g); // 3.80
   avg_costs[n9] = AvgCost(n9, &g); // 3.75
 
-  // The node weight asociated with each group here is just the commod_weight
-  double exp_nw_1 = weights[n1->commod]; 
-  double exp_nw_2 = weights[n2->commod];
-  double exp_nw_3 = weights[n3->commod];
-  double exp_nw_4 = weights[n4->commod];
-  double exp_nw_5 = weights[n5->commod];
-  double exp_nw_6 = weights[n6->commod];
-  double exp_nw_7 = weights[n7->commod];
-  double exp_nw_8 = weights[n8->commod];
-  double exp_nw_9 = weights[n9->commod];
+  // Calculate the expected (1 + avg_arc_cost / (1 + |avg_arc_cost|)) term
+  double c1e = (1 + avg_costs[n1] / (1 + avg_costs[n1]));
+  double c2e = (1 + avg_costs[n2] / (1 + avg_costs[n2]));
+  double c3e = (1 + avg_costs[n3] / (1 + avg_costs[n3]));
+  double c4e = (1 + avg_costs[n4] / (1 + avg_costs[n4]));
+  double c5e = (1 + avg_costs[n5] / (1 + avg_costs[n5]));
+  double c6e = (1 + avg_costs[n6] / (1 + avg_costs[n6]));
+  double c7e = (1 + avg_costs[n7] / (1 + avg_costs[n7]));
+  double c8e = (1 + avg_costs[n8] / (1 + avg_costs[n8]));
+  double c9e = (1 + avg_costs[n9] / (1 + avg_costs[n9]));
+
+  // Calculate the expected node_weight for each node
+  double exp_nw_1 = c1e * weights[n1->commod]; 
+  double exp_nw_2 = c2e * weights[n2->commod];
+  double exp_nw_3 = c3e * weights[n3->commod];
+  double exp_nw_4 = c4e * weights[n4->commod];
+  double exp_nw_5 = c5e * weights[n5->commod];
+  double exp_nw_6 = c6e * weights[n6->commod];
+  double exp_nw_7 = c7e * weights[n7->commod];
+  double exp_nw_8 = c8e * weights[n8->commod];
+  double exp_nw_9 = c9e * weights[n9->commod];
 
   EXPECT_DOUBLE_EQ(NodeWeight(n1, &weights, avg_costs[n1]), exp_nw_1);
   EXPECT_DOUBLE_EQ(NodeWeight(n2, &weights, avg_costs[n2]), exp_nw_2);
@@ -310,6 +321,6 @@ TEST(ConditionerTests, Conditioning) {
   EXPECT_EQ(g.request_groups().at(2), g2);
   EXPECT_EQ(g.request_groups().at(2)->nodes().at(0), n2);
   EXPECT_EQ(g.request_groups().at(2)->nodes().at(1), n9);
-  EXPECT_EQ(g.request_groups().at(2)->nodes().at(0), n8);
-  EXPECT_EQ(g.request_groups().at(2)->nodes().at(1), n7);
+  EXPECT_EQ(g.request_groups().at(2)->nodes().at(2), n8);
+  EXPECT_EQ(g.request_groups().at(2)->nodes().at(3), n7);
 }
