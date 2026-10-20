@@ -1275,6 +1275,21 @@ cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] r):
     return res
 
 
+cdef std_vector[shared_ptr[cpp_cyclus.Resource]] resources_to_cpp(
+        rs, type res_type) except *:
+    """Converts resources to a vector of C++ pointers, after checking that
+    every one of them is a res_type, so that a buffer is left unchanged when
+    one of them is not.
+    """
+    cdef std_vector[shared_ptr[cpp_cyclus.Resource]] cpp_rs
+    for r in rs:
+        if not isinstance(r, res_type):
+            raise TypeError(f"expected a {res_type.__name__}, "
+                            f"not {type(r).__name__}")
+        cpp_rs.push_back((<_Resource> r).ptx)
+    return cpp_rs
+
+
 #
 # Inventories block
 #
@@ -1383,7 +1398,7 @@ cdef class _{{tclassname}}:
         rtn = r
         return rtn
 
-    def push(self, _{{rcname}} r):
+    def push(self, _{{rcname}} r not None):
         """Pushes a single {{rcname}} object to the buffer."""
         self.ptx.Push(r.ptx)
 
@@ -1396,10 +1411,10 @@ cdef class _{{tclassname}}:
 
     def push_many(self, rs):
         """A consistent interface for pushing many resources into the buffer.
-        For ResBuf, this iteratively calls push().
+        For ResBuf, this pushes all of them at once, and so none of them if one
+        cannot be pushed.
         """
-        for r in rs:
-            self.push(r)
+        self.ptx.PushVec(resources_to_cpp(rs, _{{rcname}}))
 
 {% elif ts.norms[t][0] == 'cyclus::toolkit::ResMap' %}
 {% set k = ts.norms[t][1] %}
@@ -1493,11 +1508,7 @@ cdef class _{{tclassname}}:
         """A consistent interface for pushing many resources into the buffer.
         For ResMap, this calls ResValues(vals).
         """
-        cdef std_vector[shared_ptr[cpp_cyclus.Resource]] cpp_rs = \
-            std_vector[shared_ptr[cpp_cyclus.Resource]]()
-        for r in rs:
-            cpp_rs.push_back((<_Resource> r).ptx)
-        self.ptx.ResValues(cpp_rs)
+        self.ptx.ResValues(resources_to_cpp(rs, _{{rcname}}))
 
 {% endif %}
 
