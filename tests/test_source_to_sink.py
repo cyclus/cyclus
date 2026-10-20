@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_allclose, assert_array_equal
 import os
 import sqlite3
 import tables
@@ -90,14 +90,14 @@ def test_source_to_sink(source_to_sink_case, thread_count):
         expected_sender_array.fill(source_id[0])
         expected_receiver_array = np.empty(receiver_ids.size)
         expected_receiver_array.fill(sink_id[0])
-        assert_array_equal, sender_ids, expected_sender_array
-        assert_array_equal, receiver_ids, expected_receiver_array
+        assert_array_equal(sender_ids, expected_sender_array)
+        assert_array_equal(receiver_ids, expected_receiver_array)
 
         # Transaction ids must be equal range from 1 to the number of rows
         expected_trans_ids = np.arange(0, sender_ids.size, 1)
-        assert_array_equal, \
-            to_ary(transactions, "TransactionId"),\
-            expected_trans_ids
+        assert_array_equal(
+            to_ary(transactions, "TransactionId"),
+            expected_trans_ids)
 
         # Track transacted resources
         resource_ids = to_ary(resources, "ResourceId")
@@ -106,7 +106,7 @@ def test_source_to_sink(source_to_sink_case, thread_count):
         # Expect that every transaction quantity is the same amount
         expected_quantities.fill(quantities[0])
 
-        assert_array_equal, quantities, expected_quantities
+        assert_allclose(quantities, expected_quantities)
 
         clean_outs()
 
