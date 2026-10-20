@@ -1257,36 +1257,36 @@ class Product(_Product, Resource):
     """
 
 
-cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] r):
+cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] ptr):
     """Wraps a resource in the Python class of its C++ type, as ``ResCast()``
     does in C++, so that a material that is only known to be a resource (e.g.
     one from an inventory snapshot) is still a ``Material`` in Python. A resource
     of a type that is not in RESOURCES is wrapped as a ``Resource``.
     """
     cdef _Resource res
-{% for rt in ts.resources %}
-    if dynamic_cast[{{ ts.funcname(rt) }}_ptr](r.get()) != NULL:
-        res = {{ ts.classname(rt) }}()
-        res.ptx = r
+{% for resource in ts.resources %}
+    if dynamic_cast[{{ ts.funcname(resource) }}_ptr](ptr.get()) != NULL:
+        res = {{ ts.classname(resource) }}()
+        res.ptx = ptr
         return res
 {% endfor %}
     res = Resource()
-    res.ptx = r
+    res.ptx = ptr
     return res
 
 
 cdef std_vector[shared_ptr[cpp_cyclus.Resource]] resources_to_cpp(
-        rs, type res_type) except *:
+        resources, type res_type) except *:
     """Converts resources to a vector of C++ pointers, after checking that
     every one of them is a res_type, so that a buffer is left unchanged when
     one of them is not.
     """
     cdef std_vector[shared_ptr[cpp_cyclus.Resource]] cpp_rs
-    for r in rs:
-        if not isinstance(r, res_type):
+    for res in resources:
+        if not isinstance(res, res_type):
             raise TypeError(f"expected a {res_type.__name__}, "
-                            f"not {type(r).__name__}")
-        cpp_rs.push_back((<_Resource> r).ptx)
+                            f"not {type(res).__name__}")
+        cpp_rs.push_back((<_Resource> res).ptx)
     return cpp_rs
 
 
@@ -1374,11 +1374,11 @@ cdef class _{{tclassname}}:
 
     def pop_n_res(self, int n):
         """Pops the specified number of resources from the buffer."""
-        cdef list v = []
-        cdef cpp_cyclus.ResVec rs = self.ptx.PopNRes(n)
-        for r in rs:
-            v.append(resource_ptr_to_py(r))
-        return v
+        cdef list resources = []
+        cdef cpp_cyclus.ResVec ptrs = self.ptx.PopNRes(n)
+        for ptr in ptrs:
+            resources.append(resource_ptr_to_py(ptr))
+        return resources
 
     def peek(self):
         """Returns the next resource in line to be popped from the buffer
@@ -1482,11 +1482,11 @@ cdef class _{{tclassname}}:
         """Pops the resources from the buffer.
         For the version of this method which sets resources, see push_many().
         """
-        cdef list v = []
-        cdef std_vector[shared_ptr[cpp_cyclus.Resource]] rs = self.ptx.ResValues()
-        for r in rs:
-            v.append(resource_ptr_to_py(r))
-        return v
+        cdef list resources = []
+        cdef std_vector[shared_ptr[cpp_cyclus.Resource]] ptrs = self.ptx.ResValues()
+        for ptr in ptrs:
+            resources.append(resource_ptr_to_py(ptr))
+        return resources
 
     def pop(self, key):
         """Pops one {{rcname}} object from the store."""
@@ -2484,11 +2484,11 @@ cdef class _Product(_Resource):
     pass
 
 # dynamic_cast[] cannot be given a pointer type that is written with a '*'
-{% for rt in ts.resources %}
-ctypedef {{ ts.cython_type(rt) }}* {{ ts.funcname(rt) }}_ptr
+{% for resource in ts.resources %}
+ctypedef {{ ts.cython_type(resource) }}* {{ ts.funcname(resource) }}_ptr
 {% endfor %}
 
-cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] r)
+cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] ptr)
 
 {% for t in ts.inventory_types %}
 {% set tclassname = ts.classname(t)%}
