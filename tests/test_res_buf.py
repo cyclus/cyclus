@@ -32,13 +32,13 @@ def test_pop_all_res_push_many(buf_type, res_type, new_res, new_other_res):
     buf.push(new_res(1.0))
     buf.push(new_res(2.0))
 
-    rs = buf.pop_all_res()
+    popped = buf.pop_all_res()
 
     assert len(buf) == 0
-    assert [type(r) for r in rs] == [res_type, res_type]
-    assert [r.quantity for r in rs] == [1.0, 2.0]
+    assert [type(res) for res in popped] == [res_type, res_type]
+    assert [res.quantity for res in popped] == [1.0, 2.0]
 
-    buf.push_many(rs)
+    buf.push_many(popped)
 
     assert len(buf) == 2
     assert buf.quantity == pytest.approx(3.0)
@@ -84,14 +84,14 @@ def test_push_many_over_capacity(buf_type, res_type, new_res, new_other_res):
                           (ts.ResMapIntProduct, new_material)])
 def test_res_map_push_many_wrong_type(map_type, new_other_res):
     """Tests that a resource map only accepts resources of its type."""
-    m = map_type(init=True)
+    res_map = map_type(init=True)
 
     with pytest.raises(TypeError):
-        m.push_many([new_other_res(1.0)])
+        res_map.push_many([new_other_res(1.0)])
     with pytest.raises(TypeError):
-        m.push_many([None])
+        res_map.push_many([None])
 
-    assert len(m) == 0
+    assert len(res_map) == 0
 
 
 @pytest.mark.parametrize("res_type,new_res", [(ts.Material, new_material),
@@ -100,5 +100,5 @@ def test_extract_res_keeps_type(res_type, new_res):
     """Tests that extract_res() returns a resource of the type of the
     resource that it is called on.
     """
-    r = new_res(2.0)
-    assert type(r.extract_res(1.0)) is res_type
+    res = new_res(2.0)
+    assert type(res.extract_res(1.0)) is res_type
