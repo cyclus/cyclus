@@ -1260,16 +1260,17 @@ class Product(_Product, Resource):
 cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] r):
     """Wraps a resource in the Python class of its C++ type, as ``ResCast()``
     does in C++, so that a material that is only known to be a resource (e.g.
-    one from an inventory snapshot) is still a ``Material`` in Python. Any other
-    type of resource is wrapped as a ``Resource``.
+    one from an inventory snapshot) is still a ``Material`` in Python. A resource
+    of a type that is not in RESOURCES is wrapped as a ``Resource``.
     """
     cdef _Resource res
-    if dynamic_cast[material_ptr](r.get()) != NULL:
-        res = Material()
-    elif dynamic_cast[product_ptr](r.get()) != NULL:
-        res = Product()
-    else:
-        res = Resource()
+{% for rt in ts.resources %}
+    if dynamic_cast[{{ ts.funcname(rt) }}_ptr](r.get()) != NULL:
+        res = {{ ts.classname(rt) }}()
+        res.ptx = r
+        return res
+{% endfor %}
+    res = Resource()
     res.ptx = r
     return res
 
@@ -2472,8 +2473,9 @@ cdef class _Product(_Resource):
     pass
 
 # dynamic_cast[] cannot be given a pointer type that is written with a '*'
-ctypedef cpp_cyclus.Material* material_ptr
-ctypedef cpp_cyclus.Product* product_ptr
+{% for rt in ts.resources %}
+ctypedef {{ ts.cython_type(rt) }}* {{ ts.funcname(rt) }}_ptr
+{% endfor %}
 
 cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] r)
 
