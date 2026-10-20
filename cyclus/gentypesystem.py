@@ -1257,6 +1257,12 @@ class Product(_Product, Resource):
     """
 
 
+# dynamic_cast[] cannot be given a pointer type that is written with a '*'
+{% for resource in ts.resources %}
+ctypedef {{ ts.cython_type(resource) }}* {{ ts.funcname(resource) }}_ptr
+{% endfor %}
+
+
 cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] ptr):
     """Wraps a resource in the Python class of its C++ type, as ``ResCast()``
     does in C++, so that a material that is only known to be a resource (e.g.
@@ -1374,11 +1380,8 @@ cdef class _{{tclassname}}:
 
     def pop_n_res(self, int n):
         """Pops the specified number of resources from the buffer."""
-        cdef list resources = []
         cdef cpp_cyclus.ResVec ptrs = self.ptx.PopNRes(n)
-        for ptr in ptrs:
-            resources.append(resource_ptr_to_py(ptr))
-        return resources
+        return [resource_ptr_to_py(ptr) for ptr in ptrs]
 
     def peek(self):
         """Returns the next resource in line to be popped from the buffer
@@ -1482,11 +1485,8 @@ cdef class _{{tclassname}}:
         """Pops the resources from the buffer.
         For the version of this method which sets resources, see push_many().
         """
-        cdef list resources = []
         cdef std_vector[shared_ptr[cpp_cyclus.Resource]] ptrs = self.ptx.ResValues()
-        for ptr in ptrs:
-            resources.append(resource_ptr_to_py(ptr))
-        return resources
+        return [resource_ptr_to_py(ptr) for ptr in ptrs]
 
     def pop(self, key):
         """Pops one {{rcname}} object from the store."""
@@ -2482,11 +2482,6 @@ cdef class _Material(_Resource):
 
 cdef class _Product(_Resource):
     pass
-
-# dynamic_cast[] cannot be given a pointer type that is written with a '*'
-{% for resource in ts.resources %}
-ctypedef {{ ts.cython_type(resource) }}* {{ ts.funcname(resource) }}_ptr
-{% endfor %}
 
 cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] ptr)
 
