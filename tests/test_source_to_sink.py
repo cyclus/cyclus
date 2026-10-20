@@ -44,7 +44,8 @@ def test_source_to_sink(source_to_sink_case, thread_count):
             return  # don't execute further commands
 
         # Tables of interest
-        paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info"]
+        paths = ["/AgentEntry", "/Resources", "/Transactions", "/Info",
+                 "/AgentStateInventories"]
         # Check if these tables exist
         assert  tables_exist(outfile, paths)
         if not tables_exist(outfile, paths):
@@ -114,10 +115,13 @@ def test_source_to_sink(source_to_sink_case, thread_count):
         # the sink received in the inventory of the sink
         received_ids = to_ary(transactions, "ResourceId")
         assert received_ids.size > 0
-        assert_array_equal(to_ary(inventories, "AgentId"),
+        snapshot_times = to_ary(inventories, "SimTime")
+        last_snapshot = snapshot_times == snapshot_times.max()
+        assert_array_equal(to_ary(inventories, "AgentId")[last_snapshot],
                            np.full(received_ids.size, sink_id[0]))
-        assert_array_equal(np.sort(to_ary(inventories, "ResourceId")),
-                           np.sort(received_ids))
+        assert_array_equal(
+            np.sort(to_ary(inventories, "ResourceId")[last_snapshot]),
+            np.sort(received_ids))
 
         clean_outs()
 
