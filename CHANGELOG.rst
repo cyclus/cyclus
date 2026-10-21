@@ -80,6 +80,7 @@ Since last release
 
 **Fixed:**
 
+* Fixed the checks of the sender and receiver ids, the transaction ids, and the resource quantities in ``test_source_to_sink``, which were never run (#1993)
 * Fixed the generated random seed (``seed`` of 0) becoming negative on Linux hosts with more than about 25 days of uptime, which made the seed recorded in the Info table invalid as an input file seed. The seed is now generated from the system clock instead of the time since the host booted (#1989)
 * Fixed building with Boost 1.89 and newer, which no longer has a compiled Boost.System library (#1985)
 * Fixed a segmentation fault when a Cyclus Python module fails to import, which is now reported as an error with the Python traceback (#1985)
