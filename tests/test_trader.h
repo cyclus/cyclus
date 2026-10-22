@@ -86,8 +86,8 @@ class TestTrader : public TestFacility {
     }
   }
 
-  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {
-    bid = (*prefs[req].begin()).first;  // obs bid
+  virtual void AdjustMatlParams(RequestBidMap<Material>::type& rb_map) {
+    bid = (*rb_map[req].begin()).first;  // obs bid
     adjusts++;
   }
 

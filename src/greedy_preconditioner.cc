@@ -2,8 +2,8 @@
 
 #include <algorithm>
 #include <assert.h>
-#include <numeric>
 #include <string>
+#include <cmath>
 
 #include <boost/lambda/bind.hpp>
 
@@ -14,16 +14,23 @@ namespace l = boost::lambda;
 
 namespace cyclus {
 
-inline double SumPref(double total, std::pair<Arc, double> pref) {
-  return total += pref.second;
-}
+double AvgCost(ExchangeNode::Ptr n, ExchangeGraph* graph) {
+  // Compute average arc costs across all arcs connected to this node
+  if (graph == NULL) {
+    return 0.0;
+  }
 
-double AvgPref(ExchangeNode::Ptr n) {
-  std::map<Arc, double>& prefs = n->prefs;
-  return prefs.size() > 0
-             ? std::accumulate(prefs.begin(), prefs.end(), 0.0, SumPref) /
-                   prefs.size()
-             : 0;
+  const std::vector<Arc>& arcs = graph->GetArcsFromNode(n);
+  if (arcs.empty()){
+    return 0.0;
+  }
+
+  double sum = 0.0;
+  for (std::vector<Arc>::const_iterator arc_it = arcs.begin(); arc_it != arcs.end(); ++arc_it) {
+    sum += arc_it->arc_cost();
+  }
+
+  return sum / arcs.size();
 }
 
 GreedyPreconditioner::GreedyPreconditioner(){};
@@ -41,7 +48,7 @@ GreedyPreconditioner::GreedyPreconditioner(
 };
 
 void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
-  avg_prefs_.clear();
+  avg_arc_costs_.clear();
 
   std::vector<RequestGroup::Ptr>& groups =
       const_cast<std::vector<RequestGroup::Ptr>&>(graph->request_groups());
@@ -51,9 +58,9 @@ void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
     std::vector<ExchangeNode::Ptr>& nodes =
         const_cast<std::vector<ExchangeNode::Ptr>&>((*it)->nodes());
 
-    // get avg prefs
+    // get avg arc costs
     for (int i = 0; i != nodes.size(); i++) {
-      avg_prefs_[nodes[i]] = AvgPref(nodes[i]);
+      avg_arc_costs_[nodes[i]] = AvgCost(nodes[i], graph);
     }
 
     // sort nodes by weight
@@ -62,7 +69,7 @@ void GreedyPreconditioner::Condition(ExchangeGraph* graph) {
         l::bind(&GreedyPreconditioner::NodeComp, this, l::_1, l::_2));
 
     // get avg group weights
-    group_weights_[*it] = GroupWeight(*it, &commod_weights_, &avg_prefs_);
+    group_weights_[*it] = GroupWeight(*it, &commod_weights_, &avg_arc_costs_);
     CLOG(LEV_DEBUG1) << "Group weight value during graph preconditioning is "
                      << group_weights_[*it] << ".";
   }
@@ -110,14 +117,14 @@ void GreedyPreconditioner::ProcessWeights_(WgtOrder order) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double GroupWeight(RequestGroup::Ptr g,
                    std::map<std::string, double>* weights,
-                   std::map<ExchangeNode::Ptr, double>* avg_prefs) {
+                   std::map<ExchangeNode::Ptr, double>* avg_arc_costs) {
   std::vector<ExchangeNode::Ptr>& nodes = g->nodes();
   double sum = 0;
 
   ExchangeNode::Ptr n;
   for (int i = 0; i != nodes.size(); i++) {
     n = nodes[i];
-    sum += NodeWeight(n, weights, (*avg_prefs)[n]);
+    sum += NodeWeight(n, weights, (*avg_arc_costs)[n]);
   }
   return nodes.size() > 0 ? sum / nodes.size() : 0;
 }
@@ -125,13 +132,14 @@ double GroupWeight(RequestGroup::Ptr g,
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 double NodeWeight(ExchangeNode::Ptr n,
                   std::map<std::string, double>* weights,
-                  double avg_pref) {
+                  double avg_arc_cost) {
   double commod_weight = (weights->size() != 0) ? (*weights)[n->commod] : 1;
-  double node_weight = commod_weight * (1 + avg_pref / (1 + avg_pref));
+  double node_weight = commod_weight *
+    (1 + avg_arc_cost / (1 + std::abs(avg_arc_cost)));
 
   CLOG(LEV_DEBUG5) << "Determining node weight: ";
   CLOG(LEV_DEBUG5) << "       commodity weight: " << commod_weight;
-  CLOG(LEV_DEBUG5) << "               avg pref: " << avg_pref;
+  CLOG(LEV_DEBUG5) << "           avg arc cost: " << avg_arc_cost;
   CLOG(LEV_DEBUG5) << "            node weight: " << node_weight;
 
   return node_weight;

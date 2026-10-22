@@ -21,7 +21,7 @@ namespace toolkit {
 ///
 /// For simple behavior, policies virtually eliminate the need to write any code
 /// for resource exchange. Just assign a few policies to work with a few buffers
-/// and focus on writing the physics and other behvavior of your agent.  Typical
+/// and focus on writing the physics and other behavior of your agent.  Typical
 /// usage goes something like this:
 ///
 /// @code
@@ -147,18 +147,18 @@ class MatlBuyPolicy : public Trader {
   MatlBuyPolicy& ResetBehavior();
 
   /// Instructs the policy to fill its buffer with requests on the given
-  /// commodity of composition c and the given preference.  This must be called
-  /// at least once or the policy will do nothing.  The policy can request on an
-  /// arbitrary number of commodities by calling Set multiple times.  Re-calling
-  /// Set to modify the composition or preference of a commodity that has been
-  /// set previously is allowed.
+  /// commodity of composition c and the given unit cost modifier.  This must
+  /// be called at least once or the policy will do nothing.  The policy can
+  /// request on an arbitrary number of commodities by calling Set multiple
+  /// times.  Re-calling Set to modify the composition or unit cost modifier
+  /// of a commodity that has been set previously is allowed.
   /// @param commod the commodity name
   /// @param c the composition to request for the given commodity
-  /// @param pref the preference value for the commodity
+  /// @param unit_cost_mod the unit cost modifier for the commodity
   /// @{
   MatlBuyPolicy& Set(std::string commod);
-  MatlBuyPolicy& Set(std::string commod, Composition::Ptr c);
-  MatlBuyPolicy& Set(std::string commod, Composition::Ptr c, double pref);
+  MatlBuyPolicy& Set(std::string commod, Composition::Ptr c,
+                     double unit_cost_mod = kDefaultUnitCostMod);
   /// @}
 
   /// Instructs the policy to stop requesting a speific commodity
@@ -229,7 +229,7 @@ class MatlBuyPolicy : public Trader {
  private:
   struct CommodDetail {
     Composition::Ptr comp;
-    double pref;
+    double unit_cost_mod;
   };
 
   void set_manager(Agent* m);

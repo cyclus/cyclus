@@ -12,8 +12,10 @@
 #include "equality_helpers.h"
 #include "exchange_graph.h"
 #include "logger.h"
+#include "prog_solver.h"
 #include "prog_translator.h"
 #include "solver_factory.h"
+#include "test_context.h"
 #include "env.h"
 #include "cyc_limits.h"
 
@@ -34,7 +36,16 @@ TEST(ProgTranslatorTests, translation) {
   int nrows = 8;
   int nexcl = 3;
 
-  double prefs[] = {0.2, 1.2, 4, 5, 1.3};
+  // unit cost (from bid) and unit cost modifier (from request) for each arc
+  double unit_cost_vals[] = {5.0, 2.0, 1.0, 0.5, 1.5};
+  double unit_cost_mod_vals[] = {0.0, 0.5, 0.0, 0.0, 0.2};
+
+  // Calculate arc_cost = unit_cost + unit_cost_mod for each arc
+  double arc_costs[narcs];
+  for (int i = 0; i != narcs; i++) {
+    arc_costs[i] = unit_cost_vals[i] + unit_cost_mod_vals[i];
+  }
+
   double ucaps_a_0[] = {0.5, 0.4};
   double ucaps_a_3[] = {0.3, 0.6};
   double ucaps_b_1[] = {0.9};
@@ -56,15 +67,22 @@ TEST(ProgTranslatorTests, translation) {
   int excl_arcs[] = {1, 2, 4};
   double excl_flow[] = {0, 2, 2, 0, 2, 0, 0};
 
+  // Calculate expected objective coefficients.
+  // excl_flow[i] represents the corresponding arc's excl_val():
+  //   non-exclusive arc: arc_cost
+  //   exclusive arc: arc_cost * excl_val
   std::vector<double> obj_coeffs;
-  for (int i = 0; i != narcs; i++) {
-    obj_coeffs.push_back((excl_flow[i] != 0) ?
-                         excl_flow[i] / prefs[i] : 1 / prefs[i]);
+  for (int i = 0; i != narcs; ++i) {
+    double coeff = arc_costs[i];
+    if (excl_flow[i] != 0) {
+      coeff *= excl_flow[i];
+    }
+    obj_coeffs.push_back(coeff);
   }
 
-
+  // Calculate max_cost for faux arcs
   double cost_add = 1;
-  double max_obj_coeff = 1 / 0.2;  // 1 / prefs[0]
+  double max_obj_coeff = arc_costs[0];  // Use arc_cost directly
   double min_row_coeff = 0.3;  // ucaps_a_3
   double max_cost = max_obj_coeff / min_row_coeff + cost_add;
   for (int i = 0; i != nfaux; i++) {
@@ -82,15 +100,25 @@ TEST(ProgTranslatorTests, translation) {
   ExchangeNode::Ptr d1(new ExchangeNode());
 
   Arc x0(a0, c0);
-  x0.pref(prefs[0]);
+  x0.unit_cost(unit_cost_vals[0]);
+  x0.unit_cost_mod(unit_cost_mod_vals[0]);
+  x0.arc_cost(arc_costs[0]);
   Arc x1(b0, c1);
-  x1.pref(prefs[1]);
+  x1.unit_cost(unit_cost_vals[1]);
+  x1.unit_cost_mod(unit_cost_mod_vals[1]);
+  x1.arc_cost(arc_costs[1]);
   Arc x2(b1, c2);
-  x2.pref(prefs[2]);
+  x2.unit_cost(unit_cost_vals[2]);
+  x2.unit_cost_mod(unit_cost_mod_vals[2]);
+  x2.arc_cost(arc_costs[2]);
   Arc x3(a1, d0);
-  x3.pref(prefs[3]);
+  x3.unit_cost(unit_cost_vals[3]);
+  x3.unit_cost_mod(unit_cost_mod_vals[3]);
+  x3.arc_cost(arc_costs[3]);
   Arc x4(b1, d1);
-  x4.pref(prefs[4]);
+  x4.unit_cost(unit_cost_vals[4]);
+  x4.unit_cost_mod(unit_cost_mod_vals[4]);
+  x4.arc_cost(arc_costs[4]);
 
   a0->unit_capacities[x0] = std::vector<double>(
       ucaps_a_0, ucaps_a_0 + sizeof(ucaps_a_0) / sizeof(ucaps_a_0[0]) );
@@ -113,11 +141,6 @@ TEST(ProgTranslatorTests, translation) {
   d1->unit_capacities[x4] = std::vector<double>(
       ucaps_d_4, ucaps_d_4 + sizeof(ucaps_d_4) / sizeof(ucaps_d_4[0]) );
 
-  a0->prefs[x0] = prefs[0];
-  b0->prefs[x1] = prefs[1];
-  b1->prefs[x2] = prefs[2];
-  a1->prefs[x3] = prefs[3];
-  b1->prefs[x4] = prefs[4];
 
   RequestGroup::Ptr a(new RequestGroup());  // new RequestGroup(dem_a[0])?
   a->AddExchangeNode(a0);
@@ -280,5 +303,38 @@ TEST(ProgTranslatorTests, translation) {
   delete iface;
 }
 
+// A zero-cost real arc must beat the positive faux unmet-demand arc.
+TEST(ProgSolverTests, ZeroCostArcProducesRealMatch) {
+  TestContext tc;
+
+  ExchangeNode::Ptr request(new ExchangeNode(1.0));
+  ExchangeNode::Ptr supply(new ExchangeNode(1.0));
+  Arc real_arc(request, supply);
+  real_arc.arc_cost(0.0);
+  request->unit_capacities[real_arc].push_back(1.0);
+  supply->unit_capacities[real_arc].push_back(1.0);
+
+  RequestGroup::Ptr requests(new RequestGroup(1.0));
+  requests->AddExchangeNode(request);
+  requests->AddCapacity(1.0);
+  ExchangeNodeGroup::Ptr supplies(new ExchangeNodeGroup());
+  supplies->AddExchangeNode(supply);
+  supplies->AddCapacity(1.0);
+
+  ExchangeGraph graph;
+  graph.AddRequestGroup(requests);
+  graph.AddSupplyGroup(supplies);
+  graph.AddArc(real_arc);
+
+  ProgSolver solver("clp");
+  solver.sim_ctx(tc.get());
+  ASSERT_NO_THROW(solver.Solve(&graph));
+
+  ASSERT_EQ(1, graph.matches().size());
+  EXPECT_EQ(request, graph.matches()[0].first.unode());
+  EXPECT_EQ(supply, graph.matches()[0].first.vnode());
+  EXPECT_DOUBLE_EQ(0.0, graph.matches()[0].first.arc_cost());
+  EXPECT_DOUBLE_EQ(1.0, graph.matches()[0].second);
+}
 
 }  // namespace cyclus

@@ -232,18 +232,14 @@ MatlBuyPolicy& MatlBuyPolicy::Init(
 MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod) {
   CompMap c;
   c[10010000] = 1e-100;
-  return Set(commod, Composition::CreateFromMass(c), 1.0);
-}
-
-MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod, Composition::Ptr c) {
-  return Set(commod, c, 1.0);
+  return Set(commod, Composition::CreateFromMass(c));
 }
 
 MatlBuyPolicy& MatlBuyPolicy::Set(std::string commod, Composition::Ptr c,
-                                  double pref) {
+                                  double unit_cost_mod) {
   CommodDetail d;
   d.comp = c;
-  d.pref = pref;
+  d.unit_cost_mod = unit_cost_mod;
   commod_details_[commod] = d;
   return *this;
 }
@@ -309,7 +305,7 @@ std::set<RequestPortfolio<Material>::Ptr> MatlBuyPolicy::GetMatlRequests() {
       CommodDetail d = it->second;
       LG(INFO3) << "  - one " << amt << " kg request of " << commod;
       Material::Ptr m = Material::CreateUntracked(req_amt, d.comp);
-      Request<Material>* r = port->AddRequest(m, this, commod, d.pref, excl);
+      Request<Material>* r = port->AddRequest(m, this, commod, d.unit_cost_mod, excl);
       mreqs.push_back(r);
     }
     port->AddMutualReqs(mreqs);
