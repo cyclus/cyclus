@@ -89,7 +89,6 @@ void CommodityRecipeContext::Snapshot(DbInit di) {
         ->AddVal("out_recipe", out_recipes_[c])
         ->Record();
   }
-
   std::map<int, std::string>::iterator it = rsrc_commod_map_.begin();
   for (; it != rsrc_commod_map_.end(); ++it) {
     di.NewDatum("CommodityRecipeContext_resmap")
@@ -98,6 +97,16 @@ void CommodityRecipeContext::Snapshot(DbInit di) {
         ->Record();
   }
 }
+
+  void CommodityRecipeContext::CommodSnapshot(DbInit di) {
+  std::set<std::string>::iterator it2;
+  for (it2 = in_commods_.begin(); it2 != in_commods_.end(); ++it2) {
+    std::string c = *it2;
+    di.NewDatum("CommodityContext_inoutmap")
+        ->AddVal("in_commod", c)
+        ->Record();
+  }
+  }
 
 std::string CommodityRecipeContext::schema() {
   return "  <oneOrMore>                                 \n"

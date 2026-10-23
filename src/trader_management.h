@@ -84,13 +84,15 @@ inline void AcceptTrades(
     Trader* trader,
     const std::vector<std::pair<Trade<Material>, Material::Ptr>>& responses) {
   dynamic_cast<Trader*>(trader)->AcceptMatlTrades(responses);
+  trader->SetParticipated(true);
 }
 
 template <>
 inline void AcceptTrades(
-    Trader* trader,
-    const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {
+  Trader* trader,
+  const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {
   trader->AcceptProductTrades(responses);
+  trader->SetParticipated(true);
 }
 
 }  // namespace cyclus

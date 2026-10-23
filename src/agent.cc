@@ -11,6 +11,8 @@
 #include "error.h"
 #include "logger.h"
 #include "resource.h"
+#include <set>
+
 
 namespace cyclus {
 
@@ -22,6 +24,7 @@ void Agent::InitFrom(Agent* m) {
   kind_ = m->kind_;
   spec_ = m->spec_;
   lifetime_ = m->lifetime_;
+  method_ = m->method_;
   ctx_ = m->ctx_;
 }
 
@@ -36,10 +39,24 @@ std::string Agent::InformErrorMsg(std::string msg) {
 void Agent::InfileToDb(InfileTree* qe, DbInit di) {
   std::string proto = qe->GetString("name");
   int lifetime = OptionalQuery<int>(qe, "lifetime", -1);
+  if (qe->NMatches("scheduler") == 1){
+    InfileTree* scheduler = qe->SubTree("scheduler");
+    method_ = scheduler->GetString("method");
+    ScheduleInfo(scheduler,method_);
+  }
   di.NewDatum("Agent")
-      ->AddVal("Prototype", proto)
-      ->AddVal("Lifetime", lifetime)
-      ->Record();
+    ->AddVal("Prototype", proto)
+    ->AddVal("Lifetime", lifetime)
+    ->AddVal("Method", method_)
+    ->Record();
+}
+
+void Agent::ScheduleInfo(InfileTree* scheduler, std::string method){
+  info_.method = method;
+  info_.schedule = OptionalQuery<std::set<int>>(scheduler,"schedule",{});
+  info_.cycle_length = OptionalQuery<int>(scheduler,"cycle_length",-1);
+  //info.commodities = OptionalQuery<std::set<std::string>>(scheduler,"commodities",{});
+  std::cout << info_.method << std::endl;
 }
 
 void Agent::InitFrom(QueryableBackend* b) {
@@ -47,12 +64,14 @@ void Agent::InitFrom(QueryableBackend* b) {
   prototype_ = qr.GetVal<std::string>("Prototype");
   id_ = qr.GetVal<int>("AgentId");
   lifetime_ = qr.GetVal<int>("Lifetime");
+  method_ = qr.GetVal<std::string>("Method");
 }
 
 void Agent::Snapshot(DbInit di) {
   di.NewDatum("Agent")
       ->AddVal("Prototype", prototype_)
       ->AddVal("Lifetime", lifetime_)
+      ->AddVal("Method", method_)
       ->Record();
 }
 
@@ -64,6 +83,7 @@ Agent::Agent(Context* ctx)
       enter_time_(-1),
       lifetime_(-1),
       parent_(NULL),
+      method_("fixed"),
       spec_("UNSPECIFIED") {
   ctx_->agent_list_.insert(this);
   MLOG(LEV_DEBUG3) << "Agent ID=" << id_ << ", ptr=" << this << " created.";

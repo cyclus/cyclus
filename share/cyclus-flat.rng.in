@@ -189,6 +189,21 @@
               <data type="nonNegativeInteger"/> </element>
           </optional>
 
+
+
+
+        <element name = "scheduler">
+          <a:documentation>method</a:documentation>
+          <interleave>
+              <element name = "method">
+                <a:documentation>method</a:documentation>
+              <text/>
+              </element>
+          </interleave>
+        </element>
+
+
+
           <element name="config">
             <a:documentation>Configuration to specify which archetype is being used for this prototype, and then 
               provide parameters to specify a particular prototype definition.</a:documentation>
