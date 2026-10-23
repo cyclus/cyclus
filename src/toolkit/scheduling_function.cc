@@ -5,19 +5,36 @@
 namespace cyclus {
 namespace toolkit {
 
-
 SchedulingFunctions::SchedulingFunctions(Facility* fac): 
-    f_(fac) {}
+    f_(fac)
+    {}
+
+void SchedulingFunctions::ScheduleMethod(SchedulingInfo info){
+    if (info.method == "fixed"){
+        FixIncSchedule();
+    }
+    if (info.method == "ConstantRequest"){
+        ConstantRequest(info.cycle_length, info.commodities);
+    }
+    // if (info.method == "DemandDrivenRequest"){
+    //     DemandDrivenRequests(info.resource_buffers, info.commodities);
+    // }
+    if (info.method == "PredefinedSchedule"){
+        PredefinedSchedule(info.schedule);
+    }
+}
 
 void SchedulingFunctions::Scheduler(int t, std::set<std::string> in_commods){
-    f_-> context()-> RegisterRequesters(t, f_);
+    f_-> context()-> RegisterRequesters(t, f_); // technically i dont even need this 
     f_-> context()-> RegisterCommoditiesTraded(t, in_commods);
     t_.insert(t);
 } //archetype developers can also call this method to schedule some time directly with context
 // from their own scheduling function/parameters
 
 void SchedulingFunctions::FixIncSchedule(){
-    Scheduler(FacilityTime()+  1, f_->GetInCommods());
+    //Scheduler(FacilityTime() + 1, f_->GetInCommods());
+    std::cout << "fixinc" << std::endl;
+    Scheduler(FacilityTime() + 5, f_->GetInCommods());
 }
 
 void SchedulingFunctions::ConstantRequest(int cycle_length, std::set<std::string> commods){
@@ -44,14 +61,7 @@ void SchedulingFunctions::clear(){
 }
 
 void SchedulingFunctions::InitialTrade(){
-    Scheduler(FacilityTime(),f_->GetInCommods());
-    //i changed this from the original
-//   if(FacilityTime() == 0){ 
-//     Scheduler(1, f_->GetInCommods());  
-//   }
-//   else if (FacilityTime() > 0){ //if during sim_time >0 register for sim_time
-//     Scheduler(FacilityTime(),f_->GetInCommods());
-//   }
+    Scheduler(0,f_->GetInCommods());
 }
 
 int SchedulingFunctions::FacilityTime(){

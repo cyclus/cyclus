@@ -31,9 +31,9 @@ void Timer::RunSim() {
   ExchangeManager<Product> genrsrc_manager(ctx_);
 
   //the following 3 lines are to add an upper limit to the 3 event maps so that the there is always a final event in "queue"
-  ctx_->SchedPopulate(dur()+1); 
-  build_queue_[dur()+1]; // find a better home 
-  decom_queue_[dur()+1]; // find a better home 
+  // ctx_->SchedPopulate(dur()+1); 
+  // build_queue_[dur()+1]; // find a better home 
+  // decom_queue_[dur()+1]; // find a better home 
 
   while (time_ < si_.duration) {
     CLOG(LEV_INFO1) << "Current time: " << time_;
@@ -108,10 +108,12 @@ void Timer::DoTick() {
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
   auto reg_traders = ctx_->EventRequesters(time_);  
-  std::cout <<"Context commodity map size called in Timer is"<< (ctx_->CommoditiesTraded(time_)).size()<<" (empty) \n\n\n\n";
-  std::cout<<"Context discrete-registered traders map size is "<<reg_traders.size()<<" (not empty?)\n\n\n";
-  //still unclear: do decom events require secondary registration for trades? 
+  // std::cout <<"Context commodity map size called in Timer is"<< (ctx_->CommoditiesTraded(time_)).size()<<" (empty) \n\n\n\n";
+
+  // std::cout<<"Context discrete-registered traders map size is "<<reg_traders.size()<<" (not empty?)\n\n\n";
+  // //still unclear: do decom events require secondary registration for trades? 
   if(reg_traders.size()>0){
+    std::cout << "larger than 0 " << std::endl;
       matmgr->Execute();
       genmgr->Execute();
     }
@@ -248,6 +250,7 @@ int Timer::NextEvent(){
   int t_p = time_ +1;  
   std::vector<int> event_lists = {decom_queue_.lower_bound(t_p)->first,build_queue_.lower_bound(t_p)->first,
                                   reg_traders.lower_bound(t_p)->first};
+  std::cout <<*std::min_element(event_lists.begin(), event_lists.end()) << std::endl;
   return *std::min_element(event_lists.begin(), event_lists.end());
 }
 
@@ -311,6 +314,10 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   ctx_ = ctx;
   time_ = 0;
   si_ = si;
+  ctx_->SchedPopulate(dur()+1); 
+  build_queue_[dur()+1]; // find a better home 
+  decom_queue_[dur()+1]; // find a better home 
+
 
   if (si.branch_time > -1) {
     time_ = si.branch_time;

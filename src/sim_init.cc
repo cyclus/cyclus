@@ -5,6 +5,7 @@
 #include "platform.h"
 #include "prog_solver.h"
 #include "region.h"
+#include "toolkit/commodity_recipe_context.h"
 
 namespace cyclus {
 
@@ -49,7 +50,7 @@ void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id, int t,
 }
 
 void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
-  ctx_ = new Context(&ti_, rec_);
+  ctx_ = new Context(&ti_, rec_); // why is there two contexts does it every get fileld before this why a new one? 
 
   std::vector<Cond> conds;
   conds.push_back(Cond("SimId", "==", simid));
@@ -66,6 +67,7 @@ void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
   LoadPrototypes();
   LoadInitialAgents();
   LoadInventories();
+  LoadCommodities(); 
   LoadBuildSched();
   LoadDecomSched();
   LoadNextIds();
@@ -125,7 +127,6 @@ void SimInit::SnapAgent(Agent* m) {
   // call manually without agent impl injected to keep all Agent state in a
   // single, consolidated db table
   m->Agent::Snapshot(DbInit(m, true));
-
   m->Snapshot(DbInit(m));
   Inventories invs = m->SnapshotInv();
   Context* ctx = m->context();
@@ -461,6 +462,7 @@ void SimInit::LoadInitialAgents() {
 
   // notify all agents that they are active in a simulation AFTER the
   // parent-child hierarchy has been reconstructed.
+  //LoadCommodities();
   for (int i = 0; i < enter_list.size(); ++i) {
     enter_list[i]->EnterNotify();
   }
@@ -505,6 +507,34 @@ void SimInit::LoadBuildSched() {
     int parentid = qr.GetVal<int>("ParentId", i);
     std::string proto = qr.GetVal<std::string>("Prototype", i);
     ctx_->SchedBuild(agents_[parentid], proto, t);
+  }
+}
+
+void SimInit::LoadCommodities() {
+    QueryResult qr = b_->Query("AgentVersions", NULL);
+    for (int i = 0; i < qr.rows.size(); ++i) {
+      std::string impl = qr.GetVal<std::string>("Spec", i);
+      AgentSpec spec(impl);
+      try{
+        std::string proto_commod = "AgentState" + 
+                                    spec.Sanitize() + 
+                                    "CommodityContext_inoutmap";
+                          
+        QueryResult qr = b_->Query(proto_commod,NULL);
+
+        for (int i = 0; i < qr.rows.size(); ++i) {
+          std::string commod = qr.GetVal<std::string>("in_commod",i);
+          int id = qr.GetVal<int>("AgentId",i);
+          std::map<int, Trader*> traderids = ctx_->IdTrader();
+
+          Trader* e = traderids[id];
+          e->FillInCommods(commod);
+          ctx_->RegisterCommodityConsumer(commod,e);
+        }
+      }
+      catch(...){
+        continue;
+      }
   }
 }
 

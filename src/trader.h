@@ -79,17 +79,16 @@ class Trader {
       const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {}
 
   virtual void EventRequest(){} // can be overridden ? 
-  
-  bool Traded; //follows DRE to assess whether trader completed trades; 
-  // archetype devs may want to use this to assess event scheduling
-
-  void SetTraded(bool status){Traded = status;} //setter for Traded
-
-  bool ReturnTraded(){return Traded;} //getter for Traded 
 
   void FillInCommods(std::string commod){in_commods_.insert(commod);}
 
   std::set<std::string> GetInCommods() {return in_commods_;}
+
+  bool Participated; //assess whether the agent has traded or decommissioend
+
+  void SetParticipated(bool status){Participated = status;} //setter for Participated
+
+  bool ReturnParticipated(){return Participated;} //getter for Participated
 
   protected:
   Agent* manager_;

@@ -80,6 +80,7 @@ extern "C" {
 #include "toolkit/symbolic_functions.h"
 #include "toolkit/timeseries.h"
 #include "toolkit/scheduling_function.h"
+#include "toolkit/scheduling_info.h"
 
 // Undefines isnan from pyne
 #ifdef isnan

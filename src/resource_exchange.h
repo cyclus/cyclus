@@ -108,6 +108,7 @@ template <class T> class ResourceExchange {
       std::set<Trader*>::iterator it;
       for (it = orig.begin(); it != orig.end(); ++it) {
         traders_.insert(*it);
+        (*it)->SetParticipated(true);
       }
     }
   }
@@ -127,6 +128,7 @@ template <class T> class ResourceExchange {
     for (std::string commods : map2){
       traders.merge(commod_map[commods]);
     }
+    std::cout << "size of trader: " << traders.size() << "\n" << std::endl;
     return traders;
   }
 

@@ -4,11 +4,13 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <functional>
 
 #include "agent.h"
 #include "time_listener.h"
 #include "trader.h"
 #include "toolkit/scheduling_function.h"
+#include "toolkit/commodity_recipe_context.h"
 
 namespace cyclus {
 
@@ -74,7 +76,7 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual ~Facility();
 
   // DO NOT call Agent class implementation of this method
-  virtual void InfileToDb(InfileTree* qe, DbInit di) {}
+  virtual void InfileToDb(InfileTree* qe, DbInit di) {} // MEG CHANGED {} 
 
   // DO NOT call Agent class implementation of this method
   virtual void InitFrom(QueryableBackend* b) {}
@@ -139,12 +141,6 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual void Tock();
 
   virtual void Tick();
-
-  //return all future events scheduled for some facility (this function is useful for deregistration context()->DeregisterRequesters(--)
-  // purposes and for archetype developer scheduled facility behavior)
-  inline const std::set<int>& GetFutureEvents() const {
-    return selftimes_;
-  }
 
   /// default implementation for material preferences.
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
@@ -212,9 +208,7 @@ class Facility : public TimeListener, public Agent, public Trader {
   /// @return Vector of all parent facilities, ordered from closest to farthest
   std::vector<Facility*> GetAllParentFacilities();
 
-
-  private: 
-  std::set<int> selftimes_;
+  protected: 
   toolkit::SchedulingFunctions schedule_helper_;
 };
 

@@ -3,8 +3,11 @@
 
 #include "context.h"
 #include "symbolic_functions.h" //I may add a symbolic functions later...
+#include "scheduling_info.h"
 #include "res_buf.h"
 #include <vector>
+#include <functional> 
+#include <set>
 
 namespace cyclus {
 
@@ -39,9 +42,11 @@ void Scheduler(int t, std::set<std::string> in_commods);
 
 void PredefinedSchedule(std::set<int> sched);
 
+void ScheduleMethod(SchedulingInfo info);
+
 const std::set<int>& EventTime() const {//schedule
     return t_;
-}
+};
 
 private:
     Facility* f_;
