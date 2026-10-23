@@ -35,13 +35,11 @@ void Facility::Build(Agent* parent) {
     if(requests){
       for(auto& request : requests->requests()) {
       std::string commodity = request->commodity();
-      context()->RegisterCommodityConsumer(commodity,this);
-      comd.AddInCommod(commodity,"b","t","x");
+      comd.AddInCommod(commodity,"","","");
       }
     }
   }
   comd.CommodSnapshot(DbInit(this)); 
-  context()-> RegisterCommoditiesTraded(context()->time(), GetInCommods());
 }
 
 void Facility::EnterNotify() {
@@ -61,6 +59,7 @@ std::string Facility::str() {
 }
 
 void Facility::Decommission() {
+
   // if (CheckDecommissionCondition() == NULL){
   // std::cout << CheckDecommissionCondition() << std::endl;}
   // if (CheckDecommissionCondition() == false) { //check what happens w NULL

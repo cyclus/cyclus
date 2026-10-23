@@ -108,7 +108,8 @@ template <class T> class ResourceExchange {
       std::set<Trader*>::iterator it;
       for (it = orig.begin(); it != orig.end(); ++it) {
         traders_.insert(*it);
-        (*it)->SetParticipated(true);
+        // (*it)->SetParticipated(true); // did I mean for this to go here??? 
+        // //maybe only completed traders should be there 
       }
     }
   }

@@ -33,7 +33,6 @@ void SchedulingFunctions::Scheduler(int t, std::set<std::string> in_commods){
 
 void SchedulingFunctions::FixIncSchedule(){
     //Scheduler(FacilityTime() + 1, f_->GetInCommods());
-    std::cout << "fixinc" << std::endl;
     Scheduler(FacilityTime() + 5, f_->GetInCommods());
 }
 
