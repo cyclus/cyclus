@@ -50,7 +50,7 @@ void SimInit::Branch(QueryableBackend* b, boost::uuids::uuid prev_sim_id, int t,
 }
 
 void SimInit::InitBase(QueryableBackend* b, boost::uuids::uuid simid, int t) {
-  ctx_ = new Context(&ti_, rec_); // why is there two contexts does it every get fileld before this why a new one? 
+  ctx_ = new Context(&ti_, rec_);
 
   std::vector<Cond> conds;
   conds.push_back(Cond("SimId", "==", simid));
@@ -468,7 +468,6 @@ void SimInit::LoadInitialAgents() {
 
   // notify all agents that they are active in a simulation AFTER the
   // parent-child hierarchy has been reconstructed.
-  //LoadCommodities();
   for (int i = 0; i < enter_list.size(); ++i) {
     enter_list[i]->EnterNotify();
   }

@@ -58,10 +58,6 @@ void Timer::RunSim() {
   ExchangeManager<Material> matl_manager(ctx_);
   ExchangeManager<Product> genrsrc_manager(ctx_);
 
-  //the following 3 lines are to add an upper limit to the 3 event maps so that the there is always a final event in "queue"
-  // ctx_->SchedPopulate(dur()+1); 
-  // build_queue_[dur()+1]; // find a better home 
-  // decom_queue_[dur()+1]; // find a better home 
   if (!progress_bar_ && ProgressBarEnabled()) {
     SetupProgressBar();
   }
@@ -133,7 +129,7 @@ void Timer::DoTick() {
   }
 
 #pragma omp parallel for
-  //everyone ticks for all events (Cyclus 04/21 notes)
+
   for (size_t i = 0; i < cpp_tickers_.size(); ++i) {
     cpp_tickers_[i]->Tick();
   }
@@ -141,20 +137,14 @@ void Timer::DoTick() {
 
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
-  auto reg_traders = ctx_->EventRequesters(time_);  
-  // std::cout <<"Context commodity map size called in Timer is"<< (ctx_->CommoditiesTraded(time_)).size()<<" (empty) \n\n\n\n";
-
-  // std::cout<<"Context discrete-registered traders map size is "<<reg_traders.size()<<" (not empty?)\n\n\n";
-  // //still unclear: do decom events require secondary registration for trades? 
+  auto reg_traders = ctx_->EventRequesters(time_);   
   if(reg_traders.size()>0){
-    std::cout << "larger than 0 " << std::endl;
       matmgr->Execute();
       genmgr->Execute();
     }
 }
 
 void Timer::DoTock() {
-  //everyone tocks for all events (Cyclus 04/21 notes)
   for (TimeListener* agent : py_tickers_) {
     agent->Tock();
   }
@@ -248,7 +238,6 @@ void Timer::RecordInventory(Agent* a, std::string name, Material::Ptr m) {
 void Timer::DoDecom() {
   // decommission queued agents
   std::vector<Agent*> decom_list = decom_queue_[time_];
-  //if decom_list is empty at time, already no one decommissions i.e. "skips" event 
   for (int i = 0; i < decom_list.size(); ++i) {
     Agent* m = decom_list[i];
     if (m->parent() != NULL) {

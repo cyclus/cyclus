@@ -67,10 +67,10 @@ template <class T> class ResourceExchange {
   inline ExchangeContext<T>& ex_ctx() { return ex_ctx_; }
 
   /// @brief queries traders and collects all requests for bids
-  void AddAllRequests() { // I think we should add other commodity consumers of type a into the mix within InitRequesters() as well.  
+  void AddAllRequests() {  
     InitRequesters();
     std::for_each(requesters_.begin(),
-                  requesters_.end(), 
+                  requesters_.end(),
                   std::bind(&cyclus::ResourceExchange<T>::AddRequests_,
                             this,
                             std::placeholders::_1));

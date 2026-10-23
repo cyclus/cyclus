@@ -76,7 +76,7 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual ~Facility();
 
   // DO NOT call Agent class implementation of this method
-  virtual void InfileToDb(InfileTree* qe, DbInit di) {} // MEG CHANGED {} 
+  virtual void InfileToDb(InfileTree* qe, DbInit di) {}
 
   // DO NOT call Agent class implementation of this method
   virtual void InitFrom(QueryableBackend* b) {}
@@ -103,7 +103,7 @@ class Facility : public TimeListener, public Agent, public Trader {
 
   /// facilities over write this method if a condition must be met
   /// before their destructors can be called
-  virtual bool CheckDecommissionCondition(); 
+  virtual bool CheckDecommissionCondition();
 
   /// every agent should be able to print a verbose description
   virtual std::string str();

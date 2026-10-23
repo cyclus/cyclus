@@ -81,7 +81,6 @@ void CommodityRecipeContext::InitFrom(QueryableBackend* b) {
 void CommodityRecipeContext::Snapshot(DbInit di) {
   std::set<std::string>::iterator it2;
   for (it2 = in_commods_.begin(); it2 != in_commods_.end(); ++it2) {
-    std::cout << "commodity recipe context \n\n";
     std::string c = *it2;
     di.NewDatum("CommodityRecipeContext_inoutmap")
         ->AddVal("in_commod", c)

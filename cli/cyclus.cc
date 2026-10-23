@@ -437,7 +437,6 @@ int EarlyExitArgs(const ArgInfo& ai) {
     try {
       Recorder rec;
       Timer ti;
-      std::cout << "I am in context 1\n";
       Context* ctx = new Context(&ti, &rec);
       Agent* m = DynamicModule::Make(ctx, name);
       std::cout << m->schema();
@@ -452,7 +451,6 @@ int EarlyExitArgs(const ArgInfo& ai) {
     try {
       Recorder rec;
       Timer ti;
-      std::cout << "I am in context 2 \n";
       Context* ctx = new Context(&ti, &rec);
       Agent* m = DynamicModule::Make(ctx, name);
       std::cout << m->version() << "\n";

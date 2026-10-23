@@ -82,8 +82,6 @@ void Facility::Tock(){ // archetype developers need to invoke this method in toc
 }
 
 void Facility::Tick(){
-  //this gets toggled if a trade is completed 
-  std::cout << info().cycle_length << std::endl;
  SetParticipated(false); //archetype developers need to invoke this method in tick
 }
 
