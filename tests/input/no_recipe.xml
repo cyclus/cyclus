@@ -1,0 +1,40 @@
+<!-- Lotka-Volterra simulation with Predators only. -->
+
+<simulation>
+  <control>
+    <duration>10</duration>
+    <startmonth>1</startmonth>
+    <startyear>2000</startyear>
+  </control>
+
+  <archetypes>
+    <spec><lib>agents</lib><name>Predator</name></spec>
+    <spec><lib>agents</lib><name>NullRegion</name></spec>
+    <spec><lib>agents</lib><name>NullInst</name></spec>
+  </archetypes>
+
+  <facility>
+    <name>Predator</name>
+    <config>
+      <Predator>
+        <commod>commodity</commod>
+        <prey>none</prey>
+      </Predator>
+    </config>
+  </facility>
+
+  <region>
+    <name>SingleRegion</name>
+    <config> <NullRegion/> </config>
+    <institution>
+      <name>SingleInstitution</name>
+      <initialfacilitylist>
+        <entry>
+          <prototype>Predator</prototype>
+          <number>1</number>
+        </entry>
+      </initialfacilitylist>
+      <config> <NullInst/> </config>
+    </institution>
+  </region>
+</simulation>

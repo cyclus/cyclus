@@ -152,3 +152,25 @@ TEST_F(InfileTreeTest, optional_queries) {
   EXPECT_EQ(str_val, OptionalQuery<string>(&qe, str_str, str_other));
   EXPECT_EQ(str_other, OptionalQuery<string>(&qe, other, str_other));
 }
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+TEST_F(InfileTreeTest, bool_queries) {
+  using cyclus::Query;
+
+  std::stringstream ss;
+  ss << "<root>"
+     << "<true> true </true>"
+     << "<false>false</false>"
+     << "<one>1</one>"
+     << "<zero>0</zero>"
+     << "</root>";
+
+  cyclus::XMLParser parser;
+  parser.Init(ss);
+  cyclus::InfileTree qe(parser);
+
+  EXPECT_TRUE(Query<bool>(&qe, "true"));
+  EXPECT_FALSE(Query<bool>(&qe, "false"));
+  EXPECT_TRUE(Query<bool>(&qe, "one"));
+  EXPECT_FALSE(Query<bool>(&qe, "zero"));
+}

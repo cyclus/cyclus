@@ -493,8 +493,8 @@ void XMLFileLoader::LoadControlParams() {
   int y0 = strtol(y0_str.c_str(), NULL, 10);
   // get decay mode
   std::string d = OptionalQuery<std::string>(qe, "decay", "manual");
-
   SimInfo si(dur, y0, m0, handle, d);
+  si.decay_eps = OptionalQuery<double>(qe, "decay_eps", kDefaultDecayEps);
 
   si.explicit_inventory = OptionalQuery<bool>(qe, "explicit_inventory", false);
   si.explicit_inventory_compact =
@@ -512,7 +512,8 @@ void XMLFileLoader::LoadControlParams() {
   cy_eps_rsrc = si.eps_rsrc = eps_rsrc_;
 
   // get seed
-  si.seed = OptionalQuery<int>(qe, "seed", kDefaultSeed);
+  int seed_inp = OptionalQuery<int>(qe, "seed", kDefaultSeed);
+  si.seed = (seed_inp == 0) ? ctx_->date_time_int() : seed_inp;
 
   // get stride
   si.stride = OptionalQuery<int>(qe, "stride", kDefaultStride);

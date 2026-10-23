@@ -86,8 +86,8 @@ class TestTrader : public TestFacility {
     }
   }
 
-  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {
-    bid = (*prefs[req].begin()).first;  // obs bid
+  virtual void AdjustMatlParams(RequestBidMap<Material>::type& rb_map) {
+    bid = (*rb_map[req].begin()).first;  // obs bid
     adjusts++;
   }
 
@@ -97,7 +97,8 @@ class TestTrader : public TestFacility {
     std::vector< Trade<Material> >::const_iterator it;
     for (it = trades.begin(); it != trades.end(); ++it) {
       obs_trade = Trade<Material>(*it);
-      responses.push_back(std::make_pair(*it, obj_fac->mat));
+      Material::Ptr response = (obj_fac != NULL) ? obj_fac->mat : NewBlankMaterial(it->amt);
+      responses.push_back(std::make_pair(*it, response));
       offer++;
     }
   }

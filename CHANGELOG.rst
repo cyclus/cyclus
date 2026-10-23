@@ -6,6 +6,13 @@ Since last release
 ====================
 
 **Added:**
+* Added concurrency groups to the build, MacOS build, and code coverage workflows so that a new push cancels superseded in-progress runs (#1984)
+* Added a Pixi workspace (``pixi.toml``, ``pixi.lock``) for development on Linux and MacOS (#1984)
+* Added forced decay mode for use inside Material::Absorb() to correctly handle lazy mode with small timesteps and half-lives (#1974)
+* Added a boolean-specific Query function to infile_tree.h to support archetype bools using true and false (#1970)
+* Added a copy constructor to Timer to allow MockSim to copy it without upsetting the progress bar (#1961)
+* Added progress bar to the simulation loop (#1912)
+* Added a warning for when a facility trades with itself (#1895)
 * Added a new datatype to the backend for tariff region (#1922)
 * Added Functions to access region and institution from facilities and institutions (#1914)
 * Added a unit value to Resource, Material, and Product objects (#1894)
@@ -32,9 +39,22 @@ Since last release
 * Support for OpenMP parallelized simulations (#1709)
 * Command-line option to make a new blank input file referencing a current schema (#1861)
 * Allow multiple archetype blocks to facilitate includes (#1874)
+* New composition specification based on single nuclide (#1949)
+* Added ability to calcuate a time shift between the start time and some other time stamp (#1907)
+* Users can specify for random seed to be created for random number generation (#1950)
+* Added a ``minimum`` environment to the Pixi workspace that has the minimum versions of the dependencies documented in ``DEPENDENCIES.rst``, and a CI workflow that builds and tests Cyclus in it on changes to the Pixi workspace and every week
+* Introduced a definition of "stocked" for a resource buffer, which is a threshold quantity that can be set by the user (#)
 
 **Changed:**
-
+* Raised the minimum versions of Python to 3.10.0, SQLite to 3.36.0, Jinja2 to 2.10.3, NumPy to 1.21.4, and pandas to 1.3.4, and lowered that of Coin-Clp to 1.17.3, which are the versions tested in the ``minimum`` environment of the Pixi workspace
+* Removed the ``python<3.13`` and ``cython<3.1.0`` pins from the conda Docker builds, which now install ``libpython`` in place of the Python bindings of Boost (#1985)
+* Updated the Pixi workspace to Boost 1.92, Python 3.15, and Cython 3.3, and added ``libpython`` to it, as the conda-forge ``python`` package no longer installs the Python shared library as of Python 3.15 (#1985)
+* Clarify behavior of `Material::Absorb()` with respect to decay (#1966)
+* Modified cycpp.py to fix a few whitespace-related bugs, and allow cyclus vars to be initialized (#1954)
+* Changed the epsilon (eps) in Material::Decay to 1e-4 allowing 1 day decay of tritium (#1946)
+* Changed the schema for recipes to require oneOrMore instead of zeroOrMore (#1940)
+* Renamed DRE variables to remove reference to preference and clarify intent (#1937)
+* Reworked the Dynamic Resource Exchange to minimize direct arc costs rather than inverted preferences. Renamed variables as needed/appropriate (#1937)
 * Made the Unit Tests far less verbose by suppressing log output during RunSim (#1927)
 * Reworked the facility/instituion/region_cost.cycpp.h files to work with MC (#1931)
 * Changed Dockerfile to use boost and boost-cpp instead of libboost-devel (#1906)
@@ -62,7 +82,19 @@ Since last release
 * Removed ``exclusive_orders_only`` from schema (#1816)
 
 **Fixed:**
-
+* Fixed the generated random seed (``seed`` of 0) becoming negative on Linux hosts with more than about 25 days of uptime, which made the seed recorded in the Info table invalid as an input file seed. The seed is now generated from the system clock instead of the time since the host booted (#1989)
+* Fixed building with Boost 1.89 and newer, which no longer has a compiled Boost.System library (#1985)
+* Fixed a segmentation fault when a Cyclus Python module fails to import, which is now reported as an error with the Python traceback (#1985)
+* Fixed the inventory of the Python ``Sink`` agent, which raised a ``TypeError`` for every material it accepted, causing a segmentation fault with Python 3.13 and newer, and now keeps the materials and products that it accepts (#1985)
+* Fixed the snapshot of a Python agent failing when one of its resource buffer inventories is not empty (#1985)
+* Fixed the inventories of Python agents missing from every snapshot (#1985)
+* Removed the uses of ``distutils``, which was removed from the standard library in Python 3.12 (#1985)
+* Fixed a typo in the ``AttrToaster`` test agent that caused a segmentation fault in the Python tests with Python 3.13 and newer (#1985)
+* Fixed building the Python bindings with Cython 3.1 and newer (#1985)
+* Removed the macos-14 runner and the Xcode selection step from the MacOS CI, which now uses the default Xcode of the runner for the MacOS SDK (#1984)
+* Fixed the MacOS CI by building in a locked Pixi environment instead of pinning old compilers (#1984)
+* Fixed the conda Docker builds by installing ``libxml2-devel``, which has the headers of the conda-forge ``libxml2`` as of version 2.14 (#1984)
+* Removed retired macos-13 runner for CI tests and added macos-15-intel and macos-latest (#1938)
 * Removed unnecessary records being added to the Resource database by packaging process (#1761)
 * Removed GTest source code from code coverage reports (#1759)
 * Extended new GTest handling to Institutions and Facilities as they were done in Regions (#1836)
@@ -76,7 +108,9 @@ Since last release
 * Allow master schema be to reported with all discoverable archetypes (#1846)
 * Ensure that the RNG Schema is only printed if requested (#1858)
 * Allow stubs generated by `cycstub` to have library names with CamelCase (#1856)
-* Update conributing guide to match current practice (#1882)
+* Update contributing guide to match current practice (#1882)
+* Improved documentation in schema (#1958, #1959)
+* Updated Changelog test (#1962)
 
 v1.6.0
 ====================
@@ -143,6 +177,7 @@ v1.6.0
 * Fix how Env::GetInstallPath() finds the location of the cyclus installation (#1689)
 * Fix Debian package generation (#1676)
 * Fixed ResBuf.Decay() and added test (#1825)
+* Fixed questionable memory access (#1965)
 
 
 

@@ -3,6 +3,8 @@
 
 #include <cstddef>
 
+#include "error.h"
+
 namespace cyclus {
 
 class Context;
@@ -17,7 +19,15 @@ class ExchangeSolver {
   /// default value to allow exclusive orders or not
   static const bool kDefaultExclusive = true;
 
-  /// return the cost of an arc
+  /// @brief Returns an arc's effective objective coefficient.
+  ///
+  /// For an exclusive arc when exclusive orders are enabled, the stored arc cost
+  /// is scaled by the exclusive quantity. An arc with a non-positive exclusive
+  /// quantity is left unscaled.
+  ///
+  /// @param a The exchange arc to evaluate.
+  /// @param exclusive_orders Whether to apply exclusive-order scaling.
+  /// @return The effective objective coefficient for the arc.
   static double Cost(const Arc& a, bool exclusive_orders = kDefaultExclusive);
 
   explicit ExchangeSolver(bool exclusive_orders = kDefaultExclusive)
@@ -42,21 +52,52 @@ class ExchangeSolver {
     return this->SolveGraph();
   }
 
-  /// @brief Calculates the ratio of the maximum objective coefficient to
-  /// minimum unit capacity plus an added cost. This is guaranteed to be larger
-  /// than any other arc cost measure and can be used as a cost for unmet
-  /// demand.
-  /// @param cost_factor the additional cost for false arc costs, i.e., max_cost
-  /// * (1 + cost_factor)
-  /// @{
+  /// @brief Calculates the default faux-arc penalty for unmet demand.
+  ///
+  /// Uses the default relative margin factor of 0.1.
+  ///
+  /// @return A penalty greater than every finite effective real-arc cost, or
+  ///         0.0 when the graph has no arcs.
+  /// @throws ValueError if an effective arc cost is not finite.
   double PseudoCost();
+
+  /// @brief Calculates a faux-arc penalty for unmet demand.
+  ///
+  /// @param cost_factor The positive relative margin applied to the largest
+  ///                    effective arc cost. Should be finite and positive.
+  /// @return A penalty greater than every finite effective real-arc cost, or
+  ///         0.0 when the graph has no arcs.
   double PseudoCost(double cost_factor);
+
+  /// @brief Calculates a capacity-derived faux-arc penalty for unmet demand.
+  ///
+  /// The penalty is based on the maximum effective arc coefficient and the
+  /// minimum unit capacity found in the exchange graph.
+  ///
+  /// @param cost_factor The relative margin applied to the calculated penalty.
+  /// @return A capacity-derived faux-arc penalty.
+  /// @warning Requires valid, non-empty positive unit-capacity data in the
+  ///          exchange graph.
   double PseudoCostByCap(double cost_factor);
-  double PseudoCostByPref(double cost_factor);
+
+  /// @brief Calculates a penalty for the faux arc representing unmet demand.
+  ///
+  /// The returned cost is strictly greater than every finite effective real-arc
+  /// cost in the exchange graph, so a solver minimizes unmet demand whenever a
+  /// real trade is feasible. The penalty is the largest effective arc cost plus
+  /// a scale-aware positive margin.
+  ///
+  /// @param cost_factor The positive relative margin applied to the largest
+  ///                    effective arc cost.
+  /// @return The faux-arc penalty, or 0.0 when the graph has no arcs.
+  /// @throws ValueError if an effective arc cost is not finite.
+  double PseudoCostByArcCost(double cost_factor);
   /// @}
 
-  /// return the cost of an arc
-  inline double ArcCost(const Arc& a) { return Cost(a, exclusive_orders_); }
+  /// return the cost of an arc (instance method that uses the solver's graph)
+  inline double arc_cost(const Arc& a) {
+    return Cost(a, exclusive_orders_);
+  }
 
  protected:
   /// @brief Worker function for solving a graph. This must be implemented by

@@ -24,7 +24,13 @@
 // a round number)
 const uint64_t cyclusYear = 31558200;
 
-const uint64_t kDefaultTimeStepDur = cyclusYear / 12;
+const uint64_t kMonthsPerYear = 12;
+
+const uint64_t cyclusMonth = cyclusYear / kMonthsPerYear;
+
+const uint64_t kDefaultTimeStepDur = cyclusMonth;
+
+const double kDefaultDecayEps = 1e-4;
 
 const uint64_t kDefaultSeed = 20160212;
 
@@ -85,6 +91,9 @@ class SimInfo {
   /// "manual" if use of the decay function is allowed, "never" otherwise
   std::string decay;
 
+  /// Fractional decay threshold in [0, 1). Smaller changes may be discarded.
+  double decay_eps;
+
   /// length of the simulation in timesteps (months)
   int duration;
 
@@ -131,6 +140,10 @@ class SimInfo {
   /// some parameter, such as the agent_id.
   uint64_t stride;
 };
+
+/// Folds a time in milliseconds into a seed in [1, INT_MAX], which is valid as
+/// the input file's seed.
+int MillisecondsToSeed(int64_t ms);
 
 /// A simulation context provides access to necessary simulation-global
 /// functions and state. All code that writes to the output database, needs to
@@ -283,6 +296,9 @@ class Context {
   /// Returns the current simulation timestep.
   virtual int time();
 
+  /// Returns a time shift between the simulation start time and another time stamp
+  int CalcTimeDiff(int year, int month);
+
   /// Adds a package type to a simulation-wide accessible list.
   /// Agents should NOT add their own packages.
   void AddPackage(std::string name, double fill_min = 0,
@@ -316,6 +332,9 @@ class Context {
 
   /// Returns a random number from a uniform integer distribution.
   int random_uniform_int(int low, int high);
+
+  //returns an integer representation of the date-time to seed the simulation
+  int date_time_int();
 
   /// Returns a random number from a uniform real distribution.
   double random_uniform_real(double low, double high);

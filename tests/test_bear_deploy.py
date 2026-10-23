@@ -15,6 +15,9 @@ inputfile = {
    ],
   },
   'control': {'duration': 35, 'startmonth': 1, 'startyear': 2000},
+  "recipe": [{"name": "dummy_recipe",
+                            "basis": "mass",
+                            "nuclide": {"id": "H1", "comp": 1},},],
   'facility': {
    'config': {
     'DemandFac': {

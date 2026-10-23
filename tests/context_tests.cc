@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <limits>
 
 #include "context.h"
 #include "recorder.h"
@@ -177,4 +178,15 @@ TEST_F(ContextTests, GetAgentList) {
   // Clean up
   delete ctx;
   EXPECT_EQ(3, DonutShop::destruct_count);
+}
+TEST_F(ContextTests, InvalidDecayEps) {
+  const double values[] = {-0.1, 1.0, 2.0,
+                          std::numeric_limits<double>::infinity(),
+                          -std::numeric_limits<double>::infinity(),
+                          std::numeric_limits<double>::quiet_NaN()};
+  for (double value : values) {
+    cyclus::SimInfo info(5);
+    info.decay_eps = value;
+    EXPECT_THROW(ctx->InitSim(info), cyclus::ValueError);
+  }
 }

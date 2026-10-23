@@ -32,4 +32,13 @@
     </institution>
   </region>
 
+  <recipe>
+    <name>dummy</name>
+    <basis>mass</basis>
+    <nuclide>
+      <id>922350000</id>
+      <comp>1</comp>
+    </nuclide>
+  </recipe>
+  
 </simulation>

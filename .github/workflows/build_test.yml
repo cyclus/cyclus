@@ -10,6 +10,7 @@ on:
       - '.github/workflows/changelog_test.yml'
       - '.github/workflows/code_coverage.yml'
       - '.github/workflows/rocky_build_test.yml'
+      - '.github/workflows/minimum_build_test.yml'
       - '.github/workflows/macos_build_test.yml'
       - 'doc/**'
       - 'CHANGELOG.rst'
@@ -20,9 +21,16 @@ on:
       - '.github/workflows/changelog_test.yml'
       - '.github/workflows/code_coverage.yml'
       - '.github/workflows/rocky_build_test.yml'
+      - '.github/workflows/minimum_build_test.yml'
       - '.github/workflows/macos_build_test.yml'
       - 'doc/**'
       - 'CHANGELOG.rst'
+
+# Cancel an in-progress run when a newer commit is pushed to the same branch
+# or pull request.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build-test-ubuntu:

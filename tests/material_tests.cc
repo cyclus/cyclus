@@ -134,6 +134,42 @@ TEST_F(MaterialTest, AbsorbIntoZeroMaterial) {
   EXPECT_FLOAT_EQ(test_size_, same_as_test_mat->quantity());
 }
 
+TEST_F(MaterialTest, AbsorbMatlWithoutContext) {
+  Material::Ptr no_ctx_mat = Material::CreateUntracked(0, test_comp_);
+  EXPECT_FALSE(no_ctx_mat->HasContext());
+
+  // Since test_mat_ and no_ctx_mat both don't have context this is fine
+  EXPECT_NO_THROW(test_mat_->Absorb(no_ctx_mat));
+}
+
+TEST_F(MaterialTest, DecayTiming) {
+  FakeContext* fake_ctx = new FakeContext(&ti, &rec);
+  TestFacility* fake_fac = new TestFacility(fake_ctx);
+
+  double untracked_qty = 1.0;
+
+  Material::Ptr m1 = Material::Create(fake_fac, 1, diff_comp_);
+  Material::Ptr m2 = Material::CreateUntracked(untracked_qty, diff_comp_);
+
+  // Set context time to 10 to match the decay time
+  fake_ctx->time(10);
+
+  m1->Decay(); // decay m1 to time 10
+  EXPECT_EQ(10, m1->prev_decay_time());
+  EXPECT_ANY_THROW(m1->Decay(9)); // no backwards decay for tracked mats
+  EXPECT_ANY_THROW(m1->Decay(1000)); // tracked can't decay past sim time
+
+  m2->Decay(10); // decay m2 to time 10
+  EXPECT_EQ(10, m2->prev_decay_time());
+  EXPECT_NO_THROW(m2->Decay(6)); // Backwards decay is fine if untracked
+  EXPECT_EQ(6, m2->prev_decay_time()); // correctly updates prev_decay_time_
+  EXPECT_NO_THROW(m2->Decay(1000)); // Arbitrary decay fine on untracked
+  EXPECT_EQ(1000, m2->prev_decay_time());
+
+  delete fake_fac;
+  delete fake_ctx;
+}
+
 TEST_F(MaterialTest, ExtractMass) {
   double amt = test_size_ / 3;
   double diff = test_size_ - amt;
@@ -211,15 +247,15 @@ TEST_F(MaterialTest, ExtractInGrams) {
 
 TEST_F(MaterialTest, DecayResBuf) {
   // prequeries
-  cyclus::toolkit::MatQuery orig(tracked_mat_);
+  cyclus::toolkit::MatQuery orig(untracked_mat_);
   double u235_qty = orig.mass(u235_);
   double pb208_qty = orig.mass(pb208_);
   double am241_qty = orig.mass(am241_);
   double sr89_qty = orig.mass(sr89_);
-  double orig_mass = tracked_mat_->quantity();
+  double orig_mass = untracked_mat_->quantity();
 
   cyclus::toolkit::ResBuf<cyclus::Material> res_buf;
-  res_buf.Push(tracked_mat_);
+  res_buf.Push(untracked_mat_); // use untracked mat so we can forward decay
   // decay for 2 months which is just over 1 Sr-89 half-life
   res_buf.Decay(2);
   cyclus::Material::Ptr pop_mat = res_buf.Pop();
@@ -236,17 +272,17 @@ TEST_F(MaterialTest, DecayResBuf) {
 
 TEST_F(MaterialTest, DecayManual) {
   // prequeries
-  cyclus::toolkit::MatQuery orig(tracked_mat_);
+  cyclus::toolkit::MatQuery orig(untracked_mat_);
   double u235_qty = orig.mass(u235_);
   double pb208_qty = orig.mass(pb208_);
   double am241_qty = orig.mass(am241_);
   double sr89_qty = orig.mass(sr89_);
-  double orig_mass = tracked_mat_->quantity();
+  double orig_mass = untracked_mat_->quantity();
 
-  tracked_mat_->Decay(100);
+  untracked_mat_->Decay(100);
 
   // postquery
-  cyclus::toolkit::MatQuery mq(tracked_mat_);
+  cyclus::toolkit::MatQuery mq(untracked_mat_);
 
   // postchecks
   EXPECT_NE(u235_qty, mq.mass(u235_));
@@ -338,7 +374,7 @@ TEST_F(MaterialTest, DecayShortcut) {
 
   double sec_per_month = 2629152;
   double u235_lambda = pyne::decay_const(u235) * sec_per_month;  // per month
-  double eps = 1e-3;
+  double eps = kDefaultDecayEps;
   double threshold = -1 * std::log(1-eps) / u235_lambda;
 
   // If delta t is small w.r.t. composition's decay constants, no decay is
@@ -347,26 +383,89 @@ TEST_F(MaterialTest, DecayShortcut) {
   EXPECT_EQ(c, m->comp());
 }
 
+TEST_F(MaterialTest, DecayBelowThresholdAdvancesTime) {
+  SimInfo si(10, 2015, 1, "", "manual");
+  FakeContext* fake_ctx = new FakeContext(&ti, &rec);
+  fake_ctx->InitSim(si);
+  TestFacility* fake_fac = new TestFacility(fake_ctx);
+
+  CompMap v;
+  v[u235_] = 1;
+  Composition::Ptr c = Composition::CreateFromAtom(v);
+  Material::Ptr m = Material::Create(fake_fac, 1.0, c);
+
+  fake_ctx->time(1);
+  m->Decay();
+
+  EXPECT_EQ(1, m->prev_decay_time());
+  EXPECT_EQ(c, m->comp());
+
+  delete fake_fac;
+  delete fake_ctx;
+}
+
+// A one-step change is below epsilon, even though two steps exceed it.
+// Repeated calls discard that change rather than accumulating decay time.
+TEST_F(MaterialTest, DecayEpsDiscardsSmallChanges) {
+  SimInfo si(10, 2015, 1, "", "manual");
+  const int nuc = id("H3");
+  const double step = pyne::decay_const(nuc) * si.dt;
+  si.decay_eps = -std::expm1(-1.5 * step);
+  FakeContext ctx(&ti, &rec);
+  ctx.InitSim(si);
+  TestFacility fac(&ctx);
+  CompMap v;
+  v[nuc] = 1;
+  Composition::Ptr c = Composition::CreateFromAtom(v);
+  Material::Ptr frequent = Material::Create(&fac, 1.0, c);
+  Material::Ptr delayed = Material::Create(&fac, 1.0, c);
+  ctx.time(1);
+  frequent->Decay();
+  ctx.time(2);
+  frequent->Decay();
+  delayed->Decay();
+  EXPECT_EQ(c, frequent->comp());
+  EXPECT_EQ(2, frequent->prev_decay_time());
+  EXPECT_NE(c, delayed->comp());
+}
+
+TEST_F(MaterialTest, DecayEpsZero) {
+  SimInfo si(10, 2015, 1, "", "manual");
+  si.decay_eps = 0.0;
+  FakeContext ctx(&ti, &rec);
+  ctx.InitSim(si);
+  TestFacility fac(&ctx);
+  CompMap v;
+  v[u235_] = 1;
+  Composition::Ptr c = Composition::CreateFromAtom(v);
+  Material::Ptr m = Material::Create(&fac, 1.0, c);
+  ctx.time(1);
+  m->Decay();
+  EXPECT_NE(c, m->comp());
+}
+
 // this test checks that we handle potentially non-default custom time step
 // durations correctly w.r.t. decay.
 TEST_F(MaterialTest, DecayCustomTimeStep) {
   cyclus::Env::SetNucDataPath();
   std::string cs137 ("Cs137");
   uint64_t custom_timestep = pyne::half_life(cs137);
+  double qty = 1.0;
 
   SimInfo si(10, 2015, 1, "", "manual");
   si.dt = custom_timestep;
-  cyclus::Context ctx(&ti, &rec);
-  ctx.InitSim(si);
-  Agent* a = new TestFacility(&ctx);
+  FakeContext* fake_ctx = new FakeContext(&ti, &rec);
+  fake_ctx->InitSim(si);
 
   CompMap v;
   v[id("Cs137")] = 1;
   Composition::Ptr c = Composition::CreateFromAtom(v);
   CompMap tmp = c->atom();
-  Material::Ptr m = Material::Create(a, 1.0, c);
+  TestFacility* fake_fac = new TestFacility(fake_ctx);
+  Material::Ptr m = Material::Create(fake_fac, qty, c);
 
-  m->Decay(1);
+  fake_ctx->time(1);
+  m->Decay();
 
   Composition::Ptr newc = m->comp();
   CompMap newv = newc->atom();
@@ -375,14 +474,17 @@ TEST_F(MaterialTest, DecayCustomTimeStep) {
   // one half of atoms should have decayed away
   double eps = cyclus::CY_NEAR_ZERO;
   EXPECT_NEAR(0.5, newv[id("Cs137")], eps) << "one Cs137 half-life duration time step did not decay half of Cs atoms";
+
+  delete fake_fac;
+  delete fake_ctx;
 }
 
 TEST_F(MaterialTest, ExtractPrevDecay) {
-  tracked_mat_->Decay(10);
-  double qty = tracked_mat_->quantity() / 2;
-  cyclus::Material::Ptr x = tracked_mat_->ExtractQty(qty);
+  untracked_mat_->Decay(10);
+  double qty = untracked_mat_->quantity() / 2;
+  cyclus::Material::Ptr x = untracked_mat_->ExtractQty(qty);
 
-  EXPECT_EQ(tracked_mat_->prev_decay_time(), x->prev_decay_time());
+  EXPECT_EQ(untracked_mat_->prev_decay_time(), x->prev_decay_time());
 }
 
 // Transmute should reset a material's prev_decay_time to the current
@@ -408,23 +510,54 @@ TEST_F(MaterialTest, TransmutePrevDecay) {
 // as coded.  We may decide to change the behavior in the future breaking
 // this test; the test will need to be modified accordingly.
 //
-// This test checks to see that, when materials are absorbed together, the
-// previous decay time for the larger quantity material is used as the value
-// for the new, combined material.
-TEST_F(MaterialTest, AbsorbPrevDecay) {
-  Material::Ptr m1 = Material::Create(fac, 1, diff_comp_);
-  Material::Ptr m2 = Material::Create(fac, 1, diff_comp_);
-  Material::Ptr m3 = Material::Create(fac, 1000, diff_comp_);
-  m3->Decay(10);
+// This test checks to see that, when materials are absorbed together, both 
+// materials are decayed prior to the absorption.
 
+TEST_F(MaterialTest, AbsorbPrevDecay) {
+  FakeContext* fake_ctx = new FakeContext(&ti, &rec);
+  
+  // FakeContexts get generated with "manual" decay by default,
+  // so we need to set it to lazy to get Absorb to decay.
+  SimInfo lazy_si(100, 2015, 1, "", "lazy");
+  fake_ctx->InitSim(lazy_si);
+
+  TestFacility* fake_fac = new TestFacility(fake_ctx);
+
+  double untracked_qty = 1.0;
+
+  Material::Ptr m1 = Material::Create(fake_fac, 1, diff_comp_);
+  Material::Ptr m2 = Material::Create(fake_fac, 1, diff_comp_);
+  Material::Ptr m3 = Material::Create(fake_fac, 1000, diff_comp_);
+  Material::Ptr m4 = Material::CreateUntracked(untracked_qty, diff_comp_);
+  Material::Ptr m5 = Material::CreateUntracked(untracked_qty, diff_comp_);
+
+  // Set context time to 10 to match the decay time
+  fake_ctx->time(10);
+
+  m3->Decay(); // decay m3 to time 10
   EXPECT_EQ(0, m1->prev_decay_time());
   EXPECT_EQ(0, m2->prev_decay_time());
   EXPECT_EQ(10, m3->prev_decay_time());
 
+  fake_ctx->time(11);
+
   m1->Absorb(m3);
-  EXPECT_EQ(10, m1->prev_decay_time());
+  EXPECT_EQ(11, m1->prev_decay_time());
   m1->Absorb(m2);
-  EXPECT_EQ(10, m1->prev_decay_time());
+  EXPECT_EQ(11, m1->prev_decay_time());
+
+  // We shouldn't be able to absorb a more-decayed untracked material 
+  // but we should be able to absorb materials not in a context.
+  m4->Decay(11);
+  EXPECT_ANY_THROW(m5->Absorb(m4));
+  EXPECT_NO_THROW(m4->Absorb(m5));
+
+  // Can't combine a tracked an untracked mat
+  EXPECT_ANY_THROW(m1->Absorb(m5));
+  EXPECT_ANY_THROW(m5->Absorb(m1));
+
+  delete fake_fac;
+  delete fake_ctx;
 }
 
 TEST_F(MaterialTest, DecayHeatTest) {
@@ -438,6 +571,41 @@ TEST_F(MaterialTest, DecayHeatTest) {
                                         diff_test_comp);
   double dec_heat = diff_test_mat->DecayHeat();
   ASSERT_NEAR(3.614E-14 , dec_heat, 0.0005);
+}
+
+TEST_F(MaterialTest, DecaySmallAmount) {
+  // The default decay threshold allows tritium to decay on a one-day step.
+  const int tritium_id = 10030000;
+  const double qty = 1; //kg, NOTE: fractional amounts all that matter 
+
+  CompMap v;
+  v[tritium_id] = 1.0;
+  Composition::Ptr tritium_comp = Composition::CreateFromMass(v);
+
+  // Set up the one day time step context
+  int one_day = 86400;
+  cyclus::Timer ti_day_timestep;
+  si_day_timestep = SimInfo(100, 2015, 1, "", "manual");
+  si_day_timestep.dt = one_day;
+  FakeContext* ctx_day_timestep = new FakeContext(&ti_day_timestep, &rec);
+  ctx_day_timestep->InitSim(si_day_timestep);
+  TestFacility* fac_day_timestep = new TestFacility(ctx_day_timestep);
+
+  Material::Ptr tritium = Material::Create(fac_day_timestep, qty, tritium_comp);
+
+  cyclus::toolkit::MatQuery mq(tritium);
+  double start_qty = mq.mass(tritium_id);
+  EXPECT_EQ(qty, start_qty);
+
+  // Decay forward by one day (we have to push the fake_ctx's time forward first)
+  ctx_day_timestep->time(1);
+  tritium->Decay();
+  double decayed_qty = mq.mass(tritium_id);
+
+  // NOTE: we've already tested that Decay is decaying the correct amt, so we
+  // can just make sure that any decay happens here and be satisfied that it's
+  // correct.
+  EXPECT_LT(decayed_qty, start_qty); // First entry < second enty
 }
 
 TEST_F(MaterialTest, GetNormalizedCompAtom) {

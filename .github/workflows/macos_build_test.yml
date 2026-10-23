@@ -11,6 +11,7 @@ on:
       - ".github/workflows/changelog_test.yml"
       - ".github/workflows/code_coverage.yml"
       - ".github/workflows/rocky_build_test.yml"
+      - ".github/workflows/minimum_build_test.yml"
       - "doc/**"
       - "CHANGELOG.rst"
   push:
@@ -21,17 +22,24 @@ on:
       - ".github/workflows/changelog_test.yml"
       - ".github/workflows/code_coverage.yml"
       - ".github/workflows/rocky_build_test.yml"
+      - ".github/workflows/minimum_build_test.yml"
       - "doc/**"
       - "CHANGELOG.rst"
 
+# Cancel an in-progress run when a newer commit is pushed to the same branch
+# or pull request.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build-test-conda:
+  build-test-pixi:
     strategy:
       fail-fast: false
       matrix:
         macos_versions: [
-            macos-13,
-            macos-14,
+            macos-15-intel,
+            macos-latest, # arm64
         ]
         parallel_flag : [
           "",
@@ -45,56 +53,22 @@ jobs:
     runs-on: ["${{ matrix.macos_versions }}"]
 
     steps:
-      - name: Setup XCode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest
-
       - name: Checkout Cyclus
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
-      - name: Set up Miniconda
-        uses: conda-incubator/setup-miniconda@v3
+      - name: Set up Pixi
+        uses: prefix-dev/setup-pixi@v0.11.0
         with:
-          python-version: "3.12"
-          miniforge-version: "latest"
-          conda-solver: "libmamba"
-          auto-update-conda: true
-          channels: conda-forge
+          locked: true
+          environments: test
+          cache: true
+          cache-write: ${{ github.event_name == 'push' && github.ref_name == 'main' }}
 
-      - name: Build and Test Cyclus
-        id: build-cyclus
-        shell: bash -el {0}
-        run: |
-          mamba install -y \
-            compilers \
-            cmake \
-            make \
-            git \
-            glib \
-            libxml2 \
-            libxmlpp-4.0 \
-            liblapack \
-            pkg-config \
-            coincbc \
-            boost-cpp \
-            hdf5 \
-            sqlite \
-            pcre \
-            setuptools \
-            pytest \
-            pytables \
-            pandas \
-            jinja2 \
-            "cython<3.1.0" \
-            websockets \
-            pprintpp \
-            pip
-          export CC=$CONDA_PREFIX/bin/clang
-          export CXX=$CONDA_PREFIX/bin/clang++
-          export CPP=$CONDA_PREFIX/bin/clang-cpp
-          mkdir -p $(python3 -m site --user-site)
-          python3 install.py -j 3 ${{ matrix.parallel_flag }} ${{ matrix.coin_flag }}
-          export PATH=$HOME/.local/bin:$PATH
-          cyclus_unit_tests
-          cd tests && python3 -m pytest
+      - name: Build Cyclus
+        run: pixi run -e test build -j "$(sysctl -n hw.logicalcpu)" ${{ matrix.parallel_flag }} ${{ matrix.coin_flag }}
+
+      - name: Run unit tests
+        run: pixi run -e test test-unit
+
+      - name: Run Python tests
+        run: pixi run -e test test-python

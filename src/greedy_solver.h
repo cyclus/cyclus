@@ -20,31 +20,41 @@ void Capacity(boost::shared_ptr<cyclus::ExchangeNode>, cyclus::Arc const&,
 ///     return 0;
 /// }
 
-/// @brief A comparison function for sorting a container of Arcs by the
-/// requester's (unode's) preference, in decensing order (i.e., most preferred
-/// Arc first). In the case of a tie, a lexicalgraphic ordering of node ids is
-/// used.
-inline bool ReqPrefComp(const Arc& l, const Arc& r) {
-  int lu = l.unode()->agent_id;
-  int lv = l.vnode()->agent_id;
-  int ru = r.unode()->agent_id;
-  int rv = r.vnode()->agent_id;
-  double lpref = l.unode()->prefs[l];
-  double rpref = r.unode()->prefs[r];
-  return (lpref != rpref) ? (lpref > rpref)
-                          : (lu > ru || (lu == ru && lv > rv));
-}
+/// @brief A comparison functor for sorting a container of Arcs by arc cost,
+/// in ascending order (i.e., lowest cost Arc first). In the case of a tie, a
+/// lexicographic ordering of node ids is used.
+/// Note: Lower arc cost is better, so we sort ascending.
+struct ReqCostComp {
+  ReqCostComp() {}
+  bool operator()(const Arc& l, const Arc& r) const {
+    int lu = l.unode()->agent_id;
+    int lv = l.vnode()->agent_id;
+    int ru = r.unode()->agent_id;
+    int rv = r.vnode()->agent_id;
+    // Use stored arc cost
+    double l_cost = l.arc_cost();
+    double r_cost = r.arc_cost();
+    return (l_cost != r_cost) ? (l_cost < r_cost)
+                                : (lu > ru || (lu == ru && lv > rv));
+  }
+};
 
-/// @brief A comparison function for sorting a container of Nodes by the nodes
-/// preference in decensing order (i.e., most preferred Node first). In the case
-/// of a tie, a lexicalgraphic ordering of node ids is used.
-inline bool AvgPrefComp(ExchangeNode::Ptr l, ExchangeNode::Ptr r) {
-  int lid = l->agent_id;
-  int rid = r->agent_id;
-  double lpref = AvgPref(l);
-  double rpref = AvgPref(r);
-  return (lpref != rpref) ? (lpref > rpref) : (lid > rid);
-}
+/// @brief A comparison function for sorting a container of Nodes by average arc cost
+/// in ascending order (i.e., lowest cost Node first). In the case of a tie, a
+/// lexicographic ordering of node ids is used.
+/// Note: This requires the graph to be available, so it's not a simple inline function
+struct AvgArcCostComp {
+  ExchangeGraph* graph_;
+  AvgArcCostComp(ExchangeGraph* graph) : graph_(graph) {}
+  bool operator()(ExchangeNode::Ptr l, ExchangeNode::Ptr r) const {
+    int lid = l->agent_id;
+    int rid = r->agent_id;
+    double l_cost = AvgCost(l, graph_);
+    double r_cost = AvgCost(r, graph_);
+    // Lower arc cost is better, so we sort ascending
+    return (l_cost != r_cost) ? (l_cost < r_cost) : (lid > rid);
+  }
+};
 
 class ExchangeGraph;
 class GreedyPreconditioner;
@@ -56,7 +66,7 @@ class GreedyPreconditioner;
 /// RequestGroup in the graph, matching request nodes "greedily" with supply
 /// nodes. Each request node will attempt to be supplied by supplier arcs as
 /// long as those supplier arcs have some excess capacity. The possible
-/// suppliers will be ordered by descending preference. The algorithm terminates
+/// suppliers will be ordered by ascending arc cost. The algorithm terminates
 /// when one of the following conditions is met:
 ///   1) All RequestGroups are satisfied
 ///   2) All SupplySets are at capacity
@@ -80,7 +90,7 @@ class GreedySolver : public ExchangeSolver {
 
   /// Uses the provided (or a default) GreedyPreconditioner to condition the
   /// solver's ExchangeGraph so that RequestGroups are ordered by average
-  /// preference and commodity weight.
+  /// arc cost and commodity weight.
   ///
   /// @warning this function is called during the Solve step and should most
   /// likely not be called independently thereof (except for testing)
@@ -150,7 +160,7 @@ class GreedySolver : public ExchangeSolver {
   void GetCaps(ExchangeNodeGroup::Ptr prs);
   void GreedilySatisfySet(RequestGroup::Ptr prs);
   void UpdateCapacity(ExchangeNode::Ptr n, const Arc& a, double qty);
-  void UpdateObj(double qty, double pref);
+  void UpdateObj(double qty, double arc_cost);
 
   GreedyPreconditioner* conditioner_;
   std::map<ExchangeNode::Ptr, double> n_qty_;

@@ -77,7 +77,7 @@ class Material : public Resource {
 
   virtual ~Material();
 
-  /// Creates a new material resource that is "live" and tracked. creator is a
+  /// Creates a new material resource that is "live" and tracked. Creator is a
   /// pointer to the agent creating the resource (usually will be the caller's
   /// "this" pointer). All future output data recorded will be done using the
   /// creator's context.
@@ -107,6 +107,9 @@ class Material : public Resource {
 
   /// Returns the mass of this material in kg.
   virtual double quantity() const;
+
+  /// Returns true if the material has a context, false otherwise.
+  virtual bool HasContext() const {return ctx_ != NULL;}
 
   virtual Resource::Ptr ExtractRes(double qty);
 
@@ -139,6 +142,8 @@ class Material : public Resource {
   /// not result in an updated material composition.  Does nothing if the
   /// simulation decay mode is set to "never" or none of the nuclides' decay
   /// constants are significant with respect to the time delta.
+  /// The optional control decay_eps sets the fractional threshold (default
+  /// 1e-4). Below-threshold decay is not accumulated or guaranteed.
   /// @param curr_time current time to use for the decay calculation
   ///        (default: -1 forces the decay to the context's current time)
   virtual void Decay(int curr_time = -1);

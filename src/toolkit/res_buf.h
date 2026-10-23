@@ -63,6 +63,7 @@ template <class T> class ResBuf {
   ResBuf(bool is_bulk = false, bool keep_pkg = false)
       : qty_(0), is_bulk_(is_bulk) {
     capacity(INFINITY);
+    stocked_threshold(0);
     keep_packaging(keep_pkg);
   }
 
@@ -92,6 +93,30 @@ template <class T> class ResBuf {
     cap_ = cap;
   }
 
+  /// Returns the threhold resource quantity that buffer must hold 
+  /// to be considered stocked (units based on constituent resource objects' units).
+  /// Never throws.
+  inline double stocked_threshold() const { return stocked_threshold_; }
+
+  /// Sets the quantity this buffer must hold to be considered stocked 
+  // (units based on constituent resource objects' units).
+  ///
+  /// @throws ValueError the new capacity is lower (by eps_rsrc()) than the
+  /// quantity of resources that exist in the buffer.
+  void stocked_threshold(double stocked_threshold) {
+    if (stocked_threshold < 0) {
+      throw ValueError("stocked threshold must not be negative");
+    }
+
+    if (cap_ - stocked_threshold < eps_rsrc()) {
+      std::stringstream ss;
+      ss << std::setprecision(17) << "new stocked threshold " << stocked_threshold
+         << " higher than capacity " << capacity();
+      throw ValueError(ss.str());
+    }
+    stocked_threshold_ = stocked_threshold;
+  }
+
   /// Sets whether the buffer should keep packaged resources
   void keep_packaging(bool keep_packaging) {
     if (is_bulk_ && keep_packaging) {
@@ -119,6 +144,9 @@ template <class T> class ResBuf {
 
   /// Returns true if there are no resources in the buffer.
   inline bool empty() const { return rs_.empty(); }
+
+  /// Returns true if the buffer is stocked (i.e. quantity >= stocked_threshold).
+  inline bool stocked() const { return qty_ >= stocked_threshold_; }
 
   /// Pops and returns the specified quantity from the buffer as a vector of
   /// resources.
@@ -370,6 +398,9 @@ template <class T> class ResBuf {
 
   /// Maximum quantity of resources this buffer can hold
   double cap_;
+
+  /// Threshold quantity at which the buffer is considered stocked
+  double stocked_threshold_;
 
   /// Whether materials should be stored as a single squashed item or as
   /// individual resource objects

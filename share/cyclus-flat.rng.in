@@ -35,6 +35,15 @@
             <a:documentation>Mode for when radioactive decay occurs. Choose from "never", "manual", "lazy".</a:documentation>
             <text/> </element> 
         </optional>
+        <optional>
+          <element name="decay_eps">
+            <a:documentation>Fractional decay threshold. Default: 1e-4. Must satisfy 0 &lt;= decay_eps &lt; 1. Use at your own risk: below-threshold decay is not accumulated or guaranteed; changing this value can affect accuracy and performance.</a:documentation>
+            <data type="double">
+              <param name="minInclusive">0</param>
+              <param name="maxExclusive">1</param>
+            </data>
+          </element>
+        </optional>
         <optional> 
           <element name="dt">
             <a:documentation>Length of a time step in seconds. Default: 1 month = 1 year/12 (i.e. 2,629,846 seconds).</a:documentation>
@@ -65,7 +74,7 @@
         <optional>
             <element name="seed">
               <a:documentation>Value used for seed in built in random number generator. (Default: 20160212)</a:documentation>              
-              <data type="positiveInteger" /></element>
+              <data type="nonNegativeInteger" /></element>
         </optional>
         <optional>
             <element name="stride">
@@ -130,7 +139,7 @@
             <a:documentation>The name of a commodity being given priority treatment.</a:documentation>
             <text/> </element>
           <element name="solution_priority"> 
-            <a:documentation>The relative solution priority of this commodity. Higher values have higher priorit. (Default: -1)</a:documentation>
+            <a:documentation>The relative solution priority of this commodity. Higher values have higher priority. (Default: -1)</a:documentation>
             <data type="double"/> </element>
         </interleave>
       </element>
@@ -225,7 +234,7 @@
       </element>
     </oneOrMore>
 
-    <zeroOrMore>
+    <oneOrMore>
       <element name="recipe">
         <a:documentation>A material composition recipe that can be reused in other places in the simulation.</a:documentation>
         <interleave>
@@ -250,7 +259,7 @@
           </oneOrMore>
         </interleave>
       </element>
-    </zeroOrMore>
+    </oneOrMore>
 
     <zeroOrMore>
       <element name="package">
@@ -302,4 +311,3 @@
 </element><!-- end of simulation -->
 </start>
 </grammar>
-

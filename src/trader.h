@@ -49,11 +49,13 @@ class Trader {
     return std::set<BidPortfolio<Product>::Ptr>();
   }
 
-  /// default implementation for material preferences.
-  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
+  /// default implementation for adjusting costs of materials.
+  /// @param rb_map map for adjusting unit costs (from bids)
+  virtual void AdjustMatlParams(RequestBidMap<Material>::type& rb_map) {}
 
-  /// default implementation for material preferences.
-  virtual void AdjustProductPrefs(PrefMap<Product>::type& prefs) {}
+  /// default implementation for adusting costs of products.
+  /// @param rb_map map for adjusting unit costs (from bids)
+  virtual void AdjustProductParams(RequestBidMap<Product>::type& rb_map) {}
 
   /// @brief default implementation for responding to material trades
   /// @param trades all trades in which this trader is the supplier

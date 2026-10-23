@@ -11,7 +11,7 @@ from cython.operator cimport dereference as deref
 cimport cython
 
 from cpython cimport (PyObject, PyDict_New, PyDict_Contains,
-    PyDict_GetItemString, PyDict_SetItemString, PyString_FromString,
+    PyDict_GetItemString, PyDict_SetItemString,
     PyBytes_FromString, PyDict_GetItem, PyDict_SetItem, PyObject_GetAttrString)
 
 import json
@@ -43,13 +43,13 @@ _VAR_DECL = VarDeclarationFilter()
 _SCHEMA = SchemaFilter()
 
 
-cdef int _GET_MAT_PREFS_TIME = -9999999999
-cdef cpp_cyclus.PrefMap[cpp_cyclus.Material].type* _GET_MAT_PREFS_PTR = NULL
-cdef dict _GET_MAT_PREFS = {}
+cdef int _GET_MAT_ARC_COSTS_TIME = -9999999999
+cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type* _GET_MAT_ARC_COSTS_PTR = NULL
+cdef dict _GET_MAT_ARC_COSTS = {}
 
-cdef int _GET_PROD_PREFS_TIME = -9999999999
-cdef cpp_cyclus.PrefMap[cpp_cyclus.Product].type* _GET_PROD_PREFS_PTR = NULL
-cdef dict _GET_PROD_PREFS = {}
+cdef int _GET_PROD_ARC_COSTS_TIME = -9999999999
+cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type* _GET_PROD_ARC_COSTS_PTR = NULL
+cdef dict _GET_PROD_ARC_COSTS = {}
 
 
 #
@@ -135,47 +135,47 @@ cdef cppclass CyclusAgentShim "CyclusAgentShim" (cpp_cyclus.Agent):
     void DecomNotify() except *:
         (<object> this.self).decom_notify()
 
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except *:
-        # cache the commod_reqs wrappers globally
-        global _GET_MAT_PREFS_TIME, _GET_MAT_PREFS_PTR, _GET_MAT_PREFS
+    void AdjustMatlParams(cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type& arc_costs) except *:
+        # Cache the request-bid arc-cost wrappers globally.
+        global _GET_MAT_ARC_COSTS_TIME, _GET_MAT_ARC_COSTS_PTR, _GET_MAT_ARC_COSTS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Material].type* curr_ptr = &prefs
-        if curr_time == _GET_MAT_PREFS_TIME and curr_ptr == _GET_MAT_PREFS_PTR:
-            pyprefs = _GET_MAT_PREFS
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type* curr_ptr = &arc_costs
+        if curr_time == _GET_MAT_ARC_COSTS_TIME and curr_ptr == _GET_MAT_ARC_COSTS_PTR:
+            py_arc_costs = _GET_MAT_ARC_COSTS
         else:
-            pyprefs = ts.material_pref_map_to_py(prefs)
-            _GET_MAT_PREFS_TIME = curr_time
-            _GET_MAT_PREFS_PTR = curr_ptr
-            _GET_MAT_PREFS = pyprefs
-        # call the python function
-        updates = (<object> this.self).adjust_material_prefs(pyprefs)
+            py_arc_costs = ts.material_arc_cost_map_to_py(arc_costs)
+            _GET_MAT_ARC_COSTS_TIME = curr_time
+            _GET_MAT_ARC_COSTS_PTR = curr_ptr
+            _GET_MAT_ARC_COSTS = py_arc_costs
+        # Call the Python function.
+        updates = (<object> this.self).adjust_material_params(py_arc_costs)
         if updates is None or len(updates) == 0:
             return
-        # update the prefs objects
-        pyprefs.update(updates)
-        for (req, bid), pref in updates.items():
-            prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
+        # Update the arc-cost map.
+        py_arc_costs.update(updates)
+        for (req, bid), arc_cost in updates.items():
+            arc_costs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = arc_cost
 
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except *:
-        # cache the commod_reqs wrappers globally
-        global _GET_PROD_PREFS_TIME, _GET_PROD_PREFS_PTR, _GET_PROD_PREFS
+    void AdjustProductParams(cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type& arc_costs) except *:
+        # Cache the request-bid arc-cost wrappers globally.
+        global _GET_PROD_ARC_COSTS_TIME, _GET_PROD_ARC_COSTS_PTR, _GET_PROD_ARC_COSTS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Product].type* curr_ptr = &prefs
-        if curr_time == _GET_PROD_PREFS_TIME and curr_ptr == _GET_PROD_PREFS_PTR:
-            pyprefs = _GET_PROD_PREFS
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type* curr_ptr = &arc_costs
+        if curr_time == _GET_PROD_ARC_COSTS_TIME and curr_ptr == _GET_PROD_ARC_COSTS_PTR:
+            py_arc_costs = _GET_PROD_ARC_COSTS
         else:
-            pyprefs = ts.product_pref_map_to_py(prefs)
-            _GET_PROD_PREFS_TIME = curr_time
-            _GET_PROD_PREFS_PTR = curr_ptr
-            _GET_PROD_PREFS = pyprefs
-        # call the python function
-        updates = (<object> this.self).adjust_product_prefs(pyprefs)
+            py_arc_costs = ts.product_arc_cost_map_to_py(arc_costs)
+            _GET_PROD_ARC_COSTS_TIME = curr_time
+            _GET_PROD_ARC_COSTS_PTR = curr_ptr
+            _GET_PROD_ARC_COSTS = py_arc_costs
+        # Call the Python function.
+        updates = (<object> this.self).adjust_product_params(py_arc_costs)
         if updates is None or len(updates) == 0:
             return
-        # update the prefs objects
-        pyprefs.update(updates)
-        for (req, bid), pref in updates.items():
-            prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = pref
+        # Update the arc-cost map.
+        py_arc_costs.update(updates)
+        for (req, bid), arc_cost in updates.items():
+            arc_costs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = arc_cost
 
 
 cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
@@ -259,47 +259,47 @@ cdef cppclass CyclusRegionShim "CyclusRegionShim" (cpp_cyclus.Region):
     void DecomNotify() except *:
         (<object> this.self).decom_notify()
 
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except *:
-        # cache the commod_reqs wrappers globally
-        global _GET_MAT_PREFS_TIME, _GET_MAT_PREFS_PTR, _GET_MAT_PREFS
+    void AdjustMatlParams(cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type& arc_costs) except *:
+        # Cache the request-bid arc-cost wrappers globally.
+        global _GET_MAT_ARC_COSTS_TIME, _GET_MAT_ARC_COSTS_PTR, _GET_MAT_ARC_COSTS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Material].type* curr_ptr = &prefs
-        if curr_time == _GET_MAT_PREFS_TIME and curr_ptr == _GET_MAT_PREFS_PTR:
-            pyprefs = _GET_MAT_PREFS
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type* curr_ptr = &arc_costs
+        if curr_time == _GET_MAT_ARC_COSTS_TIME and curr_ptr == _GET_MAT_ARC_COSTS_PTR:
+            py_arc_costs = _GET_MAT_ARC_COSTS
         else:
-            pyprefs = ts.material_pref_map_to_py(prefs)
-            _GET_MAT_PREFS_TIME = curr_time
-            _GET_MAT_PREFS_PTR = curr_ptr
-            _GET_MAT_PREFS = pyprefs
-        # call the python function
-        updates = (<object> this.self).adjust_material_prefs(pyprefs)
+            py_arc_costs = ts.material_arc_cost_map_to_py(arc_costs)
+            _GET_MAT_ARC_COSTS_TIME = curr_time
+            _GET_MAT_ARC_COSTS_PTR = curr_ptr
+            _GET_MAT_ARC_COSTS = py_arc_costs
+        # Call the Python function.
+        updates = (<object> this.self).adjust_material_params(py_arc_costs)
         if updates is None or len(updates) == 0:
             return
-        # update the prefs objects
-        pyprefs.update(updates)
-        for (req, bid), pref in updates.items():
-            prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
+        # Update the arc-cost map.
+        py_arc_costs.update(updates)
+        for (req, bid), arc_cost in updates.items():
+            arc_costs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = arc_cost
 
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except *:
-        # cache the commod_reqs wrappers globally
-        global _GET_PROD_PREFS_TIME, _GET_PROD_PREFS_PTR, _GET_PROD_PREFS
+    void AdjustProductParams(cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type& arc_costs) except *:
+        # Cache the request-bid arc-cost wrappers globally.
+        global _GET_PROD_ARC_COSTS_TIME, _GET_PROD_ARC_COSTS_PTR, _GET_PROD_ARC_COSTS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Product].type* curr_ptr = &prefs
-        if curr_time == _GET_PROD_PREFS_TIME and curr_ptr == _GET_PROD_PREFS_PTR:
-            pyprefs = _GET_PROD_PREFS
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type* curr_ptr = &arc_costs
+        if curr_time == _GET_PROD_ARC_COSTS_TIME and curr_ptr == _GET_PROD_ARC_COSTS_PTR:
+            py_arc_costs = _GET_PROD_ARC_COSTS
         else:
-            pyprefs = ts.product_pref_map_to_py(prefs)
-            _GET_PROD_PREFS_TIME = curr_time
-            _GET_PROD_PREFS_PTR = curr_ptr
-            _GET_PROD_PREFS = pyprefs
-        # call the python function
-        updates = (<object> this.self).adjust_product_prefs(pyprefs)
+            py_arc_costs = ts.product_arc_cost_map_to_py(arc_costs)
+            _GET_PROD_ARC_COSTS_TIME = curr_time
+            _GET_PROD_ARC_COSTS_PTR = curr_ptr
+            _GET_PROD_ARC_COSTS = py_arc_costs
+        # Call the Python function.
+        updates = (<object> this.self).adjust_product_params(py_arc_costs)
         if updates is None or len(updates) == 0:
             return
-        # update the prefs objects
-        pyprefs.update(updates)
-        for (req, bid), pref in updates.items():
-            prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = pref
+        # Update the arc-cost map.
+        py_arc_costs.update(updates)
+        for (req, bid), arc_cost in updates.items():
+            arc_costs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = arc_cost
 
     void Tick() except *:
         (<object> this.self).tick()
@@ -395,47 +395,47 @@ cdef cppclass CyclusInstitutionShim "CyclusInstitutionShim" (cpp_cyclus.Institut
     void DecomNotify() except *:
         (<object> this.self).decom_notify()
 
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except *:
-        # cache the commod_reqs wrappers globally
-        global _GET_MAT_PREFS_TIME, _GET_MAT_PREFS_PTR, _GET_MAT_PREFS
+    void AdjustMatlParams(cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type& arc_costs) except *:
+        # Cache the request-bid arc-cost wrappers globally.
+        global _GET_MAT_ARC_COSTS_TIME, _GET_MAT_ARC_COSTS_PTR, _GET_MAT_ARC_COSTS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Material].type* curr_ptr = &prefs
-        if curr_time == _GET_MAT_PREFS_TIME and curr_ptr == _GET_MAT_PREFS_PTR:
-            pyprefs = _GET_MAT_PREFS
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type* curr_ptr = &arc_costs
+        if curr_time == _GET_MAT_ARC_COSTS_TIME and curr_ptr == _GET_MAT_ARC_COSTS_PTR:
+            py_arc_costs = _GET_MAT_ARC_COSTS
         else:
-            pyprefs = ts.material_pref_map_to_py(prefs)
-            _GET_MAT_PREFS_TIME = curr_time
-            _GET_MAT_PREFS_PTR = curr_ptr
-            _GET_MAT_PREFS = pyprefs
-        # call the python function
-        updates = (<object> this.self).adjust_material_prefs(pyprefs)
+            py_arc_costs = ts.material_arc_cost_map_to_py(arc_costs)
+            _GET_MAT_ARC_COSTS_TIME = curr_time
+            _GET_MAT_ARC_COSTS_PTR = curr_ptr
+            _GET_MAT_ARC_COSTS = py_arc_costs
+        # Call the Python function.
+        updates = (<object> this.self).adjust_material_params(py_arc_costs)
         if updates is None or len(updates) == 0:
             return
-        # update the prefs objects
-        pyprefs.update(updates)
-        for (req, bid), pref in updates.items():
-            prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
+        # Update the arc-cost map.
+        py_arc_costs.update(updates)
+        for (req, bid), arc_cost in updates.items():
+            arc_costs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = arc_cost
 
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except *:
-        # cache the commod_reqs wrappers globally
-        global _GET_PROD_PREFS_TIME, _GET_PROD_PREFS_PTR, _GET_PROD_PREFS
+    void AdjustProductParams(cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type& arc_costs) except *:
+        # Cache the request-bid arc-cost wrappers globally.
+        global _GET_PROD_ARC_COSTS_TIME, _GET_PROD_ARC_COSTS_PTR, _GET_PROD_ARC_COSTS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Product].type* curr_ptr = &prefs
-        if curr_time == _GET_PROD_PREFS_TIME and curr_ptr == _GET_PROD_PREFS_PTR:
-            pyprefs = _GET_PROD_PREFS
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type* curr_ptr = &arc_costs
+        if curr_time == _GET_PROD_ARC_COSTS_TIME and curr_ptr == _GET_PROD_ARC_COSTS_PTR:
+            py_arc_costs = _GET_PROD_ARC_COSTS
         else:
-            pyprefs = ts.product_pref_map_to_py(prefs)
-            _GET_PROD_PREFS_TIME = curr_time
-            _GET_PROD_PREFS_PTR = curr_ptr
-            _GET_PROD_PREFS = pyprefs
-        # call the python function
-        updates = (<object> this.self).adjust_product_prefs(pyprefs)
+            py_arc_costs = ts.product_arc_cost_map_to_py(arc_costs)
+            _GET_PROD_ARC_COSTS_TIME = curr_time
+            _GET_PROD_ARC_COSTS_PTR = curr_ptr
+            _GET_PROD_ARC_COSTS = py_arc_costs
+        # Call the Python function.
+        updates = (<object> this.self).adjust_product_params(py_arc_costs)
         if updates is None or len(updates) == 0:
             return
-        # update the prefs objects
-        pyprefs.update(updates)
-        for (req, bid), pref in updates.items():
-            prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = pref
+        # Update the arc-cost map.
+        py_arc_costs.update(updates)
+        for (req, bid), arc_cost in updates.items():
+            arc_costs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = arc_cost
 
     void Tick() except *:
         (<object> this.self).tick()
@@ -540,47 +540,47 @@ cdef cppclass CyclusFacilityShim "CyclusFacilityShim" (cpp_cyclus.Facility):
     void DecomNotify() except *:
         (<object> this.self).decom_notify()
 
-    void AdjustMatlPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Material].type& prefs) except *:
-        # cache the commod_reqs wrappers globally
-        global _GET_MAT_PREFS_TIME, _GET_MAT_PREFS_PTR, _GET_MAT_PREFS
+    void AdjustMatlParams(cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type& arc_costs) except *:
+        # Cache the request-bid arc-cost wrappers globally.
+        global _GET_MAT_ARC_COSTS_TIME, _GET_MAT_ARC_COSTS_PTR, _GET_MAT_ARC_COSTS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Material].type* curr_ptr = &prefs
-        if curr_time == _GET_MAT_PREFS_TIME and curr_ptr == _GET_MAT_PREFS_PTR:
-            pyprefs = _GET_MAT_PREFS
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Material].type* curr_ptr = &arc_costs
+        if curr_time == _GET_MAT_ARC_COSTS_TIME and curr_ptr == _GET_MAT_ARC_COSTS_PTR:
+            py_arc_costs = _GET_MAT_ARC_COSTS
         else:
-            pyprefs = ts.material_pref_map_to_py(prefs)
-            _GET_MAT_PREFS_TIME = curr_time
-            _GET_MAT_PREFS_PTR = curr_ptr
-            _GET_MAT_PREFS = pyprefs
-        # call the python function
-        updates = (<object> this.self).adjust_material_prefs(pyprefs)
+            py_arc_costs = ts.material_arc_cost_map_to_py(arc_costs)
+            _GET_MAT_ARC_COSTS_TIME = curr_time
+            _GET_MAT_ARC_COSTS_PTR = curr_ptr
+            _GET_MAT_ARC_COSTS = py_arc_costs
+        # Call the Python function.
+        updates = (<object> this.self).adjust_material_params(py_arc_costs)
         if updates is None or len(updates) == 0:
             return
-        # update the prefs objects
-        pyprefs.update(updates)
-        for (req, bid), pref in updates.items():
-            prefs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = pref
+        # Update the arc-cost map.
+        py_arc_costs.update(updates)
+        for (req, bid), arc_cost in updates.items():
+            arc_costs[(<ts._MaterialRequest> req).ptx][(<ts._MaterialBid> bid).ptx] = arc_cost
 
-    void AdjustProductPrefs(cpp_cyclus.PrefMap[cpp_cyclus.Product].type& prefs) except *:
-        # cache the commod_reqs wrappers globally
-        global _GET_PROD_PREFS_TIME, _GET_PROD_PREFS_PTR, _GET_PROD_PREFS
+    void AdjustProductParams(cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type& arc_costs) except *:
+        # Cache the request-bid arc-cost wrappers globally.
+        global _GET_PROD_ARC_COSTS_TIME, _GET_PROD_ARC_COSTS_PTR, _GET_PROD_ARC_COSTS
         cdef int curr_time = this.context().time()
-        cdef cpp_cyclus.PrefMap[cpp_cyclus.Product].type* curr_ptr = &prefs
-        if curr_time == _GET_PROD_PREFS_TIME and curr_ptr == _GET_PROD_PREFS_PTR:
-            pyprefs = _GET_PROD_PREFS
+        cdef cpp_cyclus.RequestBidMap[cpp_cyclus.Product].type* curr_ptr = &arc_costs
+        if curr_time == _GET_PROD_ARC_COSTS_TIME and curr_ptr == _GET_PROD_ARC_COSTS_PTR:
+            py_arc_costs = _GET_PROD_ARC_COSTS
         else:
-            pyprefs = ts.product_pref_map_to_py(prefs)
-            _GET_PROD_PREFS_TIME = curr_time
-            _GET_PROD_PREFS_PTR = curr_ptr
-            _GET_PROD_PREFS = pyprefs
-        # call the python function
-        updates = (<object> this.self).adjust_product_prefs(pyprefs)
+            py_arc_costs = ts.product_arc_cost_map_to_py(arc_costs)
+            _GET_PROD_ARC_COSTS_TIME = curr_time
+            _GET_PROD_ARC_COSTS_PTR = curr_ptr
+            _GET_PROD_ARC_COSTS = py_arc_costs
+        # Call the Python function.
+        updates = (<object> this.self).adjust_product_params(py_arc_costs)
         if updates is None or len(updates) == 0:
             return
-        # update the prefs objects
-        pyprefs.update(updates)
-        for (req, bid), pref in updates.items():
-            prefs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = pref
+        # Update the arc-cost map.
+        py_arc_costs.update(updates)
+        for (req, bid), arc_cost in updates.items():
+            arc_costs[(<ts._ProductRequest> req).ptx][(<ts._ProductBid> bid).ptx] = arc_cost
 
     void Tick() except *:
         (<object> this.self).tick()
@@ -1035,12 +1035,12 @@ cdef class _Agent(lib._Agent):
         """Called when a new child of this agent is about to be decommissioned."""
         pass
 
-    def adjust_material_prefs(self, prefs):
-        """Product preferences adjustment."""
+    def adjust_material_params(self, params):
+        """Material trade-parameter adjustment."""
         return None
 
-    def adjust_product_prefs(self, prefs):
-        """Product preferences adjustment."""
+    def adjust_product_params(self, params):
+        """Product trade-parameter adjustment."""
         return None
 
 
@@ -1123,7 +1123,9 @@ cdef class _Region(_Agent):
         """Agent annotations."""
         cdef jsoncpp.Value cpp_rtn = jsoncpp.Value()
         if self._annotations is None:
-            cpp_rtn._inst[0] = (<CyclusRegionShim*> (<_Agent> self).shim).annotations()
+            # Call the virtual annotations() through the Agent base class, as
+            # Cython 3.1+ rejects the call on the shim type as ambiguous.
+            cpp_rtn._inst[0] = (<cpp_cyclus.Agent*> (<CyclusRegionShim*> (<_Agent> self).shim)).annotations()
         self._annotations = cpp_rtn
         return self._annotations
 
@@ -1323,7 +1325,9 @@ cdef class _Institution(_Agent):
         """Agent annotations."""
         cdef jsoncpp.Value cpp_rtn = jsoncpp.Value()
         if self._annotations is None:
-            cpp_rtn._inst[0] = (<CyclusInstitutionShim*> (<_Agent> self).shim).annotations()
+            # Call the virtual annotations() through the Agent base class, as
+            # Cython 3.1+ rejects the call on the shim type as ambiguous.
+            cpp_rtn._inst[0] = (<cpp_cyclus.Agent*> (<CyclusInstitutionShim*> (<_Agent> self).shim)).annotations()
         self._annotations = cpp_rtn
         return self._annotations
 
@@ -1524,7 +1528,9 @@ cdef class _Facility(_Agent):
         """Agent annotations."""
         cdef jsoncpp.Value cpp_rtn = jsoncpp.Value()
         if self._annotations is None:
-            cpp_rtn._inst[0] = (<CyclusFacilityShim*> (<_Agent> self).shim).annotations()
+            # Call the virtual annotations() through the Agent base class, as
+            # Cython 3.1+ rejects the call on the shim type as ambiguous.
+            cpp_rtn._inst[0] = (<cpp_cyclus.Agent*> (<CyclusFacilityShim*> (<_Agent> self).shim)).annotations()
         self._annotations = cpp_rtn
         return self._annotations
 

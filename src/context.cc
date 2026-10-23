@@ -15,6 +15,8 @@
 #include "timer.h"
 #include "random_number_generator.h"
 #include "version.h"
+#include <chrono>
+#include <limits>
 
 namespace cyclus {
 
@@ -27,6 +29,7 @@ SimInfo::SimInfo()
       m0(0),
       dt(kDefaultTimeStepDur),
       decay("manual"),
+      decay_eps(kDefaultDecayEps),
       branch_time(-1),
       explicit_inventory(false),
       explicit_inventory_compact(false),
@@ -41,6 +44,7 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle)
       m0(m0),
       dt(kDefaultTimeStepDur),
       decay("manual"),
+      decay_eps(kDefaultDecayEps),
       branch_time(-1),
       handle(handle),
       explicit_inventory(false),
@@ -56,6 +60,7 @@ SimInfo::SimInfo(int dur, int y0, int m0, std::string handle, std::string d)
       m0(m0),
       dt(kDefaultTimeStepDur),
       decay(d),
+      decay_eps(kDefaultDecayEps),
       branch_time(-1),
       handle(handle),
       explicit_inventory(false),
@@ -72,6 +77,7 @@ SimInfo::SimInfo(int dur, boost::uuids::uuid parent_sim, int branch_time,
       m0(-1),
       dt(kDefaultTimeStepDur),
       decay("manual"),
+      decay_eps(kDefaultDecayEps),
       parent_sim(parent_sim),
       parent_type(parent_type),
       branch_time(branch_time),
@@ -265,6 +271,10 @@ TransportUnit::Ptr Context::GetTransportUnit(std::string name) {
 }
 
 void Context::InitSim(SimInfo si) {
+  if (!(si.decay_eps >= 0.0 && si.decay_eps < 1.0)) {
+    throw ValueError("decay_eps must be finite and satisfy 0 <= decay_eps < 1");
+  }
+
   NewDatum("Info")
       ->AddVal("Handle", si.handle)
       ->AddVal("InitialYear", si.y0)
@@ -285,6 +295,8 @@ void Context::InitSim(SimInfo si) {
       ->Record();
 
   NewDatum("DecayMode")->AddVal("Decay", si.decay)->Record();
+
+  NewDatum("DecayThreshold")->AddVal("Epsilon", si.decay_eps)->Record();
 
   NewDatum("InfoExplicitInv")
       ->AddVal("RecordInventory", si.explicit_inventory)
@@ -315,6 +327,10 @@ int Context::time() {
   return ti_->time();
 }
 
+int Context::CalcTimeDiff(int year, int month) {
+  return ti_->CalcTimeDiff(year, month);
+}
+
 int Context::random() {
   return rng_->random();
 }
@@ -325,6 +341,23 @@ double Context::random_01() {
 
 int Context::random_uniform_int(int low, int high) {
   return rng_->random_uniform_int(low, high);
+}
+
+int MillisecondsToSeed(int64_t ms) {
+  // Milliseconds since the Unix epoch do not fit in an int, so fold them into
+  // [1, INT_MAX] instead of letting the narrowing conversion wrap negative.
+  // The seed must be positive because it is recorded in the Info table and a
+  // recorded seed has to be valid as the input file's seed (a
+  // nonNegativeInteger, where 0 means generate a seed) to reproduce the
+  // simulation.
+  uint64_t folded = static_cast<uint64_t>(ms) % std::numeric_limits<int>::max();
+  return static_cast<int>(folded) + 1;
+}
+
+int Context::date_time_int(){
+  auto time = std::chrono::system_clock::now().time_since_epoch();
+  return MillisecondsToSeed(
+      std::chrono::duration_cast<std::chrono::milliseconds>(time).count());
 }
 
 double Context::random_uniform_real(double low, double high) {
