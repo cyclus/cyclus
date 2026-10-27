@@ -11,7 +11,6 @@ cxx-compiler = ">=2.0.0,<3"
 cmake = ">=4.4.3,<5"
 make = ">=4.4.1,<5"
 pkg-config = ">=0.29.2,<0.30"
-git = ">=2.55.0,<3"
 # C++ library dependencies
 libboost-devel = ">=1.92.0,<2"
 coincbc = ">=2.10.13,<3"
@@ -22,7 +21,9 @@ liblapack = ">=3.11.0,<4"
 # libxml2 2.14 on conda-forge, and are needed both by Cyclus itself and by
 # libxml++-4.0.pc.
 libxml2-devel = ">=2.15.4,<3"
-"libxmlpp-4.0" = ">=4.0.2,<5"
+# The headers and pkg-config file of libxml++ are in libxmlpp-devel as of
+# build 4 of libxmlpp-4.0 on conda-forge, and libxmlpp-devel 5.x is libxml++-5.0.
+libxmlpp-devel = ">=4.0.2,<5"
 pcre = ">=8.45,<9"
 sqlite = ">=3.53.4,<4"
 # Python dependencies
