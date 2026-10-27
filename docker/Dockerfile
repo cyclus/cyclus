@@ -65,11 +65,11 @@ RUN mamba install -y python --no-pin && \
                git \
                glib \
                libxml2-devel \
-               libxmlpp-4.0 \
+               "libxmlpp-devel>=4.0.2,<5" \
                liblapack \
                pkg-config \
                coincbc \
-               boost-cpp \
+               libboost-devel \
                hdf5 \
                sqlite \
                pcre \
