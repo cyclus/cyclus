@@ -87,6 +87,8 @@ Since last release
 * Fixed building with Boost 1.89 and newer, which no longer has a compiled Boost.System library (#1985)
 * Fixed a segmentation fault when a Cyclus Python module fails to import, which is now reported as an error with the Python traceback (#1985)
 * Fixed the inventory of the Python ``Sink`` agent, which raised a ``TypeError`` for every material it accepted, causing a segmentation fault with Python 3.13 and newer, and now keeps the materials and products that it accepts (#1985)
+* Fixed the resources of the inventories of Python agents being a ``Resource`` and not a ``Material`` or ``Product`` in ``snapshot_inv`` and ``init_inv``, and changed ``push`` of the Python resource buffers back to only accepting the type of resource that the buffer holds (#1988)
+* Fixed ``push`` of the Python resource buffers crashing when given ``None``, ``push_many`` of the Python resource buffers pushing some of the resources when one of them could not be pushed, and ``push_many`` of the Python resource maps accepting resources that are not of the type that the map holds. Each of them now raises a ``TypeError`` for a resource of the wrong type, and ``push_many`` of a resource buffer pushes none of the resources if one of them cannot be pushed, as in C++ (#1988)
 * Fixed the snapshot of a Python agent failing when one of its resource buffer inventories is not empty (#1985)
 * Fixed the inventories of Python agents missing from every snapshot (#1985)
 * Removed the uses of ``distutils``, which was removed from the standard library in Python 3.12 (#1985)
