@@ -80,6 +80,8 @@ Since last release
 
 **Fixed:**
 
+* Fixed the Pixi workspace failing to find libxml++ by depending on ``libxmlpp-devel``, which has the headers and pkg-config file of libxml++ that build 4 of the conda-forge ``libxmlpp-4.0`` no longer includes (#1994)
+* Updated the Pixi lock file to use ``ca-certificates`` 2026.10.23, which removes the eMudhra intermediate certificates of the eMudhra emSign CA certificate security incident (#1994)
 * Fixed the checks of the sender and receiver ids, the transaction ids, and the resource quantities in ``test_source_to_sink``, which were never run (#1993)
 * Fixed the generated random seed (``seed`` of 0) becoming negative on Linux hosts with more than about 25 days of uptime, which made the seed recorded in the Info table invalid as an input file seed. The seed is now generated from the system clock instead of the time since the host booted (#1989)
 * Fixed building with Boost 1.89 and newer, which no longer has a compiled Boost.System library (#1985)
