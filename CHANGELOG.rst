@@ -80,6 +80,7 @@ Since last release
 
 **Fixed:**
 
+* Fixed the shared libraries on Linux being linked without the flags of the ``LDFLAGS`` environment variable, as ``CMakeLists.txt`` replaced ``CMAKE_SHARED_LINKER_FLAGS`` instead of appending to it (#2001)
 * Fixed the Pixi workspace failing to find libxml++ by depending on ``libxmlpp-devel``, which has the headers and pkg-config file of libxml++ that build 4 of the conda-forge ``libxmlpp-4.0`` no longer includes (#1994)
 * Updated the Pixi lock file to use ``ca-certificates`` 2026.10.23, which removes the eMudhra intermediate certificates of the eMudhra emSign CA certificate security incident (#1994)
 * Fixed the checks of the sender and receiver ids, the transaction ids, and the resource quantities in ``test_source_to_sink``, which were never run (#1993)
