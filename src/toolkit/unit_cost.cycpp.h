@@ -22,11 +22,25 @@
          "unit and can be used here.", \
   "units": "Unit of Currency/Unit of Production", \
   "uitype": "range", \
-  "range": [0.0, CY_LARGE_DOUBLE], \
+  "range": [-CY_LARGE_DOUBLE, CY_LARGE_DOUBLE], \
   }
-double variable_unit_cost;
+double unit_cost;
+
+#pragma cyclus var { \
+  "default": 0.0, \
+  "uilabel": "Unit Cost Modifier", \
+  "doc": "Requesting facility cost modifier to express preferences. In units" \
+         "of currency. Setting this term arbitrarily removes economic meaning"\
+         "from the reported arc_cost in Transactions. Does not affect costs" \
+         "carried through facilities." ,\
+  "units": "Unit of Currency/Unit of Production", \
+  "uitype": "range", \
+  "range": [-CY_LARGE_DOUBLE, CY_LARGE_DOUBLE], \
+  }
+double unit_cost_mod;
 // clang-format on
 
 // Required for compilation but not added by the cycpp preprocessor. Do not
 // remove. Must be one for each variable.
-std::vector<int> cycpp_shape_variable_unit_cost = {0};
+std::vector<int> cycpp_shape_unit_cost = {0};
+std::vector<int> cycpp_shape_unit_cost_mod = {0};
