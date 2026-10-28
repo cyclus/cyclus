@@ -46,6 +46,8 @@ Since last release
 * Introduced a definition of "stocked" for a resource buffer, which is a threshold quantity that can be set by the user (#)
 
 **Changed:**
+* Replaced the Docker builds across Ubuntu versions, package managers, and Rocky Linux versions in the build CI workflow with builds and tests in the Pixi workspace on Linux and MacOS, with and without ``--parallel`` and ``--allow-milps`` (#1996)
+* Moved the conda CI build, and the Cycamore and Cymetric builds, into a separate workflow that builds in a conda environment installed with a ``conda`` from Pixi and not in a container, and changed the PR comment workflow to run after it (#1996)
 * Set the maximum CMake policy version of Cyclus to 4.4 with the ``cyclus_cmake_policy_max`` macro, so that CMake uses the NEW behavior of the policies up to 4.4, and removed the version guard of policy CMP0135 (#1998)
 * Raised the minimum versions of Python to 3.10.0, SQLite to 3.36.0, Jinja2 to 2.10.3, NumPy to 1.21.4, and pandas to 1.3.4, and lowered that of Coin-Clp to 1.17.3, which are the versions tested in the ``minimum`` environment of the Pixi workspace
 * Removed the ``python<3.13`` and ``cython<3.1.0`` pins from the conda Docker builds, which now install ``libpython`` in place of the Python bindings of Boost (#1985)
@@ -75,6 +77,7 @@ Since last release
 
 **Removed:**
 
+* Removed the MacOS CI workflow, as its Pixi build is now part of the build CI workflow (#1996)
 * Removed the ResourceBuff class and replaced its instances with ResBuf (#1755)
 * Removed reference to deprecated ``ProgTranslator::Context`` class (#1811)
 * Removed ``exclusive_orders_only`` from schema (#1816)
