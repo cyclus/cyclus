@@ -46,6 +46,7 @@ Since last release
 * Introduced a definition of "stocked" for a resource buffer, which is a threshold quantity that can be set by the user (#)
 
 **Changed:**
+* Set the maximum CMake policy version of Cyclus to 4.4 with the ``cyclus_cmake_policy_max`` macro, so that CMake uses the NEW behavior of the policies up to 4.4, and removed the version guard of policy CMP0135 (#1998)
 * Raised the minimum versions of Python to 3.10.0, SQLite to 3.36.0, Jinja2 to 2.10.3, NumPy to 1.21.4, and pandas to 1.3.4, and lowered that of Coin-Clp to 1.17.3, which are the versions tested in the ``minimum`` environment of the Pixi workspace
 * Removed the ``python<3.13`` and ``cython<3.1.0`` pins from the conda Docker builds, which now install ``libpython`` in place of the Python bindings of Boost (#1985)
 * Updated the Pixi workspace to Boost 1.92, Python 3.15, and Cython 3.3, and added ``libpython`` to it, as the conda-forge ``python`` package no longer installs the Python shared library as of Python 3.15 (#1985)
@@ -80,6 +81,7 @@ Since last release
 
 **Fixed:**
 
+* Fixed the ``add_custom_command`` calls of ``UseCyclus.cmake`` that gave ``COMMENT`` twice, which is an error with policy CMP0175 of CMake 3.31 (#1998)
 * Fixed the shared libraries on Linux being linked without the flags of the ``LDFLAGS`` environment variable, as ``CMakeLists.txt`` replaced ``CMAKE_SHARED_LINKER_FLAGS`` instead of appending to it (#2001)
 * Fixed the Pixi workspace failing to find libxml++ by depending on ``libxmlpp-devel``, which has the headers and pkg-config file of libxml++ that build 4 of the conda-forge ``libxmlpp-4.0`` no longer includes (#1994)
 * Updated the Pixi lock file to use ``ca-certificates`` 2026.10.23, which removes the eMudhra intermediate certificates of the eMudhra emSign CA certificate security incident (#1994)
