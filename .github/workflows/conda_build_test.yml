@@ -1,0 +1,203 @@
+name: Conda Build/Test Cyclus
+
+on:
+  # allows us to run workflows manually
+  workflow_dispatch:
+  pull_request:
+    paths-ignore:
+      - '.github/workflows/publish_latest.yml'
+      - '.github/workflows/publish_release.yml'
+      - '.github/workflows/changelog_test.yml'
+      - '.github/workflows/code_coverage.yml'
+      - '.github/workflows/rocky_build_test.yml'
+      - '.github/workflows/minimum_build_test.yml'
+      - '.github/workflows/build_test.yml'
+      - 'doc/**'
+      - 'CHANGELOG.rst'
+      # The conda environment does not use the Pixi workspace
+      - 'pixi.toml'
+      - 'pixi.lock'
+  push:
+    paths-ignore:
+      - '.github/workflows/publish_latest.yml'
+      - '.github/workflows/publish_release.yml'
+      - '.github/workflows/changelog_test.yml'
+      - '.github/workflows/code_coverage.yml'
+      - '.github/workflows/rocky_build_test.yml'
+      - '.github/workflows/minimum_build_test.yml'
+      - '.github/workflows/build_test.yml'
+      - 'doc/**'
+      - 'CHANGELOG.rst'
+      # The conda environment does not use the Pixi workspace
+      - 'pixi.toml'
+      - 'pixi.lock'
+
+# Cancel an in-progress run when a newer commit is pushed to the same branch
+# or pull request.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Builds Cyclus in a conda environment that is solved at run time rather than
+  # from pixi.lock, so that it tests against the latest conda-forge packages.
+  # The downstream Cycamore and Cymetric builds are done here, as dependencies
+  # that only they need (e.g. matplotlib) can be added to the environment
+  # without changing pixi.toml. Cyclus is always built with --allow-milps, as
+  # Cycamore is built with --allow-milps and so needs Cyclus to have COIN.
+  build-test-conda:
+    runs-on: ubuntu-latest
+    env:
+      ARTIFACT_NAME: conda
+
+    steps:
+      - name: Checkout Cyclus
+        uses: actions/checkout@v7
+
+      - name: Set up Pixi
+        uses: prefix-dev/setup-pixi@v0.11.0
+        with:
+          run-install: false
+
+      - name: Install conda
+        run: pixi global install conda
+
+      # The dependencies of Cyclus are the [dependencies] and
+      # [feature.test.dependencies] of pixi.toml, so keep them in sync.
+      - name: Create conda environment
+        run: |
+          conda create --yes --quiet --name cyclus \
+            --override-channels --channel conda-forge \
+            compilers \
+            cmake \
+            make \
+            glib \
+            libxml2-devel \
+            "libxmlpp-devel>=4.0.2,<5" \
+            liblapack \
+            pkg-config \
+            coincbc \
+            libboost-devel \
+            hdf5 \
+            sqlite \
+            pcre \
+            python \
+            libpython \
+            setuptools \
+            pytest \
+            pytables \
+            pandas \
+            jinja2 \
+            cython \
+            websockets \
+            pprintpp \
+            pip \
+            matplotlib
+          conda list --name cyclus
+          # Cyclus, Cycamore, and Cymetric install into ~/.local by default
+          echo "${HOME}/.local/bin" >> "${GITHUB_PATH}"
+
+      # 'conda run' activates the environment, which sets the compilers (CC,
+      # CXX, etc.) for the build.
+      - name: Build Cyclus
+        id: build-cyclus
+        shell: conda run --live-stream --name cyclus bash -e {0}
+        run: |
+          # The install step that symlinks the Cython modules into the user
+          # site does not create it.
+          mkdir -p "$(python -m site --user-site)"
+          python install.py -j "$(nproc)" --allow-milps --parallel
+
+      - name: Run unit tests
+        shell: conda run --live-stream --name cyclus bash -e {0}
+        run: cyclus_unit_tests
+
+      - name: Run Python tests
+        shell: conda run --live-stream --name cyclus bash -e {0}
+        working-directory: tests
+        run: python -m pytest
+
+      - name: Checkout Cycamore
+        if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
+        uses: actions/checkout@v7
+        with:
+          repository: cyclus/cycamore
+          path: cycamore
+
+      - name: Build and Test Cycamore
+        id: build-cycamore
+        if: ${{ github.event_name == 'pull_request' && steps.build-cyclus.outcome == 'success' }}
+        continue-on-error: true
+        shell: conda run --live-stream --name cyclus bash -e {0}
+        working-directory: cycamore
+        run: |
+          python install.py -j "$(nproc)" --allow-milps
+          cycamore_unit_tests
+          cd tests && python -m pytest
+
+      - name: Checkout Cymetric
+        if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
+        uses: actions/checkout@v7
+        with:
+          repository: cyclus/cymetric
+          path: cymetric
+
+      - name: Build and Test Cymetric
+        id: build-cymetric
+        if: ${{ github.event_name == 'pull_request' && steps.build-cycamore.outcome == 'success' }}
+        continue-on-error: true
+        shell: conda run --live-stream --name cyclus bash -e {0}
+        working-directory: cymetric
+        run: |
+          python -m pip install --target "$(python -m site --user-site)" --no-deps .
+          cd tests && python -m pytest
+
+      - name: Export Environment Variables
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "CYCAMORE_BUILD_STATUS=${{steps.build-cycamore.outcome == 'success' && '**Success** :white_check_mark:' || 
+          steps.build-cycamore.outcome == 'failure' && '**Failure** :x:' || 
+          '**Skipped due to upstream failure** :warning:'}}" >> "$GITHUB_ENV"
+
+          echo "CYMETRIC_BUILD_STATUS=${{steps.build-cymetric.outcome == 'success' && '**Success** :white_check_mark:' || 
+          steps.build-cymetric.outcome == 'failure' && '**Failure** :x:' || 
+          '**Skipped due to upstream failure** :warning:'}}" >> "$GITHUB_ENV"
+
+      - name: Construct Artifact
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "
+          ##### Build with conda
+            - Cycamore: ${{ env.CYCAMORE_BUILD_STATUS }}
+            - Cymetric: ${{ env.CYMETRIC_BUILD_STATUS }}" > ${{ env.ARTIFACT_NAME }}.txt
+      
+      - name: Upload Artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ARTIFACT_NAME }}
+          path: ${{ env.ARTIFACT_NAME }}.txt
+
+  upload-pr-number:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Checkout cyclus
+        uses: actions/checkout@v4
+
+      - name: Save PR number and Commit hash to file
+        run: |
+          echo "${{ github.event.number }}" > pr_number
+          echo "${{ github.event.pull_request.head.sha }} - $(git log -1 --format=%ci)" > commit_hash_timestamp
+      
+      - name: Upload PR number artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr_number
+          path: pr_number
+      
+      - name: Upload Commit hash artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: commit_hash_timestamp
+          path: commit_hash_timestamp
