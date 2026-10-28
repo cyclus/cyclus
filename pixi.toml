@@ -8,6 +8,8 @@ platforms = ["linux-64", "osx-64", "osx-arm64"]
 # Build tools
 c-compiler = ">=2.0.0,<3"
 cxx-compiler = ">=2.0.0,<3"
+# Keep the cyclus_cmake_policy_max macro of cmake/CyclusBuildSetup.cmake in
+# sync with the CMake version of pixi.lock
 cmake = ">=4.4.3,<5"
 make = ">=4.4.1,<5"
 pkg-config = ">=0.29.2,<0.30"

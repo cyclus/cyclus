@@ -6,6 +6,13 @@ MACRO(cyclus_minimum_cmake_version VERSION_NUMBER)
     SET(${VERSION_NUMBER} "3.16")
 ENDMACRO()
 
+# The newest CMake version whose policies Cyclus is tested with, which should
+# be the CMake version of pixi.lock. CMake uses the NEW behavior of the
+# policies up to it, or up to its own version if it is older.
+MACRO(cyclus_cmake_policy_max VERSION_NUMBER)
+    SET(${VERSION_NUMBER} "4.4")
+ENDMACRO()
+
 MACRO(cyclus_require_out_of_source_build)
     IF(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
         MESSAGE(STATUS "Cyclus requires an out-of-source build.")

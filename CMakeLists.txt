@@ -6,7 +6,9 @@ MESSAGE("-- CMAKE_MODULE_PATH: ${CMAKE_MODULE_PATH}")
 
 INCLUDE(CyclusBuildSetup)
 cyclus_minimum_cmake_version(MINIMUM_CMAKE_VERSION)
-CMAKE_MINIMUM_REQUIRED(VERSION ${MINIMUM_CMAKE_VERSION})
+cyclus_cmake_policy_max(CMAKE_POLICY_MAX)
+# See https://cmake.org/cmake/help/latest/command/cmake_minimum_required.html
+CMAKE_MINIMUM_REQUIRED(VERSION ${MINIMUM_CMAKE_VERSION}...${CMAKE_POLICY_MAX})
 
 # This project name is cyclus.
 PROJECT(CYCLUS VERSION 1.6.0)
