@@ -2,7 +2,7 @@ name: Comment on PR
 
 on:
   workflow_run:
-    workflows: ["Build/Test Cyclus"]
+    workflows: ["Conda Build/Test Cyclus"]
     types:
       - completed
 
