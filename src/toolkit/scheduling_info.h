@@ -15,6 +15,7 @@ struct SchedulingInfo {
     std::string method;
     std::set<std::string> commodities;
     // ResBuf<Material> resource_buffers;
+    int increment;
     int cycle_length;
     std::set<int> schedule;
 };

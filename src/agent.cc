@@ -53,10 +53,10 @@ void Agent::InfileToDb(InfileTree* qe, DbInit di) {
 
 void Agent::ScheduleInfo(InfileTree* scheduler, std::string method){
   info_.method = method;
-  info_.schedule = OptionalQuery<std::set<int>>(scheduler,"schedule",{});
+  // info_.schedule = OptionalQuery<std::set<int>>(scheduler,"schedule",{});
   info_.cycle_length = OptionalQuery<int>(scheduler,"cycle_length",-1);
   //info.commodities = OptionalQuery<std::set<std::string>>(scheduler,"commodities",{});
-  std::cout << info_.method << std::endl;
+  info_.increment = OptionalQuery<int>(scheduler,"increment",-1);
 }
 
 void Agent::InitFrom(QueryableBackend* b) {

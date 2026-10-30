@@ -85,7 +85,7 @@ void Facility::Tick(){
 }
 
 void Facility::EventRequest(){
-  if (ReturnParticipated()){ // should maybe add this to the tock metho instead of event request
+  if (ReturnParticipated()){
     schedule_helper_.ScheduleMethod(info());
   }
 }

@@ -2,7 +2,7 @@
 #define CYCLUS_SRC_TOOLKIT_SCHEDULING_FUNCTION_H_
 
 #include "context.h"
-#include "symbolic_functions.h" //I may add a symbolic functions later...
+#include "symbolic_functions.h" 
 #include "scheduling_info.h"
 #include "res_buf.h"
 #include <vector>
@@ -11,12 +11,10 @@
 
 namespace cyclus {
 
-class Facility;
+class Facility; //forward declaration 
 
 namespace toolkit {
-//these are a kit of functions to help the archetype developer start their own DRE event scheduling.    
-//the dev can use as many functions as they want in the GetSchedulingTime() override ... 
-// because of that fact there is an time_stamp set with an associated commodity pair (which times they want to trade what) getter function 
+//these are a kit of functions for the user and potentially archetype to use to establish a scheduling type for their agent.
 //
 
 class SchedulingFunctions { 
@@ -26,11 +24,16 @@ public:
 
 // deconstructor .. 
 
-void DemandDrivenRequests(ResBuf<cyclus::Material> res,std::set<std::string> commods);
 
-void ConstantRequest(int cycle_length, std::set<std::string> commods);
+/// Demand driver registration process for agents based on space being available in a resource buffer.
+/// The resource buffer should have an associated commodity to order with it 
+/// for reactor archetype after a buffer is filled, the agent does not need to trade until some cycle length. 
+void DemandDrivenRequests(ResBuf<cyclus::Material> res,std::set<std::string> commods, int cycle_length);
 
-void FixIncSchedule();
+
+/// Cyclus operates on a fixed increment cycle of increment = 1 with a set of all commodities a consumer registers being ordered.
+/// Users should be able to change the increment.
+void FixIncSchedule(int increment);
 
 void clear();
 
@@ -44,13 +47,13 @@ void PredefinedSchedule(std::set<int> sched);
 
 void ScheduleMethod(SchedulingInfo info);
 
-const std::set<int>& EventTime() const {//schedule
+const std::set<int>& EventTime() const { 
     return t_;
 };
 
 private:
     Facility* f_;
-    std::set<int> t_; //this may be sketchy with clear(), should i not have a variable and just have sched. func return event times? 
+    std::set<int> t_; // for future deregistration of events 
 };
 
 }  // namespace toolkit

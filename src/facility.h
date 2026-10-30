@@ -27,7 +27,7 @@ class Region;
 ///
 /// @section intro Introduction
 ///
-/// The Facility type plays a primary role in Cyclus.  A Facility
+/// The Facility type plays a primary role dseCyclus.  A Facility
 /// facility is where offers and requests are generated and transmitted to a
 /// ResourceExchange and where shipments of material, issued by the exchange,
 /// are executed. The algorithms to determine what offers and requests are
@@ -143,18 +143,17 @@ class Facility : public TimeListener, public Agent, public Trader {
   virtual void Tick();
 
   /// default implementation for material preferences.
-  virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {}
+  virtual void AdjustMatlPrefs(RequestBidMap<Material>::type& prefs) {}
 
   /// default implementation for material preferences.
-  virtual void AdjustProductPrefs(PrefMap<Product>::type& prefs) {}
+  virtual void AdjustProductPrefs(RequestBidMap<Product>::type& prefs) {}
 
   /// @brief default implementation for responding to material trades
   /// @param trades all trades in which this trader is the supplier
   /// @param responses a container to populate with responses to each trade
   virtual void GetMatlTrades(
       const std::vector<Trade<Material>>& trades,
-      std::vector<std::pair<Trade<Material>, Material::Ptr>>& responses) {
-  }
+      std::vector<std::pair<Trade<Material>, Material::Ptr>>& responses) {}
 
   /// @brief default implementation for responding to product trades
   /// @param trades all trades in which this trader is the supplier

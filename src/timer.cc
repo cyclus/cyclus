@@ -273,7 +273,6 @@ int Timer::NextEvent(){
   int t_p = time_ +1;  
   std::vector<int> event_lists = {decom_queue_.lower_bound(t_p)->first,build_queue_.lower_bound(t_p)->first,
                                   reg_traders.lower_bound(t_p)->first};
-  std::cout <<*std::min_element(event_lists.begin(), event_lists.end()) << std::endl;
   return *std::min_element(event_lists.begin(), event_lists.end());
 }
 
