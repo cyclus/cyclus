@@ -15,6 +15,8 @@
 #include "resource.h"
 #include "state_wrangler.h"
 #include "economic_entity.h"
+#include "toolkit/scheduling_info.h"
+// #include "toolkit/res_buf.h"
 
 // Undefines isnan from pyne
 #ifdef isnan
@@ -271,7 +273,7 @@ class Agent : public StateWrangler, virtual public Ider, public EconomicEntity {
 
   /// recursively prints the parent-child tree
   std::string PrintChildren();
-
+  void ScheduleInfo(InfileTree* scheduler, std::string method);
   /// returns a vector of strings representing the parent-child tree
   /// at the node for Agent m
   /// @param m the agent node to base as the root of this print tree
@@ -393,7 +395,7 @@ class Agent : public StateWrangler, virtual public Ider, public EconomicEntity {
   /// Returns the number of time steps this agent operates between building and
   /// decommissioning (-1 if the agent has an infinite lifetime).
   inline const int lifetime() const { return lifetime_; }
-
+  inline const toolkit::SchedulingInfo info() const {return info_;}
   /// Returns the default time step at which this agent will exit the
   /// simulation (-1 if the agent has an infinite lifetime).
   ///
@@ -491,6 +493,8 @@ class Agent : public StateWrangler, virtual public Ider, public EconomicEntity {
  private:
   /// length of time this agent is intended to operate
   int lifetime_;
+  std::string method_;
+  toolkit::SchedulingInfo info_;
 
   /// Prevents creation/use of copy constructors (including in subclasses).
   /// Cloning and InitFrom should be used instead.

@@ -10,10 +10,12 @@
 #include "institution.h"
 #include "logger.h"
 #include "timer.h"
+#include <boost/enable_shared_from_this.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace cyclus {
 
-Facility::Facility(Context* ctx) : Trader(this), Agent(ctx) {
+Facility::Facility(Context* ctx) : Trader(this), Agent(ctx), schedule_helper_(this) {
   kind_ = std::string("Facility");
 }
 
@@ -24,13 +26,29 @@ void Facility::InitFrom(Facility* m) {
 }
 
 void Facility::Build(Agent* parent) {
-  Agent::Build(parent);
+  Agent::Build(parent); 
+  toolkit::CommodityRecipeContext comd;
+  if (lifetime() >= 0 && CheckDecommissionCondition() == NULL) { 
+    context()->SchedDecom(this, exit_time());
+  }
+  for (auto& requests: GetMatlRequests()) {
+    if(requests){
+      for(auto& request : requests->requests()) {
+      std::string commodity = request->commodity();
+      comd.AddInCommod(commodity,"","","");
+      }
+    }
+  }
+  comd.CommodSnapshot(DbInit(this)); 
 }
 
 void Facility::EnterNotify() {
   Agent::EnterNotify();
   context()->RegisterTrader(dynamic_cast<Trader*>(this));
   context()->RegisterTimeListener(this);
+  context()->SetTraderIds(id(),dynamic_cast<Trader*>(this));
+
+  schedule_helper_.InitialTrade();
 }
 
 std::string Facility::str() {
@@ -41,17 +59,35 @@ std::string Facility::str() {
 }
 
 void Facility::Decommission() {
-  if (!CheckDecommissionCondition()) {
-    throw Error("Cannot decommission " + prototype());
-  }
 
+  // if (CheckDecommissionCondition() == NULL){
+  // std::cout << CheckDecommissionCondition() << std::endl;}
+  // if (CheckDecommissionCondition() == false) { //check what happens w NULL
+  //   throw Error("Cannot decommission " + prototype());
+  // }
   context()->UnregisterTrader(dynamic_cast<Trader*>(this));
-  context()->UnregisterTimeListener(this);
+  context()->UnregisterTimeListener(this); 
+  context()->UnregisterCommodityConsumer(GetInCommods(),this);
+
   Agent::Decommission();
 }
 
 bool Facility::CheckDecommissionCondition() {
-  return true;
+  return NULL;
+}
+
+void Facility::Tock(){ // archetype developers need to invoke this method in tock 
+  EventRequest();
+}
+
+void Facility::Tick(){
+ SetParticipated(false); //archetype developers need to invoke this method in tick
+}
+
+void Facility::EventRequest(){
+  if (ReturnParticipated()){
+    schedule_helper_.ScheduleMethod(info());
+  }
 }
 
 Region* Facility::GetParentRegion(int layer) {
