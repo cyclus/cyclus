@@ -19,7 +19,7 @@ namespace toolkit {
 
 // Extension points:
 // 1. Include a new snippet in injectable_facility.h.
-// 2. Add any required lifecycle calls in injectable_facility.cc.
+// 2. Add any required lifecycle calls in injectable_facility.h.
 // 3. Add expected names below and feature-specific behavior checks here.
 //
 // Scalar parameters automatically join the default, explicit-input, clone, and
