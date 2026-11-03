@@ -559,6 +559,31 @@ class InjectableFacilityTest : public ::testing::Test {
     EXPECT_NEAR(lon, qr.GetVal<double>("Longitude"), 1e-6);
   }
 
+  // 7. Included getter/setter helpers to pass friendship along to the TESTS
+  void SetUnitCost(InjectableFacility* a, double value) {
+    a->set_unit_cost(value);
+  }
+
+  double GetUnitCost(InjectableFacility* a) {
+    return a->get_unit_cost();
+  }
+
+  void SetUnitCostMod(InjectableFacility* a, double value) {
+    a->set_unit_cost_mod(value);
+  }
+
+  double GetUnitCostMod(InjectableFacility* a) {
+    return a->get_unit_cost_mod();
+  }
+
+  void SetUnitCostMods(InjectableFacility* a, std::vector<double> value) {
+    a->set_unit_cost_mods(value);
+  }
+
+  std::vector<double> GetUnitCostMods(InjectableFacility* a) {
+    return a->get_unit_cost_mods();
+  }
+
   // Keep the recorder and backend alive until context cleanup finishes.
   cyclus::SqliteBack back_;
   cyclus::Recorder rec_;
@@ -567,7 +592,9 @@ class InjectableFacilityTest : public ::testing::Test {
   int snapshot_time_;
 };
 
-// 7. Helper tests: check generic type handling independently of the facility.
+
+
+// 8. Helper tests: check generic type handling independently of the facility.
 
 // Exercise the generated dispatch and recursive conversions independently of
 // which types happen to be present in the currently included snippets.
@@ -750,6 +777,23 @@ TEST_F(InjectableFacilityTest, InvalidBuyPolicyParameters) {
                              "<active_buying_max>2</active_buying_max>");
   // Build invokes EnterNotify with normally initialized input state.
   EXPECT_THROW(a->Build(nullptr), cyclus::ValueError);
+}
+
+TEST_F(InjectableFacilityTest, UnitCostGettersAndSetters) {
+  InjectableFacility* a = Load("");
+
+  double fac_cost = 10.0;
+  double fac_cost_mod = 1.0;
+  std::vector<double> fac_cost_mods = {4.13, 5.14, 19.31};
+
+  SetUnitCost(a, fac_cost);
+  EXPECT_EQ(fac_cost, GetUnitCost(a));
+
+  SetUnitCostMod(a, fac_cost_mod);
+  EXPECT_EQ(fac_cost_mod, GetUnitCostMod(a));
+
+  SetUnitCostMods(a, fac_cost_mods);
+  EXPECT_EQ(fac_cost_mods, GetUnitCostMods(a));
 }
 
 }  // namespace toolkit

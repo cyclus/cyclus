@@ -54,6 +54,15 @@ double unit_cost_mod;
 std::vector<double> unit_cost_mods;
 // clang-format on
 
+double get_unit_cost() const { return unit_cost; }
+void set_unit_cost(double value) { unit_cost = value; }
+
+double get_unit_cost_mod() const { return unit_cost_mod; }
+void set_unit_cost_mod(double value) { unit_cost_mod = value; }
+
+std::vector<double> get_unit_cost_mods() const { return unit_cost_mods; }
+void set_unit_cost_mods(std::vector<double> value) { unit_cost_mods = value; }
+
 // Required for compilation but not added by the cycpp preprocessor. Do not
 // remove. Must be one for each variable.
 std::vector<int> cycpp_shape_unit_cost = {0};
