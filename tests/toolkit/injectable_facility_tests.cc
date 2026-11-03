@@ -3,6 +3,11 @@
 #include <gtest/gtest.h>
 
 #include <iomanip>
+#include <list>
+#include <map>
+#include <set>
+#include <stdexcept>
+#include <type_traits>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -17,17 +22,353 @@
 namespace cyclus {
 namespace toolkit {
 
-// Extension points:
-// 1. Include a new snippet in injectable_facility.h.
-// 2. Add any required lifecycle calls in injectable_facility.h.
-// 3. Add expected names below and feature-specific behavior checks here.
+namespace {
+
+// Extend this list when adding a snippet or variable.
+const char* const kExpectedVariables[] = {
+    "latitude", "longitude", "unit_cost", "unit_cost_mod", "unit_cost_mods",
+    "sell_quantity",
+    "active_buying_frequency_type", "active_buying_val", "active_buying_min",
+    "active_buying_max", "active_buying_mean", "active_buying_stddev",
+    "active_buying_end_probability", "active_buying_disruption_probability",
+    "active_buying_disruption", "dormant_buying_frequency_type",
+    "dormant_buying_val", "dormant_buying_min", "dormant_buying_max",
+    "dormant_buying_mean", "dormant_buying_stddev",
+    "dormant_buying_end_probability", "dormant_buying_disruption_probability",
+    "dormant_buying_disruption", "buying_size_type", "buying_size_val",
+    "buying_size_min", "buying_size_max", "buying_size_mean",
+    "buying_size_stddev", "reorder_point", "reorder_quantity",
+    "cumulative_cap"};
+
+// To make these tests as general as possible, we use the list of backend
+// types provided by share/dbtypes.json and some helper functions and templates
+// defined below. Some comments have been added to help guide readers through
+// those functions and templates, since they all look a little "samey".
+
+// 1. Value conversions (TestValue and SequenceValue).
+// Read means JSON -> C++; Write means C++ -> JSON. Container rules call the
+// same conversions for their children, so nested types reuse these rules.
+// JSON is the common representation for test values. Sequences use arrays;
+// pairs use two-element arrays; maps use arrays of [key, value] entries so
+// non-string keys and nested containers retain their types.
+// 1a. Fallback and scalar rules. The primary template reports unsupported
+// types; the specializations below handle arithmetic values and strings.
+template<class T, class Enable = void>
+struct TestValue {
+  static T Read(const Json::Value&) {
+    throw std::runtime_error("Add test conversion rules for this leaf type");
+  }
+  static Json::Value Write(const T&) {
+    throw std::runtime_error("Add test conversion rules for this leaf type");
+  }
+};
+
+template<class T>
+struct TestValue<T, typename std::enable_if<std::is_arithmetic<T>::value>::type> {
+  static T Read(const Json::Value& v) {
+    return static_cast<T>(v.asDouble());
+  }
+  static Json::Value Write(T v) { return Json::Value(v); }
+};
+
+template<>
+struct TestValue<std::string> {
+  static std::string Read(const Json::Value& v) { return v.asString(); }
+  static Json::Value Write(const std::string& v) { return v; }
+};
+
+// 1b. Shared sequence rule: convert one element at a time. This supplies the
+// implementation used by vectors, lists, and sets immediately below.
+template<class C>
+struct SequenceValue {
+  typedef typename C::value_type Element;
+  static C Read(const Json::Value& v) {
+    if (!v.isArray()) throw std::runtime_error("Expected a sequence array");
+    C result;
+    for (Json::ArrayIndex i = 0; i < v.size(); ++i)
+      result.insert(result.end(), TestValue<Element>::Read(v[i]));
+    return result;
+  }
+  static Json::Value Write(const C& v) {
+    Json::Value result(Json::arrayValue);
+    for (typename C::const_iterator it = v.begin(); it != v.end(); ++it)
+      result.append(TestValue<Element>::Write(*it));
+    return result;
+  }
+};
+
+// These three specializations select the shared sequence implementation for
+// each container family; they do not duplicate its conversion logic.
+template<class T>
+struct TestValue<std::vector<T> > : SequenceValue<std::vector<T> > {};
+template<class T>
+struct TestValue<std::list<T> > : SequenceValue<std::list<T> > {};
+template<class T>
+struct TestValue<std::set<T> > : SequenceValue<std::set<T> > {};
+
+// 1c. Pair rule: convert the two members using their own type rules. Maps
+// below also reuse this rule to represent each key/value entry.
+template<class K, class V>
+struct TestValue<std::pair<K, V> > {
+  static std::pair<K, V> Read(const Json::Value& v) {
+    if (!v.isArray() || v.size() != 2)
+      throw std::runtime_error("Expected a two-element pair array");
+    return std::make_pair(TestValue<K>::Read(v[0]), TestValue<V>::Read(v[1]));
+  }
+  static Json::Value Write(const std::pair<K, V>& v) {
+    Json::Value result(Json::arrayValue);
+    result.append(TestValue<K>::Write(v.first));
+    result.append(TestValue<V>::Write(v.second));
+    return result;
+  }
+};
+
+// 1d. Map rule: accept dictionary defaults or arrays of key/value entries,
+// then write the common entry-array representation used by the other helpers.
+template<class K, class V>
+struct TestValue<std::map<K, V> > {
+  static std::map<K, V> Read(const Json::Value& v) {
+    std::map<K, V> result;
+    if (v.isObject()) {
+      // cycpp annotations encode dictionary defaults as JSON objects.
+      std::vector<std::string> keys = v.getMemberNames();
+      for (size_t i = 0; i < keys.size(); ++i) {
+        Json::Value key(keys[i]);
+        if (!std::is_same<K, std::string>::value) {
+          Json::Reader reader;
+          if (!reader.parse(keys[i], key))
+            throw std::runtime_error("Cannot decode map default key");
+        }
+        result[TestValue<K>::Read(key)] = TestValue<V>::Read(v[keys[i]]);
+      }
+    } else {
+      if (!v.isArray()) throw std::runtime_error("Expected map entries");
+      for (Json::ArrayIndex i = 0; i < v.size(); ++i) {
+        std::pair<K, V> entry = TestValue<std::pair<K, V> >::Read(v[i]);
+        result.insert(entry);
+      }
+    }
+    return result;
+  }
+  static Json::Value Write(const std::map<K, V>& v) {
+    Json::Value result(Json::arrayValue);
+    for (typename std::map<K, V>::const_iterator it = v.begin();
+         it != v.end(); ++it)
+      result.append(TestValue<std::pair<K, V> >::Write(*it));
+    return result;
+  }
+};
+
+// 2. Value comparison. Once both sides are JSON, a single recursive check
+// handles every supported container and retains floating-point comparisons.
+void ExpectValue(const Json::Value& expected, const Json::Value& actual) {
+  if (expected.isArray()) {
+    ASSERT_TRUE(actual.isArray());
+    ASSERT_EQ(expected.size(), actual.size());
+    for (Json::ArrayIndex i = 0; i < expected.size(); ++i) {
+      SCOPED_TRACE(i);
+      ExpectValue(expected[i], actual[i]);
+    }
+  } else if (expected.isDouble()) {
+    EXPECT_DOUBLE_EQ(expected.asDouble(), actual.asDouble());
+  } else {
+    EXPECT_EQ(expected, actual);
+  }
+}
+
+// 3. Type registry: bridge runtime annotations and compile-time C++ types.
+// The tests discover a variable's type through annotations. TypeOps lets them
+// select operations already instantiated for that concrete type by Register<T>.
+struct TypeOps {
+  Json::Value type;
+  Json::Value (*normalize)(const Json::Value&);
+  Json::Value (*fetch)(cyclus::QueryResult&, const std::string&);
+  void (*record)(cyclus::Recorder&, const Json::Value&);
+};
+
+// Typed operations stored in TypeOps:
+// - Normalize passes JSON through T so expected values have T's representation
+//   (for example, sets become ordered and map defaults become entry arrays).
+// - Fetch reads a database value as T and returns comparable JSON.
+// - Record writes JSON as T for the standalone helper tests below.
+template<class T>
+Json::Value Normalize(const Json::Value& value) {
+  return TestValue<T>::Write(TestValue<T>::Read(value));
+}
+
+template<class T>
+Json::Value Fetch(cyclus::QueryResult& state, const std::string& name) {
+  return TestValue<T>::Write(state.GetVal<T>(name));
+}
+
+template<class T>
+void Record(cyclus::Recorder& recorder, const Json::Value& value) {
+  recorder.NewDatum("GenericTypeState")
+      ->AddVal("value", TestValue<T>::Read(value))->Record();
+}
+
+// Use structural annotation JSON as the key, matching cycpp's representation.
+std::string TypeKey(const Json::Value& type) {
+  return Json::FastWriter().write(type);
+}
+
+// Bind the operations for one concrete T to its annotation. The generated
+// header supplies these calls, so this file needs no list of concrete types.
+template<class T>
+void Register(std::map<std::string, TypeOps>& registry, const char* annotation) {
+  TypeOps ops;
+  Json::Reader reader;
+  if (!reader.parse(annotation, ops.type))
+    throw std::runtime_error("Invalid generated type annotation");
+  ops.normalize = &Normalize<T>;
+  ops.fetch = &Fetch<T>;
+  ops.record = &Record<T>;
+  registry[TypeKey(ops.type)] = ops;
+}
+
+const std::map<std::string, TypeOps>& Types() {
+  static const std::map<std::string, TypeOps> types = [] {
+    std::map<std::string, TypeOps> registry;
+// CMake generates Register<T>(...) calls here from share/dbtypes.json.
+#include "injectable_dbtypes.h"
+    return registry;
+  }();
+  return types;
+}
+
+// This lookup is the fixture's entry point into the generated registry.
+const TypeOps& Operations(const Json::Value& type) {
+  const auto& types = Types();
+  auto it = types.find(TypeKey(type));
+  if (it == types.end())
+    throw std::runtime_error("Type is absent from current SQLite dbtypes: " +
+                             TypeKey(type));
+  return it->second;
+}
+
+// 4. Sample generation. Walk the annotation type tree to build explicit
+// input, filling containers even when their declared defaults are empty.
+// Shape metadata controls fixed lengths; otherwise containers get two entries.
+// ShapeRank keeps nested children aligned with cycpp's shape dimensions.
+int ShapeRank(const Json::Value& type) {
+  if (type.isString()) return type == "std::string" ? 1 : 0;
+  int rank = type[0] == "std::pair" ? 0 : 1;
+  for (Json::ArrayIndex i = 1; i < type.size(); ++i)
+    rank += ShapeRank(type[i]);
+  return rank;
+}
+
+Json::Value Sample(const Json::Value& type, const Json::Value& def, int seed,
+                   const Json::Value& shape, int dimension = 0) {
+  if (type.isString()) {
+    if (type == "double" || type == "float")
+      return def.isNumeric() ? def.asDouble() + 0.25 + seed * 0.01
+                             : 0.25 + seed;
+    if (type == "int") return def.isInt() ? def.asInt() + 2 + seed : 2 + seed;
+    if (type == "bool") return def.isBool() ? !def.asBool() : seed % 2 == 0;
+    if (type == "std::string") {
+      std::string value = std::to_string(seed) + "_injected";
+      if (dimension < shape.size() && shape[dimension].asInt() > 0)
+        value.resize(shape[dimension].asInt(), 'x');
+      return value;
+    }
+    throw std::runtime_error("Add sample rules for leaf type " + TypeKey(type));
+  }
+  const std::string family = type[0].asString();
+  Json::Value result(Json::arrayValue);
+  if (family == "std::pair") {
+    result.append(Sample(type[1], Json::Value(), seed, shape, dimension));
+    result.append(Sample(type[2], Json::Value(), seed + 1, shape,
+                         dimension + ShapeRank(type[1])));
+    return result;
+  }
+  if (family != "std::vector" && family != "std::list" &&
+      family != "std::set" && family != "std::map")
+    throw std::runtime_error("Add sample rules for container " + family);
+  int count = dimension < shape.size() && shape[dimension].asInt() > 0
+                  ? shape[dimension].asInt() : 2;
+  for (int i = 0; i < count; ++i) {
+    Json::Value child = Sample(type[1], Json::Value(), seed + i, shape,
+                               dimension + 1);
+    if (family == "std::map") {
+      Json::Value entry(Json::arrayValue);
+      entry.append(child);
+      entry.append(Sample(type[2], Json::Value(), seed + i + 1, shape,
+                           dimension + 1 + ShapeRank(type[1])));
+      result.append(entry);
+    } else {
+      result.append(child);
+    }
+  }
+  return result;
+}
+
+// 5. XML generation. Walk the value and alias trees together so nested
+// containers use the element names expected by cycpp's input reader.
+std::string XmlName(const Json::Value& alias) {
+  if (alias.isString()) return alias.asString();
+  return XmlName(alias[0]);
+}
+
+// Follow cycpp's nested alias tree, including map item/key/value names.
+void WriteXml(std::ostream& xml, const Json::Value& value,
+              const Json::Value& type, const Json::Value& alias) {
+  const std::string name = XmlName(alias);
+  xml << "<" << name << ">";
+  if (type.isString()) {
+    if (value.isString()) {
+      const std::string text = value.asString();
+      for (size_t i = 0; i < text.size(); ++i) {
+        switch (text[i]) {
+          case '&': xml << "&amp;"; break;
+          case '<': xml << "&lt;"; break;
+          case '>': xml << "&gt;"; break;
+          default: xml << text[i];
+        }
+      }
+    } else if (value.isBool()) {
+      xml << (value.asBool() ? "true" : "false");
+    } else if (value.isIntegral()) {
+      xml << value.asInt();
+    } else {
+      xml << value.asDouble();
+    }
+  } else if (type[0] == "std::pair") {
+    WriteXml(xml, value[0], type[1], alias[1]);
+    WriteXml(xml, value[1], type[2], alias[2]);
+  } else {
+    for (Json::ArrayIndex i = 0; i < value.size(); ++i) {
+      if (type[0] == "std::map") {
+        const std::string item = alias[0][1].asString();
+        xml << "<" << item << ">";
+        WriteXml(xml, value[i][0], type[1], alias[1]);
+        WriteXml(xml, value[i][1], type[2], alias[2]);
+        xml << "</" << item << ">";
+      } else {
+        WriteXml(xml, value[i], type[1], alias[1]);
+      }
+    }
+  }
+  xml << "</" << name << ">";
+}
+
+}  // namespace
+
+// 6. Facility fixture: assemble the helpers into the test workflow.
+// Values -> Config -> Load -> Snapshot -> ExpectState:
+// choose expected values, generate XML, load a facility, save its state, and
+// compare that state with expectations. Clone/restart tests add their own
+// copy/reload step before checking state again. Defaults use Load("") directly.
 //
-// Scalar parameters automatically join the default, explicit-input, clone, and
-// database round-trip checks. Add support for new types in Values/ExpectState;
-// unsupported types fail explicitly. Explicit-input values test serialization
-// and may not form a valid configuration for running a simulation. 
+// Extension points: include snippets and lifecycle calls in the test agent,
+// then add expected names and behavior checks below. Concrete SQLite types are
+// discovered from dbtypes.json at build time. New combinations of supported
+// containers work automatically; new leaf/container families need rules above.
+// Explicit-input values test serialization, not simulation configuration validity.
 class InjectableFacilityTest : public ::testing::Test {
  protected:
+  // Fixture setup and loading: own the test environment and construct agents.
+
   // Create the test database and context, and reset the snapshot counter.
   InjectableFacilityTest()
       : back_(":memory:"), ctx_(&timer_, &rec_), snapshot_time_(0) {}
@@ -98,6 +439,8 @@ class InjectableFacilityTest : public ::testing::Test {
     return a;
   }
 
+  // Test input: choose expected values and serialize explicit configuration.
+
   // Generate a map of annotated variable names to expected test values.
   // With explicit_values=false, use declared defaults. With explicit_values
   // =true, offset numeric defaults, flip booleans, and choose categorical 
@@ -122,62 +465,36 @@ class InjectableFacilityTest : public ::testing::Test {
       // We require that injected variables have a default value. Check that.
       EXPECT_TRUE(info.isMember("default")) << name << " needs a default";
       
-      // Either use the default vals, or generate new ones depending on type
-      const Json::Value& def = info["default"];
-      if (!explicit_values) {
-        values[name] = def;
-      } else if (info["type"] == "double") {
-        values[name] = def.asDouble() + 0.25 + i * 0.01;
-      } else if (info["type"] == "int") {
-        values[name] = def.asInt() + 2 + i;
-      } else if (info["type"] == "bool") {
-        values[name] = !def.asBool();
-      } else if (info["type"] == "std::string") {
-        const Json::Value& choices = info["categorical"];
-        values[name] = choices.isArray() && !choices.empty()
-                           ? choices[choices.size() - 1]
-                           : Json::Value("injected_value");
-      } else {
-        ADD_FAILURE() << "Add a test value for " << name << ": "
-                      << info["type"];
-      }
+      SCOPED_TRACE(name);
+      const TypeOps& ops = Operations(info["type"]);
+      Json::Value value = explicit_values
+          ? Sample(info["type"], info["default"], i, info["shape"])
+          : info["default"];
+      const Json::Value& choices = info["categorical"];
+      if (explicit_values && info["type"] == "std::string" &&
+          choices.isArray() && !choices.empty())
+        value = choices[choices.size() - 1];
+      values[name] = ops.normalize(value);
     }
 
     return values;
   }
 
-  // Turn named scalar values into XML, escaping strings as needed.
-  std::string Config(const Json::Value& values) {
+  // Serialize normalized test values using the same aliases as cycpp.
+  std::string Config(const Json::Value& values, const Json::Value& vars) {
     std::stringstream xml;
     xml << std::setprecision(17);
-
     std::vector<std::string> names = values.getMemberNames();
-    for (int i = 0; i < names.size(); ++i) {
+    for (size_t i = 0; i < names.size(); ++i) {
       const std::string& name = names[i];
-      // Current snippets have scalar, unaliased XML fields.
-      xml << "<" << name << ">";
-      if (values[name].isString()) {
-        const std::string value = values[name].asString();
-        for (int j = 0; j < value.size(); ++j) {
-          switch (value[j]) {
-            case '&': xml << "&amp;"; break;
-            case '<': xml << "&lt;"; break;
-            case '>': xml << "&gt;"; break;
-            default: xml << value[j];
-          }
-        }
-      } else if (values[name].isBool()) {
-        xml << (values[name].asBool() ? "true" : "false");
-      } else if (values[name].isIntegral()) {
-        xml << values[name].asInt();
-      } else {
-        xml << values[name].asDouble();
-      }
-      xml << "</" << name << ">";
+      const Json::Value& info = vars[name];
+      WriteXml(xml, values[name], info["type"],
+               info.isMember("alias") ? info["alias"] : Json::Value(name));
     }
-
     return xml.str();
   }
+
+  // State verification: capture database state and compare it with expectations.
 
   // Record base and injected state at a new test time, then return the
   // database row containing the injected state.
@@ -215,20 +532,12 @@ class InjectableFacilityTest : public ::testing::Test {
       const std::string& name = names[i];
       SCOPED_TRACE(name); // include the variable name in failure reports
 
-      const Json::Value& type = vars[name]["type"];
-      if (type == "double") {
-        EXPECT_DOUBLE_EQ(values[name].asDouble(), state.GetVal<double>(name));
-      } else if (type == "int") {
-        EXPECT_EQ(values[name].asInt(), state.GetVal<int>(name));
-      } else if (type == "bool") {
-        EXPECT_EQ(values[name].asBool(), state.GetVal<bool>(name));
-      } else if (type == "std::string") {
-        EXPECT_EQ(values[name].asString(), state.GetVal<std::string>(name));
-      } else {
-        ADD_FAILURE() << "Add a state comparison for " << type;
-      }
+      const TypeOps& ops = Operations(vars[name]["type"]);
+      ExpectValue(ops.normalize(values[name]), ops.fetch(state, name));
     }
   }
+
+  // Simulation behavior helpers: inspect transactions and recorded positions.
 
   // Read a resource's recorded quantity without rebuilding its composition.
   double Quantity(cyclus::MockSim& sim, int resource_id) {
@@ -258,26 +567,81 @@ class InjectableFacilityTest : public ::testing::Test {
   int snapshot_time_;
 };
 
+// 7. Helper tests: check generic type handling independently of the facility.
+
+// Exercise the generated dispatch and recursive conversions independently of
+// which types happen to be present in the currently included snippets.
+TEST(InjectableTypes, PopulatedDatabaseValues) {
+  for (const auto& entry : Types()) {
+    const TypeOps& ops = entry.second;
+    SCOPED_TRACE(entry.first);
+    // These backend-only leaves have no test XML/value rules. A facility that
+    // introduces one still fails explicitly in Values(), rather than skipping it.
+    if (ops.type == "cyclus::Blob" || ops.type == "boost::uuids::uuid") {
+      EXPECT_THROW(Sample(ops.type, Json::Value(), 0, Json::Value()),
+                   std::runtime_error);
+      continue;
+    }
+    Json::Value value = ops.normalize(
+        Sample(ops.type, Json::Value(), 0, Json::Value()));
+    cyclus::SqliteBack backend(":memory:");
+    cyclus::Recorder recorder;
+    recorder.RegisterBackend(&backend);
+    ops.record(recorder, value);
+    recorder.Flush();
+    cyclus::QueryResult state = backend.Query("GenericTypeState", nullptr);
+    ASSERT_EQ(1, state.rows.size());
+    ExpectValue(value, ops.fetch(state, "value"));
+  }
+}
+
+TEST(InjectableTypes, NestedAliasesAndEscaping) {
+  Json::Reader reader;
+  Json::Value type, alias, value;
+  ASSERT_TRUE(reader.parse(
+      R"json(["std::map", "std::string", ["std::pair", "double",
+              ["std::vector", "std::string"]]])json", type));
+  ASSERT_TRUE(reader.parse(
+      R"json([["settings", "entry"], "label",
+              ["details", "cost", ["names", "name"]]])json", alias));
+  ASSERT_TRUE(reader.parse(R"json([["a&b", [1.25, ["x<y", "z"]]]])json", value));
+  std::stringstream xml;
+  WriteXml(xml, value, type, alias);
+  EXPECT_EQ("<settings><entry><label>a&amp;b</label><details><cost>1.25</cost>"
+            "<names><name>x&lt;y</name><name>z</name></names></details>"
+            "</entry></settings>", xml.str());
+  cyclus::XMLParser parser;
+  EXPECT_NO_THROW(parser.Init(xml));
+}
+
+TEST(InjectableTypes, ShapesAndDictionaryDefaults) {
+  Json::Reader reader;
+  Json::Value type, shape, defaults;
+  ASSERT_TRUE(reader.parse(R"json(["std::vector", "std::string"])json", type));
+  ASSERT_TRUE(reader.parse("[3, 5]", shape));
+  Json::Value sample = Sample(type, Json::Value(), 0, shape);
+  ASSERT_EQ(3, sample.size());
+  for (Json::ArrayIndex i = 0; i < sample.size(); ++i)
+    EXPECT_EQ(5, sample[i].asString().size());
+  ASSERT_TRUE(reader.parse(R"json(["std::map", "int", "double"])json", type));
+  ASSERT_TRUE(reader.parse(R"json({"2": 1.25, "3": -0.5})json", defaults));
+  Json::Value entries = Operations(type).normalize(defaults);
+  ASSERT_EQ(2, entries.size());
+  EXPECT_EQ(2, entries[0][0].asInt());
+  EXPECT_DOUBLE_EQ(1.25, entries[0][1].asDouble());
+  EXPECT_EQ(3, entries[1][0].asInt());
+  EXPECT_DOUBLE_EQ(-0.5, entries[1][1].asDouble());
+  EXPECT_THROW(Operations(Json::Value("unknown_type")), std::runtime_error);
+}
+
+// 8. Facility state tests: discover variables and check defaults, explicit
+// input, cloning, database restoration, and the generated input schema.
+
 TEST_F(InjectableFacilityTest, ExpectedVariables) {
   InjectableFacility* a = Load("");
   Json::Value vars = a->annotations()["vars"];
-  // Independent expectations catch a missing pragma/include that discovery
-  // alone would overlook. Extend this list when adding a snippet or variable.
-  const char* expected[] = {
-      "latitude", "longitude", "unit_cost", "unit_cost_mod", "sell_quantity",
-      "active_buying_frequency_type", "active_buying_val", "active_buying_min",
-      "active_buying_max", "active_buying_mean", "active_buying_stddev",
-      "active_buying_end_probability", "active_buying_disruption_probability",
-      "active_buying_disruption", "dormant_buying_frequency_type",
-      "dormant_buying_val", "dormant_buying_min", "dormant_buying_max",
-      "dormant_buying_mean", "dormant_buying_stddev",
-      "dormant_buying_end_probability", "dormant_buying_disruption_probability",
-      "dormant_buying_disruption", "buying_size_type", "buying_size_val",
-      "buying_size_min", "buying_size_max", "buying_size_mean",
-      "buying_size_stddev", "reorder_point", "reorder_quantity",
-      "cumulative_cap"};
-  for (int i = 0; i < sizeof(expected) / sizeof(expected[0]); ++i) {
-    EXPECT_TRUE(vars[expected[i]].isObject()) << expected[i];
+  for (const char* name : kExpectedVariables) {
+    EXPECT_TRUE(vars[name].isObject()) << name;
   }
 }
 
@@ -289,14 +653,14 @@ TEST_F(InjectableFacilityTest, Defaults) {
 TEST_F(InjectableFacilityTest, ExplicitInput) {
   InjectableFacility* defaults = Load("");
   Json::Value values = Values(defaults, true);
-  InjectableFacility* a = Load(Config(values));
+  InjectableFacility* a = Load(Config(values, defaults->annotations()["vars"]));
   ExpectState(Snapshot(a), values, a->annotations()["vars"]);
 }
 
 TEST_F(InjectableFacilityTest, Clone) {
   InjectableFacility* defaults = Load("");
   Json::Value values = Values(defaults, true);
-  InjectableFacility* a = Load(Config(values));
+  InjectableFacility* a = Load(Config(values, defaults->annotations()["vars"]));
   InjectableFacility* clone = dynamic_cast<InjectableFacility*>(a->Clone());
   ASSERT_NE(nullptr, clone);
   ExpectState(Snapshot(clone), values, a->annotations()["vars"]);
@@ -307,7 +671,7 @@ TEST_F(InjectableFacilityTest, Clone) {
 TEST_F(InjectableFacilityTest, DatabaseRoundTrip) {
   InjectableFacility* defaults = Load("");
   Json::Value values = Values(defaults, true);
-  InjectableFacility* a = Load(Config(values));
+  InjectableFacility* a = Load(Config(values, defaults->annotations()["vars"]));
   ExpectState(Snapshot(a), values, a->annotations()["vars"]);
   std::vector<cyclus::Cond> conds = Conditions(a);
   cyclus::CondInjector filtered(&back_, conds);
@@ -330,10 +694,12 @@ TEST_F(InjectableFacilityTest, Schema) {
   cyclus::XMLParser parser;
   parser.Init("<InjectableFacility/>");
   EXPECT_NO_THROW(parser.Validate(schema));
-  parser.Init("<InjectableFacility>" + Config(Values(a, true)) +
+  parser.Init("<InjectableFacility>" + Config(Values(a, true), a->annotations()["vars"]) +
               "</InjectableFacility>");
   EXPECT_NO_THROW(parser.Validate(schema));
 }
+
+// 9. Facility behavior tests: run simulations and check lifecycle behavior.
 
 TEST_F(InjectableFacilityTest, RunsWithDefaults) {
   cyclus::MockSim sim(2);
