@@ -78,10 +78,15 @@ MESSAGE("--    HDF5 Include directory: ${HDF5_INCLUDE_DIR}")
 MESSAGE("--    HDF5 Library directories: ${HDF5_LIBRARY_DIRS}")
 MESSAGE("--    HDF5 Libraries: ${HDF5_LIBRARIES}")
 
-# find Coin
-FIND_PACKAGE(COIN REQUIRED)
-SET(STUB_INCLUDE_DIRS ${STUB_INCLUDE_DIRS} ${COIN_INCLUDE_DIR})
-set(LIBS ${LIBS} ${COIN_LIBRARIES})
+# Find Coin, for archetypes that use the Coin solver interface of Cyclus, e.g.
+# by including prog_translator.h. It is optional, as Cyclus itself is only
+# built with Coin when configured with --allow-milps, and the archetypes
+# generated from this stub do not use it.
+FIND_PACKAGE(COIN)
+IF(COIN_FOUND)
+    SET(STUB_INCLUDE_DIRS ${STUB_INCLUDE_DIRS} ${COIN_INCLUDE_DIR})
+    set(LIBS ${LIBS} ${COIN_LIBRARIES})
+ENDIF()
 
 
 # include all the directories we just found
