@@ -83,6 +83,7 @@ Since last release
 
 **Fixed:**
 
+* Fixed the publish workflows failing in pull requests from forks, which cannot push to the GitHub Container Registry of the organization. They now only push the images for events of the repository itself, and only build and test them in pull requests from forks (#2009)
 * Fixed the ``add_custom_command`` calls of ``UseCyclus.cmake`` that gave ``COMMENT`` twice, which is an error with policy CMP0175 of CMake 3.31 (#1998)
 * Fixed the shared libraries on Linux being linked without the flags of the ``LDFLAGS`` environment variable, as ``CMakeLists.txt`` replaced ``CMAKE_SHARED_LINKER_FLAGS`` instead of appending to it (#2001)
 * Fixed the Pixi workspace failing to find libxml++ by depending on ``libxmlpp-devel``, which has the headers and pkg-config file of libxml++ that build 4 of the conda-forge ``libxmlpp-4.0`` no longer includes (#1994)
