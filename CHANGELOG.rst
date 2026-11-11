@@ -46,6 +46,7 @@ Since last release
 * Introduced a definition of "stocked" for a resource buffer, which is a threshold quantity that can be set by the user (#)
 
 **Changed:**
+* Changed the preference adjustment in the resource exchange tests to multiply by a fixed factor instead of squaring (#1971)
 * Set the maximum CMake policy version of Cyclus to 4.4 with the ``cyclus_cmake_policy_max`` macro, so that CMake uses the NEW behavior of the policies up to 4.4, and removed the version guard of policy CMP0135 (#1998)
 * Raised the minimum versions of Python to 3.10.0, SQLite to 3.36.0, Jinja2 to 2.10.3, NumPy to 1.21.4, and pandas to 1.3.4, and lowered that of Coin-Clp to 1.17.3, which are the versions tested in the ``minimum`` environment of the Pixi workspace
 * Removed the ``python<3.13`` and ``cython<3.1.0`` pins from the conda Docker builds, which now install ``libpython`` in place of the Python bindings of Boost (#1985)

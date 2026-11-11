@@ -1,6 +1,5 @@
 #include <set>
 #include <string>
-#include <math.h>
 
 #include <gtest/gtest.h>
 
@@ -36,6 +35,12 @@ using cyclus::TestContext;
 using std::set;
 using std::string;
 
+// Requester multiplies each preference it adjusts by this factor. A factor of
+// unity would leave the preferences untouched and make the expected values
+// pass without any adjustment having happened.
+constexpr double kPrefAdjustFactor = 2;
+static_assert(kPrefAdjustFactor != 1, "preference adjustment must be visible");
+
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class Requester: public TestFacility {
  public:
@@ -61,7 +66,7 @@ class Requester: public TestFacility {
     return rps;
   }
 
-  // increments counter and squares all preferences
+  // increments counter and multiplies all preferences by kPrefAdjustFactor
   virtual void AdjustMatlPrefs(PrefMap<Material>::type& prefs) {
     std::map<Request<Material>*,
              std::map<Bid<Material>*, double> >::iterator p_it;
@@ -69,7 +74,7 @@ class Requester: public TestFacility {
       std::map<Bid<Material>*, double>& map = p_it->second;
       std::map<Bid<Material>*, double>::iterator m_it;
       for (m_it = map.begin(); m_it != map.end(); ++m_it) {
-        m_it->second = std::pow(m_it->second, 2);
+        m_it->second *= kPrefAdjustFactor;
       }
     }
     pref_ctr_++;
@@ -314,8 +319,10 @@ TEST_F(ResourceExchangeTests, PrefValues) {
 
   EXPECT_NO_THROW(exchng->AdjustAll());
 
-  pobs[preq].begin()->second = std::pow(preq->preference(), 2);
-  cobs[creq].begin()->second = std::pow(std::pow(creq->preference(), 2), 2);
+  // parent adjusts its own prefs once, child's prefs get adjusted by both
+  pobs[preq].begin()->second = preq->preference() * kPrefAdjustFactor;
+  cobs[creq].begin()->second =
+      creq->preference() * kPrefAdjustFactor * kPrefAdjustFactor;
   EXPECT_EQ(context.trader_prefs[parent], pobs);
   EXPECT_EQ(context.trader_prefs[child], cobs);
 
