@@ -21,6 +21,14 @@ def tmplog(fname):
 
 @pytest.mark.parametrize("pth", ['stubtest', 'stub_test', 'stubTest', 'StubTest'])
 def test_stubs(pth):
+    # Building a stub project needs the tools that a Cyclus install alone does
+    # not provide, e.g. in the test environment of the conda-forge feedstock.
+    # Without them the test is skipped, but with them a build failure is a
+    # real failure of the installed headers or CMake modules.
+    for tool in ['cmake', 'make']:
+        if shutil.which(tool) is None:
+            pytest.skip(f'{tool} is needed to build a stub project')
+
     log = f'stub_test_{pth}.log'
     agent_name_prefix = 'tmp'
 
@@ -58,7 +66,7 @@ def test_stubs(pth):
                                         cwd=src, stdout=f, stderr=f)
             except subprocess.CalledProcessError as e:
                 print(msg)
-                pytest.skip(msg)  # skip if we can't install for some reason.
+                raise e
 
             # run unit tests for stub
             cmd = tst_cmd
