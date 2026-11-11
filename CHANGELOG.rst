@@ -6,6 +6,7 @@ Since last release
 ====================
 
 **Added:**
+* Added a Dependabot configuration (``.github/dependabot.yml``) that checks weekly for updates of the GitHub Actions used in the workflows and groups them into a single pull request (#2009)
 * Added concurrency groups to the build, MacOS build, and code coverage workflows so that a new push cancels superseded in-progress runs (#1984)
 * Added a Pixi workspace (``pixi.toml``, ``pixi.lock``) for development on Linux and MacOS (#1984)
 * Added forced decay mode for use inside Material::Absorb() to correctly handle lazy mode with small timesteps and half-lives (#1974)
@@ -46,6 +47,7 @@ Since last release
 * Introduced a definition of "stocked" for a resource buffer, which is a threshold quantity that can be set by the user (#)
 
 **Changed:**
+* Updated the GitHub Actions of the workflows to their latest versions (#2009)
 * Set the maximum CMake policy version of Cyclus to 4.4 with the ``cyclus_cmake_policy_max`` macro, so that CMake uses the NEW behavior of the policies up to 4.4, and removed the version guard of policy CMP0135 (#1998)
 * Raised the minimum versions of Python to 3.10.0, SQLite to 3.36.0, Jinja2 to 2.10.3, NumPy to 1.21.4, and pandas to 1.3.4, and lowered that of Coin-Clp to 1.17.3, which are the versions tested in the ``minimum`` environment of the Pixi workspace
 * Removed the ``python<3.13`` and ``cython<3.1.0`` pins from the conda Docker builds, which now install ``libpython`` in place of the Python bindings of Boost (#1985)
@@ -81,6 +83,7 @@ Since last release
 
 **Fixed:**
 
+* Fixed the publish workflows failing in pull requests from forks, which cannot push to the GitHub Container Registry of the organization. They now only push the images for events of the repository itself, and only build and test them in pull requests from forks (#2009)
 * Fixed the ``add_custom_command`` calls of ``UseCyclus.cmake`` that gave ``COMMENT`` twice, which is an error with policy CMP0175 of CMake 3.31 (#1998)
 * Fixed the shared libraries on Linux being linked without the flags of the ``LDFLAGS`` environment variable, as ``CMakeLists.txt`` replaced ``CMAKE_SHARED_LINKER_FLAGS`` instead of appending to it (#2001)
 * Fixed the Pixi workspace failing to find libxml++ by depending on ``libxmlpp-devel``, which has the headers and pkg-config file of libxml++ that build 4 of the conda-forge ``libxmlpp-4.0`` no longer includes (#1994)
