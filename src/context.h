@@ -196,36 +196,50 @@ class Context {
   /// @return the current set of traders registered for resource exchange.
   inline const std::set<Trader*>& traders() const { return traders_; }
 
-  inline const std::map<int,Trader*>& IdTrader() const {return traderids_;}
-
-  inline void SetTraderIds(int id, Trader* e) {traderids_[id] = e;}
-
   ////////////////////////////////////////////////////////// discrete cyclus functions ///////////////////
 
-  inline void RegisterCommodityConsumer(std::string in_commod, Trader* e){commodity_consumers_[in_commod].insert(e);}
+  //////////////////////////////////////////////////
+  ///////////////// Registering Trading DRE Commodities 
+
+  void RegisterCommoditiesTraded(int t, std::set<std::string> trade_commods);
 
   void UnregisterCommodityConsumer(std::set<std::string> in_commods, Trader* e);
 
-  inline const std::map<std::string, std::set<Trader*>>& consumers() const {return commodity_consumers_;}
+  //////////////////////////////////////////////////
+  ///////////////// TIME LINE ORGANIZATION FUNCTIONS 
+  inline int NextEvent(){return next_event_;}
+
+  void AddToTimeline(int t);
+
+  void DeleteFromTimeline();
 
 
-  
-  void RegisterCommoditiesTraded(int t, std::set<std::string> trade_commods);
-
-  inline std::set<std::string>& CommoditiesTraded(int t) {return commodities_traded_.at(t);}
-
-  inline void RegisterRequesters(int time, Trader* e) {request_queue_[time].insert(e);
-  } //conditions to register an event is up to archetype dev
-
-  inline void EventComplete(int t) {request_queue_.erase(t);} // fit this so it purges any 0 entries as well as the most current completed event ! 
-  inline std::set<Trader*> EventRequesters(int t) {return request_queue_[t];}
-  // inline const std::set<Trader*>& EventRequesters(int t) const {return request_queue_[t];}
+  template <typename agent_type, typename key_type> void AddToMap(key_type key, agent_type agent, 
+                                std::map<key_type,std::set<agent_type>> map){
+    map[key].insert(agent);
     
-    // return request_queue_.at(t); }
-  
-  inline const std::map<int,std::set<Trader*>>& EventTimeline() const { return request_queue_; }
+  } 
 
-  inline void SchedPopulate(int next_event) {pop_sched_.insert(next_event); request_queue_[next_event];} // there are more use cases for this
+  template <typename agent_type, typename key_type> void DeleteFromMap(key_type key,
+                                std::map<key_type,std::set<agent_type>> map){
+    map.erase(key);
+    
+  } 
+
+  template <typename agent_type, typename key_type> std::set<agent_type> KeyToMap(key_type key ,
+                                std::map<key_type,std::set<agent_type>> map){
+    return map[key];
+  } 
+
+  /////// getter functions for the maps /// use the above templates to interrogate them 
+
+  inline const std::map<int,std::set<Trader*>>& GetTraderQueue() const {return request_queue_;}
+
+  inline const std::map<int,std::set<std::string>>& GetCommodityQueue() const {return commodities_traded_;}
+
+  inline const std::map<int,std::set<TimeListener*>>& GetUpdateQueue() const {return update_queue_;}
+
+  inline const std::map<std::string,std::set<Trader*>>& GetConsumerCommodities() const {return commodity_consumers_;}
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -286,7 +300,8 @@ class Context {
   void RegisterTimeListener(TimeListener* tl);
 
   /// Removes an agent from receiving tick/tock notifications.
-  /// Agents should unregister from their Decommission method.
+  /// Agents should 
+  // ister from their Decommission method.
   void UnregisterTimeListener(TimeListener* tl);
 
   /// Initializes the simulation time parameters. Should only be called once -
@@ -424,10 +439,11 @@ class Context {
 
   std::set<Trader*> traders_;
   std::map<int, std::set<Trader*>> request_queue_;
+  std::map<int, std::set<TimeListener*>> update_queue_;
   std::map<std::string, std::set<Trader*>> commodity_consumers_;
   std::map<int,std::set<std::string>> commodities_traded_;
-  std::set<int> pop_sched_;
-  std::map<int,Trader*> traderids_;
+  std::set<int> timeline_;
+  int next_event_;
 
   std::map<std::string, int> n_prototypes_;
   std::map<std::string, int> n_specs_;

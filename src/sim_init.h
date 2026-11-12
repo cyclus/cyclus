@@ -89,7 +89,6 @@ class SimInit {
   void LoadBuildSched();
   void LoadDecomSched();
   void LoadNextIds();
-  void LoadCommodities();
 
   void* LoadPreconditioner(std::string name);
   ExchangeSolver* LoadGreedySolver(

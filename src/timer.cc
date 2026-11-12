@@ -71,11 +71,12 @@ void Timer::RunSim() {
     // run through phases
     DoBuild();
     CLOG(LEV_INFO2) << "Beginning Tick for time: " << time_;
-    DoTick();
+    //DoTick();
+    DoUpdate();
     CLOG(LEV_INFO2) << "Beginning DRE for time: " << time_;
     DoResEx(&matl_manager, &genrsrc_manager);
     CLOG(LEV_INFO2) << "Beginning Tock for time: " << time_;
-    DoTock();
+    //DoTock();
     CLOG(LEV_INFO2) << "Beginning Decision for time: " << time_;
     DoDecision();
     DoDecom();
@@ -83,8 +84,12 @@ void Timer::RunSim() {
 #ifdef CYCLUS_WITH_PYTHON
     EventLoop();
 #endif
-    time_ = NextEvent();
-    
+
+    //anything with delete the times would probably go here 
+    ctx_->DeleteFromTimeline(); //delete time for most recent event 
+    // could maybe condense the build_queue and decom_queue stuff here 
+    time_ = ctx_->NextEvent();
+
     RedrawProgressBar();
 
 
@@ -137,10 +142,11 @@ void Timer::DoTick() {
 
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
-  auto reg_traders = ctx_->EventRequesters(time_);   
+  auto reg_traders = ctx_->KeyToMap(time_,ctx_->GetTraderQueue());
   if(reg_traders.size()>0){
       matmgr->Execute();
       genmgr->Execute();
+      ctx_->DeleteFromMap(time_,ctx_->GetTraderQueue());
     }
 }
 
@@ -163,17 +169,6 @@ void Timer::DoTock() {
       if (a->enter_time() != -1) {
         RecordInventories(a);
       }
-    }
-  }
-  auto reg_traders = ctx_->EventTimeline();
-  if(reg_traders[time_].size()>0){
-    ctx_->EventComplete(time_); //to dereference some pointers, maybe applied to build/decom maps too
-
-    if(reg_traders.count(reg_traders.lower_bound(time_ +1)->first) == 0){ 
-      //if archetype developer has some ctx_->DeregisterRequester behavior
-      //this looks for instances that previously registered -upcoming- events 
-      //have been emptied of requesters
-      ctx_->EventComplete(reg_traders.lower_bound(time_ + 1)->first);
     }
   }
 }
@@ -256,6 +251,16 @@ void Timer::RegisterTimeListener(TimeListener* agent) {
   }
 }
 
+void Timer::DoUpdate(){
+  auto updaters = ctx_->KeyToMap(time_, ctx_->GetUpdateQueue());
+    if(updaters.size()>0){
+      for (TimeListener* agent : updaters) {
+        agent->DoUpdate();
+      }
+      ctx_->DeleteFromMap(time_,ctx_->GetUpdateQueue());
+    }
+}
+
 void Timer::UnregisterTimeListener(TimeListener* tl) {
   tickers_.erase(tl->id());
   if (tl->IsShim()) {
@@ -266,14 +271,6 @@ void Timer::UnregisterTimeListener(TimeListener* tl) {
         std::remove(cpp_tickers_.begin(), cpp_tickers_.end(), tl),
         cpp_tickers_.end());
   }
-}
-
-int Timer::NextEvent(){
-  auto reg_traders = ctx_->EventTimeline();
-  int t_p = time_ +1;  
-  std::vector<int> event_lists = {decom_queue_.lower_bound(t_p)->first,build_queue_.lower_bound(t_p)->first,
-                                  reg_traders.lower_bound(t_p)->first};
-  return *std::min_element(event_lists.begin(), event_lists.end());
 }
 
 void Timer::SchedBuild(Agent* parent, std::string proto_name, int t) {
@@ -338,10 +335,6 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   ctx_ = ctx;
   time_ = 0;
   si_ = si;
-  ctx_->SchedPopulate(dur()+1); 
-  build_queue_[dur()+1]; // find a better home 
-  decom_queue_[dur()+1]; // find a better home 
-
 
   if (si.branch_time > -1) {
     time_ = si.branch_time;

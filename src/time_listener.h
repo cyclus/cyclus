@@ -34,6 +34,14 @@ class TimeListener : virtual public Ider {
   /// @param time is the current simulation timestep
   virtual void Tock() = 0;
 
+  /// Simulation agents should be able to create their own event scheduling
+  /// method. 
+  virtual void EventRequest() {};
+
+  /// Replaces Tick/Tock methods (not deteled yet)
+  /// method. 
+  virtual void DoUpdate() {};
+
   /// Simulation agents do their end-of-timestep decisions in the
   /// Decision method. The decision method allows for agents to
   /// make decision based on the operation of facilities during the

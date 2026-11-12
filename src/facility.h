@@ -4,13 +4,10 @@
 #include <string>
 #include <vector>
 #include <set>
-#include <functional>
 
 #include "agent.h"
 #include "time_listener.h"
 #include "trader.h"
-#include "toolkit/scheduling_function.h"
-#include "toolkit/commodity_recipe_context.h"
 
 namespace cyclus {
 
@@ -27,7 +24,7 @@ class Region;
 ///
 /// @section intro Introduction
 ///
-/// The Facility type plays a primary role dseCyclus.  A Facility
+/// The Facility type plays a primary role in Cyclus.  A Facility
 /// facility is where offers and requests are generated and transmitted to a
 /// ResourceExchange and where shipments of material, issued by the exchange,
 /// are executed. The algorithms to determine what offers and requests are
@@ -130,18 +127,6 @@ class Facility : public TimeListener, public Agent, public Trader {
     return std::set<BidPortfolio<Product>::Ptr>();
   }
 
-  virtual void EventRequest(); //maybe an archetype dev will want to replace this
-  // this is intended to be a default behavior should an archetype developer not invoke their own "Scheduling Function "
-  //within cycamore
-  // void EventRequest(){
-  //schedule_helper_.<chosen function>(args);;
-  // or more directly schedule_helper.schedule(time,commods)
-  //}
-
-  virtual void Tock();
-
-  virtual void Tick();
-
   /// default implementation for material preferences.
   virtual void AdjustMatlPrefs(RequestBidMap<Material>::type& prefs) {}
 
@@ -206,9 +191,6 @@ class Facility : public TimeListener, public Agent, public Trader {
   /// @brief Returns all parent facilities by traversing up the hierarchy
   /// @return Vector of all parent facilities, ordered from closest to farthest
   std::vector<Facility*> GetAllParentFacilities();
-
-  protected: 
-  toolkit::SchedulingFunctions schedule_helper_;
 };
 
 }  // namespace cyclus

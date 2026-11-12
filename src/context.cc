@@ -137,6 +137,7 @@ void Context::SchedBuild(Agent* parent, std::string proto_name, int t) {
         ->AddVal("BuildTime", t)
         ->Record();
   }
+  AddToTimeline(t);
 }
 
 void Context::SchedDecom(Agent* m, int t) {
@@ -152,6 +153,7 @@ void Context::SchedDecom(Agent* m, int t) {
         ->AddVal("DecomTime", t)
         ->Record();
   }
+  AddToTimeline(t);
 }
 
 boost::uuids::uuid Context::sim_id() {
@@ -404,6 +406,17 @@ void Context::RegisterCommoditiesTraded(int t, std::set<std::string> trade_commo
   commodities_traded_[t].merge(trade_commods);
   for (auto commod : trade_commods){
   }
+}
+
+void Context::AddToTimeline(int t){
+  if (t >= time()){
+  timeline_.insert(t);
+  next_event_ = *timeline_.begin(); //minimum int in ordered set
+  }
+}
+
+void Context::DeleteFromTimeline(){
+  timeline_.erase(time());
 }
 
 Datum* Context::NewDatum(std::string title) {

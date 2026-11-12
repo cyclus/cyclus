@@ -124,10 +124,11 @@ template <class T> class ResourceExchange {
   
   std::set<Trader*> InitRequestersAdjacent() { 
     std::set<Trader*> traders;
-    auto commod_map = sim_ctx_->consumers(); 
-    auto map2 = sim_ctx_->CommoditiesTraded(sim_ctx_->time());
-    for (std::string commods : map2){
-      traders.merge(commod_map[commods]);
+    auto commodities_to_trade = sim_ctx_->KeyToMap(sim_ctx_->time(), sim_ctx_->GetCommodityQueue());
+    for (std::string commods : commodities_to_trade){
+      traders.merge(
+        sim_ctx_->KeyToMap(commods, sim_ctx_->GetConsumerCommodities())
+      );
     }
     return traders;
   }

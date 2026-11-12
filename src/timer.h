@@ -55,8 +55,6 @@ class Timer {
   /// Agents should unregister from their Decommission method.
   void UnregisterTimeListener(TimeListener* tl);
 
-  int NextEvent();
-
   /// Schedules the named prototype to be built for the specified parent at
   /// timestep t.
   void SchedBuild(Agent* parent, std::string proto_name, int t);
@@ -98,6 +96,7 @@ class Timer {
   /// sends the tick signal to all of the agents receiving time
   /// notifications.
   void DoTick();
+  void DoUpdate(); 
 
   /// Runs the resource exchange process for all traders.
   void DoResEx(ExchangeManager<Material>* matmgr,
