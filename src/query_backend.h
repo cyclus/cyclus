@@ -1016,7 +1016,11 @@ class Sha1 {
     Digest d;
     const unsigned int block_size = sizeof(CYCLUS_SHA1_ELEM_TYPE);
     const unsigned int bits_per_byte = std::numeric_limits<unsigned char>::digits;
-    #if BOOST_VERSION_MINOR < 86
+    // boost::uuids::detail::sha1::get_digest takes unsigned char (&)[20] as of
+    // Boost 1.86, and unsigned int (&)[5] before. BOOST_VERSION is from
+    // <boost/version.hpp>, so this header does not depend on any compile
+    // definitions of the build that includes it.
+    #if BOOST_VERSION < 108600
         unsigned int tmp[CYCLUS_SHA1_NINT];
     #else
         unsigned char tmp[CYCLUS_SHA1_NINT * block_size];
@@ -1024,7 +1028,7 @@ class Sha1 {
     hash_.get_digest(tmp);
 
     for (int i = 0; i < CYCLUS_SHA1_NINT; ++i) {
-        #if BOOST_VERSION_MINOR < 86
+        #if BOOST_VERSION < 108600
             d[i] = tmp[i];
         #else
             CYCLUS_SHA1_ELEM_TYPE elem = 0;

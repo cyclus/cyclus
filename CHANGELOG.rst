@@ -83,6 +83,8 @@ Since last release
 
 **Fixed:**
 
+* Fixed the installed ``query_backend.h`` failing to compile in archetype projects, including those generated with ``cycstub``, with Boost 1.86 or later unless they defined ``BOOST_VERSION_MINOR``. The header now checks the ``BOOST_VERSION`` macro of Boost, and the ``BOOST_VERSION_MINOR`` compile definition is removed. ``test_stubs`` now fails instead of being skipped when a stub project fails to build, and is only skipped when ``cmake`` or ``make`` is missing (#2008)
+* Fixed projects generated with ``cycstub`` failing to configure against a Cyclus built without Coin (i.e. without ``--allow-milps``), as the CMakeLists.txt of the stub template required Coin. Coin is now optional in the stub template, and is only used when it is found (#2008)
 * Fixed the publish workflows failing in pull requests from forks, which cannot push to the GitHub Container Registry of the organization. They now only push the images for events of the repository itself, and only build and test them in pull requests from forks (#2009)
 * Fixed the ``add_custom_command`` calls of ``UseCyclus.cmake`` that gave ``COMMENT`` twice, which is an error with policy CMP0175 of CMake 3.31 (#1998)
 * Fixed the shared libraries on Linux being linked without the flags of the ``LDFLAGS`` environment variable, as ``CMakeLists.txt`` replaced ``CMAKE_SHARED_LINKER_FLAGS`` instead of appending to it (#2001)
