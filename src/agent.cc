@@ -11,8 +11,6 @@
 #include "error.h"
 #include "logger.h"
 #include "resource.h"
-#include <set>
-
 
 namespace cyclus {
 
@@ -39,9 +37,9 @@ void Agent::InfileToDb(InfileTree* qe, DbInit di) {
   std::string proto = qe->GetString("name");
   int lifetime = OptionalQuery<int>(qe, "lifetime", -1);
   di.NewDatum("Agent")
-    ->AddVal("Prototype", proto)
-    ->AddVal("Lifetime", lifetime)
-    ->Record();
+      ->AddVal("Prototype", proto)
+      ->AddVal("Lifetime", lifetime)
+      ->Record();
 }
 
 void Agent::InitFrom(QueryableBackend* b) {
