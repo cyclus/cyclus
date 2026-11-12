@@ -80,13 +80,11 @@ class Trader {
   virtual void AcceptProductTrades(
       const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {}
 
-  virtual void EventRequest(){} // can be overridden ? 
-
   void FillInCommods(std::string commod){in_commods_.insert(commod);}
 
   std::set<std::string> GetInCommods() {return in_commods_;}
 
-  bool Participated; //assess whether the agent has traded or decommissioend
+  bool Participated; //assess whether the agent has traded 
 
   void SetParticipated(bool status){Participated = status;} //setter for Participated
 

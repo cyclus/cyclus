@@ -114,7 +114,6 @@ void Timer::RunSim() {
 void Timer::DoBuild() {
   // build queued agents
   std::vector<std::pair<std::string, Agent*>> build_list = build_queue_[time_];
-  //if build_list is empty at time, already no one builds i.e. "skips" event 
   for (int i = 0; i < build_list.size(); ++i) {
     Agent* m = ctx_->CreateAgent<Agent>(build_list[i].first);
     Agent* parent = build_list[i].second;
@@ -331,6 +330,7 @@ void Timer::Initialize(Context* ctx, SimInfo si) {
   if (si.m0 < 1 || si.m0 > 12) {
     throw ValueError("Invalid month0; must be between 1 and 12 (inclusive).");
   }
+
   want_kill_ = false;
   ctx_ = ctx;
   time_ = 0;
