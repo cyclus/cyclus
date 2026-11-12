@@ -89,7 +89,7 @@ void CommodityRecipeContext::Snapshot(DbInit di) {
         ->AddVal("out_recipe", out_recipes_[c])
         ->Record();
   }
-  
+
   std::map<int, std::string>::iterator it = rsrc_commod_map_.begin();
   for (; it != rsrc_commod_map_.end(); ++it) {
     di.NewDatum("CommodityRecipeContext_resmap")

@@ -24,7 +24,7 @@ void Facility::InitFrom(Facility* m) {
 }
 
 void Facility::Build(Agent* parent) {
-  Agent::Build(parent); 
+  Agent::Build(parent);
 }
 
 void Facility::EnterNotify() {
@@ -41,12 +41,12 @@ std::string Facility::str() {
 }
 
 void Facility::Decommission() {
-    if (!CheckDecommissionCondition()) {
+  if (!CheckDecommissionCondition()) {
     throw Error("Cannot decommission " + prototype());
   }
-  context()->UnregisterTrader(dynamic_cast<Trader*>(this));
-  context()->UnregisterTimeListener(this); 
 
+  context()->UnregisterTrader(dynamic_cast<Trader*>(this));
+  context()->UnregisterTimeListener(this);
   Agent::Decommission();
 }
 
