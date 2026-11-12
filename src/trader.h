@@ -92,7 +92,7 @@ class Trader {
   // getter for participated_
   bool Participated() { return Participated; }
 
-  protected:
+protected:
   Agent* manager_;
 
  private:
