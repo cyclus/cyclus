@@ -84,7 +84,7 @@ class Trader {
 
   std::set<std::string> GetInCommods() {return in_commods_;}
 
-  bool Participated; //assess whether the agent has traded 
+  bool participated_; // indicate whether the agent has traded 
 
   // setter for participated_
   void Participated(bool status = true) { participated_ = status; }
