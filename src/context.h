@@ -300,8 +300,7 @@ class Context {
   void RegisterTimeListener(TimeListener* tl);
 
   /// Removes an agent from receiving tick/tock notifications.
-  /// Agents should 
-  // ister from their Decommission method.
+  /// Agents should unregister from their Decommission method.
   void UnregisterTimeListener(TimeListener* tl);
 
   /// Initializes the simulation time parameters. Should only be called once -

@@ -93,7 +93,6 @@ inline void AcceptTrades(
   Trader* trader,
   const std::vector<std::pair<Trade<Product>, Product::Ptr>>& responses) {
   trader->AcceptProductTrades(responses);
-
 }
 
 }  // namespace cyclus

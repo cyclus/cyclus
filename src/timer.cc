@@ -64,10 +64,12 @@ void Timer::RunSim() {
 
   while (time_ < si_.duration) {
     CLOG(LEV_INFO1) << "Current time: " << time_;
+
     if (want_snapshot_) {
       want_snapshot_ = false;
       SimInit::Snapshot(ctx_);
     }
+
     // run through phases
     DoBuild();
     CLOG(LEV_INFO2) << "Beginning Tick for time: " << time_;
@@ -123,6 +125,7 @@ void Timer::DoBuild() {
     if (parent != NULL) {
       parent->BuildNotify(m);
     } else {
+      CLOG(LEV_DEBUG1) << "Hey! Listen! Built an Agent without a Parent.";
     }
   }
 }
