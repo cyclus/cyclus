@@ -86,9 +86,11 @@ class Trader {
 
   bool Participated; //assess whether the agent has traded 
 
-  void SetParticipated(bool status){Participated = status;} //setter for Participated
+  // setter for participated_
+  void Participated(bool status = true) { participated_ = status; }
 
-  bool ReturnParticipated(){return Participated;} //getter for Participated
+  // getter for participated_
+  bool Participated() { return Participated; }
 
   protected:
   Agent* manager_;
