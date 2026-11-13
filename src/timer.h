@@ -96,6 +96,7 @@ class Timer {
   /// sends the tick signal to all of the agents receiving time
   /// notifications.
   void DoTick();
+  void DoUpdate(); 
 
   /// Runs the resource exchange process for all traders.
   void DoResEx(ExchangeManager<Material>* matmgr,

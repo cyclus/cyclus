@@ -73,11 +73,12 @@ void Timer::RunSim() {
     // run through phases
     DoBuild();
     CLOG(LEV_INFO2) << "Beginning Tick for time: " << time_;
-    DoTick();
+    //DoTick();
+    DoUpdate();
     CLOG(LEV_INFO2) << "Beginning DRE for time: " << time_;
     DoResEx(&matl_manager, &genrsrc_manager);
     CLOG(LEV_INFO2) << "Beginning Tock for time: " << time_;
-    DoTock();
+    //DoTock();
     CLOG(LEV_INFO2) << "Beginning Decision for time: " << time_;
     DoDecision();
     DoDecom();
@@ -86,7 +87,9 @@ void Timer::RunSim() {
     EventLoop();
 #endif
 
-    time_++;
+    ctx_->DeleteFromTimeline(); //delete time for most recent event 
+    time_ = ctx_->NextEvent(); // get next event from context
+
     RedrawProgressBar();
 
 
@@ -131,6 +134,7 @@ void Timer::DoTick() {
   }
 
 #pragma omp parallel for
+
   for (size_t i = 0; i < cpp_tickers_.size(); ++i) {
     cpp_tickers_[i]->Tick();
   }
@@ -138,8 +142,12 @@ void Timer::DoTick() {
 
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
-  matmgr->Execute();
-  genmgr->Execute();
+  auto reg_traders = ctx_->KeyToMap(time_,ctx_->GetTraderQueue());
+  if(reg_traders.size()>0){ // skip events with no traders 
+      matmgr->Execute();
+      genmgr->Execute();
+      ctx_->DeleteFromMap(time_,ctx_->GetTraderQueue()); // delete completed event 
+    }
 }
 
 void Timer::DoTock() {
@@ -241,6 +249,16 @@ void Timer::RegisterTimeListener(TimeListener* agent) {
   } else {
     cpp_tickers_.push_back(agent);
   }
+}
+
+void Timer::DoUpdate(){
+  auto updaters = ctx_->KeyToMap(time_, ctx_->GetUpdateQueue());
+    if(updaters.size()>0){ // skip events with no updaters 
+      for (TimeListener* agent : updaters) {
+        agent->DoUpdate();
+      }
+      ctx_->DeleteFromMap(time_,ctx_->GetUpdateQueue()); // delete completed event 
+    }
 }
 
 void Timer::UnregisterTimeListener(TimeListener* tl) {

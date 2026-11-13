@@ -196,6 +196,50 @@ class Context {
   /// @return the current set of traders registered for resource exchange.
   inline const std::set<Trader*>& traders() const { return traders_; }
 
+  ////////////////////////////////////////////////////////// discrete cyclus functions ///////////////////
+
+  /// Replaces AddtoMap for CommodityQueue as facilities may request sets of commodities
+  void RegisterCommoditiesTraded(int t, std::set<std::string> trade_commods);  
+
+  /// Returns the earliest next event in the timeline
+  inline int NextEvent(){return next_event_;}
+
+  /// Schedules new event in the timeline (no knowledge of who scheduled)
+  void AddToTimeline(int t);
+
+  /// Removes an event from timeline after completion and updates next event.
+  void DeleteFromTimeline();
+
+  /// Template for adding to TraderQueue, UpdateQueue, ConsumerCommodities 
+  template <typename agent_type, typename key_type> void AddToMap(key_type key, agent_type agent, 
+                                std::map<key_type,std::set<agent_type>> map){
+    map[key].insert(agent);
+  } 
+
+  /// Template for deleting from TraderQueue, UpdateQueue, ConsumerCommodities after event completion
+  template <typename agent_type, typename key_type> void DeleteFromMap(key_type key,
+                                std::map<key_type,std::set<agent_type>> map){
+    map.erase(key);
+  } 
+
+  /// Template for return value from TraderQueue, UpdateQueue, ConsumerCommodities using key
+  template <typename agent_type, typename key_type> std::set<agent_type> KeyToMap(key_type key ,
+                                std::map<key_type,std::set<agent_type>> map){
+    return map[key];
+  } 
+
+  /////// getter functions for the maps /// use the above templates to interrogate them.
+
+  inline const std::map<int,std::set<Trader*>>& GetTraderQueue() const {return request_queue_;}
+
+  inline const std::map<int,std::set<std::string>>& GetCommodityQueue() const {return commodities_traded_;}
+
+  inline const std::map<int,std::set<TimeListener*>>& GetUpdateQueue() const {return update_queue_;}
+
+  inline const std::map<std::string,std::set<Trader*>>& GetConsumerCommodities() const {return commodity_consumers_;}
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   /// Create a new agent by cloning the named prototype. The returned agent is
   /// not initialized as a simulation participant.
   ///
@@ -383,16 +427,23 @@ class Context {
   /// contains archetype specs of all agents for which version have already
   /// been recorded in the db
   std::set<std::string> rec_ver_;
-
+  
   std::map<std::string, Agent*> protos_;
   std::map<std::string, Composition::Ptr> recipes_;
   std::map<std::string, Package::Ptr> packages_;
   std::map<std::string, TransportUnit::Ptr> transport_units_;
   std::set<Agent*> agent_list_;
+
   std::set<Trader*> traders_;
+  std::map<int, std::set<Trader*>> request_queue_;
+  std::map<int, std::set<TimeListener*>> update_queue_;
+  std::map<std::string, std::set<Trader*>> commodity_consumers_;
+  std::map<int,std::set<std::string>> commodities_traded_;
+  std::set<int> timeline_;
+  int next_event_;
+
   std::map<std::string, int> n_prototypes_;
   std::map<std::string, int> n_specs_;
-
   SimInfo si_;
   Timer* ti_;
   ExchangeSolver* solver_;
