@@ -383,40 +383,28 @@ void Context::UnregisterTimeListener(TimeListener* tl) {
   ti_->UnregisterTimeListener(tl);
 }
 
-void Context::UnregisterCommodityConsumer(std::set<std::string> in_commods, Trader* e){
-  for (std::string commod : in_commods){
-      commodity_consumers_.at(commod).erase(e);
-    }
-  std::map<int, std::set<Trader*>>::iterator it;
-  for (it = request_queue_.begin(); it!= request_queue_.end(); ++it){
-    if ((it->second).find(e) != (it->second).end()){
-    continue;
-    }
-    else {
-      (it->second).erase(e);
-      //come back to this below stuff 
-      // if ((it->second).size() ==0){
-      //     request_queue_.erase(it->first);
-      // }
-    }
-  }
-}
-
 void Context::RegisterCommoditiesTraded(int t, std::set<std::string> trade_commods){
   commodities_traded_[t].merge(trade_commods);
-  for (auto commod : trade_commods){
-  }
 }
 
 void Context::AddToTimeline(int t){
-  if (t >= time()){
+  if (t >= time() && t<= duration){
   timeline_.insert(t);
-  next_event_ = *timeline_.begin(); //minimum int in ordered set
+
   }
 }
 
 void Context::DeleteFromTimeline(){
-  timeline_.erase(time());
+  if (time()>0){
+    timeline_.erase(time());
+  }
+
+  if (timeline_.begin() != timeline_.end()){
+    next_event_ = *timeline_.begin(); //minimum int in ordered set
+  }
+  else {
+    next_event_ = duration;
+  }
 }
 
 Datum* Context::NewDatum(std::string title) {

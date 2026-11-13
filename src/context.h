@@ -201,12 +201,15 @@ class Context {
   //////////////////////////////////////////////////
   ///////////////// Registering Trading DRE Commodities 
 
-  void RegisterCommoditiesTraded(int t, std::set<std::string> trade_commods);
-
-  void UnregisterCommodityConsumer(std::set<std::string> in_commods, Trader* e);
+  void RegisterCommoditiesTraded(int t, std::set<std::string> trade_commods); //this function is needed over AddtoMap as a facility may request a set of commodities instead of singular 
 
   //////////////////////////////////////////////////
   ///////////////// TIME LINE ORGANIZATION FUNCTIONS 
+
+// need to make sure that it does not goo over duration and that we have reached the final event 
+//check if the list is 0 or check if the current event is the final event 
+
+
   inline int NextEvent(){return next_event_;}
 
   void AddToTimeline(int t);
@@ -430,6 +433,7 @@ class Context {
   /// contains archetype specs of all agents for which version have already
   /// been recorded in the db
   std::set<std::string> rec_ver_;
+  
   std::map<std::string, Agent*> protos_;
   std::map<std::string, Composition::Ptr> recipes_;
   std::map<std::string, Package::Ptr> packages_;
