@@ -62,7 +62,7 @@ inline void PopulateTradeResponses<Material>(
     const std::vector<Trade<Material>>& trades,
     std::vector<std::pair<Trade<Material>, Material::Ptr>>& responses) {
   dynamic_cast<Trader*>(trader)->GetMatlTrades(trades, responses);
-  trader->SetParticipated(true);
+  trader->Participated(true);
 }
 
 template <>
@@ -85,7 +85,7 @@ inline void AcceptTrades(
     Trader* trader,
     const std::vector<std::pair<Trade<Material>, Material::Ptr>>& responses) {
   dynamic_cast<Trader*>(trader)->AcceptMatlTrades(responses);
-  trader->SetParticipated(true);
+  trader->Participated(true);
 }
 
 template <>

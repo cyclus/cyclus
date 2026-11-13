@@ -90,7 +90,7 @@ class Trader {
   void Participated(bool status = true) { participated_ = status; }
 
   // getter for participated_
-  bool Participated() { return Participated; }
+  bool Participated() { return participated_; }
 
 protected:
   Agent* manager_;

@@ -108,14 +108,12 @@ template <class T> class ResourceExchange {
       std::set<Trader*>::iterator it;
       for (it = orig.begin(); it != orig.end(); ++it) {
         traders_.insert(*it);
-        (*it)->SetParticipated(true); // did I mean for this to go here??? 
-        //maybe only completed traders should be there 
       }
     }
   }
 
   void InitRequesters() {
-    auto orig = InitRequestersAdjacent(); //we do not need the whole ass map tbh. 
+    auto orig = InitRequestersAdjacent(); 
     std::set<Trader*>::iterator it;
     for (it = orig.begin(); it != orig.end(); ++it) {
       requesters_.insert(*it);

@@ -87,10 +87,8 @@ void Timer::RunSim() {
     EventLoop();
 #endif
 
-    //anything with delete the times would probably go here 
     ctx_->DeleteFromTimeline(); //delete time for most recent event 
-    // could maybe condense the build_queue and decom_queue stuff here 
-    time_ = ctx_->NextEvent();
+    time_ = ctx_->NextEvent(); // get next event from context
 
     RedrawProgressBar();
 
@@ -145,10 +143,10 @@ void Timer::DoTick() {
 void Timer::DoResEx(ExchangeManager<Material>* matmgr,
                     ExchangeManager<Product>* genmgr) {
   auto reg_traders = ctx_->KeyToMap(time_,ctx_->GetTraderQueue());
-  if(reg_traders.size()>0){
+  if(reg_traders.size()>0){ // skip events with no traders 
       matmgr->Execute();
       genmgr->Execute();
-      ctx_->DeleteFromMap(time_,ctx_->GetTraderQueue());
+      ctx_->DeleteFromMap(time_,ctx_->GetTraderQueue()); // delete completed event 
     }
 }
 
@@ -255,11 +253,11 @@ void Timer::RegisterTimeListener(TimeListener* agent) {
 
 void Timer::DoUpdate(){
   auto updaters = ctx_->KeyToMap(time_, ctx_->GetUpdateQueue());
-    if(updaters.size()>0){
+    if(updaters.size()>0){ // skip events with no updaters 
       for (TimeListener* agent : updaters) {
         agent->DoUpdate();
       }
-      ctx_->DeleteFromMap(time_,ctx_->GetUpdateQueue());
+      ctx_->DeleteFromMap(time_,ctx_->GetUpdateQueue()); // delete completed event 
     }
 }
 

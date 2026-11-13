@@ -198,43 +198,37 @@ class Context {
 
   ////////////////////////////////////////////////////////// discrete cyclus functions ///////////////////
 
-  //////////////////////////////////////////////////
-  ///////////////// Registering Trading DRE Commodities 
+  /// Replaces AddtoMap for CommodityQueue as facilities may request sets of commodities
+  void RegisterCommoditiesTraded(int t, std::set<std::string> trade_commods);  
 
-  void RegisterCommoditiesTraded(int t, std::set<std::string> trade_commods); //this function is needed over AddtoMap as a facility may request a set of commodities instead of singular 
-
-  //////////////////////////////////////////////////
-  ///////////////// TIME LINE ORGANIZATION FUNCTIONS 
-
-// need to make sure that it does not goo over duration and that we have reached the final event 
-//check if the list is 0 or check if the current event is the final event 
-
-
+  /// Returns the earliest next event in the timeline
   inline int NextEvent(){return next_event_;}
 
+  /// Schedules new event in the timeline (no knowledge of who scheduled)
   void AddToTimeline(int t);
 
+  /// Removes an event from timeline after completion and updates next event.
   void DeleteFromTimeline();
 
-
+  /// Template for adding to TraderQueue, UpdateQueue, ConsumerCommodities 
   template <typename agent_type, typename key_type> void AddToMap(key_type key, agent_type agent, 
                                 std::map<key_type,std::set<agent_type>> map){
     map[key].insert(agent);
-    
   } 
 
+  /// Template for deleting from TraderQueue, UpdateQueue, ConsumerCommodities after event completion
   template <typename agent_type, typename key_type> void DeleteFromMap(key_type key,
                                 std::map<key_type,std::set<agent_type>> map){
     map.erase(key);
-    
   } 
 
+  /// Template for return value from TraderQueue, UpdateQueue, ConsumerCommodities using key
   template <typename agent_type, typename key_type> std::set<agent_type> KeyToMap(key_type key ,
                                 std::map<key_type,std::set<agent_type>> map){
     return map[key];
   } 
 
-  /////// getter functions for the maps /// use the above templates to interrogate them 
+  /////// getter functions for the maps /// use the above templates to interrogate them.
 
   inline const std::map<int,std::set<Trader*>>& GetTraderQueue() const {return request_queue_;}
 

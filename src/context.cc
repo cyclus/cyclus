@@ -388,7 +388,7 @@ void Context::RegisterCommoditiesTraded(int t, std::set<std::string> trade_commo
 }
 
 void Context::AddToTimeline(int t){
-  if (t >= time() && t<= duration){
+  if (t >= time() && t<= si_.duration){
   timeline_.insert(t);
 
   }
@@ -403,7 +403,7 @@ void Context::DeleteFromTimeline(){
     next_event_ = *timeline_.begin(); //minimum int in ordered set
   }
   else {
-    next_event_ = duration;
+    next_event_ = si_.duration;
   }
 }
 
