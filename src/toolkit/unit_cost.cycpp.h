@@ -15,7 +15,7 @@
 
 // clang-format off
 #pragma cyclus var { \
-  "default": 0.0, \
+  "default": 1.0, \
   "uilabel": "Variable Cost Per Unit", \
   "doc": "Variable cost per unit of production (labor, materials, etc.). " \
          "The data from the Cost Basis Report represents a variable cost per " \
