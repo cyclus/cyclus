@@ -47,9 +47,10 @@ Since last release
 * Introduced a definition of "stocked" for a resource buffer, which is a threshold quantity that can be set by the user (#)
 
 **Changed:**
+* Replaced the deprecated ``pkg-config`` with ``pkgconf`` in the Pixi workspace, and listed the minimum version of Python as 3.10.x in ``DEPENDENCIES.rst`` (#2011)
 * Updated the GitHub Actions of the workflows to their latest versions (#2009)
 * Set the maximum CMake policy version of Cyclus to 4.4 with the ``cyclus_cmake_policy_max`` macro, so that CMake uses the NEW behavior of the policies up to 4.4, and removed the version guard of policy CMP0135 (#1998)
-* Raised the minimum versions of Python to 3.10.0, SQLite to 3.36.0, Jinja2 to 2.10.3, NumPy to 1.21.4, and pandas to 1.3.4, and lowered that of Coin-Clp to 1.17.3, which are the versions tested in the ``minimum`` environment of the Pixi workspace
+* Raised the minimum versions of Python to 3.10.x, SQLite to 3.36.0, Jinja2 to 2.10.3, NumPy to 1.21.4, and pandas to 1.3.4, and lowered that of Coin-Clp to 1.17.3, which are the versions tested in the ``minimum`` environment of the Pixi workspace
 * Removed the ``python<3.13`` and ``cython<3.1.0`` pins from the conda Docker builds, which now install ``libpython`` in place of the Python bindings of Boost (#1985)
 * Updated the Pixi workspace to Boost 1.92, Python 3.15, and Cython 3.3, and added ``libpython`` to it, as the conda-forge ``python`` package no longer installs the Python shared library as of Python 3.15 (#1985)
 * Clarify behavior of `Material::Absorb()` with respect to decay (#1966)
@@ -83,6 +84,7 @@ Since last release
 
 **Fixed:**
 
+* Fixed the tests of the ``minimum`` environment of the Pixi workspace failing as pytest 9.2.0 does not work with Python 3.10.0, which the SQLite 3.36.0 minimum holds the environment at. pytest is now capped below 9.2 in the ``minimum`` environment (#2011)
 * Fixed the installed ``query_backend.h`` failing to compile in archetype projects, including those generated with ``cycstub``, with Boost 1.86 or later unless they defined ``BOOST_VERSION_MINOR``. The header now checks the ``BOOST_VERSION`` macro of Boost, and the ``BOOST_VERSION_MINOR`` compile definition is removed. ``test_stubs`` now fails instead of being skipped when a stub project fails to build, and is only skipped when ``cmake`` or ``make`` is missing (#2008)
 * Fixed projects generated with ``cycstub`` failing to configure against a Cyclus built without Coin (i.e. without ``--allow-milps``), as the CMakeLists.txt of the stub template required Coin. Coin is now optional in the stub template, and is only used when it is found (#2008)
 * Fixed the publish workflows failing in pull requests from forks, which cannot push to the GitHub Container Registry of the organization. They now only push the images for events of the repository itself, and only build and test them in pull requests from forks (#2009)

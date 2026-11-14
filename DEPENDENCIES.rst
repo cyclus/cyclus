@@ -30,7 +30,7 @@ Package                   Minimum Version
 ``boost``                 1.71.0
 ``libxml2``               2.9.10
 ``libxml++``              2.40.1
-``python``                3.10.0
+``python``                3.10.x
 ``sqlite3``               3.36.0
 ``HDF5``                  1.10.4
 ``LAPACK``                3.9.0
