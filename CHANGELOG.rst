@@ -6,7 +6,7 @@ Since last release
 ====================
 
 **Added:**
-* Added an InjectableFacility to test injected code from cycpp.h files (#2003)
+* Added Cycpp tests for the unit-cost injectable fields (#2003)
 * Added concurrency groups to the build, MacOS build, and code coverage workflows so that a new push cancels superseded in-progress runs (#1984)
 * Added a Pixi workspace (``pixi.toml``, ``pixi.lock``) for development on Linux and MacOS (#1984)
 * Added forced decay mode for use inside Material::Absorb() to correctly handle lazy mode with small timesteps and half-lives (#1974)

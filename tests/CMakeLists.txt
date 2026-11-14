@@ -72,6 +72,17 @@ INSTALL(FILES ${header_files}
 ADD_SUBDIRECTORY(input)
 ADD_SUBDIRECTORY(toolkit)
 ADD_SUBDIRECTORY(agent_tests)
+SET(CYCLUS_TEST_LIBRARIES
+    "${CYCLUS_TEST_LIBRARIES}" gtest PARENT_SCOPE) # for stubs/agents
+
+ADD_SUBDIRECTORY(test_agents)
+INSTALL(FILES ${test_agents}
+    DESTINATION include/cyclus/test_agents
+    COMPONENT testing
+    )
+
+# test_agents may add Cycpp-generated test sources. Export after loading it so
+# that cyclus_unit_tests receives both ordinary and generated-host tests.
 SET(
     CYCLUS_CORE_TEST_SOURCE "${CYCLUS_CORE_TEST_SOURCE}"
     "${cc_files}"
@@ -81,15 +92,6 @@ SET(
     CYCLUS_CORE_INCLUDE_DIRS "${CYCLUS_CORE_INCLUDE_DIRS}"
     "${CYCLUS_CORE_TEST_INCLUDE_DIRS}"
     PARENT_SCOPE
-    )
-
-SET(CYCLUS_TEST_LIBRARIES
-    "${CYCLUS_TEST_LIBRARIES}" gtest PARENT_SCOPE) # for stubs/agents
-
-ADD_SUBDIRECTORY(test_agents)
-INSTALL(FILES ${test_agents}
-    DESTINATION include/cyclus/test_agents
-    COMPONENT testing
     )
 
 # read tests after building the driver, and add them to ctest
