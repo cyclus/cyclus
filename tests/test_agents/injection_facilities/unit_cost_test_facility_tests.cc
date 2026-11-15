@@ -18,9 +18,9 @@ const double kDefaultInjectedUnitCostMod = 0.0;
 class UnitCostTest : public InjectableTest<UnitCostTestFacility> {
  protected:
   void ExpectValues(UnitCostTestFacility* facility) {
-    EXPECT_DOUBLE_EQ(kConfiguredUnitCost, facility->get_unit_cost());
-    EXPECT_DOUBLE_EQ(kConfiguredUnitCostMod, facility->get_unit_cost_mod());
-    EXPECT_EQ(kConfiguredUnitCostMods, facility->get_unit_cost_mods());
+    EXPECT_DOUBLE_EQ(kConfiguredUnitCost, facility->unit_cost);
+    EXPECT_DOUBLE_EQ(kConfiguredUnitCostMod, facility->unit_cost_mod);
+    EXPECT_EQ(kConfiguredUnitCostMods, facility->unit_cost_mods);
   }
 };
 
@@ -47,9 +47,9 @@ TEST_F(UnitCostTest, AnnotationsAndDefaults) {
   EXPECT_DOUBLE_EQ(kDefaultInjectedUnitCostMod,
                  vars["unit_cost_mod"]["default"].asDouble());
   EXPECT_TRUE(vars["unit_cost_mods"]["default"].isArray());
-  EXPECT_DOUBLE_EQ(kDefaultInjectedUnitCost, facility->get_unit_cost());
-  EXPECT_DOUBLE_EQ(kDefaultInjectedUnitCostMod, facility->get_unit_cost_mod());
-  EXPECT_TRUE(facility->get_unit_cost_mods().empty());
+  EXPECT_DOUBLE_EQ(kDefaultInjectedUnitCost, facility->unit_cost);
+  EXPECT_DOUBLE_EQ(kDefaultInjectedUnitCostMod, facility->unit_cost_mod);
+  EXPECT_TRUE(facility->unit_cost_mods.empty());
 }
 
 TEST_F(UnitCostTest, ExplicitInputCloneAndRestart) {
@@ -72,22 +72,6 @@ TEST_F(UnitCostTest, ExplicitInputCloneAndRestart) {
 
   UnitCostTestFacility* restored = Restore(facility);
   ExpectValues(restored);
-}
-
-TEST_F(UnitCostTest, GettersAndSetters) {
-  UnitCostTestFacility* facility = Load("UnitCostTestFacility", "");
-
-  double new_cost = -4.0;
-  double new_cost_mod = 1.5;
-  std::vector<double> new_cost_mods = {2.0, 3.0};
-
-  facility->set_unit_cost(new_cost);
-  facility->set_unit_cost_mod(new_cost_mod);
-  facility->set_unit_cost_mods(new_cost_mods);
-
-  EXPECT_DOUBLE_EQ(new_cost, facility->get_unit_cost());
-  EXPECT_DOUBLE_EQ(new_cost_mod, facility->get_unit_cost_mod());
-  EXPECT_EQ(new_cost_mods, facility->get_unit_cost_mods());
 }
 
 }  // namespace
