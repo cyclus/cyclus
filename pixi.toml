@@ -12,7 +12,7 @@ cxx-compiler = ">=2.0.0,<3"
 # sync with the CMake version of pixi.lock
 cmake = ">=4.4.3,<5"
 make = ">=4.4.1,<5"
-pkg-config = ">=0.29.2,<0.30"
+pkgconf = ">=3.0.10,<4"
 # C++ library dependencies
 libboost-devel = ">=1.92.0,<2"
 coincbc = ">=2.10.13,<3"
@@ -139,7 +139,7 @@ pkg-config = "0.29.1.*"
 boost-cpp = "1.71.0.*"
 libxml2 = "2.9.10.*"
 libxmlpp = "2.40.1.*"
-python = "3.10.0.*"
+python = "3.10.*"
 # Python 3.10 on conda-forge requires 3.36.0
 sqlite = "3.36.0.*"
 hdf5 = "1.10.4.*"
@@ -160,6 +160,10 @@ numpy = "1.21.4.*"
 # The oldest pandas on conda-forge for Python 3.10
 pandas = "1.3.4.*"
 pip = "20.0.2.*"
+# pytest 9.2.0 does not work with Python 3.10.0: its NodeId dataclass uses
+# slots=True with an init=False default, which CPython 3.10.0 does not set
+# (fixed in 3.10.1).
+pytest = "<9.2"
 # The same as in [dependencies]
 c-compiler = ">=2.0.0,<3"
 cxx-compiler = ">=2.0.0,<3"
@@ -167,7 +171,6 @@ cxx-compiler = ">=2.0.0,<3"
 make = "*"
 pcre = "*"
 pprintpp = "*"
-pytest = "*"
 setuptools = "*"
 websockets = "*"
 
