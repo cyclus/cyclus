@@ -993,10 +993,7 @@ cdef class _Resource:
         """Returns an untracked (not part of the simulation) copy of the resource.
         A cloned resource should never record anything in the output database.
         """
-        cdef _Resource co = Resource()
-        co.ptx = self.ptx.get().Clone()
-        copy = co
-        return copy
+        return resource_ptr_to_py(self.ptx.get().Clone())
 
     def record(self, lib._Context ctx):
         """Records the resource's state to the output database.  This method
@@ -1024,10 +1021,7 @@ cdef class _Resource:
         object.  Allows for things like ResBuf and Traders to split
         offers/requests of arbitrary resource implementation type.
         """
-        cdef _Resource res = Resource()
-        res.ptx = self.ptx.get().ExtractRes(quantity)
-        respy = res
-        return respy
+        return resource_ptr_to_py(self.ptx.get().ExtractRes(quantity))
 
 
 class Resource(_Resource):
@@ -1260,6 +1254,31 @@ class Product(_Product, Resource):
     """
 
 
+# dynamic_cast[] cannot be given a pointer type that is written with a '*'
+{% for resource in ts.resources %}
+ctypedef {{ ts.cython_type(resource) }}* {{ ts.funcname(resource) }}_ptr
+{% endfor %}
+
+
+cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] ptr):
+    """Wraps a resource in the Python class of its C++ type, which this finds
+    with ``dynamic_cast``, so that a material that is only known to be a
+    resource (e.g. one from an inventory snapshot) is still a ``Material`` in
+    Python. A resource of a type that is not in RESOURCES is wrapped as a
+    ``Resource``.
+    """
+    cdef _Resource res
+{% for resource in ts.resources %}
+    if dynamic_cast[{{ ts.funcname(resource) }}_ptr](ptr.get()) != NULL:
+        res = {{ ts.classname(resource) }}()
+        res.ptx = ptr
+        return res
+{% endfor %}
+    res = Resource()
+    res.ptx = ptr
+    return res
+
+
 #
 # Inventories block
 #
@@ -1452,15 +1471,8 @@ cdef class _{{tclassname}}:
         """Pops the resources from the buffer.
         For the version of this method which sets resources, see push_many().
         """
-        cdef _Resource x
-        cdef list v = []
-        cdef std_vector[shared_ptr[cpp_cyclus.Resource]] rs = self.ptx.ResValues()
-        for r in rs:
-            x = Resource()
-            x.ptx = r
-            v.append(x)
-        rtn = v
-        return rtn
+        cdef std_vector[shared_ptr[cpp_cyclus.Resource]] ptrs = self.ptx.ResValues()
+        return [resource_ptr_to_py(ptr) for ptr in ptrs]
 
     def pop(self, key):
         """Pops one {{rcname}} object from the store."""
@@ -2460,6 +2472,8 @@ cdef class _Material(_Resource):
 
 cdef class _Product(_Resource):
     pass
+
+cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] ptr)
 
 {% for t in ts.inventory_types %}
 {% set tclassname = ts.classname(t)%}
