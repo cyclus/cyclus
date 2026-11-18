@@ -1468,7 +1468,7 @@ cdef class _{{tclassname}}:
         return rtn
 
     def res_values(self):
-        """Pops the resources from the buffer.
+        """Returns the resources of the map, without removing them from it.
         For the version of this method which sets resources, see push_many().
         """
         cdef std_vector[shared_ptr[cpp_cyclus.Resource]] ptrs = self.ptx.ResValues()
@@ -1486,7 +1486,8 @@ cdef class _{{tclassname}}:
 
     def pop_all_res(self):
         """A consistent interface for popping all of the resources from the buffer.
-        For ResBuf, this is equivalent to self.res_values()
+        For ResMap, this is equivalent to self.res_values(), and so returns the
+        resources of the map without removing them from it.
         """
         return self.res_values()
 
