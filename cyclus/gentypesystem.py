@@ -1100,14 +1100,6 @@ cdef class _Material(_Resource):
         rtn = mat
         return rtn
 
-    def clone(self):
-        """Returns an untracked (not part of the simulation) copy of the material.
-        """
-        cdef _Material co = Material()
-        co.ptx = self.ptx.get().Clone()
-        copy = co
-        return copy
-
     def extract_qty(self, double quantity):
         """Same as ExtractComp with c = this->comp() and returns a Material,
         not a Resource.
@@ -1218,14 +1210,6 @@ cdef class _Product(_Resource):
                                                        str_py_to_cpp(quality)))
         rtn = prod
         return rtn
-
-    def clone(self):
-        """Returns an untracked (not part of the simulation) copy of the product.
-        """
-        cdef _Product co = Product()
-        co.ptx = self.ptx.get().Clone()
-        copy = co
-        return copy
 
     def extract(self, double qty):
         """Extracts the specified mass from this resource and returns it as a
