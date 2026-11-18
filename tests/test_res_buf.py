@@ -46,6 +46,23 @@ def test_pop_all_res_push_many(buf_type, res_type, new_res, new_other_res):
     assert buf.quantity == pytest.approx(qty1 + qty2)
 
 
+@pytest.mark.parametrize("buf_type,res_type,new_res,new_other_res",
+                         RES_BUF_CASES)
+def test_push_wrong_type(buf_type, res_type, new_res, new_other_res):
+    """Tests that a buffer only accepts resources of its type."""
+    buf = buf_type(init=True)
+    buf.capacity = 10.0
+
+    with pytest.raises(TypeError):
+        buf.push(new_other_res(1.0))
+    with pytest.raises(TypeError):
+        buf.push(None)
+    with pytest.raises(TypeError):
+        buf.push_many([new_other_res(1.0)])
+
+    assert len(buf) == 0
+
+
 @pytest.mark.parametrize("map_type,res_type,new_res",
                          [(ts.ResMapIntMaterial, ts.Material, new_material),
                           (ts.ResMapIntProduct, ts.Product, new_product)])

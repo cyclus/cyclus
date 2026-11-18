@@ -1367,12 +1367,8 @@ cdef class _{{tclassname}}:
         rtn = r
         return rtn
 
-    def push(self, _Resource r):
-        """Pushes a single resource object to the buffer. The resource has to
-        be a {{rcname}}, which the buffer checks, as resources that come from
-        the buffer of another type, or from an inventory snapshot, are only
-        known to be a Resource.
-        """
+    def push(self, _{{rcname}} r not None):
+        """Pushes a single {{rcname}} object to the buffer."""
         self.ptx.Push(r.ptx)
 
     def pop_all_res(self):
