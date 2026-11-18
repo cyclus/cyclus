@@ -1344,15 +1344,7 @@ cdef class _{{tclassname}}:
 
     def pop_n_res(self, int n):
         """Pops the specified number of resources from the buffer."""
-        cdef _Resource x
-        cdef list v = []
-        cdef cpp_cyclus.ResVec rs = self.ptx.PopNRes(n)
-        for r in rs:
-            x = Resource()
-            x.ptx = r
-            v.append(x)
-        rtn = v
-        return rtn
+        return self.pop_n(n)
 
     def peek(self):
         """Returns the next resource in line to be popped from the buffer
