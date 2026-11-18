@@ -850,9 +850,9 @@ cdef extern from "toolkit/res_buf.h" namespace "cyclus::toolkit":
         shared_ptr[T] Pop()
         shared_ptr[T] PopBack()
         void Push(shared_ptr[Resource]) except +
-        # cannot overload template and non-template functions in Cython.
-        # it is probably bad design on Cyclus's part anyway.
-        #void Push[B](vector[B])
+        # Cython cannot overload a template and a non-template function, so
+        # the template Push[B](vector[B]) is declared under another name.
+        void PushVec "Push"(vector[shared_ptr[Resource]]) except +
 
 cdef extern from "toolkit/res_map.h" namespace "cyclus::toolkit":
 

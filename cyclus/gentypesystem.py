@@ -1398,10 +1398,12 @@ cdef class _{{tclassname}}:
 
     def push_many(self, rs):
         """A consistent interface for pushing many resources into the buffer.
-        For ResBuf, this iteratively calls push().
+        For ResBuf, this pushes all of them at once, and so none of them if one
+        cannot be pushed. The exception is a resource that is in rs more than
+        once, which is pushed twice, until ResBuf::Push() of a vector in C++
+        checks for it.
         """
-        for r in rs:
-            self.push(r)
+        self.ptx.PushVec(resources_to_cpp(rs, _{{rcname}}))
 
 {% elif ts.norms[t][0] == 'cyclus::toolkit::ResMap' %}
 {% set k = ts.norms[t][1] %}
