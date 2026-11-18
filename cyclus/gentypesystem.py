@@ -1263,6 +1263,24 @@ cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] ptr):
     return res
 
 
+cdef std_vector[shared_ptr[cpp_cyclus.Resource]] resources_to_cpp(
+        resources, type res_type) except *:
+    """Converts resources to a vector of C++ pointers, after checking that
+    every one of them is a res_type, so that a buffer is left unchanged when
+    one of them is not.
+    """
+    cdef std_vector[shared_ptr[cpp_cyclus.Resource]] cpp_rs
+    for res in resources:
+        if not isinstance(res, res_type):
+            # The extension types are the public classes with a leading
+            # underscore (e.g. _Material for Material), so strip it to report
+            # the name that users know
+            raise TypeError(f"expected a {res_type.__name__.lstrip('_')}, "
+                            f"not {type(res).__name__}")
+        cpp_rs.push_back((<_Resource> res).ptx)
+    return cpp_rs
+
+
 #
 # Inventories block
 #
@@ -1474,11 +1492,7 @@ cdef class _{{tclassname}}:
         """A consistent interface for pushing many resources into the buffer.
         For ResMap, this calls ResValues(vals).
         """
-        cdef std_vector[shared_ptr[cpp_cyclus.Resource]] cpp_rs = \
-            std_vector[shared_ptr[cpp_cyclus.Resource]]()
-        for r in rs:
-            cpp_rs.push_back((<_Resource> r).ptx)
-        self.ptx.ResValues(cpp_rs)
+        self.ptx.ResValues(resources_to_cpp(rs, _{{rcname}}))
 
 {% endif %}
 
@@ -2454,6 +2468,8 @@ cdef class _Product(_Resource):
     pass
 
 cdef object resource_ptr_to_py(shared_ptr[cpp_cyclus.Resource] ptr)
+cdef std_vector[shared_ptr[cpp_cyclus.Resource]] resources_to_cpp(
+        resources, type res_type) except *
 
 {% for t in ts.inventory_types %}
 {% set tclassname = ts.classname(t)%}

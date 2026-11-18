@@ -1276,13 +1276,9 @@ cdef cpp_cyclus.Inventories inventories_to_cpp(object pyinvs):
     """Converts a dict of lists of resources to inventories."""
     cdef cpp_cyclus.Inventories invs = cpp_cyclus.Inventories()
     cdef std_string name
-    cdef std_vector[shared_ptr[cpp_cyclus.Resource]] value
     for pyname, pyvalue in pyinvs.items():
         name = str_py_to_cpp(pyname)
-        value = std_vector[shared_ptr[cpp_cyclus.Resource]]()
-        for r in pyvalue:
-            value.push_back((<ts._Resource> r).ptx)
-        invs[name] = value
+        invs[name] = ts.resources_to_cpp(pyvalue, ts._Resource)
     return invs
 
 

@@ -63,6 +63,23 @@ def test_push_wrong_type(buf_type, res_type, new_res, new_other_res):
     assert len(buf) == 0
 
 
+@pytest.mark.parametrize("map_type,new_other_res",
+                         [(ts.ResMapIntMaterial, new_product),
+                          (ts.ResMapIntProduct, new_material)])
+def test_res_map_push_many_wrong_type(map_type, new_other_res):
+    """Tests that a resource map only accepts resources of its type."""
+    res_map = map_type(init=True)
+
+    with pytest.raises(TypeError,
+                       match=r"expected a (Material|Product), not "):
+        res_map.push_many([new_other_res(1.0)])
+    with pytest.raises(TypeError,
+                       match=r"expected a (Material|Product), not "):
+        res_map.push_many([None])
+
+    assert len(res_map) == 0
+
+
 @pytest.mark.parametrize("map_type,res_type,new_res",
                          [(ts.ResMapIntMaterial, ts.Material, new_material),
                           (ts.ResMapIntProduct, ts.Product, new_product)])
