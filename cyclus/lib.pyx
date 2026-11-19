@@ -1266,16 +1266,9 @@ cdef object agent_to_py(cpp_cyclus.Agent* a_ptx, object ctx):
 cdef dict inventories_to_py(cpp_cyclus.Inventories& invs):
     """Converts inverories map to a dict of lists of Resources."""
     cdef dict pyinvs = {}
-    cdef list value
-    cdef ts._Resource r
     for name_value in invs:
         name = std_string_to_py(name_value.first)
-        value = []
-        for x in name_value.second:
-            r = ts.Resource()
-            r.ptx = x
-            value.append(r)
-        pyinvs[name] = value
+        pyinvs[name] = [ts.resource_ptr_to_py(ptr) for ptr in name_value.second]
     return pyinvs
 
 
@@ -1283,13 +1276,9 @@ cdef cpp_cyclus.Inventories inventories_to_cpp(object pyinvs):
     """Converts a dict of lists of resources to inventories."""
     cdef cpp_cyclus.Inventories invs = cpp_cyclus.Inventories()
     cdef std_string name
-    cdef std_vector[shared_ptr[cpp_cyclus.Resource]] value
     for pyname, pyvalue in pyinvs.items():
         name = str_py_to_cpp(pyname)
-        value = std_vector[shared_ptr[cpp_cyclus.Resource]]()
-        for r in pyvalue:
-            value.push_back((<ts._Resource> r).ptx)
-        invs[name] = value
+        invs[name] = ts.resources_to_cpp(pyvalue, ts._Resource)
     return invs
 
 
