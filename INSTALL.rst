@@ -19,26 +19,63 @@ Installation
 ************
 .. website_include_start
 
-Before going further with the installation procedure be sure you have installed
-all the required dependencies. We have provided detailed
-instructions `for installing those dependencies for the major supported systems`_.
+Installation with Pixi
+----------------------
 
-
-Default Installation
---------------------
-
-Run the install script:
+The recommended way to build Cyclus from source is with `Pixi
+<https://pixi.prefix.dev/>`_.
+The repository is a Pixi workspace driven by a Pixi manifest (``pixi.toml``)
+that provides all of the Cyclus dependencies from conda-forge for Linux (x86-64)
+and macOS (Apple Silicon and x86-64), with the exact versions recorded in the
+``pixi.lock`` lock file.
+The only thing you need to install yourself is Pixi.
+Build Cyclus and install it into the ``install`` directory of the workspace
+(which keeps the Pixi environment itself unmodified) with:
 
 .. code-block:: console
-  
+
+  pixi run build
+
+Any additional arguments are passed on to ``install.py``, e.g.
+``pixi run build -j 4 --parallel --allow-milps``.
+
+The dependencies that are only needed for the tests are in a separate ``test``
+environment, which Pixi selects automatically for the test tasks.
+After building, run the tests with:
+
+.. code-block:: console
+
+  pixi run test
+
+To uninstall, build, and test in one step run ``pixi run start``.
+
+Use ``pixi shell`` to get a shell with the environment activated, which also
+puts the installed ``cyclus`` on ``PATH``.
+To uninstall Cyclus, which removes the ``install`` directory, run
+``pixi run uninstall``.
+Run ``pixi task list`` to see all of the tasks of the workspace.
+
+Installation with install.py
+----------------------------
+
+To build Cyclus with dependencies that you have installed yourself, e.g. with
+the package manager of your system, first be sure you have installed all the
+required dependencies.
+We have provided detailed instructions `for installing those dependencies for
+the major supported systems`_.
+
+Then run the install script:
+
+.. code-block:: console
+
   python3 install.py
 
 If you successfully followed the instruction above, the cyclus binary has been
-generated and placed in the  ``~/.local/`` in your home directory. 
+generated and placed in the  ``~/.local/`` in your home directory.
 You need to add ``~/.local/bin`` to the front of your ``$PATH``:
 
 .. code-block:: console
-  
+
   echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
   source ~/.bashrc
 
@@ -70,58 +107,58 @@ flags:
 
 .. list-table::
 
-  * - ``-h, --help``                              
-    - show the help message and exit                                                                   
+  * - ``-h, --help``
+    - show the help message and exit
 
-  * - ``--build-dir BUILD_DIR``                   
-    - where to place the build directory                                                               
+  * - ``--build-dir BUILD_DIR``
+    - where to place the build directory
 
-  * - ``--uninstall``                             
-    - uninstall                       
+  * - ``--uninstall``
+    - uninstall
 
   * - ``--allow-milps``
-    - build with COIN solvers                                                                  
+    - build with COIN solvers
 
-  * - ``--no-update``                             
-    - do not update the hash in version.cc                                                             
+  * - ``--no-update``
+    - do not update the hash in version.cc
 
-  * - ``--clean-build``                           
-    - attempt to remove the build directory before building                                            
+  * - ``--clean-build``
+    - attempt to remove the build directory before building
 
-  * - ``-j THREADS, --threads``                   
-    - THREADS the number of threads to use in the make step                                            
+  * - ``-j THREADS, --threads``
+    - THREADS the number of threads to use in the make step
 
-  * - ``--prefix PREFIX``                         
-    - the relative path to the installation directory                                                  
+  * - ``--prefix PREFIX``
+    - the relative path to the installation directory
 
-  * - ``--config-only``                           
-    - only configure the package, do not build or install                                              
+  * - ``--config-only``
+    - only configure the package, do not build or install
 
-  * - ``--build-only``                            
-    - only build the package, do not install                                                           
+  * - ``--build-only``
+    - only build the package, do not install
 
-  * - ``--test``                                  
-    - run tests after  building                                                                        
+  * - ``--test``
+    - run tests after  building
 
-  * - ``--coin-root COIN_ROOT``                   
-    - the relative path to the Coin-OR libraries directory                                             
+  * - ``--coin-root COIN_ROOT``
+    - the relative path to the Coin-OR libraries directory
 
-  * - ``--boost-root BOOST_ROOT``                 
-    - the relative path to the Boost libraries directory                                               
+  * - ``--boost-root BOOST_ROOT``
+    - the relative path to the Boost libraries directory
 
-  * - ``--hdf5-root HDF5_ROOT``                   
-    - the path to the HDF5 libraries directory                                                         
+  * - ``--hdf5_root HDF5_ROOT``
+    - the path to the HDF5 libraries directory
 
-  * - ``--cmake-prefix-path CMAKE_PREFIX_PATH``   
-    - the cmake prefix path for use with FIND_PACKAGE, FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros 
+  * - ``--cmake-prefix-path CMAKE_PREFIX_PATH``
+    - the cmake prefix path for use with FIND_PACKAGE, FIND_PATH, FIND_PROGRAM, or FIND_LIBRARY macros
 
-  * - ``--build-type BUILD_TYPE``                 
-    - change the CMAKE_BUILD_TYPE     
+  * - ``--build-type BUILD_TYPE``
+    - change the CMAKE_BUILD_TYPE
 
-  * - ``--data-model-version``        
+  * - ``--data-model-version``
     - sets the data model version number
 
-  * - ``--code_coverage``
+  * - ``--code-coverage``
     - Enable code coverage analysis using gcov/lcov
 
   * - ``--fast``
@@ -129,12 +166,12 @@ flags:
 
   * - ``--slow``
     - Will NOT try to compile from assembly, if possible. This is slower as it must compile from source.
-          
-  * - ``-D VAR``                                  
+
+  * - ``-D VAR``
     - set environment variable(s).
 
   * - ``--parallel``
-    - enable support for OpenMP directives                                                          
+    - enable support for OpenMP directives
 
 
 For example, if you have installed coin-Cbc from source or otherwise have it
@@ -155,11 +192,10 @@ If you are ``CMake`` aficionado you can also install Cyclus without using the
 
 .. code-block:: console
 
-  mkdir build
-  cd build
-  cmake .. -DCMAKE_INSTALL_PREFIX=~/.local/
-  make
-  make install
+  cmake -DCMAKE_INSTALL_PREFIX=~/.local/ -S . -B build
+  cmake build -LH
+  cmake --build build --clean-first --parallel <number of threads>
+  cmake --install build
 
 As usual you can customize your cmake installation using the proper cmake flag.
 All cmake variables can be listed using: ``cmake -LAH``.
@@ -167,58 +203,27 @@ The main variables used are:
 
 .. list-table::
 
-  * - ``COIN_ROOT_DIR`` 
-    - set Coin-OT library directory 
+  * - ``COIN_ROOT_DIR``
+    - set Coin-OT library directory
 
-  * - ``BOOST_ROOT``    
+  * - ``BOOST_ROOT``
     - set Boost libraries directory
 
-  * - ``HDF5_ROOT``     
+  * - ``HDF5_ROOT``
     - set HDF5 root directory
 
-  * - ``HDF5_LIBRARIES`` 
+  * - ``HDF5_LIBRARIES``
     - set HDF5 libraries path
 
-  * - ``HDF5_LIBRARY_DIRS`` 
+  * - ``HDF5_LIBRARY_DIRS``
     - set HDF5 library directory
 
-  * - ``HDF5_INCLUDE_DIRS`` 
+  * - ``HDF5_INCLUDE_DIRS``
     - set HDF5 include directory
 
 All variables can be set using ``-DMY_VARIABLE=MY_VARIABLES_VALUE``.
 
 .. website_custom_end
-
-Note on Building Cyclus with Pixi
----------------------------------
-
-The repository is a `Pixi <https://pixi.sh>`_ workspace (``pixi.toml``) that
-provides all of the Cyclus dependencies from conda-forge for Linux (x86-64) and
-macOS (Apple Silicon and Intel), with the exact versions recorded in
-``pixi.lock``. With Pixi installed, build Cyclus and install it into the
-``install`` directory of the workspace (which keeps the Pixi environment itself
-unmodified) with:
-
-.. code-block:: console
-
-  pixi run build
-
-Any additional arguments are passed on to ``install.py``, e.g.
-``pixi run build -j 4 --parallel --allow-milps``.
-
-The dependencies that are only needed for the tests are in a separate ``test``
-environment, which Pixi selects automatically for the test tasks. After
-building, run the tests with:
-
-.. code-block:: console
-
-  pixi run test
-
-To uninstall, build, and test in one step run ``pixi run start``.
-
-Use ``pixi shell`` to get a shell with the environment activated, which also
-puts the installed ``cyclus`` on ``PATH``. To uninstall Cyclus, which removes
-the ``install`` directory, run ``pixi run uninstall``.
 
 
 *************
