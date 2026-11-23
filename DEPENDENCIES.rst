@@ -65,6 +65,29 @@ Installing Dependencies
 Cyclus dependencies can either be installed manually or using an operating system's package
 manager.
 
+Installing Dependencies with Pixi
+---------------------------------
+
+The Cyclus repository is a `Pixi <https://pixi.prefix.dev/>`_ workspace driven
+by a Pixi manifest (``pixi.toml``) that provides all of the dependencies needed
+to build and test Cyclus, including Coin-Cbc and the Python dependencies, from
+conda-forge for Linux (x86-64) and macOS (Apple Silicon and x86-64).
+This is the recommended way to get the dependencies, as Pixi installs them into
+an environment in the repository and nothing has to be installed on the system
+other than Pixi itself.
+Pixi installs the dependencies automatically when you build Cyclus with
+``pixi run build`` (see the `Cyclus Installation Guide <INSTALL.rst>`_).
+
+The ``minimum`` environment of the workspace has the minimum versions of the
+dependencies listed above, and Cyclus is built and tested in it on Linux
+(x86-64) in CI.
+To build and test Cyclus in it run:
+
+.. code-block:: console
+
+  pixi run build-minimum
+  pixi run test-minimum
+
 Installing Dependencies (Linux and Unix)
 ----------------------------------------
 
@@ -201,6 +224,10 @@ in the future.
 
 Installing Dependencies (Mac OSX)
 ---------------------------------
+
+*The instructions below are for installing the dependencies with MacPorts.*
+*On macOS we recommend* `Installing Dependencies with Pixi`_ *instead, which is
+tested in CI on both Apple Silicon and x86-64 Macs.*
 
 Cyclus archetype development is not fully supported on Mac.  Nonetheless,
 because there are some use cases which require installation from source, we have
