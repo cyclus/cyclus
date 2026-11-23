@@ -56,7 +56,14 @@ Reviewing a Pull Request
 Running Tests
 =============
 
-You can run the tests yourself using:
+If you build Cyclus with Pixi (see the `Cyclus Installation Guide
+<INSTALL.rst>`_), run all of the tests of Cyclus with:
+
+.. code-block:: console
+
+  $ pixi run test
+
+You can also run the tests yourself using:
   - for Cyclus:
 
     .. code-block:: console
