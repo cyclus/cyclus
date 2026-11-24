@@ -525,7 +525,8 @@ ENDIF(NOT CYCLUS_DOC_ONLY)
 ##############################################################################################
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
-SET(DOC_SOURCE_DIR "${CYCLUS_SOURCE_DIR}")
+# The generated headers and sources of libcyclus are in the build tree
+SET(DOC_SOURCE_DIR "${CYCLUS_SOURCE_DIR}" "${CYCLUS_BINARY_DIR}/src")
 SET(DOC_INPUT_DIR "${CYCLUS_DOC_DIR}")
 SET(DOC_OUTPUT_DIR "${CMAKE_BINARY_DIR}/doc")
 
