@@ -7,14 +7,15 @@ FILL_BUF, WRITE, VAL_TO_BUF_H, VAL_TO_BUF, and BUF_TO_VAL. Each of these
 generates a different section of Hdf5 backend code. All are invoked by
 src/CMakeLists.txt prior to C++ compilation. However, for debugging purposes,
 each section can be printed individually by passing that section's identifier
-as a command line argument. The entry point for each of these generation
+as a command line argument, followed by the path to the dbtypes.json file
+that the build generates. The entry point for each of these generation
 routines is the function main_XXXX, where XXXX is a generation option.
 
 Example
 -------
 To generate the code found in src/hdf5_back.cc::Query, use
 
-    $ python3 hdf5_back_gen.py QUERY
+    $ python3 hdf5_back_gen.py QUERY <build dir>/share/cyclus/dbtypes.json
 
 """
 import os
@@ -2758,12 +2759,11 @@ def main_buf_to_val():
     output += CPPGEN.visit(block)
     return output
 
-def setup():
+def setup(dbtypes_json):
     global NOT_VL
     global MAIN_DISPATCH
 
-    with open(os.path.join(os.path.dirname(__file__), '..', 'share',
-                       'dbtypes.json')) as f:
+    with open(dbtypes_json) as f:
         raw_table = resolve_unicode(json.load(f))
 
     version = ""
@@ -2844,12 +2844,12 @@ def setup():
 
 def main():
     try:
-        gen_instruction = sys.argv[1]
-    except:
-        raise ValueError("No generation instruction provided")
+        gen_instruction, dbtypes_json = sys.argv[1:]
+    except ValueError:
+        raise ValueError("usage: hdf5_back_gen.py GEN_INSTRUCTION DBTYPES_JSON")
 
     # Setup for global util dictionaries
-    setup()
+    setup(dbtypes_json)
 
     # Dispatch to requested generation function
     function = MAIN_DISPATCH[gen_instruction]

@@ -65,6 +65,11 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CYCLUS_CMAKE_DIR "${PROJECT_SOURCE_DIR}/cmake")
     SET(CYCLUS_PYSOURCE_DIR "${PROJECT_SOURCE_DIR}/cyclus")
 
+    # The files of share/ are downloaded and generated into the directory of the
+    # build tree that Env::nuc_data() falls back on when Cyclus is not installed.
+    SET(CYCLUS_SHARE_BINARY_DIR "${CYCLUS_BINARY_DIR}/share/cyclus")
+    SET(CYCLUS_DBTYPES_JSON "${CYCLUS_SHARE_BINARY_DIR}/dbtypes.json")
+
     # set cycpp var
     SET(CYCPP "${CYCLUS_CLI_DIR}/cycpp.py")
 

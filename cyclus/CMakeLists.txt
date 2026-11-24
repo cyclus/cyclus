@@ -11,6 +11,7 @@ CONFIGURE_FILE(system.py.in "${CMAKE_CURRENT_SOURCE_DIR}/system.py" @ONLY)
 message(STATUS "Generating Type System API for Python")
 EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/gentypesystem.py
     "--src-dir=${CMAKE_CURRENT_SOURCE_DIR}"
+    "--dbtypes-json=${CYCLUS_DBTYPES_JSON}"
     "--data-model-version=${DATA_MODEL_VERSION}"
     "--verbose"
     RESULT_VARIABLE res_var)
