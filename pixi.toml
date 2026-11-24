@@ -77,9 +77,6 @@ CYCLUS_INSTALL_PREFIX = "$PIXI_PROJECT_ROOT/install"
 # The build directory is per Pixi environment, as CMake records the absolute
 # paths of the compilers and of cmake itself in it at configure time, and so a
 # build directory can only be reused from the environment that configured it.
-# It has to be directly under the top level of the repository, as the build
-# refers to the sources relative to it (e.g. ../cyclus/system.py in
-# cli/sidecar.py).
 CYCLUS_BUILD_DIR = "$PIXI_PROJECT_ROOT/build-$PIXI_ENVIRONMENT_NAME"
 PATH = "$CYCLUS_INSTALL_PREFIX/bin:$PATH"
 # Relocate the Python user site, which is where CMakeLists.txt installs the

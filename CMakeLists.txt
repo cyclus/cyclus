@@ -71,7 +71,12 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CYCLUS_DBTYPES_JSON "${CYCLUS_SHARE_BINARY_DIR}/dbtypes.json")
 
     # set cycpp var
-    SET(CYCPP "${CYCLUS_CLI_DIR}/cycpp.py")
+    # cycpp.py is run from a copy in the build tree, as the archetypes of this
+    # repository import the generated sidecar.py from its directory with
+    # '#pragma cyclus exec'.
+    CONFIGURE_FILE("${CYCLUS_CLI_DIR}/cycpp.py" "${CYCLUS_BINARY_DIR}/cli/cycpp.py" COPYONLY)
+    CONFIGURE_FILE("${CYCLUS_CLI_DIR}/sidecar.py.in" "${CYCLUS_BINARY_DIR}/cli/sidecar.py" @ONLY)
+    SET(CYCPP "${CYCLUS_BINARY_DIR}/cli/cycpp.py")
 
     # set cython post-processor var
     SET(CYTHON_POST_PROCESSOR "${CYCLUS_CLI_DIR}/post-process-cython.py")
