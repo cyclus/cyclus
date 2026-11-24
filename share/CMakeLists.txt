@@ -3,8 +3,10 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5")
 else()
     message("-- Downloading https://raw.githubusercontent.com/cyclus/data/main/cyclus_nuc_data.h5 to "
         "'${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5'...")
-    file(DOWNLOAD "https://raw.githubusercontent.com/cyclus/data/main/cyclus_nuc_data.h5"
-        "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5" SHOW_PROGRESS)
+    # Fails the configure step if the download fails, so that the build does
+    # not continue without the data file.
+    cyclus_download("https://raw.githubusercontent.com/cyclus/data/main/cyclus_nuc_data.h5"
+        "${CMAKE_CURRENT_SOURCE_DIR}/cyclus_nuc_data.h5")
     message("-- ...download complete!")
 endif()
 
