@@ -7,10 +7,10 @@ INCLUDE_DIRECTORIES(${CYCLUS_CORE_INCLUDE_DIRS})
 #
 # First things first, code-generation
 #
-CONFIGURE_FILE(system.py.in "${CMAKE_CURRENT_SOURCE_DIR}/system.py" @ONLY)
+CONFIGURE_FILE(system.py.in "${CMAKE_CURRENT_BINARY_DIR}/system.py" @ONLY)
 message(STATUS "Generating Type System API for Python")
 EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/gentypesystem.py
-    "--src-dir=${CMAKE_CURRENT_SOURCE_DIR}"
+    "--out-dir=${CMAKE_CURRENT_BINARY_DIR}"
     "--dbtypes-json=${CYCLUS_DBTYPES_JSON}"
     "--data-model-version=${DATA_MODEL_VERSION}"
     "--verbose"
@@ -23,6 +23,14 @@ ENDIF()
 # Build cython files
 #
 file(GLOB CYCLUS_CYTHON_FILES "${CYCLUS_PYSOURCE_DIR}/*.pyx")
+list(APPEND CYCLUS_CYTHON_FILES "${CMAKE_CURRENT_BINARY_DIR}/typesystem.pyx")
+
+# typesystem.pyx, typesystem.pxd, and cpp_typesystem.pxd are generated into
+# the cyclus/ directory of the build tree, which the ReplicatePythonSourceTree
+# target makes a complete copy of the cyclus package. Cython looks up
+# "cimport cyclus.<module>" in the cyclus/ directory next to the file it
+# compiles and then in that of each of its include directories.
+set(CYTHON_FLAGS ${CYTHON_FLAGS} -I "${PROJECT_BINARY_DIR}")
 
 set_source_files_properties(${CYCLUS_CYTHON_FILES}
     PROPERTIES CYTHON_IS_CXX TRUE)
@@ -35,6 +43,7 @@ foreach(file ${CYCLUS_CYTHON_FILES})
     get_filename_component(name ${file} NAME_WE)
     set(targ "py_${name}_")
     cython_add_module(${targ} ${file})
+    add_dependencies(${targ} ReplicatePythonSourceTree)
     target_link_libraries(${targ} PRIVATE dl ${LIBS} cyclus)
     set_target_properties(${targ} PROPERTIES LINKER_LANGUAGE CXX
                                              OUTPUT_NAME ${name}

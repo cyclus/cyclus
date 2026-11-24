@@ -2648,8 +2648,9 @@ def parse_args(argv):
     parser.add_argument('--verbose', default=False, action='store_true',
                         dest='verbose',
                         help="whether to give extra information at run time.")
-    parser.add_argument('--src-dir', default='.', dest='src_dir',
-                        help="the local source directory, default '.'")
+    parser.add_argument('--out-dir', default='.', dest='out_dir',
+                        help="the directory to write the generated files to, "
+                             "default '.'")
     parser.add_argument('--test-dir', default='tests', dest='test_dir',
                         help="the local tests directory, default 'tests'")
     parser.add_argument('--build-dir', default='build', dest='build_dir',
@@ -2666,11 +2667,10 @@ def parse_args(argv):
                         dest='typesystem_pxd',
                         help="the name of the Cython typesystem wrapper header, "
                              "default 'typesystem.pxd'")
-    dbtd = os.path.join(os.path.dirname(__file__), '..', 'share', 'dbtypes.json')
-    parser.add_argument('--dbtypes-json', default=dbtd,
+    parser.add_argument('--dbtypes-json', default=None,
                         dest='dbtypes_json',
                         help="the path to dbtypes.json file, "
-                             "default " + dbtd)
+                             "default the one of the installed Cyclus")
     parser.add_argument('--data-model-version', default=None,
                         dest='data_model_version',
                         help="The Cyclus API version to target."
@@ -2683,7 +2683,7 @@ def setup(ns):
     """Ensure that we are ready to perform code generation. Returns typesystem."""
     if not os.path.exists(ns.build_dir):
         os.mkdir(ns.build_dir)
-    if not os.path.isfile(ns.dbtypes_json):
+    if ns.dbtypes_json is None or not os.path.isfile(ns.dbtypes_json):
         try:
             instdir = safe_output(['cyclus', '--install-path'])
         except (subprocess.CalledProcessError, OSError):
@@ -2726,7 +2726,7 @@ def code_gen(ts, ns):
              (typesystem_pxd, ns.typesystem_pxd),]
     for func, basename in cases:
         s = func(ts, ns)
-        fname = os.path.join(ns.src_dir, basename)
+        fname = os.path.join(ns.out_dir, basename)
         orig = None
         if os.path.isfile(fname):
             with io.open(fname, 'r') as f:

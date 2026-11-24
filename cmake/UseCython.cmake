@@ -108,7 +108,11 @@ function( compile_pyx _name generated_file )
     # Get the include directories.
     get_source_file_property( pyx_location ${pyx_file} LOCATION )
     get_filename_component( pyx_path ${pyx_location} PATH )
-    get_directory_property( cmake_include_directories DIRECTORY ${pyx_path} INCLUDE_DIRECTORIES )
+    # Use the include directories of the directory that defines the target,
+    # not of the directory of the .pyx file: the generated typesystem.pyx is
+    # in the build tree, and get_directory_property(DIRECTORY) only accepts
+    # a binary directory from CMake 3.19 on (the minimum is 3.16).
+    get_directory_property( cmake_include_directories INCLUDE_DIRECTORIES )
     list( APPEND cython_include_directories ${cmake_include_directories} )
     list( APPEND pyx_locations "${pyx_location}" )
 
