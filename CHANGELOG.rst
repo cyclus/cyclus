@@ -6,6 +6,10 @@ Since last release
 ====================
 
 **Added:**
+* Added a "Developing Archetypes" section to ``README.rst`` on setting up an environment for developing archetypes with ``cycstub``, against either a nightly build of Cyclus from the ``https://prefix.dev/cyclus/nightly`` channel or Cyclus built from source (#2012)
+* Added a "Building Cyclus from Source" section to ``README.rst`` on building and testing Cyclus with the Pixi workspace (#2012)
+* Added an "Installing Dependencies with Pixi" section to ``DEPENDENCIES.rst``, which also describes the ``minimum`` environment of the Pixi workspace (#2012)
+* Added ``pixi run test`` to the "Running Tests" section of ``CONTRIBUTING.rst`` (#2012)
 * Added a Dependabot configuration (``.github/dependabot.yml``) that checks weekly for updates of the GitHub Actions used in the workflows and groups them into a single pull request (#2009)
 * Added concurrency groups to the build, MacOS build, and code coverage workflows so that a new push cancels superseded in-progress runs (#1984)
 * Added a Pixi workspace (``pixi.toml``, ``pixi.lock``) for development on Linux and MacOS (#1984)
@@ -47,6 +51,10 @@ Since last release
 * Introduced a definition of "stocked" for a resource buffer, which is a threshold quantity that can be set by the user (#)
 
 **Changed:**
+* Changed the quick installation of ``README.rst`` from installing Miniconda to installing the conda-forge package of Cyclus with Pixi or conda (#2012)
+* Replaced the instructions for building Cycamore from source in ``README.rst``, which assumed that Cyclus was installed in ``~/.local``, with a pointer to the Cycamore repository (#2012)
+* Made the installation with the Pixi workspace the recommended installation of ``INSTALL.rst``, ahead of the installation with ``install.py`` (#2012)
+* Recommended the Pixi workspace over MacPorts for installing the dependencies on macOS in ``DEPENDENCIES.rst`` (#2012)
 * Replaced the deprecated ``pkg-config`` with ``pkgconf`` in the Pixi workspace, and listed the minimum version of Python as 3.10.x in ``DEPENDENCIES.rst`` (#2011)
 * Updated the GitHub Actions of the workflows to their latest versions (#2009)
 * Set the maximum CMake policy version of Cyclus to 4.4 with the ``cyclus_cmake_policy_max`` macro, so that CMake uses the NEW behavior of the policies up to 4.4, and removed the version guard of policy CMP0135 (#1998)
@@ -84,6 +92,7 @@ Since last release
 
 **Fixed:**
 
+* Fixed the names of the ``--hdf5_root`` and ``--code-coverage`` flags of ``install.py`` in the custom installation table of ``INSTALL.rst``, which listed them as ``--hdf5-root`` and ``--code_coverage`` (#2012)
 * Fixed the configure step failing intermittently in CI when raw.githubusercontent.com answered a download of the PyNE decay and CRAM sources with an HTTP error, e.g. when the shared runners are rate limited. The downloads of ``cmake/DownloadAndExtract.cmake`` are now retried up to 5 times with a backoff, report the HTTP status of the failed response, and remove the partial file of a failed attempt. The download of ``cyclus_nuc_data.h5`` in ``share/CMakeLists.txt``, which did not check whether it succeeded and so could leave an empty data file behind, now uses the same retries and fails the configure step if they all fail (#2015)
 * Fixed the tests of the ``minimum`` environment of the Pixi workspace failing as pytest 9.2.0 does not work with Python 3.10.0, which the SQLite 3.36.0 minimum holds the environment at. pytest is now capped below 9.2 in the ``minimum`` environment (#2011)
 * Fixed the installed ``query_backend.h`` failing to compile in archetype projects, including those generated with ``cycstub``, with Boost 1.86 or later unless they defined ``BOOST_VERSION_MINOR``. The header now checks the ``BOOST_VERSION`` macro of Boost, and the ``BOOST_VERSION_MINOR`` compile definition is removed. ``test_stubs`` now fails instead of being skipped when a stub project fails to build, and is only skipped when ``cmake`` or ``make`` is missing (#2008)
