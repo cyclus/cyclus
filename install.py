@@ -28,11 +28,13 @@ def check_windows_cmake(cmake_cmd):
         cmake_cmd = ' '.join(cmake_cmd)
 
 
-def update_describe():
-    root_dir = os.path.split(__file__)[0]
-    fname = os.path.join(root_dir, 'src', 'version.cc.in')
-    cmd = 'touch {0}'.format(fname)
-    subprocess.check_call(cmd.split(), shell=(os.name == 'nt'))
+def reconfigure(build_dir):
+    """Runs CMake again in a build directory that is already configured, so
+    that the build picks up changes that CMake only looks for when it is run,
+    e.g. new source files.
+    """
+    subprocess.check_call(['cmake', '.'], cwd=build_dir,
+                          shell=(os.name == 'nt'))
 
 
 def install_cyclus(args):
@@ -101,7 +103,7 @@ def install_cyclus(args):
         return
 
     if args.update:
-        update_describe()
+        reconfigure(args.build_dir)
 
     make_cmd = ['make']
     if args.threads:
@@ -139,7 +141,7 @@ def main():
     uninst = 'uninstall'
     parser.add_argument('--uninstall', action='store_true', help=uninst, default=False)
 
-    noupdate = 'do not update the hash in version.cc'
+    noupdate = 'do not run CMake again before building'
     parser.add_argument('--no-update', dest='update', action='store_false',
                         help=noupdate, default=True)
 
