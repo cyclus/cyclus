@@ -233,7 +233,7 @@ endif()
 download_platform("https://raw.githubusercontent.com/pyne/data/master" "decay"
                   ".cpp" ".s")
 fast_compile(decay.cpp "-O0" "-O0" "-O0")
-set_source_files_properties(decay.cpp PROPERTIES COMPILE_DEFINITIONS PYNE_IS_AMALGAMATED)
+set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/decay.cpp" PROPERTIES COMPILE_DEFINITIONS PYNE_IS_AMALGAMATED)
 
 # Add CRAM solver from PyNE
 download_platform("http://raw.githubusercontent.com/pyne/data/master" "cram"
@@ -251,7 +251,9 @@ FILE(GLOB h_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 FILE(GLOB hpp_files "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 FILE(GLOB public_hpp_files "${PROJECT_SOURCE_DIR}/include/*.hpp")
 SET(h_files ${h_files} ${hpp_files} ${public_hpp_files}
+    "${CMAKE_CURRENT_BINARY_DIR}/cram.h"
     "${CMAKE_CURRENT_BINARY_DIR}/cyc_limits.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/decay.h"
     "${CMAKE_CURRENT_BINARY_DIR}/hdf5_back.h"
     "${CMAKE_CURRENT_BINARY_DIR}/platform.h"
     "${CMAKE_CURRENT_BINARY_DIR}/version.h"

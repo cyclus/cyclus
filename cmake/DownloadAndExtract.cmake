@@ -42,21 +42,21 @@ function(cyclus_download _url _dest)
 endfunction()
 
 macro(download_and_extract _url _checkfile)
-  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_checkfile}")
+  if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${_checkfile}")
     # don't need to do anything
     message(STATUS "${_checkfile} exists, no need to download or extract!")
   else()
     get_filename_component(_base "${_url}" NAME)
     # download the file if we need to
-    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${_base}")
+    if(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/${_base}")
       message(STATUS "Downloading ${_url} -> ${_base}")
-      cyclus_download("${_url}" "${CMAKE_CURRENT_SOURCE_DIR}/${_base}"
+      cyclus_download("${_url}" "${CMAKE_CURRENT_BINARY_DIR}/${_base}"
                       TLS_VERIFY OFF)
     endif()
     # extract the file
     message(STATUS "Extracting ${_base}")
     execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf "${_base}"
-                    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+                    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
   endif()
 endmacro()
 
