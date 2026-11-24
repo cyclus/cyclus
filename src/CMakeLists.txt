@@ -11,10 +11,10 @@ if(PARALLEL)
 else()
   set(cyclus_is_parallel 0)
 endif(PARALLEL)
-CONFIGURE_FILE(platform.h.in "${CMAKE_CURRENT_SOURCE_DIR}/platform.h" @ONLY)
-CONFIGURE_FILE(version.cc.in "${CMAKE_CURRENT_SOURCE_DIR}/version.cc" @ONLY)
-CONFIGURE_FILE(version.h.in "${CMAKE_CURRENT_SOURCE_DIR}/version.h" @ONLY)
-CONFIGURE_FILE(cyc_limits.h.in "${CMAKE_CURRENT_SOURCE_DIR}/cyc_limits.h" @ONLY)
+CONFIGURE_FILE(platform.h.in "${CMAKE_CURRENT_BINARY_DIR}/platform.h" @ONLY)
+CONFIGURE_FILE(version.cc.in "${CMAKE_CURRENT_BINARY_DIR}/version.cc" @ONLY)
+CONFIGURE_FILE(version.h.in "${CMAKE_CURRENT_BINARY_DIR}/version.h" @ONLY)
+CONFIGURE_FILE(cyc_limits.h.in "${CMAKE_CURRENT_BINARY_DIR}/cyc_limits.h" @ONLY)
 
 SET(cyclus_install_dir "${CMAKE_INSTALL_PREFIX}")
 SET(cyclus_build_dir "${CYCLUS_BINARY_DIR}")
@@ -34,68 +34,68 @@ endif(DEFINED DEFAULT_ALLOW_MILPS)
 MESSAGE("-- default_allow_milps: ${default_allow_milps}")
 CONFIGURE_FILE(
     "${CMAKE_CURRENT_SOURCE_DIR}/env.cc.in"
-    "${CMAKE_CURRENT_SOURCE_DIR}/env.cc"
+    "${CMAKE_CURRENT_BINARY_DIR}/env.cc"
     @ONLY
     )
 
-EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "VAL_TO_BUF_H" OUTPUT_VARIABLE HDF5_BACK_CC_VAL_TO_BUF_H RESULT_VARIABLE res_var_h)
+EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "VAL_TO_BUF_H" "${CYCLUS_DBTYPES_JSON}" OUTPUT_VARIABLE HDF5_BACK_CC_VAL_TO_BUF_H RESULT_VARIABLE res_var_h)
 IF(NOT "${res_var_h}" STREQUAL "0")
   message(FATAL_ERROR "Process hdf5_back_gen.py 'VAL_TO_BUF_H' failed, result = '${res_var_h}'")
 ENDIF()
 
 CONFIGURE_FILE(
     "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.h.in"
-    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.h.gen"
+    "${CMAKE_CURRENT_BINARY_DIR}/hdf5_back.h.gen"
     @ONLY
     )
 copy_when_diff(
-    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.h.gen"
-    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/hdf5_back.h.gen"
+    "${CMAKE_CURRENT_BINARY_DIR}/hdf5_back.h"
     )
 
-EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "QUERY" OUTPUT_VARIABLE HDF5_BACK_CC_QUERY RESULT_VARIABLE res_var_q)
+EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "QUERY" "${CYCLUS_DBTYPES_JSON}" OUTPUT_VARIABLE HDF5_BACK_CC_QUERY RESULT_VARIABLE res_var_q)
 IF(NOT "${res_var_q}" STREQUAL "0")
   message(FATAL_ERROR "Process hdf5_back_gen.py 'QUERY' failed, result = '${res_var_q}'")
 ENDIF()
 
-EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "CREATE" OUTPUT_VARIABLE HDF5_BACK_CC_CREATE RESULT_VARIABLE res_var_c)
+EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "CREATE" "${CYCLUS_DBTYPES_JSON}" OUTPUT_VARIABLE HDF5_BACK_CC_CREATE RESULT_VARIABLE res_var_c)
 IF(NOT "${res_var_c}" STREQUAL "0")
   message(FATAL_ERROR "Process hdf5_back_gen.py 'CREATE' failed, result = '${res_var_c}'")
 ENDIF()
 
-EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "VL_DATASET" OUTPUT_VARIABLE HDF5_BACK_CC_VL_DATASET RESULT_VARIABLE res_var_v)
+EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "VL_DATASET" "${CYCLUS_DBTYPES_JSON}" OUTPUT_VARIABLE HDF5_BACK_CC_VL_DATASET RESULT_VARIABLE res_var_v)
 IF(NOT "${res_var_v}" STREQUAL "0")
   message(FATAL_ERROR "Process hdf5_back_gen.py 'VL_DATASET' failed, result = '${res_var_v}'")
 ENDIF()
 
-EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "FILL_BUF" OUTPUT_VARIABLE HDF5_BACK_CC_FILL_BUF RESULT_VARIABLE res_var_f)
+EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "FILL_BUF" "${CYCLUS_DBTYPES_JSON}" OUTPUT_VARIABLE HDF5_BACK_CC_FILL_BUF RESULT_VARIABLE res_var_f)
 IF(NOT "${res_var_f}" STREQUAL "0")
   message(FATAL_ERROR "Process hdf5_back_gen.py 'FILL_BUF' failed, result = '${res_var_f}'")
 ENDIF()
 
-EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "WRITE" OUTPUT_VARIABLE HDF5_BACK_CC_WRITE RESULT_VARIABLE res_var_w)
+EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "WRITE" "${CYCLUS_DBTYPES_JSON}" OUTPUT_VARIABLE HDF5_BACK_CC_WRITE RESULT_VARIABLE res_var_w)
 IF(NOT "${res_var_w}" STREQUAL "0")
   message(FATAL_ERROR "Process hdf5_back_gen.py 'WRITE' failed, result = '${res_var_w}'")
 ENDIF()
 
-EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "VAL_TO_BUF" OUTPUT_VARIABLE HDF5_BACK_CC_VAL_TO_BUF RESULT_VARIABLE res_var_vb)
+EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "VAL_TO_BUF" "${CYCLUS_DBTYPES_JSON}" OUTPUT_VARIABLE HDF5_BACK_CC_VAL_TO_BUF RESULT_VARIABLE res_var_vb)
 IF(NOT "${res_var_vb}" STREQUAL "0")
   message(FATAL_ERROR "Process hdf5_back_gen.py 'VAL_TO_BUF' failed, result = '${res_var_vb}'")
 ENDIF()
 
-EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "BUF_TO_VAL" OUTPUT_VARIABLE HDF5_BACK_CC_BUF_TO_VAL RESULT_VARIABLE res_var_bv)
+EXECUTE_PROCESS(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back_gen.py "BUF_TO_VAL" "${CYCLUS_DBTYPES_JSON}" OUTPUT_VARIABLE HDF5_BACK_CC_BUF_TO_VAL RESULT_VARIABLE res_var_bv)
 IF(NOT "${res_var_bv}" STREQUAL "0")
   message(FATAL_ERROR "Process hdf5_back_gen.py 'BUF_TO_VAL' failed, result = '${res_var_bv}'")
 ENDIF()
 
 CONFIGURE_FILE(
     "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc.in"
-    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc.gen"
+    "${CMAKE_CURRENT_BINARY_DIR}/hdf5_back.cc.gen"
     @ONLY
     )
 copy_when_diff(
-    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc.gen"
-    "${CMAKE_CURRENT_SOURCE_DIR}/hdf5_back.cc"
+    "${CMAKE_CURRENT_BINARY_DIR}/hdf5_back.cc.gen"
+    "${CMAKE_CURRENT_BINARY_DIR}/hdf5_back.cc"
     )
 ############################################################
 ############# end special configuration ####################
@@ -136,12 +136,12 @@ if(Cython_FOUND)
     foreach(file ${CYCLUS_CORE_CYTHON_FILES})
         message(STATUS "Cython Compiling ${file}")
         get_filename_component(name ${file} NAME_WE)
-        set(_generated_h "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc.h")
-        set(_generated_api "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc_api.h")
-        set(_generated_cc "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc.gen")
-        set(_h_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.h")
-        set(_api_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}_api.h")
-        set(_cc_file "${CMAKE_CURRENT_SOURCE_DIR}/${name}.cc")
+        set(_generated_h "${CMAKE_CURRENT_BINARY_DIR}/${name}.cc.h")
+        set(_generated_api "${CMAKE_CURRENT_BINARY_DIR}/${name}.cc_api.h")
+        set(_generated_cc "${CMAKE_CURRENT_BINARY_DIR}/${name}.cc.gen")
+        set(_h_file "${CMAKE_CURRENT_BINARY_DIR}/${name}.h")
+        set(_api_file "${CMAKE_CURRENT_BINARY_DIR}/${name}_api.h")
+        set(_cc_file "${CMAKE_CURRENT_BINARY_DIR}/${name}.cc")
         set_source_files_properties(${_cc_file} PROPERTIES GENERATED TRUE)
 
         EXECUTE_PROCESS(COMMAND ${CYTHON_EXECUTABLE} --cplus
@@ -154,7 +154,6 @@ if(Cython_FOUND)
         ENDIF()
 
         ADD_LIBRARY(${name} ${_cc_file})
-        SET(CythonModuleSrc ${CythonModuleSrc} ${_cc_file})
         SET_TARGET_PROPERTIES(${name} PROPERTIES
           OUTPUT_NAME "${name}"
           PREFIX ""
@@ -185,6 +184,8 @@ if(Cython_FOUND)
         copy_when_diff(${_generated_h} ${_h_file})
         copy_when_diff(${_generated_api} ${_api_file})
         copy_when_diff(${_generated_cc} ${_cc_file})
+        list(APPEND CYCLUS_GENERATED_HEADERS ${_generated_h} ${_generated_api}
+             ${_h_file} ${_api_file})
     endforeach()
 endif(Cython_FOUND)
 ###########################################################
@@ -195,7 +196,7 @@ endif(Cython_FOUND)
 ######### build libcyclus #######################################
 #################################################################
 
-INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}")
+INCLUDE_DIRECTORIES(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_BINARY_DIR}")
 
 set(CYCLUS_COIN_SRC
     "${CMAKE_CURRENT_SOURCE_DIR}/prog_solver.cc"
@@ -207,6 +208,7 @@ set(CYCLUS_COIN_SRC
 
 SET(CYCLUS_CORE_INCLUDE_DIRS ${CYCLUS_CORE_INCLUDE_DIRS}
     "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_BINARY_DIR}"
     PARENT_SCOPE
     )
 FILE(GLOB cc_files "${CMAKE_CURRENT_SOURCE_DIR}/[^_]*.cc")
@@ -215,12 +217,11 @@ foreach(ccfile ${CYCLUS_COIN_SRC})
 endforeach()
 list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/coin_helpers.cc)
 list(REMOVE_ITEM cc_files ${CMAKE_CURRENT_SOURCE_DIR}/prog_translator.cc)
-# The cython modules are built as their own shared libraries
-# We don't want them to be included in libcyclus.so
-if(Cython_FOUND)
-  list(REMOVE_ITEM cc_files ${CythonModuleSrc})
-endif()
-SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${cc_files})
+SET(CYCLUS_CORE_SRC ${CYCLUS_CORE_SRC} ${cc_files}
+    "${CMAKE_CURRENT_BINARY_DIR}/env.cc"
+    "${CMAKE_CURRENT_BINARY_DIR}/hdf5_back.cc"
+    "${CMAKE_CURRENT_BINARY_DIR}/version.cc"
+    )
 
 # Add Cyclus source files that use COIN, if we have COIN
 if(COIN_FOUND)
@@ -232,7 +233,7 @@ endif()
 download_platform("https://raw.githubusercontent.com/pyne/data/master" "decay"
                   ".cpp" ".s")
 fast_compile(decay.cpp "-O0" "-O0" "-O0")
-set_source_files_properties(decay.cpp PROPERTIES COMPILE_DEFINITIONS PYNE_IS_AMALGAMATED)
+set_source_files_properties("${CMAKE_CURRENT_BINARY_DIR}/decay.cpp" PROPERTIES COMPILE_DEFINITIONS PYNE_IS_AMALGAMATED)
 
 # Add CRAM solver from PyNE
 download_platform("http://raw.githubusercontent.com/pyne/data/master" "cram"
@@ -249,7 +250,15 @@ file(WRITE "${CMAKE_BINARY_DIR}/includes.txt" "${incdirs}")
 FILE(GLOB h_files "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 FILE(GLOB hpp_files "${CMAKE_CURRENT_SOURCE_DIR}/*.hpp")
 FILE(GLOB public_hpp_files "${PROJECT_SOURCE_DIR}/include/*.hpp")
-SET(h_files ${h_files} ${hpp_files} ${public_hpp_files})
+SET(h_files ${h_files} ${hpp_files} ${public_hpp_files}
+    "${CMAKE_CURRENT_BINARY_DIR}/cram.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/cyc_limits.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/decay.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/hdf5_back.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/platform.h"
+    "${CMAKE_CURRENT_BINARY_DIR}/version.h"
+    ${CYCLUS_GENERATED_HEADERS}
+    )
 
 INSTALL(FILES ${h_files} DESTINATION include/cyclus COMPONENT core)
 

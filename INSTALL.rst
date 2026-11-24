@@ -83,7 +83,7 @@ flags:
     - build with COIN solvers                                                                  
 
   * - ``--no-update``                             
-    - do not update the hash in version.cc                                                             
+    - do not run CMake again before building                                                           
 
   * - ``--clean-build``                           
     - attempt to remove the build directory before building                                            

@@ -25,7 +25,36 @@ MESSAGE("CY_LARGE_INT: ${CY_LARGE_INT}")
 MESSAGE("CY_LARGE_DOUBLE: ${CY_LARGE_DOUBLE}")
 MESSAGE("CY_NEAR_ZERO: ${CY_NEAR_ZERO}")
 
+# Cyclus 1.6.0 and earlier generated files into the source tree. Any that are
+# left over would be used in place of the ones that are now generated into the
+# build tree: a header is first looked for next to the file that includes it,
+# the source files are found with file(GLOB), and the Python files are copied
+# over the generated ones. So fail if there are any. This check can be removed
+# once checkouts that were built before this change are no longer expected.
+MACRO(cyclus_require_no_generated_files_in_source_tree)
+    FILE(GLOB _generated RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+        cyclus/cpp_typesystem.pxd cyclus/cycpp.py cyclus/system.py
+        cyclus/typesystem.pxd cyclus/typesystem.pyx
+        doc/doxygen.conf
+        share/cyclus_nuc_data.h5 share/dbtypes.json
+        src/*.gen src/*.s src/*.tar.gz src/*.cc.h src/*_api.h
+        src/cram.c src/cram.h src/cyc_limits.h src/decay.cpp src/decay.h
+        src/env.cc src/eventhooks.cc src/eventhooks.h src/hdf5_back.cc
+        src/hdf5_back.h src/platform.h src/pyinfile.cc src/pyinfile.h
+        src/pymodule.cc src/pymodule.h src/version.cc src/version.h
+        )
+    IF(_generated)
+        STRING(REPLACE ";" " " _generated "${_generated}")
+        MESSAGE(FATAL_ERROR "Files that an earlier build generated were found "
+            "in the source tree. They are now generated into the build "
+            "directory, and the ones in the source tree would be used in "
+            "place of them. Remove them with:\n"
+            "  cd ${CMAKE_CURRENT_SOURCE_DIR} && rm ${_generated}")
+    ENDIF()
+ENDMACRO()
+
 cyclus_require_out_of_source_build()
+cyclus_require_no_generated_files_in_source_tree()
 cyclus_require_cxx_support()
 
 IF(CODE_COVERAGE)
@@ -65,8 +94,18 @@ IF(NOT CYCLUS_DOC_ONLY)
     SET(CYCLUS_CMAKE_DIR "${PROJECT_SOURCE_DIR}/cmake")
     SET(CYCLUS_PYSOURCE_DIR "${PROJECT_SOURCE_DIR}/cyclus")
 
+    # The files of share/ are downloaded and generated into the directory of the
+    # build tree that Env::nuc_data() falls back on when Cyclus is not installed.
+    SET(CYCLUS_SHARE_BINARY_DIR "${CYCLUS_BINARY_DIR}/share/cyclus")
+    SET(CYCLUS_DBTYPES_JSON "${CYCLUS_SHARE_BINARY_DIR}/dbtypes.json")
+
     # set cycpp var
-    SET(CYCPP "${CYCLUS_CLI_DIR}/cycpp.py")
+    # cycpp.py is run from a copy in the build tree, as the archetypes of this
+    # repository import the generated sidecar.py from its directory with
+    # '#pragma cyclus exec'.
+    CONFIGURE_FILE("${CYCLUS_CLI_DIR}/cycpp.py" "${CYCLUS_BINARY_DIR}/cli/cycpp.py" COPYONLY)
+    CONFIGURE_FILE("${CYCLUS_CLI_DIR}/sidecar.py.in" "${CYCLUS_BINARY_DIR}/cli/sidecar.py" @ONLY)
+    SET(CYCPP "${CYCLUS_BINARY_DIR}/cli/cycpp.py")
 
     # set cython post-processor var
     SET(CYTHON_POST_PROCESSOR "${CYCLUS_CLI_DIR}/post-process-cython.py")
@@ -515,7 +554,8 @@ ENDIF(NOT CYCLUS_DOC_ONLY)
 ##############################################################################################
 
 # This is the directory that holds the doxygen doxyfile template (doxy.conf.in)
-SET(DOC_SOURCE_DIR "${CYCLUS_SOURCE_DIR}")
+# The generated headers and sources of libcyclus are in the build tree
+SET(DOC_SOURCE_DIR "${CYCLUS_SOURCE_DIR}" "${CYCLUS_BINARY_DIR}/src")
 SET(DOC_INPUT_DIR "${CYCLUS_DOC_DIR}")
 SET(DOC_OUTPUT_DIR "${CMAKE_BINARY_DIR}/doc")
 
