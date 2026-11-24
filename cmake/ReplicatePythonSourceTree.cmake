@@ -1,6 +1,6 @@
-# Note: when executed in the build dir, then CMAKE_CURRENT_SOURCE_DIR is the
-# build dir.
-file(COPY cli/cycpp.py DESTINATION cyclus)
+# Run from the source directory, with the build directory as the first
+# argument after the script (CMAKE_ARGV3).
+file(COPY cli/cycpp.py DESTINATION "${CMAKE_ARGV3}/cyclus")
 file(COPY cyclus setup.py pyproject.toml README.rst LICENSE.rst DESTINATION "${CMAKE_ARGV3}"
      FILES_MATCHING PATTERN "*.py"
                     PATTERN "*.pyi"
